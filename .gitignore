@@ -1,0 +1,8 @@
+# Course materials (lecture slides, past papers, transcripts) are not redistributed
+reference/
+
+# Caches / OS files
+.ruff_cache/
+__pycache__/
+*.pyc
+.DS_Store

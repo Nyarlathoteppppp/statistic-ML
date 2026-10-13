@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SML 期末复习</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/viz.css">
+</head>
+<body>
+<header class="app-header">
+  <button class="hbtn menu-btn" id="menu" type="button" aria-label="目录">☰ 目录</button>
+  <a class="brand" href="#/home">SML 期末复习</a>
+  <div class="crumb" id="crumb"></div>
+  <span class="spacer"></span>
+  <span class="progress-pill" id="progress"></span>
+  <div class="search-wrap"><input id="search" class="search" type="search" placeholder="搜索全站…" aria-label="搜索"><div id="search-results" class="search-results" hidden></div></div>
+  <a class="hbtn" href="#/primer" title="看不懂符号时点这里">符号</a>
+  <a class="hbtn" href="#/glossary" title="术语表">术语</a>
+  <button class="hbtn" id="fontsize" type="button" title="字号">字号</button>
+  <button class="hbtn" id="theme" type="button">☾ 深色</button>
+</header>
+<div class="shell">
+  <aside class="sidebar" id="nav" aria-label="课程目录"></aside>
+  <main class="main" id="main"></main>
+</div>
+
+<!-- Order matters: no ES modules (works from file://). -->
+<script src="vendor/katex/katex.min.js"></script>
+
+<!-- core algorithms (shared with Node tests) -->
+<script src="js/core/vc.js"></script>
+<script src="js/core/bandit.js"></script>
+<script src="js/core/cnn.js"></script>
+<script src="js/core/svm.js"></script>
+<script src="js/core/dsep.js"></script>
+<script src="js/core/elim.js"></script>
+<script src="js/core/cpt.js"></script>
+<script src="js/core/perceptron.js"></script>
+<script src="js/core/stats.js"></script>
+<script src="js/core/bayes.js"></script>
+<script src="js/core/experts.js"></script>
+<script src="js/core/kernel.js"></script>
+<script src="js/core/backprop.js"></script>
+
+<!-- UI framework -->
+<script src="js/ui/store.js"></script>
+<script src="js/ui/md.js"></script>
+<script src="js/ui/render.js"></script>
+<script src="js/ui/video.js"></script>
+<script src="js/ui/formula.js"></script>
+<script src="js/ui/quiz.js"></script>
+<script src="js/ui/app.js"></script>
+<script src="js/ui/chapter.js"></script>
+<script src="js/ui/review.js"></script>
+<script src="js/ui/terms.js"></script>
+<script src="js/ui/learn.js"></script>
+
+<!-- interactive modules & practice generators -->
+<script src="js/viz/plot.js"></script>
+<script src="js/viz/graph.js"></script>
+<script src="js/viz/learn.js"></script>
+<script src="js/viz/pgm.js"></script>
+<!-- wviz:start -->
+<script src="js/viz/w01.js"></script>
+<script src="js/viz/w02.js"></script>
+<script src="js/viz/w03.js"></script>
+<script src="js/viz/w05.js"></script>
+<script src="js/viz/w07.js"></script>
+<script src="js/viz/w09.js"></script>
+<script src="js/viz/w10.js"></script>
+<!-- wviz:end -->
+
+<!-- content -->
+<script src="data/catalog.js"></script>
+<script src="data/videos.js"></script>
+<script src="data/home.js"></script>
+<script src="data/primer.js"></script>
+<script src="data/types/T01.js"></script>
+<script src="data/types/T02.js"></script>
+<script src="data/types/T03.js"></script>
+<script src="data/types/T04.js"></script>
+<script src="data/types/T05.js"></script>
+<script src="data/types/T06.js"></script>
+<script src="data/types/T07.js"></script>
+<script src="data/types/T08.js"></script>
+<script src="data/types/T09.js"></script>
+<script src="data/types/T10_T12.js"></script>
+<script src="data/types/T13.js"></script>
+<script src="data/starters.js"></script>
+<script src="data/keywords.js"></script>
+<!-- lectures:start -->
+<script src="data/lectures/_lib.js"></script>
+<script src="data/lectures/L01.js"></script>
+<script src="data/lectures/L02.js"></script>
+<script src="data/lectures/L03.js"></script>
+<script src="data/lectures/L04.js"></script>
+<script src="data/lectures/L05.js"></script>
+<script src="data/lectures/L06.js"></script>
+<script src="data/lectures/L07.js"></script>
+<script src="data/lectures/L08.js"></script>
+<script src="data/lectures/L09.js"></script>
+<script src="data/lectures/L10.js"></script>
+<script src="data/lectures/L11.js"></script>
+<script src="data/lectures/L12.js"></script>
+<script src="data/lectures/L13.js"></script>
+<script src="data/lectures/L14.js"></script>
+<script src="data/lectures/L15.js"></script>
+<script src="data/lectures/L16.js"></script>
+<script src="data/lectures/L17.js"></script>
+<script src="data/lectures/L18.js"></script>
+<script src="data/lectures/L19.js"></script>
+<script src="data/lectures/L20.js"></script>
+<script src="data/lectures/L21.js"></script>
+<script src="data/lectures/L22.js"></script>
+<script src="data/chapters/w01.js"></script>
+<script src="data/chapters/w02.js"></script>
+<script src="data/chapters/w03.js"></script>
+<script src="data/chapters/w04.js"></script>
+<script src="data/chapters/w05.js"></script>
+<script src="data/chapters/w06.js"></script>
+<script src="data/chapters/w07.js"></script>
+<script src="data/chapters/w08.js"></script>
+<script src="data/chapters/w09.js"></script>
+<script src="data/chapters/w10.js"></script>
+<script src="data/chapters/w11.js"></script>
+<!-- lectures:end -->
+<script src="data/formulas.js"></script>
+<script src="data/tools.js"></script>
+<script src="data/terms.js"></script>
+<script src="data/glossary.js"></script>
+<script src="data/mock.js"></script>
+<script src="data/mock2.js"></script>
+
+<script>SML.app.start();</script>
+</body>
+</html>
