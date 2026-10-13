@@ -384,7 +384,7 @@ class DotProduct(StepScene):
 
         # -------------------------------------------------- Step 5: Link to Classifiers
         self.step(
-            r"现在把 $\mathbf u$ 当成分类器的权重向量，改名为 $\mathbf w=(3,1)$。因为 $\mathbf w'\mathbf x=\|\mathbf w\|\times$（$\mathbf x$ 在 $\mathbf w$ 方向上的影子），所有满足 $\mathbf w'\mathbf x=c$ 的点，影子长度都是 $c/\|\mathbf w\|$，于是排成一条和 $\mathbf w$ 垂直的直线（等值线）。图上画了三条：紫线 $\mathbf w'\mathbf x=0$（过原点）、黄线 $\mathbf w'\mathbf x=3$、青线 $\mathbf w'\mathbf x=6$。验证青线：$\mathbf x_A=(1.5,1.5)$ 给 $3\times1.5+1\times1.5=6$，$\mathbf x_B=(2,0)$ 给 $3\times2+1\times0=6$；两点的垂线落在同一点 $(1.8,\ 0.6)=0.6\times(3,1)$，影子都是 $6/\sqrt{10}\approx1.90$。黄线 $\mathbf w'\mathbf x-3=0$ 就是 decision boundary（决策边界）$\mathbf w'\mathbf x+b=0$，这里 $b=-3$；$\mathbf w$ 垂直于它，叫 normal vector（法向量）。右边的分类器 $\hat y=\sgn(\mathbf w'\mathbf x+b)$（$\sgn$ 是取正负号）：$\mathbf x$ 沿 $\mathbf w$ 的方向越过黄线，$\mathbf w'\mathbf x+b>0$，判正类；没越过，判负类。**线性分类器就是在问：$\mathbf x$ 沿法向量 $\mathbf w$ 的方向走了多远，有没有越过分界线。**",
+            r"现在把 $\mathbf u$ 当成分类器的权重向量，改名为 $\mathbf w=(3,1)$。因为 $\mathbf w'\mathbf x=\|\mathbf w\|\times$（$\mathbf x$ 在 $\mathbf w$ 方向上的影子），所有满足 $\mathbf w'\mathbf x=c$ 的点，影子长度都是 $c/\|\mathbf w\|$，于是排成一条和 $\mathbf w$ 垂直的直线（等值线）。图上画了三条：紫线 $\mathbf w'\mathbf x=0$（过原点）、黄线 $\mathbf w'\mathbf x=3$、青线 $\mathbf w'\mathbf x=6$。验证青线：$\mathbf x_A=(1.5,1.5)$ 给 $3\times1.5+1\times1.5=6$，$\mathbf x_B=(2,0)$ 给 $3\times2+1\times0=6$；两点的垂线落在同一点 $(1.8,\ 0.6)=0.6\times(3,1)$，影子都是 $6/\sqrt{10}\approx1.90$。黄线 $\mathbf w'\mathbf x-3=0$ 就是 decision boundary（决策边界）$\mathbf w'\mathbf x+b=0$，这里 $b=-3$；$\mathbf w$ 垂直于它，叫 normal vector（法向量）。右边的分类器 $\hat y=\sgn(\mathbf w'\mathbf x+b)$（$\sgn$ 是取正负号）：$\mathbf x$ 沿 $\mathbf w$ 的方向越过黄线，$\mathbf w'\mathbf x+b>0$，判正类；在黄线的反方向一侧，$\mathbf w'\mathbf x+b<0$，判负类（右边卡片最后两行）。**线性分类器就是在问：$\mathbf x$ 沿法向量 $\mathbf w$ 的方向走了多远，有没有越过分界线。**",
             '分类器 w′x + b = 0：本质是看 x 在 w 方向走多远',
             stage=4,
         )
@@ -464,9 +464,11 @@ class DotProduct(StepScene):
             T('• 同一条线上的点，w′x 都相同 (= c)', 16, TEAL),
             T('• 线性分类器就是在问：', 17, WHITE),
             T('  “x 沿法向量 w 走了多远？”', 18, YELLOW),
-            T('• 跨过分界线判为正类，未跨过为负类', 16, WHITE),
+            T('• 沿法向量 w 的方向越过分界线 ⇒ 正类；', 16, WHITE),
+            T('反方向 ⇒ 负类', 16, WHITE),
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.18)
         clf_body.move_to(P(372, 205), aligned_edge=LEFT)
+        clf_body[4].align_to(clf_body[3][1], LEFT)      # continuation line starts under the text, not the bullet
 
         clf_group = VGroup(clf_header, clf_eq, clf_body)
         clf_bg = BackgroundRectangle(clf_group, color=BG, fill_opacity=0.92, buff=0.14)

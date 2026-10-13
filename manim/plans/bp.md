@@ -24,7 +24,7 @@ Curiosity (Step 1: Can 2 sweeps really compute all marginals?) → Partial clari
 - **Visual**: Yellow pills fly along edges: leaves $x_5\to x_4$, $x_1\to x_2$, $x_3\to x_2$, then $x_2\to x_4$. Visited nodes fill `#5a4a16`.
 - **Math attached**: $m_{5\to4}=(4,3)$, $m_{1\to2}=(4,2)$, $m_{3\to2}=(3,2)$, $m_{2\to4}=(52,20)$, $x_4$ receives $(208,60)$.
 - **Short caption**: 第 1 阶段 collect：叶子把信息汇聚到根 x₄（黄色消息）
-- **Technical notes**: Pills park on collect side of edges (left/above).
+- **Technical notes**: Pills park on collect side of edges (left/above). 三片叶子的消息停好后，右下角 P(488, 300) 淡入图例框（DIM 描边）：黄字“每条消息 =（收件人热时，收件人冷时）”+ 灰字“例：m₅→₄ = (4, 3) ⇒ x₄ 热时 4，冷时 3”（按 c57 的“括号里是（热，冷）”），同时 Circumscribe 第一条消息 (4,3)；图例一直保留到最后一步。
 
 ### Step 3: 发：从根分发 (stage 2)
 - **Purpose**: Distribute phase begins — root sends outward to $x_5$ and $x_2$.

@@ -232,7 +232,7 @@ class Ucb(StepScene):
         # -----------------------------------------------------------------
         self.step(
             r'假设接下来把臂 3 连拉 12 次，奖励交替为 $1, 0, 1, 0, \dots$，看柱子怎么变。'
-            r'拉完后 $N_3 = 4+12 = 16$，12 次里有 6 次得 1，奖励总和 $2+6 = 8$，平均仍是 $8/16 = 0.500$；轮号 $t = 85+12 = 97$，$\ln 97 \approx 4.5747$。'
+            r'拉完后 $N_3 = 4+12 = 16$，12 次里有 6 次得 1，奖励总和 $2+6 = 8$，平均仍是 $8/16 = 0.500$（画面下方写着这个假设），所以蓝色的均值柱一动不动，变矮的只有黄色的 bonus；轮号 $t = 85+12 = 97$，$\ln 97 \approx 4.5747$。'
             r'臂 3 的 bonus 缩水到 $\sqrt{2\ln 97 / 16} \approx 0.756$，$Q_3 = 0.500 + 0.756 \approx 1.256$；'
             r'臂 2 也是 $N=16$，bonus 同样是 $0.756$，但平均更高，$Q_2 = 0.625 + 0.756 \approx 1.381$，反超臂 3'
             r'（其实 $N_3$ 到 12 时 $Q_2$ 就已更大、标签变绿，真跑 UCB 那一轮就会改拉臂 2；这里拉满 12 次是为了看清趋势）。'
@@ -241,7 +241,9 @@ class Ucb(StepScene):
             stage=3
         )
 
-        self.play(FadeOut(arm3_box), FadeOut(pick_badge), run_time=0.3)
+        # the assumption behind the 12 pulls: the mean stays 0.500, only the bonus can shrink
+        pulls_note = T('假设这 12 次里 6 次得奖（均值仍为 8/16 = 0.500）', 15, BLUE).move_to(P(505, 323))
+        self.play(FadeOut(arm3_box), FadeOut(pick_badge), FadeIn(pulls_note, shift=UP * 0.1), run_time=0.5)
 
         # Clean static objects before introducing continuous always_redraw
         self.remove(
@@ -306,7 +308,9 @@ class Ucb(StepScene):
 
         # Smooth parameter animation over 4.5 seconds
         self.play(tracker.animate.set_value(12.0), run_time=4.5)
-        self.wait(1.0)
+        self.play(Indicate(lbl_mu3, color=WHITE, scale_factor=1.35), Indicate(pulls_note, color=BLUE, scale_factor=1.05),
+                  run_time=0.8)
+        self.wait(0.4)
 
         # Highlight Arm 2 overtaking Arm 3
         final_top2 = top_mu2 - math.sqrt(2.0 * math.log(97.0) / 16.0) * SCALE_Y
@@ -352,6 +356,7 @@ class Ucb(StepScene):
             FadeOut(arm_titles),
             FadeOut(arm12_footers),
             FadeOut(legend),
+            FadeOut(pulls_note),
             run_time=0.7
         )
 

@@ -234,8 +234,8 @@ class BayesGrid(StepScene):
 
         # ---------------------------------------------------------------- Step 6: Bayes' rule formula
         self.step(
-            r'把人数换回概率，就是贝叶斯公式 $P(D\mid +)=\frac{P(+\mid D)P(D)}{P(+)}$。红色分子是“病人阳性”：$0.9\times0.01=0.009$。分母 $P(+)$ 是所有阳性的概率，用 sum rule（求和规则）拆成两条路相加：红色的病人阳性 $0.009$，加黄色的健康人假阳性 $0.05\times0.99=0.0495$，合计 $0.0585$。所以 $P(D\mid +)=\frac{0.009}{0.0585}\approx0.154$，和数方块的结果一样：乘以 2000 人，$0.009\times2000=18$，$0.0495\times2000=99$。**分母必须把“病人阳性”和“健康人假阳性”两条路都加上。**',
-            '贝叶斯公式：分子为病人阳性，分母为所有阳性之和',
+            r'把人数换回概率，就是贝叶斯公式 $P(D\mid +)=\frac{P(+\mid D)P(D)}{P(+)}$。红色分子 $P(+\mid D)P(D)=0.9\times0.01=0.009$ 是“患病且阳性”的 joint probability（联合概率）$P(+,D)$：注意 $0.9$ 只是 $P(+\mid D)$（病人里有多少阳性），乘上患病率 $P(D)=0.01$ 后才是“随便抽一人，既患病又阳性”的概率。分母 $P(+)$ 是所有阳性的概率，用 sum rule（求和规则）拆成两条路相加：$P(+)=P(+,D)+P(+,\neg D)$（分母下方那一行），即红色的患病且阳性 $0.009$，加黄色的健康但假阳性 $P(+\mid\neg D)P(\neg D)=0.05\times0.99=0.0495$，合计 $0.009+0.0495=0.0585$。所以 $P(D\mid +)=\frac{0.009}{0.0585}\approx0.154$，和数方块的结果一样：乘以 2000 人，$0.009\times2000=18$，$0.0495\times2000=99$。**分母必须把“患病且阳性”和“健康但假阳性”两条路都加上。**',
+            '分子：患病且阳性；分母：所有阳性 = 患病阳性 + 健康假阳性',
             stage=3,
         )
         # Assemble Bayes formula matching the colors of the two groups
@@ -259,9 +259,15 @@ class BayesGrid(StepScene):
             bayes_formula.move_to(P(465, 226))
 
         # Role annotations under/above terms
-        ann_num = T('病人里的阳性', 15, RED).next_to(num_tex, UP, buff=0.10)
-        ann_tp = T('病人阳性', 15, RED).next_to(den_tp, DOWN, buff=0.16)
-        ann_fp = T('健康假阳性', 15, YELLOW).next_to(den_fp, DOWN, buff=0.16)
+        ann_num = T('患病且阳性（联合概率）', 15, RED).next_to(num_tex, UP, buff=0.10)
+        ann_tp = T('患病且阳性', 15, RED)
+        ann_fp = T('健康但假阳性', 15, YELLOW)
+        ann_den = VGroup(ann_tp, T('+', 15, WHITE), ann_fp).arrange(RIGHT, buff=0.1).next_to(den_row, DOWN, buff=0.16)
+        # the same split in symbols: P(+) = P(+, D) + P(+, not D)
+        sum_rule = M([r'P(+)=', r'P(+,D)', r'+', r'P(+,\neg D)'], 19, WHITE)
+        sum_rule[1].set_color(RED)
+        sum_rule[3].set_color(YELLOW)
+        sum_rule.next_to(ann_den, DOWN, buff=0.16)
 
         final_summary = T('罕见病体检中：假阳性人数往往反超真阳性！', 15, WHITE).move_to(P(465, 304))
 
@@ -275,8 +281,8 @@ class BayesGrid(StepScene):
         self.play(
             FadeIn(bayes_formula),
             FadeIn(ann_num),
-            FadeIn(ann_tp),
-            FadeIn(ann_fp),
+            FadeIn(ann_den),
+            FadeIn(sum_rule),
             FadeIn(final_summary),
             run_time=1.0,
         )

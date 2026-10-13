@@ -298,7 +298,14 @@ class BetaCoin(StepScene):
             dash_length=0.08,
         )
         mle_dot = Dot(ax.c2p(0.70, 0), radius=0.06, color=ORANGE)
-        mle_tag = M(r'\hat{q}_{\text{MLE}} = 0.70', 15, ORANGE).next_to(ax.c2p(0.70, 0), DOWN, buff=0.34).shift(RIGHT * 0.42)
+        # MLE / mean tags sit one row BELOW the tick labels (clear of "0.6" / "0.8"), each hung on a short
+        # dashed leader that continues its estimate line below the axis
+        tags_top = x_labels.get_bottom()[1] - 0.14
+        mle_x = ax.c2p(0.70, 0)[0]
+        mle_tag = M(r'\hat{q}_{\text{MLE}} = 0.70', 17, ORANGE)
+        mle_tag.move_to([mle_x + 0.1 + mle_tag.width / 2, tags_top - mle_tag.height / 2, 0])
+        mle_lead = DashedLine(ax.c2p(0.70, 0) + DOWN * 0.08, np.array([mle_x, mle_tag.get_center()[1], 0.0]),
+                              color=ORANGE, stroke_width=1.4, dash_length=0.05)
 
         # 2. MAP: (9-1)/(9+5-2) = 8/12 = 2/3 approx 0.667 (Peak)
         map_line = DashedLine(
@@ -320,12 +327,16 @@ class BetaCoin(StepScene):
             dash_length=0.08,
         )
         mean_dot = Dot(ax.c2p(9.0 / 14.0, 0), radius=0.06, color=GREEN)
-        mean_tag = M(r'E[q] = \frac{9}{14} \approx 0.64', 15, GREEN).next_to(ax.c2p(9.0 / 14.0, 0), DOWN, buff=0.34).shift(LEFT * 0.42)
+        mean_x = ax.c2p(9.0 / 14.0, 0)[0]
+        mean_tag = M(r'E[q] = \frac{9}{14} \approx 0.64', 17, GREEN)
+        mean_tag.move_to([mean_x - 0.1 - mean_tag.width / 2, tags_top - mean_tag.height / 2, 0])
+        mean_lead = DashedLine(ax.c2p(9.0 / 14.0, 0) + DOWN * 0.08, np.array([mean_x, mean_tag.get_center()[1], 0.0]),
+                               color=GREEN, stroke_width=1.4, dash_length=0.05)
 
         estimates_axis_group = VGroup(
-            mle_line, mle_dot, mle_tag,
+            mle_line, mle_dot, mle_tag, mle_lead,
             map_line, map_dot, map_tag,
-            mean_line, mean_dot, mean_tag,
+            mean_line, mean_dot, mean_tag, mean_lead,
         )
 
         # Comparison card in right panel
@@ -351,9 +362,9 @@ class BetaCoin(StepScene):
         )
 
         self.play(
-            Create(mle_line), FadeIn(mle_dot), FadeIn(mle_tag),
+            Create(mle_line), FadeIn(mle_dot), FadeIn(mle_tag), FadeIn(mle_lead),
             Create(map_line), FadeIn(map_dot), FadeIn(map_tag),
-            Create(mean_line), FadeIn(mean_dot), FadeIn(mean_tag),
+            Create(mean_line), FadeIn(mean_dot), FadeIn(mean_tag), FadeIn(mean_lead),
             FadeIn(compare_card_group),
             run_time=1.4,
         )

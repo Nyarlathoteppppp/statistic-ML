@@ -11,7 +11,7 @@ with unnormalized sum = 268 = Z for each node.
 """
 
 from manim import (
-    BackgroundRectangle, Circle, DOWN, FadeIn, FadeOut, Indicate, LaggedStart, LEFT,
+    BackgroundRectangle, Circle, Circumscribe, DOWN, FadeIn, FadeOut, Indicate, LaggedStart, LEFT,
     Line, MarkupText, MathTex, NORMAL, ORIGIN, Rectangle, ReplacementTransform, RIGHT,
     RoundedRectangle, Scene, Text, Transform, UP, VGroup, config,
 )
@@ -174,7 +174,7 @@ class BeliefProp(StepScene):
 
         # Step 2: 收：叶子 → 根 (stage 1)
         self.step(
-            r'第 1 阶段 collect（收）：黄色消息从叶子流向 root $x_4$。**collect 就是 c56 以 $x_4$ 为查询节点的那次消元。** 三片叶子先同时发信：叶子没有别的来信，直接对打分表求和、把自己加掉（括号里依次是收件人取热、取冷）：$m_{5\to4}=(3+1,\ 1+2)=(4,3)$，$m_{1\to2}=(3+1,\ 1+1)=(4,2)$，$m_{3\to2}=(1+2,\ 1+1)=(3,2)$。$x_2$ 要等这两条信都到了才能往 $x_4$ 发，因为它的消息要把 $x_1,x_3$ 两侧的信息都带上：先逐项相乘 $(4\times3,\ 2\times2)=(12,4)$，再乘 $\psi_{24}$ 把 $x_2$ 加掉，$m_{2\to4}=(4\times12+1\times4,\ 1\times12+2\times4)=(52,20)$。最后 $x_4$ 收齐两条来信，逐项相乘得 $(52\times4,\ 20\times3)=(208,60)$。',
+            r'第 1 阶段 collect（收）：黄色消息从叶子流向 root $x_4$。**collect 就是 c56 以 $x_4$ 为查询节点的那次消元。** 三片叶子先同时发信：叶子没有别的来信，直接对打分表求和、把自己加掉（括号里依次是收件人取热、取冷，见右下角的图例）：$m_{5\to4}=(3+1,\ 1+2)=(4,3)$，$m_{1\to2}=(3+1,\ 1+1)=(4,2)$，$m_{3\to2}=(1+2,\ 1+1)=(3,2)$。$x_2$ 要等这两条信都到了才能往 $x_4$ 发，因为它的消息要把 $x_1,x_3$ 两侧的信息都带上：先逐项相乘 $(4\times3,\ 2\times2)=(12,4)$，再乘 $\psi_{24}$ 把 $x_2$ 加掉，$m_{2\to4}=(4\times12+1\times4,\ 1\times12+2\times4)=(52,20)$。最后 $x_4$ 收齐两条来信，逐项相乘得 $(52\times4,\ 20\times3)=(208,60)$。',
             '第 1 阶段 collect：叶子把信息汇聚到根 x₄（黄色消息）',
             stage=1,
         )
@@ -185,6 +185,15 @@ class BeliefProp(StepScene):
             ('x3', 'x2', '(3,2)', YELLOW, INK, -1),
         ]
         collect_pills1 = send_parallel(self, leaf_specs, run_time=0.85)
+
+        # Legend with the first messages: what the two numbers in a pill mean (c57 writes them as (热，冷))
+        leg1 = T('每条消息 =（收件人热时，收件人冷时）', 17, YELLOW)
+        leg2 = T('例：m₅→₄ = (4, 3) ⇒ x₄ 热时 4，冷时 3', 15, '#b8c0cc')
+        leg_txt = VGroup(leg1, leg2).arrange(DOWN, buff=0.1, aligned_edge=LEFT)
+        leg_box = RoundedRectangle(corner_radius=0.08, width=leg_txt.width + 0.3, height=leg_txt.height + 0.22,
+                                   stroke_color=DIM, stroke_width=1.5, fill_color=BG, fill_opacity=0.92)
+        legend = VGroup(leg_box, leg_txt.move_to(leg_box)).move_to(P(488, 300))
+        self.play(FadeIn(legend, shift=UP * 0.08), Circumscribe(collect_pills1[0], color=YELLOW, buff=0.06), run_time=0.6)
         self.play(
             node_circles['x1'].animate.set_fill('#5a4a16'),
             node_circles['x3'].animate.set_fill('#5a4a16'),

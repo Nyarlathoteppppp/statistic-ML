@@ -223,7 +223,7 @@ class Dsep(StepScene):
 
         # Step 5: Stage 3 删掉条件 A
         self.step(
-            r'第 ④ 步删掉条件集 $S=\{A\}$：已知节点 $A$ 消失，连着它的 4 条边也一起删掉，即 $E$—$A$、$B$—$A$、$A$—$L$ 和结婚边 $R$—$A$。结婚边 $E$—$B$ 不连着 $A$，所以留了下来（橙色虚线闪了一下）。**留下的 $E$—$B$，就是“观测了 $A$”留下的痕迹。**',
+            r'第 ④ 步删掉条件集 $S=\{A\}$：已知节点 $A$ 消失，连着它的 4 条边先闪红，再一起删掉，即 $E$—$A$、$B$—$A$、$A$—$L$ 和结婚边 $R$—$A$。结婚边 $R$—$A$ 虽然是刚连上的，可它的一端就是 $A$，所以和 $A$ 一起走（图上标着“与 A 相连，一并删掉”）；结婚边 $E$—$B$ 的两端是 $E$、$B$，不连着 $A$，所以留了下来（橙色虚线闪了一下）。**留下的 $E$—$B$，就是“观测了 $A$”留下的痕迹。**',
             '④ 删掉条件：删去 A 及 4 条边（R—A 一起没了，E—B 留下）',
             stage=3,
         )
@@ -231,6 +231,21 @@ class Dsep(StepScene):
         sub4 = T('A 的 4 条边全删（含 R—A）', 14, '#9fb3c8').next_to(t4_updated, DOWN, buff=0.04)
         VGroup(t4_updated, sub4).move_to(box4)
 
+        # First show WHICH edges go with A: its 4 edges turn red; the R-A marriage edge gets a note
+        why_ra_del = T('与 A 相连，一并删掉', 14, RED).move_to(why_ra)
+        self.play(
+            c_A.animate.set_stroke(RED, width=3.5),
+            line_EA.animate.set_color(RED),
+            line_BA.animate.set_color(RED),
+            line_AL.animate.set_color(RED),
+            ra_married.animate.set_color(RED).set_stroke(width=4.2),
+            Transform(why_ra, why_ra_del),
+            Transform(t4, t4_updated),
+            FadeIn(sub4),
+            run_time=0.8,
+        )
+        self.play(Indicate(ra_married, color=RED, scale_factor=1.06), Indicate(why_ra, color=RED), run_time=0.8)
+        self.wait(0.6)
         self.play(
             FadeOut(c_A),
             FadeOut(l_A),
@@ -240,9 +255,7 @@ class Dsep(StepScene):
             FadeOut(line_AL),
             FadeOut(ra_married),
             FadeOut(why_ra),
-            Transform(t4, t4_updated),
-            FadeIn(sub4),
-            run_time=1.0,
+            run_time=0.9,
         )
         self.play(Indicate(eb_married, color=ORANGE, scale_factor=1.05), Indicate(why_eb, color=YELLOW), run_time=0.8)
         self.wait(0.8)

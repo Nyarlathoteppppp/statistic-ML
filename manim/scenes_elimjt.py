@@ -5,7 +5,7 @@ set entries are variable indices, and edge weights count shared variables.
 """
 from manim import (
     Circle, Circumscribe, Create, DashedLine, Dot, FadeIn, FadeOut,
-    Indicate, Line, RoundedRectangle, Transform, VGroup,
+    Indicate, Line, RoundedRectangle, Transform, UP, VGroup,
 )
 from common import (
     BG, BLUE, GREEN, GREY, M, ORANGE, P, PURPLE, RED, StepScene,
@@ -65,9 +65,14 @@ class ElimJt(StepScene):
                             for u in nbrs], run_time=0.6)
             if fill is not None:
                 a, b = fill
-                edges[a, b] = DashedLine(P(*pos[a]), P(*pos[b]), color=PURPLE,
-                                         stroke_width=3.5, dash_length=px(6)).set_z_index(0)
-                self.play(Create(edges[a, b]), run_time=0.8)
+                fill_line = DashedLine(P(*pos[a]), P(*pos[b]), color=PURPLE,
+                                       stroke_width=3.5, dash_length=px(6)).set_z_index(0)
+                # small tag on the new edge, so it is not mistaken for the orange marriage edge
+                mid = (P(*pos[a]) + P(*pos[b])) / 2
+                fill_tag = T('+ fill-in', 15, PURPLE).move_to(mid + UP * px(13)).set_z_index(1)
+                self.play(Create(fill_line), run_time=0.8)
+                self.play(FadeIn(fill_tag, scale=0.8), run_time=0.4)
+                edges[a, b] = VGroup(fill_line, fill_tag)   # the tag dims together with its edge
             if existing is not None:
                 self.play(Indicate(edges[existing], color=YELLOW), run_time=0.6)
             # The record is made BEFORE the node is dimmed.
@@ -83,7 +88,7 @@ class ElimJt(StepScene):
             self.wait(1.2)
 
         self.step(
-            r'左边是已做过 moralization（道德化：共同孩子的父母连边，再去掉箭头）的无向图，边是 $12,13,24,34,35,45$，橙色虚线 $34$ 就是那条已有的结婚边；上方是消元顺序 $x_1\to x_2\to x_3\to x_4\to x_5$。这是 variable elimination（变量消元）在图上的记录方式：**消一个变量前，先把它当前的邻居两两连上，再把“它 + 邻居”记成一个 clique（团）。** 消 $x_1$（黄圈）：邻居 $x_2,x_3$ 闪动，两者之间缺边，于是补一条紫色的 fill-in edge（填补边）$23$，因为对 $x_1$ 求和后得到的新表同时依赖 $x_2,x_3$，它们从此被绑在一起。记下 $c_1=\{1,2,3\}$（数字是变量编号）：自己 1 个加邻居 2 个，共 $1+2=3$ 个变量；然后 $x_1$ 变灰，不再算邻居。',
+            r'左边是已做过 moralization（道德化：共同孩子的父母连边，再去掉箭头）的无向图，边是 $12,13,24,34,35,45$，橙色虚线 $34$ 就是那条已有的结婚边；上方是消元顺序 $x_1\to x_2\to x_3\to x_4\to x_5$。这是 variable elimination（变量消元）在图上的记录方式：**消一个变量前，先把它当前的邻居两两连上，再把“它 + 邻居”记成一个 clique（团）。** 消 $x_1$（黄圈）：邻居 $x_2,x_3$ 闪动，两者之间缺边，于是补一条紫色的 fill-in edge（填补边）$23$（线上标着“+ fill-in”，和橙色的结婚边区分开），因为对 $x_1$ 求和后得到的新表同时依赖 $x_2,x_3$，它们从此被绑在一起。记下 $c_1=\{1,2,3\}$（数字是变量编号）：自己 1 个加邻居 2 个，共 $1+2=3$ 个变量；然后 $x_1$ 变灰，不再算邻居。',
             '先连邻居，再记下自己和邻居', stage=0,
         )
         self.play(FadeIn(graph), FadeIn(order), FadeIn(header), FadeIn(note),

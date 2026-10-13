@@ -440,10 +440,10 @@ class BiasVariance(StepScene):
         )
 
         self.step(
-            r"**期望测试误差拆成三项：$\mathrm{E}[(Y-\hat f)^2] = \text{bias}^2 + \text{variance} + \sigma^2$。**"
+            r"**期望测试误差拆成三项：$\mathrm{E}[(Y-\hat f)^2] = \text{bias}^2 + \text{variance} + \mathrm{Var}[Y]$。**"
             r"上方公式里，$\text{bias}^2$ 是平均预测偏离真值的平方，$\text{variance}$ 是换数据时预测晃动的方差（标准差的平方），"
-            r"$\sigma^2$（本章写作 $\mathrm{Var}[Y]$）是数据本身的噪声，叫 irreducible error（不可约误差），任何模型都消不掉。"
-            r"中间是示意图：模型越复杂，黄线 $\text{bias}^2$ 越低、绿线 $\text{variance}$ 越高，加上灰色虚线 $\sigma^2$，红色的总误差通常呈 U 形。"
+            r"$\mathrm{Var}[Y]$ 是数据本身的噪声的方差，本例里就是第一步噪声标准差的平方 $\sigma^2$（公式下方注释写着 σ²），叫 irreducible error（不可约误差），任何模型都消不掉。"
+            r"中间是示意图：模型越复杂，黄线 $\text{bias}^2$ 越低、绿线 $\text{variance}$ 越高，加上灰色虚线 $\mathrm{Var}[Y]$，红色的总误差通常呈 U 形。"
             rf"下方是本例在 $x_0$ 处模拟 {N_SIM} 天的结果：1 次 ≈ {sim_err[1]:.2f}，3 次 ≈ {sim_err[3]:.2f}（最低），"
             rf"7 次 ≈ {sim_err[7]:.2f}，9 次 ≈ {sim_err[9]:.2f}：直线输在偏差，9 次输在方差，中间的 3 次最好。"
             rf"每个数都是三项相加（用未取整的偏差和标准差算；拿两位小数手算 1 次会得 $0.16$），以 7 次为例：${abs(sim_bias[7]):.2f}^2+{sim_sd[7]:.2f}^2+{SD}^2\approx{sim_err[7]:.2f}$。",
@@ -459,13 +459,13 @@ class BiasVariance(StepScene):
         term_plus1 = M(r'+', 28, WHITE).move_to(P(340, 68))
         term_var = M(r'\text{variance}', 28, GREEN).move_to(P(425, 68))
         term_plus2 = M(r'+', 28, WHITE).move_to(P(510, 68))
-        term_noise = M(r'\sigma^2', 28, GREY).move_to(P(555, 68))
+        term_noise = M(r'\mathrm{Var}[Y]', 28, GREY).move_to(P(560, 68))
         formula_row = VGroup(term_err, term_eq, term_bias, term_plus1, term_var, term_plus2, term_noise)
 
         role_err = T('期望测试误差', 15, WHITE).next_to(term_err, DOWN, buff=0.16)
         role_bias = T('平均偏得多远', 15, YELLOW).next_to(term_bias, DOWN, buff=0.16)
         role_var = T('换一份数据晃得多厉害', 15, GREEN).next_to(term_var, DOWN, buff=0.16)
-        role_noise = T('数据本身的噪声，谁也消不掉', 15, GREY).next_to(term_noise, DOWN, buff=0.16)
+        role_noise = T('数据噪声 σ²，谁也消不掉', 15, GREY).next_to(term_noise, DOWN, buff=0.16)
         roles = VGroup(role_err, role_bias, role_var, role_noise)
 
         # Schematic U-shaped curve plot
@@ -488,7 +488,7 @@ class BiasVariance(StepScene):
             return f_bias(u) + f_var(u) + 0.5
 
         c_noise = DashedLine(ax_u.c2p(0.8, 0.5), ax_u.c2p(9.2, 0.5), color=GREY, stroke_width=1.8, dash_length=0.1)
-        lbl_c_noise = M(r'\sigma^2', 20, GREY).next_to(ax_u.c2p(9.2, 0.5), RIGHT, buff=0.08)
+        lbl_c_noise = M(r'\mathrm{Var}[Y]', 20, GREY).next_to(ax_u.c2p(9.2, 0.5), RIGHT, buff=0.08)
 
         c_bias = ax_u.plot(f_bias, x_range=[0.8, 9.2], color=YELLOW, stroke_width=2.5)
         lbl_c_bias = M(r'\text{bias}^2', 22, YELLOW).next_to(ax_u.c2p(1.2, f_bias(1.2)), UR, buff=0.06)
@@ -527,7 +527,7 @@ class BiasVariance(StepScene):
         # Takeaway closing card
         # ----------------------------------------------------
         self.takeaway(
-            r"**简单模型高偏差、低方差，复杂模型低偏差、高方差。**Bias 是平均预测离真值多远（模型太简单时大），variance 是换训练集时预测晃多大（模型太复杂时大）。期望测试误差 $=\text{bias}^2+\text{variance}+\sigma^2$，其中 $\sigma^2$ 是谁也消不掉的噪声；调正则化强度、选模型复杂度，都是在找 U 形曲线的最低点。简答题常考：写出这个分解，并说明模型变简单或变复杂时哪一项变大。",
+            r"**简单模型高偏差、低方差，复杂模型低偏差、高方差。**Bias 是平均预测离真值多远（模型太简单时大），variance 是换训练集时预测晃多大（模型太复杂时大）。期望测试误差 $=\text{bias}^2+\text{variance}+\mathrm{Var}[Y]$，其中 $\mathrm{Var}[Y]$ 是谁也消不掉的噪声（本例为 $\sigma^2$）；调正则化强度、选模型复杂度，都是在找 U 形曲线的最低点。简答题常考：写出这个分解，并说明模型变简单或变复杂时哪一项变大。",
             [
                 '简单模型：高偏差、低方差；复杂模型：低偏差、高方差',
                 '测试误差 = bias² + variance + 噪声',
