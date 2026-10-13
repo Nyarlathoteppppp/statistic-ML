@@ -23,7 +23,7 @@ class Eigen(StepScene):
         plane = NumberPlane(x_range=[-26, 26, 1], y_range=[-18, 18, 1],
                             background_line_style={'stroke_color': BLUE, 'stroke_width': 1.6, 'stroke_opacity': 0.45},
                             axis_config={'stroke_color': '#9fb3c8', 'stroke_width': 2})
-        self.question(r'矩阵会把整个平面拉扯变形，大多数向量被拉扯后都会**转向**。那有没有一些方向，变换后**仍然躺在原来那条直线上**？这些方向就是本视频的主角。',
+        self.question(r'矩阵会把整个平面拉扯变形，大多数向量被拉扯后都会转向。那有没有一些方向，变换后**仍然躺在原来那条直线上**？这些方向就是本视频的主角。',
                       ['矩阵会把整个平面拉扯变形', '有没有哪些方向，变换后仍然在原来那条直线上？'])
         self.play(FadeIn(faint), Create(plane), run_time=1.6)
         self.M = np.eye(2)
@@ -109,7 +109,7 @@ class Eigen(StepScene):
         self.play(FadeIn(k1), FadeIn(k2))
         self.wait(1)
 
-        self.step(r'这两个方向就是 $\mathbf A$ 的 **eigenvector（特征向量）**：非零向量满足 $\mathbf A\mathbf v=\lambda\mathbf v$，倍数 $\lambda$ 叫 **eigenvalue（特征值）**——正数是同向缩放，负数是反向，$0$ 是压成零向量。这里 $\lambda=3$ 和 $1$。$\mathbf A$ 是**对称**矩阵且两个特征值都 $>0$，所以它是 **PD（positive definite，正定）**——正文 ⑤ 会正式定义；特征值都不为 $0$，所以可逆。',
+        self.step(r'这两个方向就是 $\mathbf A$ 的 eigenvector（特征向量），倍数叫 eigenvalue（特征值）：**变换后仍在原直线上的非零向量满足 $\mathbf A\mathbf v=\lambda\mathbf v$，$\lambda$ 就是拉伸倍数。**正数是同向缩放，负数是反向，$0$ 是压成零向量。这里 $\lambda=3$ 和 $1$。$\mathbf A$ 是对称矩阵且两个特征值都 $>0$，所以它是 PD（positive definite，正定）——正文 ⑤ 会正式定义；特征值都不为 $0$，所以可逆。',
                   '不转向的方向 = 特征向量，拉伸倍数 = 特征值：A·v = λ·v', stage=3)
         eq = M([r'\mathbf A\mathbf v', '=', r'\lambda\mathbf v'], 56, YELLOW)
         fa, fl = eq[0], eq[2]
@@ -122,7 +122,7 @@ class Eigen(StepScene):
         self.play(Flash(np.array([3, 3, 0]), color=TEAL), Flash(np.array([1, -1, 0]), color=PURPLE))
         self.wait(1.2)
 
-        self.step(r"换成 $\mathbf B=\begin{bmatrix}1&1\\1&1\end{bmatrix}$：方向 $(1,-1)$ 的特征值是 **0**——整个平面被**压扁成一条线**。压扁后很多不同的点落在同一位置，没法“撤销”，所以 $\mathbf B$ **没有逆**。c04 的“米 / 厘米两列”让 $\mathbf X'\mathbf X$ 不可逆，就是这种情况。",
+        self.step(r"换成 $\mathbf B=\begin{bmatrix}1&1\\1&1\end{bmatrix}$：方向 $(1,-1)$ 的特征值是 0——整个平面被压扁成一条线。**压扁后很多不同的点落在同一位置，没法“撤销”，所以 $\mathbf B$ 没有逆。**c04 的“米 / 厘米两列”让 $\mathbf X'\mathbf X$ 不可逆，就是这种情况。",
                   'λ = 0：方向 (1,−1) 被压成零，平面塌成一条线 ⇒ 无法撤销（不可逆）', stage=4)
         self.play(FadeOut(k1), FadeOut(k2), FadeOut(f), FadeOut(fb))
         morph(I2, 1.0)
@@ -134,7 +134,7 @@ class Eigen(StepScene):
                   FadeIn(VGroup(BackgroundRectangle(k2, color=BG, fill_opacity=0.85, buff=0.1), k2)))
         self.wait(2)
 
-        self.takeaway(r"**一句话**：特征向量是变换后仍在原来直线上的方向，特征值是它在这条线上被拉伸的倍数，$\mathbf A\mathbf v=\lambda\mathbf v$。只要有一个特征值是 $0$，就有方向被压成零，矩阵不可逆——$\mathbf X'\mathbf X$ 不可逆就是这种情况。（$(1,1)$ 仍是特征向量，被拉成 $(2,2)$，$\lambda=2$。）",
+        self.takeaway(r"一句话：**特征向量是变换后仍在原来直线上的方向，特征值是它在这条线上被拉伸的倍数**，$\mathbf A\mathbf v=\lambda\mathbf v$。只要有一个特征值是 $0$，就有方向被压成零，矩阵不可逆——$\mathbf X'\mathbf X$ 不可逆就是这种情况。（$(1,1)$ 仍是特征向量，被拉成 $(2,2)$，$\lambda=2$。）",
                       ['特征向量：变换后仍在原来直线上的方向', '特征值 λ：在这条线上被拉伸的倍数　A·v = λ·v',
                        '有 λ = 0 ⇒ 某个方向被压成零 ⇒ 矩阵不可逆'])
 
@@ -207,7 +207,7 @@ class MsgPass(StepScene):
             self.play(FadeIn(c), run_time=0.08)
         self.wait(1)
 
-        self.step(r'换个做法：**从叶子开始**。$x_5$ 只连着 $x_4$，所以先把 $x_5$ 的两种情况加掉——$x_4$ 热时 $\psi_{45}(\text{热},\text{热})+\psi_{45}(\text{热},\text{冷})=3+1=4$，冷时 $1+2=3$。打包成一条**消息** $m_{5\to4}=(4,3)$ 送给 $x_4$。',
+        self.step(r'换个做法：**从叶子开始**。$x_5$ 只连着 $x_4$，所以先把 $x_5$ 的两种情况加掉——$x_4$ 热时 $\psi_{45}(\text{热},\text{热})+\psi_{45}(\text{热},\text{冷})=3+1=4$，冷时 $1+2=3$。打包成一条消息（message） $m_{5\to4}=(4,3)$ 送给 $x_4$。',
                   '聪明办法：叶子 x₅ 先把自己加掉，结果打包成“消息”送给 x₄', stage=1)
         self.play(FadeOut(cells), run_time=0.4)
         self.play(nodes['x5'].animate.set_fill('#5a4a16'), run_time=0.3)
@@ -258,7 +258,7 @@ class MsgPass(StepScene):
         self.play(FadeIn(T('热 0.78', 22, RED).next_to(hot, UP, buff=0.1)), FadeIn(T('冷 0.22', 22, BLUE).next_to(cold, UP, buff=0.1)))
         self.wait(2)
 
-        self.takeaway(r'**一句话**：消息就是“把一片叶子（或一整棵子树）提前加掉”后剩下的两个数。每条边只传一次消息，到达 $x_4$ 后相乘再归一化，结果和暴力枚举 16 + 16 种组合**完全一样**——这就是 variable elimination / sum-product 在树上的样子。',
+        self.takeaway(r'一句话：**消息就是“把一片叶子（或一整棵子树）提前加掉”后剩下的两个数。**每条边只传一次消息，到达 $x_4$ 后相乘再归一化，结果和暴力枚举 16 + 16 种组合完全一样——这就是 variable elimination / sum-product 在树上的样子。',
                       ['消息 = 把一棵子树提前加掉后剩下的（热，冷）两个数', '每条边只传一次：先乘来信，再把自己加掉，送给下一个',
                        '结果与暴力枚举完全相同，但计算量只随房间数线性增长'])
 
@@ -327,7 +327,7 @@ class Backprop(StepScene):
             pa, pb = P(*NN[a]), P(*NN[b])
             return pill(text, RED, INK, 18).move_to(pa + (pb - pa) * t + DOWN * down)
 
-        self.step(r'**前向第 1 步**：每个隐藏单元先算加权和 $r_j=\sum_i x_iv_{ij}$。$r_1=0.5\cdot1+1\cdot1=1.5$，$r_2=-0.5\cdot1+1\cdot1=0.5$。ReLU 让正数原样通过：$u_1=1.5$，$u_2=0.5$。',
+        self.step(r'前向第 1 步：每个隐藏单元先算加权和 $r_j=\sum_i x_iv_{ij}$。$r_1=0.5\cdot1+1\cdot1=1.5$，$r_2=-0.5\cdot1+1\cdot1=0.5$。ReLU 让正数原样通过：$u_1=1.5$，$u_2=0.5$。',
                   '前向：每个隐藏单元 = 输入的加权和，再过 ReLU（正数原样通过）', stage=0)
         run_flows([('x0', 'u1'), ('x1', 'u1'), ('x0', 'u2'), ('x1', 'u2')], BLUE)
         val['u1'] = T('r₁ = 1.5 → u₁ = 1.5', 20, YELLOW).move_to(P(300, 218))
@@ -335,14 +335,14 @@ class Backprop(StepScene):
         self.play(FadeIn(val['u1']), FadeIn(val['u2']))
         self.wait(0.8)
 
-        self.step(r'**前向第 2 步**：输出 $s=w_0u_0+w_1u_1+w_2u_2=0\cdot1+1\cdot1.5+(-1)\cdot0.5=1$，恒等输出 $z=s=1$。损失 $L=\frac12(z-y)^2=\frac12(1-0)^2=0.5$。',
+        self.step(r'前向第 2 步：输出 $s=w_0u_0+w_1u_1+w_2u_2=0\cdot1+1\cdot1.5+(-1)\cdot0.5=1$，恒等输出 $z=s=1$。损失 $L=\frac12(z-y)^2=\frac12(1-0)^2=0.5$。',
                   '输出 = 隐藏值的加权和 z = 1；和真实值 y = 0 比，损失 L = 0.5', stage=1)
         run_flows([('u0', 'z'), ('u1', 'z'), ('u2', 'z')], BLUE)
         val['z'] = T('z = 1，L = 0.5', 20, YELLOW).move_to(P(520, 220))
         self.play(FadeIn(val['z']))
         self.wait(0.8)
 
-        self.step(r'**反向从输出开始**。损失对输出的敏感度 $\delta=\dfrac{\partial L}{\partial s}=z-y=1$（平方损失 + 恒等输出时）。这个 $\delta$ 会被后面所有梯度反复用到。',
+        self.step(r'反向从输出开始。损失对输出的敏感度 $\delta=\dfrac{\partial L}{\partial s}=z-y=1$（平方损失 + 恒等输出时）。**这个 $\delta$ 只算一次，后面所有梯度都会反复用到它。**',
                   '反向从输出开始：δ = z − y 衡量“输出偏了多少”', stage=2)
         self.play(*[e.animate.set_color(DIM) for e in edge.values()], run_time=0.4)
         self.play(node['z'].animate.set_stroke(RED, width=6), run_time=0.4)
@@ -350,7 +350,7 @@ class Backprop(StepScene):
         self.play(FadeIn(dl), Indicate(node['z'], color=RED))
         self.wait(0.8)
 
-        self.step(r'**输出层的梯度** = $\delta\times$ 这条边"上游送进来的值"：$\dfrac{\partial L}{\partial w_j}=\delta\,u_j$，所以三条边分别是 $1\times1=1$、$1\times1.5=1.5$、$1\times0.5=0.5$。',
+        self.step(r'输出层：**每条边的梯度 = $\delta\times$ 这条边“上游送进来的值”**：$\dfrac{\partial L}{\partial w_j}=\delta\,u_j$，所以三条边分别是 $1\times1=1$、$1\times1.5=1.5$、$1\times0.5=0.5$。',
                   '输出层每条边的梯度 = δ × 这条边送进来的值 u<sub>j</sub>', stage=3)
         run_flows([('u0', 'z'), ('u1', 'z'), ('u2', 'z')], RED, back=True)
         self.play(*[FadeIn(grad(a, 'z', t)) for a, t in [('u0', '1'), ('u1', '1.5'), ('u2', '0.5')]])
@@ -358,7 +358,7 @@ class Backprop(StepScene):
         self.play(FadeIn(card, shift=DOWN * 0.1))
         self.wait(0.8)
 
-        self.step(r"**继续往回传到隐藏单元**。令 $g(r)=\max(0,r)$ 是 ReLU，$\varepsilon_j=\partial L/\partial r_j$ 是损失对隐藏单元加权和的导数。链式法则：$\varepsilon_j=\delta\cdot w_j\cdot g'(r_j)$。ReLU 在正数处导数为 1，所以 $\varepsilon_1=1\cdot1\cdot1=1$，$\varepsilon_2=1\cdot(-1)\cdot1=-1$。",
+        self.step(r"继续往回传到隐藏单元：**误差沿着权重 $w_j$ 往回分给隐藏单元**。令 $g(r)=\max(0,r)$ 是 ReLU，$\varepsilon_j=\partial L/\partial r_j$ 是损失对隐藏单元加权和的导数。链式法则：$\varepsilon_j=\delta\cdot w_j\cdot g'(r_j)$。ReLU 在正数处导数为 1，所以 $\varepsilon_1=1\cdot1\cdot1=1$，$\varepsilon_2=1\cdot(-1)\cdot1=-1$。",
                   '误差沿权重往回分：ε<sub>j</sub> = δ · w<sub>j</sub> · g′(r<sub>j</sub>)', stage=4)
         e1 = T('ε₁ = 1', 22, RED).move_to(P(300, 218))
         e2 = T('ε₂ = −1', 22, RED).move_to(P(300, 336))
@@ -367,7 +367,7 @@ class Backprop(StepScene):
         self.play(Indicate(node['u1'], color=RED), Indicate(node['u2'], color=RED))
         self.wait(0.8)
 
-        self.step(r'**最后是输入→隐藏层权重的梯度**：$\dfrac{\partial L}{\partial v_{ij}}=\varepsilon_j\,x_i$，四条边都是 $\pm1$。每个梯度都只是“往回流的误差 × 往前流的值”——同一个 $\varepsilon_j$ 被该隐藏单元的所有输入边复用，$\delta$ 也被所有输出边复用，这就是 backprop 比逐个求导省的原因。',
+        self.step(r'最后是输入→隐藏层权重的梯度：$\dfrac{\partial L}{\partial v_{ij}}=\varepsilon_j\,x_i$，四条边都是 $\pm1$。每个梯度都只是“往回流的误差 × 往前流的值”——**同一个 $\varepsilon_j$ 被该隐藏单元的所有输入边复用**，$\delta$ 也被所有输出边复用，这就是 backprop 比逐个求导省的原因。',
                   '输入层每条边的梯度 = 终点的误差 ε<sub>j</sub> × 起点的值 x<sub>i</sub>', stage=5)
         run_flows([('x0', 'u1'), ('x1', 'u1'), ('x0', 'u2'), ('x1', 'u2')], RED, back=True)
         self.play(*[FadeIn(grad(a, b, t, 0.8, 0)) for a, b, t in [('x0', 'u1', '1'), ('x1', 'u1', '1'), ('x0', 'u2', '−1'), ('x1', 'u2', '−1')]])
@@ -375,5 +375,5 @@ class Backprop(StepScene):
         self.play(Circumscribe(card, color=YELLOW))
         self.wait(2)
 
-        self.takeaway(r'**一句话**：前向时数值从左往右流，记下每个单元的值；反向时误差信号 $\delta$、$\varepsilon$ 从右往左流，每个只算一次。每条边的梯度 = **终点处往回流的误差 × 起点处往前流的值**，所以一次前向 + 一次反向就得到全部梯度。',
+        self.takeaway(r'一句话：前向时数值从左往右流，记下每个单元的值；反向时误差信号 $\delta$、$\varepsilon$ 从右往左流，每个只算一次。每条边的梯度 = **终点处往回流的误差 × 起点处往前流的值**，所以一次前向 + 一次反向就得到全部梯度。',
                       ['前向：数值从左往右流（记下每个 u）', '反向：误差 δ、ε 从右往左流（每个只算一次）', '每条边的梯度 = 终点的误差 × 起点的值'])

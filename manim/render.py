@@ -25,7 +25,8 @@ sys.path.insert(0, HERE)
 
 from common import StepScene, TIMINGS  # noqa: E402
 
-OUT = os.path.join(SITE, 'media', 'anim')
+# SML_ANIM_OUT=<dir> writes the mp4/poster elsewhere (e.g. narration-only edits: timings still go to manim/timings)
+OUT = os.environ.get('SML_ANIM_OUT') or os.path.join(SITE, 'media', 'anim')
 
 
 def scene_classes():

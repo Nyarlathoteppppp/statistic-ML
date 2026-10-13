@@ -10,6 +10,7 @@
   --line-2: #cfccc0;
   --accent: #2f5bd3;
   --accent-ink: #ffffff;
+  --key: #c62828;               /* key sentences (bold in body text) */
   --accent-soft: #e8eefc;
   --good: #1f8a5b;
   --good-soft: #e3f4ec;
@@ -59,6 +60,7 @@
   --hl-4: #5a2a22;
   --code-bg: #12151c;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+  --key: #ff7b72;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -67,7 +69,7 @@
     --line: #2b313e; --line-2: #3a4252; --accent: #7fa2ff; --accent-ink: #0f1320; --accent-soft: #1f2a45;
     --good: #5ccf98; --good-soft: #17322a; --bad: #ff8a75; --bad-soft: #3a1f1b; --warn: #f2b45a; --warn-soft: #382a16;
     --exam: #c3a3ff; --exam-soft: #2a2140; --hl-1: #5c4a12; --hl-2: #173a5c; --hl-3: #1d4529; --hl-4: #5a2a22;
-    --code-bg: #12151c; --shadow: 0 1px 2px rgba(0, 0, 0, .3); color-scheme: dark;
+    --code-bg: #12151c; --shadow: 0 1px 2px rgba(0, 0, 0, .3); --key: #ff7b72; color-scheme: dark;
   }
 }
 
@@ -90,6 +92,9 @@ a { color: var(--accent); text-underline-offset: 2px; }
 code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
 pre { font-family: var(--mono); font-size: .86rem; background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
 strong { font-weight: 650; }
+/* Key sentences: bold inside reading text is red; headings, chips, table heads and buttons keep their own colour */
+.page strong { color: var(--key); }
+.page :is(h1, h2, h3, h4, th, summary, .chip, .btn, .eyebrow, .ctitle, .anim-title) strong { color: inherit; }
 .en { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 .muted { color: var(--muted); }
 .small { font-size: .88rem; }

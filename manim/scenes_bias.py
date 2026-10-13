@@ -164,7 +164,7 @@ class BiasVariance(StepScene):
         # 0. Opening Question Card
         # ----------------------------------------------------
         self.question(
-            r"为什么模型不是越复杂越好？在真实世界中，训练数据本身是随机采集的：换一批数据，学到的模型到底会怎么变？这正是偏差–方差权衡（Bias–Variance Trade-off）要解答的核心问题。",
+            r"复杂的模型能把训练数据拟合得更好，为什么测试时却不一定更好？原因在于训练数据是随机采来的：换一批数据，学到的模型也跟着变。bias–variance trade-off（偏差–方差权衡）把测试误差拆成“平均偏了多少”和“换数据晃多大”两部分，用来回答这个问题。",
             ['为什么模型不是越复杂越好？', '换一份数据，学到的模型到底会怎么变？'],
             hold=2.5,
         )
@@ -225,8 +225,8 @@ class BiasVariance(StepScene):
         # Step 1: Ground truth + Monday data
         # ----------------------------------------------------
         self.step(
-            r"设定未知的真实函数 $f(x) = \sin(2.5x)$（细白线），$x \in [-1, 1]$。周一采集第一批 10 个数据点（蓝色圆点）：每个点 = 真值 + 标准差 "
-            + f"$\\sigma = {SD}$ 的随机噪声。左边用简单模型（直线），右边用复杂模型（7 次多项式），两边用的是同一份数据。",
+            r"两个面板里的细白线是真实函数 $f(x)=\sin(2.5x)$，$x\in[-1,1]$；现实中我们看不到它，只能看到数据。周一采到 10 个蓝点，每个点 = 真值 + 一点随机噪声，噪声的标准差是 "
+            + f"$\\sigma = {SD}$。左边准备用简单模型（直线），右边用复杂模型（7 次多项式），两边用的是同一份数据。",
             '真实函数 f(x)=sin(2.5x)，周一采样 10 个含噪数据点',
             stage=0,
         )
@@ -242,8 +242,9 @@ class BiasVariance(StepScene):
         # Step 2: Fit both models to Monday's data
         # ----------------------------------------------------
         self.step(
-            "分别用最小二乘法拟合两类模型。左边直线只有 2 个参数，弯不过来，整体欠拟合；右边 7 次多项式有 8 个参数，"
-            f"几乎贴着周一的每个蓝点走（拟合残差的均方根：直线 {resid1:.2f}，多项式只有 {resid7:.2f}）。",
+            "两边都用最小二乘法拟合周一的数据。左边直线只有 2 个参数，弯不过来，明显跟不上白线，这叫 underfitting（欠拟合）；"
+            "右边 7 次多项式有 8 个参数，几乎贴着每个蓝点走。"
+            f"用残差的均方根（每个点到曲线的竖直距离先平方、再平均、再开根号）衡量贴得多紧：直线 {resid1:.2f}，多项式只有 {resid7:.2f}。",
             '用周一数据拟合：直线欠拟合，多项式几乎贴着每个点',
             stage=1,
         )
@@ -254,9 +255,9 @@ class BiasVariance(StepScene):
         # Step 3: Add Tuesday and Wednesday data
         # ----------------------------------------------------
         self.step(
-            "关键思想实验：周二（绿色）和周三（紫色）各采一份新数据，各自重新拟合。左边三条直线几乎叠在一起；"
-            "右边三条 7 次多项式明显分开，尤其在两端和弯折处——换一份训练数据，模型就跟着变。"
-            "这种「随训练集晃动」的程度，就是**方差（Variance）**。",
+            "再做一个思想实验：周二（绿）和周三（紫）各采一份新数据，各自重新拟合。左边三条直线几乎叠在一起；"
+            "右边三条 7 次多项式明显分开，两端和弯折处尤其明显。"
+            "**换一份训练数据，模型跟着晃动的程度，就叫 variance（方差）。**",
             '换周二、周三的数据：三条直线几乎重合，三条多项式明显分开',
             stage=1,
         )
@@ -274,9 +275,9 @@ class BiasVariance(StepScene):
         # Step 4: Focus on test point x0 = 0.6, zoom its predictions onto number lines
         # ----------------------------------------------------
         self.step(
-            r"固定一个测试点 $x_0 = 0.6$（竖直虚线），真值 $f(0.6) = \sin(1.5) \approx 0.997$（白色刻度）。"
-            r"三天的模型在 $x_0$ 处各给出一个预测（彩色点）。在面板里它们挤在一小段上看不清，"
-            "所以把它们搬到下方放大的数轴上：两条数轴刻度相同，可以直接比较。",
+            r"现在只盯一个测试点 $x_0 = 0.6$（竖直虚线），真值是 $f(0.6)=\sin(2.5\times0.6)=\sin(1.5)\approx0.997$（白色短线）。"
+            r"三天的模型在 $x_0$ 处各给一个预测（彩色点）。面板里这些点挤在一小段上看不清，"
+            "所以把它们搬到下面放大的数轴上；左右两条数轴刻度相同，可以直接比较。",
             '固定测试点 x₀=0.6，把三天的预测搬到下方数轴上',
             stage=2,
         )
@@ -359,9 +360,11 @@ class BiasVariance(StepScene):
 
         self.step(
             rf"先看左边直线：三天在 $x_0$ 处的预测是 {val_deg1[0]:.2f}、{val_deg1[1]:.2f}、{val_deg1[2]:.2f}，"
-            rf"彼此最多只差 {range_deg1:.2f}（低方差）；但平均值 {mean_deg1:.2f}（黄色刻度）比真值 {y0_true:.3f} "
-            rf"低了 {abs(bias_deg1):.2f}（黄色色带），三天全都偏低。这就是**高偏差（High Bias）、低方差（Low Variance）**："
-            "直线弯不过来，换多少份数据都一样偏。",
+            rf"最高减最低只差 {range_deg1:.2f}，三天几乎一样，这是低方差。"
+            rf"它们的平均值（黄色短线）是 $({val_deg1[0]:.2f}+{val_deg1[1]:.2f}+{val_deg1[2]:.2f})/3\approx{mean_deg1:.3f}$，屏幕上显示为 {mean_deg1:.2f}。"
+            rf"平均预测减真值叫 bias（偏差）：${mean_deg1:.3f}-{y0_true:.3f}\approx-{abs(bias_deg1):.2f}$，"
+            rf"也就是低了 {abs(bias_deg1):.2f}（黄色色带），三天全都偏低。"
+            "**直线弯不过来，换多少份数据都一样偏：这就是高偏差、低方差。**",
             f'直线：三天挤在一起，但平均偏 {sgn(bias_deg1)} ⇒ 低方差、高偏差',
             stage=3,
         )
@@ -378,9 +381,11 @@ class BiasVariance(StepScene):
 
         self.step(
             rf"再看右边 7 次多项式：三天的预测是 {val_deg7[0]:.2f}、{val_deg7[1]:.2f}、{val_deg7[2]:.2f}，"
-            rf"最多相差 {range_deg7:.2f}，是直线的 {range_deg7 / range_deg1:.1f} 倍（高方差：单看某一天，可能偏出去很远）；"
-            rf"但它们落在真值两侧，平均 {mean_deg7:.2f} 与真值 {y0_true:.3f} 只差 {abs(bias_deg7):.2f}。"
-            "这就是**低偏差（Low Bias）、高方差（High Variance）**。",
+            rf"最高减最低相差 {range_deg7:.2f}（用没有四舍五入的预测相减），"
+            rf"是直线的 ${range_deg7:.2f}/{range_deg1:.2f}\approx{range_deg7 / range_deg1:.1f}$ 倍：这是高方差，单看某一天，可能偏出去很远。"
+            rf"但它们落在真值两侧，平均 $({val_deg7[0]:.2f}+{val_deg7[1]:.2f}+{val_deg7[2]:.2f})/3\approx{mean_deg7:.3f}$（显示为 {mean_deg7:.2f}），"
+            rf"与真值 {y0_true:.3f} 只差 {abs(bias_deg7):.2f}。"
+            "**这就是低偏差、高方差：平均起来很准，但每一次都可能晃得很远。**",
             f'多项式：三天散开 {range_deg7:.2f}（高方差），平均只偏 {sgn(bias_deg7)}（低偏差）',
             stage=3,
         )
@@ -411,10 +416,10 @@ class BiasVariance(StepScene):
         sim_group = VGroup(sim_box, sim_txt)
 
         self.step(
-            rf"只看 3 天，也可能是运气。所以把同样的实验重复 {N_SIM} 次（{N_SIM} 份独立的训练数据，数轴上的灰点画出其中 {N_CLOUD} 天的预测）："
-            rf"直线在 $x_0$ 处平均偏 {sgn(sim_bias[1])}，上下晃 ±{sim_sd[1]:.2f}（标准差）；"
-            rf"7 次多项式平均偏 {sgn(sim_bias[7])}，上下晃 ±{sim_sd[7]:.2f}。"
-            "长期规律和这 3 天一致：直线稳定地偏（高偏差、低方差），多项式围着真值大幅晃（低偏差、高方差）。",
+            rf"只看 3 天，也可能是碰巧。所以把同样的实验重复 {N_SIM} 次：{N_SIM} 份独立的训练数据各拟合一次，数轴上的灰点画出其中 {N_CLOUD} 天在 $x_0$ 处的预测。"
+            rf"直线在 $x_0$ 处平均偏 {sgn(sim_bias[1])}，上下晃动的标准差是 ±{sim_sd[1]:.2f}；"
+            rf"7 次多项式平均偏 {sgn(sim_bias[7])}，标准差是 ±{sim_sd[7]:.2f}。"
+            "**长期规律和这 3 天一致：直线稳定地偏（高偏差、低方差），多项式围着真值大幅晃动（低偏差、高方差）。**",
             f'不是巧合：换 {N_SIM} 份数据，直线总是偏低，多项式总在真值两侧晃',
             stage=3,
         )
@@ -435,10 +440,13 @@ class BiasVariance(StepScene):
         )
 
         self.step(
-            r"把期望测试误差拆成三项：$\mathrm{E}[(Y-\hat f)^2] = \text{bias}^2 + \text{variance} + \sigma^2$。"
-            r"模型越复杂，$\text{bias}^2$ 越小、$\text{variance}$ 越大，再加上任何模型都消不掉的噪声 $\sigma^2$，总误差通常呈 U 形。"
-            rf"本例在 $x_0$ 处模拟 {N_SIM} 天：1 次 ≈ {sim_err[1]:.2f}，3 次 ≈ {sim_err[3]:.2f}（最低），"
-            rf"7 次 ≈ {sim_err[7]:.2f}，9 次 ≈ {sim_err[9]:.2f}——直线输在偏差，9 次输在方差，中间的 3 次最好。",
+            r"**期望测试误差拆成三项：$\mathrm{E}[(Y-\hat f)^2] = \text{bias}^2 + \text{variance} + \sigma^2$。**"
+            r"上方公式里，$\text{bias}^2$ 是平均预测偏离真值的平方，$\text{variance}$ 是换数据时预测晃动的方差（标准差的平方），"
+            r"$\sigma^2$（本章写作 $\mathrm{Var}[Y]$）是数据本身的噪声，叫 irreducible error（不可约误差），任何模型都消不掉。"
+            r"中间是示意图：模型越复杂，黄线 $\text{bias}^2$ 越低、绿线 $\text{variance}$ 越高，加上灰色虚线 $\sigma^2$，红色的总误差通常呈 U 形。"
+            rf"下方是本例在 $x_0$ 处模拟 {N_SIM} 天的结果：1 次 ≈ {sim_err[1]:.2f}，3 次 ≈ {sim_err[3]:.2f}（最低），"
+            rf"7 次 ≈ {sim_err[7]:.2f}，9 次 ≈ {sim_err[9]:.2f}：直线输在偏差，9 次输在方差，中间的 3 次最好。"
+            rf"每个数都是三项相加（用未取整的偏差和标准差算；拿两位小数手算 1 次会得 $0.16$），以 7 次为例：${abs(sim_bias[7]):.2f}^2+{sim_sd[7]:.2f}^2+{SD}^2\approx{sim_err[7]:.2f}$。",
             '期望测试误差 = bias² + variance + 噪声，总误差通常呈 U 形',
             stage=4,
         )
@@ -491,8 +499,10 @@ class BiasVariance(StepScene):
         c_tot = ax_u.plot(f_tot, x_range=[0.8, 9.2], color=RED, stroke_width=3.2)
         lbl_c_tot = T('总测试误差 (U 形)', 15, RED).next_to(ax_u.c2p(5.0, f_tot(5.0)), UP, buff=0.12)
 
-        dot_opt = Dot(ax_u.c2p(4.8, f_tot(4.8)), radius=0.07, color=YELLOW)
-        lbl_opt = T('最佳平衡', 13, YELLOW).next_to(dot_opt, DOWN, buff=0.08)
+        u_grid = np.linspace(0.8, 9.2, 2001)
+        u_opt = float(u_grid[np.argmin(f_tot(u_grid))])      # true minimum of the drawn total curve
+        dot_opt = Dot(ax_u.c2p(u_opt, f_tot(u_opt)), radius=0.07, color=YELLOW)
+        lbl_opt = T('最佳平衡', 15, YELLOW).next_to(dot_opt, DOWN, buff=0.05)
 
         # the same U in this example's numbers (simulated expected test error at x0)
         ex_parts = [T(f'本例 x₀ 处（模拟 {N_SIM} 天）期望误差：', 14, GREY)]
@@ -517,7 +527,7 @@ class BiasVariance(StepScene):
         # Takeaway closing card
         # ----------------------------------------------------
         self.takeaway(
-            r"总结：Bias 衡量的是平均预测偏离真实目标的系统误差（模型太简单时大），Variance 衡量的是换训练集时模型预测的波动幅度（模型太复杂时大）。泛化误差是二者与不可约噪声之和，调参和正则化本质上都是在寻找 U 形曲线的最低点。",
+            r"**简单模型高偏差、低方差，复杂模型低偏差、高方差。**Bias 是平均预测离真值多远（模型太简单时大），variance 是换训练集时预测晃多大（模型太复杂时大）。期望测试误差 $=\text{bias}^2+\text{variance}+\sigma^2$，其中 $\sigma^2$ 是谁也消不掉的噪声；调正则化强度、选模型复杂度，都是在找 U 形曲线的最低点。简答题常考：写出这个分解，并说明模型变简单或变复杂时哪一项变大。",
             [
                 '简单模型：高偏差、低方差；复杂模型：低偏差、高方差',
                 '测试误差 = bias² + variance + 噪声',

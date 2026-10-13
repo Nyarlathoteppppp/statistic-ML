@@ -74,11 +74,11 @@ class KernelLift(StepScene):
 
     def construct(self):
         # Local imports keep the other scene and its helpers entirely unchanged.
-        from manim import Transform
+        from manim import RoundedRectangle, SurroundingRectangle, Transform
         from common import M
 
         self.question(
-            r'蓝点在中间，红点围成一圈。一条直线分不开它们；能不能换个看法，让两类容易分开？',
+            r'一类点（蓝）聚在中间，另一类点（红）在外面围成一圈。不管直线怎么放，都会把外圈切开，所以一条直线分不开它们。可是 SVM 这样的线性分类器，在原来的平面上只能画直线。能不能给每个点换一种描述方式，让两类变得容易分开？',
             ['一条直线分不开两类点', '换个看法，能不能分开？'],
         )
 
@@ -128,13 +128,15 @@ class KernelLift(StepScene):
                                        stroke_opacity=0.6 * tilt.get_value())),
         )
         # Build MathTex once, then move labels with the same projection.
+        # x3 sits LEFT of the axis tip: right of the tip is a lifted red dot (OUTER[3]) and the top
+        # of the r=2.25 bowl ring passes just above it.  z=9 keeps every label above dots (3/5) and plane (4).
         axis_labels = VGroup()
         for tex, xyz, offset in (
             (r'x_1', (2.5, 0, 0), RIGHT * px(12)),
             (r'x_2', (0, 2.5, 0), UP * px(12)),
-            (r'x_3', (0, 0, 6), (UP + RIGHT) * px(9)),
+            (r'x_3', (0, 0, 6), LEFT * px(13) + DOWN * px(3)),
         ):
-            label = M(tex, 22, GREY).set_z_index(7)
+            label = M(tex, 22, GREY).set_z_index(9)
             def follow(m, p=xyz, off=offset):
                 m.move_to(project(*p) + off)
                 if p[2]:
@@ -145,7 +147,7 @@ class KernelLift(StepScene):
 
         legend = card(T('蓝：内圈', 19, BLUE), T('红：外圈', 19, RED))
         self.step(
-            r'先看原来的平面：蓝是内类，红是外类。试着平移直线，它仍会把外圈红点切到两侧；蓝点被红点包围，边界应该是弯的，而不是一条直线。',
+            r'这是原来的平面，两条坐标轴是 $x_1,x_2$：蓝点（内圈）聚在中间，红点（外圈）围成一圈。灰色直线先竖在正中，再向右平移：不管停在哪里，都有红点落在线的两侧，直线总会切错。**蓝点被红点整圈包住，能分开它们的边界只能是弯的，不能是一条直线。**',
             '蓝在里面、红在外面，直线总会切错', stage=0,
         )
         self.play(FadeIn(axes), FadeIn(axis_labels), FadeIn(inner_dots),
@@ -158,7 +160,7 @@ class KernelLift(StepScene):
         self.play(FadeOut(trial), run_time=0.5)
 
         self.step(
-            r'先只倾斜视角，点还没有抬高，所有点仍在同一个底面。原来的两个方向叫 $x_1,x_2$，现在看见的新方向叫 $x_3$；换视角不会改变数据的位置。',
+            r'画面倾斜，改从斜上方看同一张平面；右侧提示“先换视角，还没抬点”。所有点仍贴在底面上，位置一点没变：换视角不会改变数据。竖起来的第三条轴叫 $x_3$，此刻每个点的 $x_3$ 都还是 $0$；倾斜是为了下一步能看见“高度”。',
             '先倾斜看：所有点仍在原来的底面', stage=1,
         )
         view_note = card(T('先换视角', 19, YELLOW), T('还没抬点', 17, GREY), y=137)
@@ -182,14 +184,14 @@ class KernelLift(StepScene):
             drops.add(always_redraw(drop_build))
 
         self.step(
-            r'这次真的抬点：保留平面位置，把到原点的距离平方变成高度，灰色竖线连回原位置，灰色等高圆组成碗面。这个 feature map（特征映射）是 $\varphi(u)=(u_1,u_2,u_1^2+u_2^2)$，因此 $x_3=r^2$。蓝点半径由 $0.25+0.65q$ 生成（$0\le q<1$），所以 $r<0.25+0.65=0.9$、$x_3<0.9^2=0.81$；红点半径为 $1.75+0.5q$，所以 $x_3\ge1.75^2=3.0625$。',
+            r'现在真的抬点：每个点在平面上的位置不变，只往上升，升高的量等于它到原点距离的平方。灰色竖线连回原位置，每个灰色圆圈上的点高度相同，叠起来是一只碗，左上角写着碗面 $x_3=x_1^2+x_2^2$。这一步叫 feature map（特征映射）：把二维点 $\mathbf u=(u_1,u_2)$ 变成三维点 $\varphi(\mathbf u)=(u_1,u_2,u_1^2+u_2^2)$，前两个坐标保留位置，第三个是新增的高度；由勾股定理 $u_1^2+u_2^2=r^2$（$r$ 是到原点的距离），所以 $x_3=r^2$。蓝点半径由 $0.25+0.65q$ 生成（$q$ 是满足 $0\le q<1$ 的随机数），所以 $r<0.25+0.65=0.9$，高度 $x_3<0.9^2=0.81$；红点半径为 $1.75+0.5q\ge1.75$，所以 $x_3\ge1.75^2=3.0625$。**离原点越远抬得越高：蓝点都很低，红点都很高。**',
             '离原点越远，新增的高度就越大', stage=1,
         )
         self.add(rings, drops)
         self.play(FadeOut(legend), FadeOut(view_note), ring_alpha.animate.set_value(0.45),
                   run_time=0.6)
         self.play(lift.animate.set_value(1), run_time=2)
-        fmap_eq = M([r'\varphi(u)=(', r'u_1,u_2', ',', r'u_1^2+u_2^2', ')'], 24)
+        fmap_eq = M([r'\varphi(\mathbf u)=(', r'u_1,u_2', ',', r'u_1^2+u_2^2', ')'], 24)
         fmap_eq[1].set_color(BLUE)
         fmap_eq[3].set_color(YELLOW)
         kept = VGroup(M(r'u_1,u_2', 22, BLUE), T('保留位置', 16, GREY)).arrange(RIGHT, buff=0.15)
@@ -218,7 +220,7 @@ class KernelLift(StepScene):
         leader = Line(project(2.45, -2.45, 2), P(424, 285), color=YELLOW,
                       stroke_width=1.2).set_z_index(6)
         self.step(
-            r'现在在两类高度之间放一张黄色平面。因为 $0.81<2<3.0625$，蓝点全在 $x_3=2$ 下方，红点全在上方；这张 separating plane（分隔平面）让新空间里的数据线性可分。这里的 $2$ 是选在空隙里的方便阈值，不是算出的最大间隔解。',
+            r'在蓝点和红点的高度之间放一张水平的黄色平面 $x_3=2$。因为 $0.81<2<3.0625$，所有蓝点都在平面下方，所有红点都在上方。这张 separating plane（分隔平面）把两类完全分开，也就是说，在新的三维空间里数据 linearly separable（线性可分）。**原来要一条弯曲线才能分开，抬高之后一张平的平面就够了。**这里的 $2$ 只是在空隙里挑的方便值，不是按最大间隔算出来的解。',
             '黄色平面夹在中间：蓝在下，红在上', stage=2,
         )
         # Explicitly add the geometry BEFORE animating its visibility.
@@ -227,19 +229,120 @@ class KernelLift(StepScene):
         self.play(FadeIn(leader), FadeIn(plane_tag), run_time=0.7)
         self.wait(2)
 
-        self.step(
-            r'算法不一定需要真的抬点，它可能只要抬点后的点积。这里的 kernel（核函数）是 $K(u,v)=\varphi(u)\cdot\varphi(v)=u_1v_1+u_2v_2+(u_1^2+u_2^2)(v_1^2+v_2^2)$：前两项是原位置的点积，最后一项是新增高度相乘。SVM 的 dual（对偶）的训练和预测只用点积，所以 kernel trick（核技巧）直接计算同一个值，不必构造高维坐标，结果精确而非近似；本例的映射不同于章节后面纯二次多项式核的映射。',
-            '直接算同一个点积，不必真的抬点', stage=3,
+        # ---- kernel step: two REAL data points, the same number by two routes ----
+        # u = INNER[12] (blue), v = OUTER[0] (red).  Chosen so that the 2-dp numbers on screen, re-multiplied
+        # by hand along either route, still round to the shown total (checked against numpy when authoring).
+        iu, iv = 12, 0
+        U, V = INNER[iu], OUTER[iv]
+        hu, hv = U[0] ** 2 + U[1] ** 2, V[0] ** 2 + V[1] ** 2
+        k_lift = float(np.dot([U[0], U[1], hu], [V[0], V[1], hv]))   # (a) build phi(u), phi(v), then dot
+        k_direct = U[0] * V[0] + U[1] * V[1] + hu * hv                 # (b) K(u,v) from the 2-D coordinates only
+        assert abs(k_lift - k_direct) < 1e-9
+
+        def n2(v):
+            return f'{v:.2f}'
+
+        def p2(v):          # negatives get brackets inside products and squares
+            return f'({v:.2f})' if v < 0 else f'{v:.2f}'
+
+        u1, u2, v1, v2, hu2, hv2, k2 = (n2(U[0]), n2(U[1]), n2(V[0]), n2(V[1]),
+                                        n2(hu), n2(hv), n2(k_lift))
+        first_two = '=' + u1 + r'\times' + v1 + '+' + p2(U[1]) + r'\times' + v2
+        heights = '+' + hu2 + r'\times' + hv2
+        squares = '+(' + u1 + '^2+' + p2(U[1]) + '^2)(' + v1 + '^2+' + v2 + '^2)'
+
+        # 3-D markers: floor point (white) -> yellow riser -> lifted point (yellow ring)
+        pu0, pu1 = project(U[0], U[1]), project(U[0], U[1], hu)
+        pv0, pv1 = project(V[0], V[1]), project(V[0], V[1], hv)
+        lift_rings = VGroup(*[Circle(radius=px(7.5), stroke_color=YELLOW, stroke_width=2.5).move_to(p)
+                              for p in (pu1, pv1)]).set_z_index(9)
+        base_rings = VGroup(*[Circle(radius=px(4.5), stroke_color=WHITE, stroke_width=2).move_to(p)
+                              for p in (pu0, pv0)]).set_z_index(9)
+        risers = VGroup(*[DashedLine(a, b, color=YELLOW, stroke_width=1.6, dash_length=px(4))
+                          for a, b in ((pu0, pu1), (pv0, pv1))]).set_z_index(8)
+
+        def tag(tex, color, at):
+            m = M(tex, 20, color).move_to(at)
+            return VGroup(BackgroundRectangle(m, color=BG, fill_opacity=0.85, buff=px(2)), m).set_z_index(10)
+
+        tags = VGroup(tag(r'\varphi(\mathbf u)', BLUE, pu1 + RIGHT * px(24) + UP * px(5)),
+                      tag(r'\mathbf u', BLUE, pu0 + RIGHT * px(13) + DOWN * px(6)),
+                      tag(r'\varphi(\mathbf v)', RED, pv1 + LEFT * px(25) + UP * px(6)),
+                      tag(r'\mathbf v', RED, pv0 + RIGHT * px(11) + DOWN * px(9)))
+
+        # Two stacked cards in the free right-hand column (x 410..626).
+        def kcard(rows, y):
+            for row in rows:
+                if row.width > px(212):
+                    row.scale_to_fit_width(px(212))
+            body = VGroup(*rows).arrange(DOWN, aligned_edge=LEFT, buff=px(6))
+            body.move_to(P(416, y), aligned_edge=UL)
+            frame = RoundedRectangle(corner_radius=px(5), width=body.width + px(14), height=body.height + px(12),
+                                     fill_color=BG, fill_opacity=0.96, stroke_color=DIM, stroke_width=1.5)
+            frame.move_to(body)
+            return VGroup(frame, body).set_z_index(20)
+
+        a_phi_u = M([r'\varphi(\mathbf u)', '=(' + u1 + r',\ ' + u2 + r',\ ', hu2, ')'], 21)
+        a_phi_v = M([r'\varphi(\mathbf v)', '=(' + v1 + r',\ ' + v2 + r',\ ', hv2, ')'], 21)
+        a_phi_u[0].set_color(BLUE)
+        a_phi_v[0].set_color(RED)
+        a_phi_u[2].set_color(YELLOW)
+        a_phi_v[2].set_color(YELLOW)
+        a_dot = M([r"\varphi(\mathbf u)'\varphi(\mathbf v)", first_two], 21)
+        a_res = VGroup(M('=', 23, YELLOW), M(k2, 23, YELLOW)).arrange(RIGHT, buff=px(8))
+        a_last = VGroup(M(heights, 21, YELLOW), a_res).arrange(RIGHT, buff=px(5))
+        card_a = kcard([T('① 先抬高成 3-D 点，再点积', 18, YELLOW), a_phi_u, a_phi_v, a_dot, a_last], 50)
+        a_last.align_to(a_dot[1], LEFT).shift(RIGHT * px(7))
+
+        b_k = M([r'K(\mathbf u,\mathbf v)=u_1v_1+u_2v_2', r'+(u_1^2+u_2^2)(v_1^2+v_2^2)'], 20)
+        b_k[1].set_color(YELLOW)
+        b_first = M(first_two, 21)
+        b_sq = M(squares, 21, YELLOW)
+        b_res = VGroup(M('=', 23, YELLOW), M(k2, 23, YELLOW)).arrange(RIGHT, buff=px(8))
+        b_last = VGroup(T('没有造出 3-D 点', 16, GREY), b_res).arrange(RIGHT, buff=px(12))
+        card_b = kcard([T('② 直接用核：只用二维的 u、v', 18, YELLOW), b_k, b_first, b_sq, b_last],
+                       60 + card_a.height / px(1))
+        b_first.align_to(a_dot[1], LEFT)          # same first two terms as route (a), same column
+        b_sq.shift(RIGHT * px(8))
+        b_res.align_to(a_res, RIGHT)              # both results in one column
+        same = VGroup(SurroundingRectangle(a_res[1], color=YELLOW, buff=px(3), stroke_width=2),
+                      SurroundingRectangle(b_res[1], color=YELLOW, buff=px(3), stroke_width=2)).set_z_index(21)
+        same_note = T('两条路，同一个数', 17, YELLOW).set_z_index(21)
+        same_note.next_to(card_b, DOWN, buff=px(8)).align_to(card_b, LEFT)
+
+        others = [d for k, d in enumerate(inner_dots) if k != iu] + [d for k, d in enumerate(outer_dots) if k != iv]
+        say_kernel = (
+            r'其余点变暗，只留两个真实数据点：白圈是它们在底面的位置，蓝点 $\mathbf u=('
+            + u1 + ',' + u2 + r')$、红点 $\mathbf v=(' + v1 + ',' + v2 + r')$；黄虚线向上连到黄圈，'
+            + r'是抬高后的 $\varphi(\mathbf u)$ 和 $\varphi(\mathbf v)$。'
+            + r'SVM 的 dual（对偶）训练和预测只用到两点之间的点积，所以算法不一定需要真的抬点，它只要抬点后的点积。'
+            + r'卡片 ① 先抬高再点积：$\varphi(\mathbf u)=(' + u1 + ',' + u2 + ',' + hu2 + r')$，$\varphi(\mathbf v)=('
+            + v1 + ',' + v2 + ',' + hv2 + r')$（第三个数是新高度，即两个坐标的平方和），'
+            + r"对应坐标相乘再相加，就是点积 $\varphi(\mathbf u)'\varphi(\mathbf v)$（一撇表示转置）：$"
+            + first_two[1:] + heights + '=' + k2 + '$。'
+            + r'卡片 ② 直接用 kernel（核函数）$K(\mathbf u,\mathbf v)=u_1v_1+u_2v_2+(u_1^2+u_2^2)(v_1^2+v_2^2)$，只代入二维坐标：$'
+            + first_two[1:] + squares + '=' + k2 + '$。'
+            + r"**两条路得到同一个数，因为 $K(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$，而 ② 全程没有造出 3-D 点。**"
+            + r'对照两式：前两项都是原位置的点积；② 最后的两个括号正是两个新高度，相乘就是 ① 的最后一项。'
+            + r'屏幕上的数都保留两位小数，用它们手算，两条路都四舍五入成 $' + k2 + '$。'
+            + r'直接算 $K$ 来代替抬高后的点积，就叫 kernel trick（核技巧），结果精确而非近似。'
+            + r'本例只有 3 维，两条路算得一样快；特征维数很高甚至无限（多项式核、RBF）时，直接用核就省得多。'
+            + r'本例的映射也不同于章节后面纯二次多项式核的映射。'
         )
-        self.play(Indicate(inner_dots, color=BLUE, scale_factor=1.04),
-                  Indicate(outer_dots, color=RED, scale_factor=1.02), run_time=0.8)
-        kernel = card(M(r'K(u,v)=\varphi(u)\cdot\varphi(v)', 25, YELLOW),
-                      T('特征空间的点积，', 17, GREY), T('但不必真的抬点', 17, GREY),
-                      M(r'=u_1v_1+u_2v_2', 23),
-                      M(r'\quad +(u_1^2+u_2^2)(v_1^2+v_2^2)', 23),
-                      T('原位置点积＋新高度乘积', 16, GREY))
-        self.play(FadeOut(fmap), FadeOut(bounds), FadeIn(kernel), run_time=0.8)
-        self.wait(3)
+        self.step(say_kernel, '两条路算出同一个数：核不用造 3-D 点', stage=3)
+        self.play(FadeOut(fmap), FadeOut(bounds), FadeOut(plane_tag), FadeOut(leader),
+                  plane_alpha.animate.set_value(0.35), ring_alpha.animate.set_value(0.2),
+                  *[d.animate.set_opacity(0.2) for d in others],
+                  Create(lift_rings), Create(base_rings), Create(risers), FadeIn(tags), run_time=0.8)
+        self.play(FadeIn(card_a, shift=LEFT * 0.1), Indicate(lift_rings, color=YELLOW, scale_factor=1.35),
+                  run_time=0.9)
+        self.wait(1.0)
+        self.play(FadeIn(card_b, shift=LEFT * 0.1), Indicate(base_rings, color=WHITE, scale_factor=1.5),
+                  run_time=0.9)
+        self.wait(0.8)
+        self.play(Create(same), FadeIn(same_note), run_time=0.6)
+        self.wait(1.5)
+        kernel_marks = VGroup(card_a, card_b, same, same_note, lift_rings, base_rings, risers, tags)
 
         def circle_build():
             r = np.sqrt(2)
@@ -256,15 +359,17 @@ class KernelLift(StepScene):
                             T('只投影交圆', 18, YELLOW),
                             T('不是把整张平面压扁', 16, GREY))
         self.step(
-            r'最后找原空间的边界：先看黄色平面与碗面的 intersection（交集），是一条在高度 $2$ 上的圆。联立 $x_3=x_1^2+x_2^2$ 和 $x_3=2$，得到 $x_1^2+x_2^2=2$，所以 $r^2=2$、$r=\sqrt2$。只把这条交圆沿竖直方向投到底面，再让点回到底面、转回俯视，黄色圆就围住蓝点、排除红点；这是投影交集，不是把整张平面压扁。',
+            r'最后回到原平面找边界。黄色平面和碗面相交出一圈黄色的圆，高度是 $2$，这叫 intersection（交集）。右侧卡片联立碗面 $x_3=x_1^2+x_2^2$ 和平面 $x_3=2$，两者相等得 $x_1^2+x_2^2=2$，即 $r^2=2$、$r=\sqrt2\approx1.41$，正好夹在蓝点的 $r<0.9$ 和红点的 $r\ge1.75$ 之间。接着平面淡去，黄圆沿竖直方向落到底面，点也落回原位，视角转回俯视：黄圆围住蓝点，把红点挡在外面。**三维里平的分隔平面，投回原平面就成了弯的边界：半径 $\sqrt2$ 的圆。**只投影这一圈交线，不是把整张平面压扁。',
             '只把交圆投回去，变成围住蓝点的边界', stage=4,
         )
         self.add(circle)
-        self.play(circle_alpha.animate.set_value(1), run_time=0.9)
-        self.play(FadeOut(kernel), FadeOut(bowl), FadeIn(intersection), run_time=0.8)
+        # Clear the kernel example and restore the full scene while the intersection circle appears.
+        self.play(circle_alpha.animate.set_value(1), FadeOut(kernel_marks),
+                  plane_alpha.animate.set_value(1), ring_alpha.animate.set_value(0.45),
+                  *[d.animate.set_opacity(1) for d in others], run_time=0.9)
+        self.play(FadeOut(bowl), FadeIn(intersection), run_time=0.8)
         self.wait(1.8)
-        self.play(plane_alpha.animate.set_value(0), FadeOut(leader), FadeOut(plane_tag),
-                  ring_alpha.animate.set_value(0.15), run_time=0.7)
+        self.play(plane_alpha.animate.set_value(0), ring_alpha.animate.set_value(0.15), run_time=0.7)
         # Keep the oblique view fixed: the SAME intersection visibly descends.
         self.play(circle_z.animate.set_value(0), run_time=2)
         self.wait(1.2)
@@ -278,7 +383,7 @@ class KernelLift(StepScene):
             mob.clear_updaters()
             mob.set_z_index(0)
         self.takeaway(
-            r'新增距离平方这个特征后，两类能被平面分开：$\varphi(u)=(u_1,u_2,u_1^2+u_2^2)$，分隔平面为 $x_3=2$。平面和碗面的交圆投回原空间得到 $x_1^2+x_2^2=2$；核直接给出 $K(u,v)=\varphi(u)\cdot\varphi(v)$，是精确的点积捷径。',
+            r"一句话：给每个点加一个新特征（到原点距离的平方），原来只能用弯曲线分开的两类，在三维里一张平面就能分开。本例 $\varphi(\mathbf u)=(u_1,u_2,u_1^2+u_2^2)$，分隔平面为 $x_3=2$；平面和碗面的交圆投回原平面，得到边界 $x_1^2+x_2^2=2$。**kernel 直接算出特征空间的点积，$K(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$，是精确的捷径，不是近似。**本章的目标是能解释核技巧为什么精确而不是近似，并能为给定的核写出对应的特征映射，再代入数字验证 $K$ 等于特征的点积。",
             ['新增高度，让两类能被平面分开', '交圆投回去，才是原空间的边界',
              '核直接算特征点积：精确而非近似'],
         )
@@ -329,7 +434,7 @@ class SvmMargin(StepScene):
 
     def construct(self):
         self.question(
-            r'有很多条线都能把两类点分开。哪一条对新数据更可靠？我们要让边界离两类点都尽量远。',
+            r'能把两类点分开的直线有很多条，它们在训练点上都不出错。可新来的点会落在训练点附近，分界线如果贴得太近，新点稍偏一点就可能被分错。哪一条对新数据最可靠？**直觉上，离两类点都尽量远的那条最稳。**',
             ['很多条线都能分开数据', '哪一条对新点更可靠？'],
         )
 
@@ -394,7 +499,7 @@ class SvmMargin(StepScene):
         band = always_redraw(dynamic_band)
 
         self.step(
-            r'这六个点来自题目：蓝圆是一类，红方是另一类。先画一条能分开的 boundary（分界线）；这样的线很多，训练错误都可以是 0，所以“分对”还不够。',
+            r'这六个点来自一道题：蓝色圆点是一类（点 1、2、6），红色方块是另一类（点 3、4、5）。绿线是一条能把它们分开的 boundary（分界线），所有训练点都分对了。但这样的线有很多条，训练错误都可以是 0。**所以光“分对”还不够，还要挑出最稳的那条。**',
             '先画一条能分开的线：分对不等于最稳',
             stage=0,
         )
@@ -409,7 +514,7 @@ class SvmMargin(StepScene):
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.1).move_to(P(448, 240), aligned_edge=LEFT)
         street_bg = BackgroundRectangle(street_note, color=BG, fill_opacity=0.84, buff=0.1)
         self.step(
-            r'把 boundary 往两边平移，直到碰到两类中最近的点，得到两条 dashed margin lines（虚线间隔线）。两条虚线围出一条空街道；但 **margin（间隔）** 按课件 L08 p13 的定义是**边界到最近点的距离**，也就是边界到任一条虚线的距离（单侧，图中黄色短线），这里约 0.391。街道的总宽度是它的 2 倍。',
+            r'把绿线往两边平行移动，直到碰到两类中最近的点，得到两条虚线；两条虚线中间的浅蓝色带子是一条“空街道”，里面没有点。图中的黄色短线是绿线到一条虚线的距离，叫 margin（间隔）。**按课件 L08 p13 的定义，margin 是分界线到最近点的距离（单侧），不是整条街道的宽度。**这条线的 margin 约为 $0.391$，右上角读数显示 $0.39$；街道总宽是它的 2 倍。',
             '空街道：边界到一条虚线（黄线）= 单侧 margin ≈ 0.391',
             stage=1,
         )
@@ -420,7 +525,7 @@ class SvmMargin(StepScene):
         self.wait(1.4)
 
         self.step(
-            r'现在只旋转这条线，并且每个角度都把它放在两类的正中间。把每个点投影到边界的法向上：$p_r$ 是红类里离边界最近的投影，$p_b$ 是蓝类里离边界最近（投影最大）的那个，单侧 margin $m=(p_r-p_b)\div2$（中间的空隙两侧各分一半）。方向一变，投影就变，所以街道会变宽或变窄。',
+            r'现在只转动绿线，每转到一个角度，都重新把它放在两类的正中间，右上角的读数跟着变。放法：把每个点投影到垂直于绿线的方向（法向）上，蓝类投影最大的点和红类投影最小的点之间隔着一段空隙，绿线放在空隙正中，单侧 margin 就是这段空隙的一半。**方向一变，投影就变，空隙跟着变，所以街道会变宽或变窄。**',
             '旋转边界：街道会随方向变宽或变窄',
             stage=2,
         )
@@ -448,7 +553,7 @@ class SvmMargin(StepScene):
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.1).move_to(P(448, 0), aligned_edge=LEFT).align_to(P(0, 212), UP)
         support_bg = BackgroundRectangle(support_text, color=BG, fill_opacity=0.88, buff=0.1)
         self.step(
-            r'最宽的位置是竖直的 boundary：$x=4.5$。这时法向就是 $x$ 轴：蓝类最靠右的 $x$ 坐标是 3（$p_b=3$），红类最靠左的是 6（$p_r=6$），所以单侧 margin $m=(6-3)\div2=1.5$（边界到任一条虚线的距离；街道总宽 3）。正好落在虚线上的点 1、2、4 叫 support vectors（支持向量）；只有它们决定这条线。',
+            r'绿线停在竖直位置 $x=4.5$，这时街道最宽。右上方的公式把上一步写成符号：$p_r$ 是红类离边界最近的投影，$p_b$ 是蓝类离边界最近的投影，单侧 margin $m=(p_r-p_b)\div2$，空隙两侧各分一半。竖直线的法向就是 $x$ 轴，投影就是横坐标：蓝类最靠右的是 $x=3$（$p_b=3$），红类最靠左的是 $x=6$（$p_r=6$），所以 $m=(6-3)\div2=1.5$，这是边界到任一条虚线的距离，街道总宽 $3$。正好落在虚线上的点 1、2、4 叫 support vector（支持向量），图中用黄圈标出。**只有支持向量决定这条线，点 3、5、6 不决定边界。**',
             '最佳线 x = 4.5：margin = (6 − 3) ÷ 2 = 1.5',
             stage=3,
         )
@@ -461,6 +566,6 @@ class SvmMargin(StepScene):
         self.wait(1.8)
 
         self.takeaway(
-            r'一句话：许多 boundary 都能分开训练点，SVM（支持向量机）选择 empty street（空街道）最宽的那条。这里 x = 4.5，单侧 margin = 1.5；只有点 1、2、4 在街道边缘，所以它们决定答案。',
+            r'一句话：许多分界线都能分开训练点，SVM（support vector machine，支持向量机）选空街道最宽的那条。**margin 是分界线到最近点的距离（单侧），SVM 要让它最大。**本例最佳线是 $x=4.5$，单侧 margin $=(6-3)\div2=1.5$；只有落在街道边缘的点 1、2、4（支持向量）决定答案。往年 T4 题型就是看图找支持向量、算 margin。',
             ['先分开，再把街道尽量变宽', 'x = 4.5，单侧 margin = 1.5', '支持向量 1、2、4 决定边界'],
         )

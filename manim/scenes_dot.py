@@ -66,6 +66,57 @@ def c2p(x, y):
     return P(OX + x * SCALE, OY - y * SCALE)
 
 
+U_DIR = np.array([3.0, 1.0, 0.0]) / np.sqrt(10.0)    # u's direction on screen (c2p keeps the aspect ratio)
+U_NRM = np.array([-1.0, 3.0, 0.0]) / np.sqrt(10.0)   # unit normal pointing to the upper-left side of u's line
+
+
+def rect_of(m, pad=0.04):
+    """Axis-aligned keep-out box (x0, y0, x1, y1) of a mobject, padded."""
+    return (m.get_left()[0] - pad, m.get_bottom()[1] - pad, m.get_right()[0] + pad, m.get_top()[1] + pad)
+
+
+def place_shadow_label(lab, v, s, avoid, prefer=None):
+    """Centre for the moving '影子 s' label next to the shadow segment, or None if no clear spot exists.
+
+    The shadow runs from the origin along ±u for |s| units. First try the side of u's line away from v
+    (the drop line and v live on v's side), starting at the shadow's midpoint and sliding outwards along the
+    shadow until the box clears every keep-out box (tick numbers, axis names, u's labels and tip, v's tip).
+    Near the origin the x-axis tick row leaves no room below a shallow shadow, so fall back to v's side just
+    past the shadow's end (beyond the drop line). The centre keeps the whole box off the shadow stroke."""
+    hw, hh = lab.width / 2, lab.height / 2
+    sgn = 1.0 if s > 0 else -1.0
+    length = abs(s) * SCALE / 50.0                                   # shadow length in screen units
+    ext = hw * abs(U_DIR[0]) + hh * abs(U_DIR[1])                    # box half-extent along u
+    clear = hw * abs(U_NRM[0]) + hh * abs(U_NRM[1]) + 0.07           # centre-to-line distance
+    v_side = 1.0 if 3.0 * v[1] - 1.0 * v[0] > 0 else -1.0            # +1: v above u's line
+    origin = c2p(0, 0)
+
+    def free(c):
+        return all(c[0] + hw <= x0 or c[0] - hw >= x1 or c[1] + hh <= y0 or c[1] - hh >= y1
+                   for x0, y0, x1, y1 in avoid)
+
+    def away():                                                       # branch 0: beside the shadow, away from v
+        for a in np.arange(length / 2, length + 0.5 * ext + 1e-6, 0.02):
+            c = origin + sgn * a * U_DIR - v_side * clear * U_NRM
+            if free(c):
+                return c
+        return None
+
+    def beyond():                                                     # branch 1: v's side, past the drop line
+        for a in np.arange(length + 0.1 + ext, length + 0.6 + ext, 0.02):
+            c = origin + sgn * a * U_DIR + v_side * clear * U_NRM
+            if free(c):
+                return c
+        return None
+
+    order = (beyond, away) if prefer == 1 else (away, beyond)        # hysteresis: keep last frame's branch first
+    for branch, fn in zip((1, 0) if prefer == 1 else (0, 1), order):
+        c = fn()
+        if c is not None:
+            return c, branch
+    return None, None
+
+
 class DotProduct(StepScene):
     ID = 'dot'
     TITLE = '点积：代数乘积与几何投影的统一'
@@ -74,7 +125,7 @@ class DotProduct(StepScene):
     def construct(self):
         # -------------------------------------------------- Opening Question
         self.question(
-            r'两个向量的点积，为什么既能按坐标相乘相加，又能算投影长度？代数与几何为什么必然给出同一个数字？这和线性分类器又有什么关系？',
+            r'两个向量的点积有两种算法：按坐标算，对应位置相乘再相加；按几何算，用两个向量的长度和它们的夹角。两个算式看起来毫不相干，为什么总给出同一个数？这个视频转动一个向量，让两种算法并排比较。**最后会看到：线性分类器判断一个点在哪一侧，靠的就是点积。**',
             ['点积：坐标相乘还是几何投影？', '两个看似无关的算式，为什么给出同一个数字？'],
         )
 
@@ -104,17 +155,20 @@ class DotProduct(StepScene):
         u_vec = Arrow(c2p(0, 0), c2p(3, 1), buff=0, color=BLUE, stroke_width=4.5, max_tip_length_to_length_ratio=0.16)
         u_lab = T('u = (3, 1)', 17, BLUE).next_to(c2p(3, 1), UR, buff=0.08)
         u_len = T('‖u‖ ≈ 3.16', 15, BLUE).next_to(u_lab, DOWN, buff=0.06).align_to(u_lab, LEFT)
+        u_bg = BackgroundRectangle(VGroup(u_lab, u_len), color=BG, fill_opacity=0.85, buff=0.04).set_z_index(1)
+        u_lab.set_z_index(2)
+        u_len.set_z_index(2)
 
         # Long dashed line along u
         u_line_start = c2p(-2.6 * 3 / np.sqrt(10), -2.6 * 1 / np.sqrt(10))
         u_line_end = c2p(3.6 * 3 / np.sqrt(10), 3.6 * 1 / np.sqrt(10))
         u_guide = DashedLine(u_line_start, u_line_end, color='#384d63', stroke_width=1.6, dash_length=0.1)
 
-        skeleton_geo = VGroup(grid, x_axis, y_axis, x_lab, y_lab, ticks, origin_dot, origin_lab, u_guide, u_vec, u_lab, u_len)
+        skeleton_geo = VGroup(grid, x_axis, y_axis, x_lab, y_lab, ticks, origin_dot, origin_lab, u_guide, u_vec, u_bg, u_lab, u_len)
 
         # -------------------------------------------------- Step 1: Define both vectors
         self.step(
-            r"给定固定向量 $\mathbf u = (3, 1)$，其长度 $\|\mathbf u\| = \sqrt{3^2 + 1^2} = \sqrt{10} \approx 3.16$；旋转向量 $\mathbf v$ 的长度固定为 $2.5$。点积课件写作 $\mathbf u'\mathbf v$（一撇是转置，也常写成 $\mathbf u\cdot\mathbf v$，同一个数），有两个等价视角：代数视角是各分量乘积之和 $\mathbf u'\mathbf v=u_1 v_1 + u_2 v_2 = 3v_1 + 1v_2$；几何视角是模长乘积乘以夹角余弦 $\mathbf u'\mathbf v=\|\mathbf u\|\|\mathbf v\|\cos\theta$。注意 $\|\mathbf v\|\cos\theta$ 正是 $\mathbf v$ 在 $\mathbf u$ 方向上的**标量投影（影子）**。",
+            r"蓝色箭头是固定向量 $\mathbf u=(3,1)$，长度 $\|\mathbf u\|=\sqrt{3^2+1^2}=\sqrt{10}\approx3.16$，沿着它的虚线是 $\mathbf u$ 所在的直线。黄色箭头 $\mathbf v$ 长度固定为 $2.5$，现在指向 $45^\circ$，等会儿会绕原点转。点积课件写作 $\mathbf u'\mathbf v$（一撇表示 transpose（转置）；也常写成 $\mathbf u\cdot\mathbf v$，是同一个数）。右边卡片是两种定义。代数式：$\mathbf u'\mathbf v=u_1v_1+u_2v_2=3v_1+1\cdot v_2$，对应坐标相乘再相加。几何式：$\mathbf u'\mathbf v=\|\mathbf u\|\,\|\mathbf v\|\cos\theta$，$\theta$ 是两个箭头之间的夹角。**$\|\mathbf v\|\cos\theta$ 是 $\mathbf v$ 在 $\mathbf u$ 方向上的影子，叫 scalar projection（标量投影），所以几何式就是“$\mathbf u$ 的长度 × $\mathbf v$ 的影子”。**",
             '两视角：代数乘积 u₁v₁ + u₂v₂ 还是几何投影？',
             stage=0,
         )
@@ -170,7 +224,7 @@ class DotProduct(StepScene):
 
         # -------------------------------------------------- Step 2: Concrete position 45°, shadow, readouts
         self.step(
-            r"将 $\mathbf v$ 置于 $45^\circ$ 位置，此时 $\mathbf v = 2.5(\cos 45^\circ, \sin 45^\circ) \approx (1.77, 1.77)$。代数算：$3 \times 1.77 + 1 \times 1.77 = 7.07$。几何算：从 $\mathbf v$ 向 $\mathbf u$ 的延伸线作垂直投影，影子长度为 $\|\mathbf v\|\cos\theta \approx 2.24$；点积即 $\|\mathbf u\| \times (\text{影子}) = 3.16 \times 2.24 \approx 7.07$。两套完全不同的算式，结果毫厘不差！",
+            r"现在把影子画出来：从 $\mathbf v$ 的箭头尖向 $\mathbf u$ 所在的直线作垂线（灰色虚线），原点到垂足这一段（绿色粗线）就是影子。右下的卡片同时用两种方法算点积。代数：$\mathbf v=2.5(\cos45^\circ,\ \sin45^\circ)\approx(1.768,\ 1.768)$，$3\times1.768+1\times1.768=4\times1.768\approx7.07$。几何：$\mathbf u$ 的方向角是 $\arctan(1/3)\approx18.43^\circ$，夹角 $\theta\approx45^\circ-18.43^\circ=26.57^\circ$，$\cos\theta\approx0.8944$，影子 $=\|\mathbf v\|\cos\theta=2.5\times0.8944\approx2.236$，点积 $=3.162\times2.236\approx7.07$。**两种完全不同的算法，给出同一个数 $7.07$。**屏幕上的数都四舍五入到两位，直接拿 $3\times1.77+1.77$ 或 $3.16\times2.24$ 会得到 $7.08$，差的 $0.01$ 只是四舍五入造成的。夹角是锐角，影子和 $\mathbf u$ 同向，所以点积为正，下方标签写着“锐角 · 影子同向”。",
             'v 投影到 u 上得到影子：3.16 × 2.24 ≈ 7.07',
             stage=1,
         )
@@ -248,16 +302,36 @@ class DotProduct(StepScene):
             b.move_to(P(480, 296))
             return b
 
+        # fixed things the moving shadow label must never cover: tick numbers, axis names, u's labels and tip,
+        # and the two axis lines themselves (a label sitting on an axis reads as clutter)
+        static_avoid = [rect_of(m) for m in (*ticks, origin_lab, x_lab, y_lab, u_lab, u_len, u_vec.get_tip())]
+        o = c2p(0, 0)
+        static_avoid += [(c2p(-3.2, 0)[0], o[1] - 0.04, c2p(3.8, 0)[0], o[1] + 0.04),
+                         (o[0] - 0.04, c2p(0, -2.8)[1], o[0] + 0.04, c2p(0, 2.8)[1])]
+
+        shadow_state = {'branch': None, 'c': None, 'mid': None}   # last frame's placement (avoids flicker)
+
         def make_shadow_lab():
-            _, proj, s = get_drop_and_proj()
+            v, _, s = get_drop_and_proj()
             if abs(s) < 0.4:
+                shadow_state.update(branch=None, c=None, mid=None)
                 return VGroup()
-            mid = c2p(proj[0] / 2.0, proj[1] / 2.0)
-            perp = np.array([-1.0 / np.sqrt(10.0), 3.0 / np.sqrt(10.0), 0]) * 0.24
             col = GREEN if s > 0 else RED
-            txt = T(f'影子 {s:.2f}', 13, col)
-            bg = BackgroundRectangle(txt, color=BG, fill_opacity=0.85, buff=0.05)
-            return VGroup(bg, txt).move_to(mid - perp)
+            txt = T(f'影子 {s:.2f}', 14, col)
+            lab = VGroup(BackgroundRectangle(txt, color=BG, fill_opacity=0.85, buff=0.03), txt)
+            a = tk_angle.get_value()
+            tip = c2p(*v)
+            v_text = tip + np.array([np.cos(a), np.sin(a), 0]) * 0.26
+            avoid = static_avoid + [(tip[0] - 0.14, tip[1] - 0.14, tip[0] + 0.14, tip[1] + 0.14),
+                                    (v_text[0] - 0.12, v_text[1] - 0.15, v_text[0] + 0.12, v_text[1] + 0.15)]
+            c, branch = place_shadow_label(lab, v, s, avoid, shadow_state['branch'])
+            mid = c2p(0, 0) + (np.sign(s) * abs(s) * SCALE / 50.0 / 2) * U_DIR
+            if c is None and shadow_state['c'] is not None:       # nowhere free this frame: follow the old spot
+                c, branch = shadow_state['c'] + (mid - shadow_state['mid']), shadow_state['branch']
+            if c is None:
+                return VGroup()
+            shadow_state.update(branch=branch, c=c, mid=mid)
+            return lab.move_to(c)
 
         readout_title = T('实时双读数对比（分秒恒等）', 15, GREY).move_to(P(350, 198), aligned_edge=LEFT)
         live_alg = always_redraw(make_readout_alg)
@@ -272,7 +346,7 @@ class DotProduct(StepScene):
 
         # -------------------------------------------------- Step 3: Rotate 360°
         self.step(
-            r"让 $\mathbf v$ 绕原点匀速旋转 $360^\circ$：夹角为锐角时，影子与 $\mathbf u$ 同向（绿色），点积为正；夹角为钝角时，影子反向落在负半轴（红色），点积为负。观察右侧的双读数：无论 $\mathbf v$ 转到哪个角度，代数分量计算与几何投影乘积都分秒不差、实时恒等。",
+            r"让 $\mathbf v$ 绕原点匀速转一整圈（$360^\circ$），盯住影子和右边的两行读数。夹角小于 $90^\circ$（锐角）时，影子和 $\mathbf u$ 同向，画成绿色，点积为正；夹角大于 $90^\circ$（钝角）时，影子落到原点另一侧、和 $\mathbf u$ 反向，画成红色，点积为负，因为这时 $\cos\theta<0$。$\mathbf v$ 和 $\mathbf u$ 同向时影子最长，就是 $\mathbf v$ 的全长 $2.5$，点积最大 $3.162\times2.5\approx7.91$；方向相反时最小，约 $-7.91$。**转到任何角度，代数读数和几何读数都相等：两种定义算的是同一个量。**",
             '360°旋转：锐角影子同向为正，钝角反向为负',
             stage=2,
         )
@@ -281,7 +355,7 @@ class DotProduct(StepScene):
 
         # -------------------------------------------------- Step 4: Orthogonal: dot = 0
         self.step(
-            r"当旋转到垂直位置时，$\mathbf v \approx (-0.79, 2.37)$，代数计算 $3 \times (-0.79) + 1 \times 2.37 = 0.00$。几何上看，垂线正好落在原点，影子长度为 $0.00$，因此 $3.16 \times 0.00 = 0.00$。两个非零向量点积为 $0$，充要条件是它们互相垂直，在线代中称为**正交（orthogonal）**。",
+            r"$\mathbf v$ 停在和 $\mathbf u$ 垂直的位置。它的方向是 $(-1,3)$，长度 $2.5$，所以 $\mathbf v=2.5\times(-1,3)/\sqrt{10}\approx(-0.79,\ 2.37)$。代数：$3\times(-0.79)+1\times2.37=-2.37+2.37=0$；只看方向更清楚，$3\times(-1)+1\times3=0$。几何：垂线正好落在原点，影子长 $0$，所以 $3.16\times0=0$，这也就是 $\cos90^\circ=0$。原点处的黄色直角记号标出垂直，卡片标题换成“$\mathbf u'\mathbf v=0\Leftrightarrow$ 正交”。**两个非零向量的点积为 $0$，当且仅当它们互相垂直，这叫 orthogonal（正交）。**",
             '垂直时影子为 0：u′v = 0 ⇔ 正交（orthogonal）',
             stage=3,
         )
@@ -310,7 +384,7 @@ class DotProduct(StepScene):
 
         # -------------------------------------------------- Step 5: Link to Classifiers
         self.step(
-            r"这正是线性分类器的几何本质：将 $\mathbf u$ 视为分类器的权重向量 $\mathbf w$。平面上所有点 $\mathbf x$，其 $\mathbf w'\mathbf x$ 就是 $\mathbf x$ 在 $\mathbf w$ 方向上的投影长乘模长。因此，所有满足 $\mathbf w'\mathbf x = c$ 的点都拥有完全相同的投影，排成一条垂直于 $\mathbf w$ 的直线（等值线）。决策边界 $\mathbf w'\mathbf x + b = 0$ 正是其中一条，$\mathbf w$ 是它的法向量；线性分类器本质上就是在测量 $\mathbf x$ 沿着 $\mathbf w$ 方向走了多远。",
+            r"现在把 $\mathbf u$ 当成分类器的权重向量，改名为 $\mathbf w=(3,1)$。因为 $\mathbf w'\mathbf x=\|\mathbf w\|\times$（$\mathbf x$ 在 $\mathbf w$ 方向上的影子），所有满足 $\mathbf w'\mathbf x=c$ 的点，影子长度都是 $c/\|\mathbf w\|$，于是排成一条和 $\mathbf w$ 垂直的直线（等值线）。图上画了三条：紫线 $\mathbf w'\mathbf x=0$（过原点）、黄线 $\mathbf w'\mathbf x=3$、青线 $\mathbf w'\mathbf x=6$。验证青线：$\mathbf x_A=(1.5,1.5)$ 给 $3\times1.5+1\times1.5=6$，$\mathbf x_B=(2,0)$ 给 $3\times2+1\times0=6$；两点的垂线落在同一点 $(1.8,\ 0.6)=0.6\times(3,1)$，影子都是 $6/\sqrt{10}\approx1.90$。黄线 $\mathbf w'\mathbf x-3=0$ 就是 decision boundary（决策边界）$\mathbf w'\mathbf x+b=0$，这里 $b=-3$；$\mathbf w$ 垂直于它，叫 normal vector（法向量）。右边的分类器 $\hat y=\sgn(\mathbf w'\mathbf x+b)$（$\sgn$ 是取正负号）：$\mathbf x$ 沿 $\mathbf w$ 的方向越过黄线，$\mathbf w'\mathbf x+b>0$，判正类；没越过，判负类。**线性分类器就是在问：$\mathbf x$ 沿法向量 $\mathbf w$ 的方向走了多远，有没有越过分界线。**",
             '分类器 w′x + b = 0：本质是看 x 在 w 方向走多远',
             stage=4,
         )
@@ -341,7 +415,10 @@ class DotProduct(StepScene):
         # Re-label u as weight vector w
         w_lab = T('w = (3, 1)', 17, BLUE).next_to(c2p(3, 1), UR, buff=0.08)
         w_role = T('法向量 (normal)', 14, BLUE).next_to(w_lab, DOWN, buff=0.06).align_to(w_lab, LEFT)
-        self.play(FadeOut(u_lab), FadeOut(u_len), FadeIn(w_lab), FadeIn(w_role), run_time=0.5)
+        w_bg = BackgroundRectangle(VGroup(w_lab, w_role), color=BG, fill_opacity=0.85, buff=0.04).set_z_index(1)
+        w_lab.set_z_index(2)
+        w_role.set_z_index(2)
+        self.play(FadeOut(u_lab), FadeOut(u_len), FadeOut(u_bg), FadeIn(w_bg), FadeIn(w_lab), FadeIn(w_role), run_time=0.5)
 
         # Draw 3 parallel classifier level lines perpendicular to w
         # Level line 1: w·x = 6 (c = 6)
@@ -400,7 +477,7 @@ class DotProduct(StepScene):
 
         # -------------------------------------------------- Closing Takeaway
         self.takeaway(
-            r"**一句话总结**：点积 $\mathbf u'\mathbf v$ 本质上是“目标向量长度 × 影子长度”，几何投影与代数坐标计算实时完全等价。点积为 $0$ 是向量正交（垂直）的充要条件。在机器学习中，线性分类器 $\mathbf w'\mathbf x + b = 0$ 的本质就是测量样本点 $\mathbf x$ 沿法向量 $\mathbf w$ 走了多远，越过分界线即判定为正类。",
+            r"一句话：**点积 $\mathbf u'\mathbf v=u_1v_1+u_2v_2=\|\mathbf u\|\,\|\mathbf v\|\cos\theta$，也就是“$\mathbf u$ 的长度 × $\mathbf v$ 在 $\mathbf u$ 方向上的影子”，坐标算法和几何算法给出同一个数。**锐角时点积为正，钝角时为负；两个非零向量点积为 $0$，当且仅当它们垂直（正交）。线性分类器 $\hat y=\sgn(\mathbf w'\mathbf x+b)$ 看的就是 $\mathbf x$ 沿法向量 $\mathbf w$ 走了多远：$\mathbf w'\mathbf x+b=0$ 是分界线，$\mathbf w$ 垂直于它，越过分界线判正类。复习时要会用两种式子算点积、用 $\mathbf u'\mathbf v=0$ 判断垂直，并且看到 $\mathbf w'\mathbf x+b=0$ 能说出 $\mathbf w$ 垂直于它、正负号决定点在哪一侧。",
             [
                 '点积是投影长乘模长：代数与几何完全统一',
                 '正交充要条件：u′v = 0 ⇔ 两向量垂直',

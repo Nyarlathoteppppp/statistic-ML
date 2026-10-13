@@ -124,11 +124,11 @@ class Pca(StepScene):
                                               buff=px(2)), text)
 
         self.question(
-            r'二维数据如果只能留下一条线，怎样尽量少丢信息？先把每个点的影子留在线上，再比较哪条线保留的变化最多。',
+            r'一团二维数据，如果每个点只准留一个数，也就是把平面压成一条线，怎样才能少丢信息？办法是让每个点在一条直线上留下影子，用影子的位置代替原来的点。**哪条线上的影子铺得最开，保留下来的变化就最多。**',
             ['二维压成一维，怎样少丢信息？', '试着把每个点的影子留在一条线上。'])
 
         self.step(
-            r"先把数据中心放到原点，蓝色是数据，黄色是待比较方向和影子；26 个点每一列减去均值，所以 $\bar{\bx}=\mathbf0$。每个点垂直落到线上，这叫 projection（投影）：单位方向 $\mathbf p=(\cos a,\sin a)$ 上的坐标是 $t_i=\mathbf p'\bx_i$（一撇表示转置，$\mathbf p'\bx$ 就是 c03 的点积），落点是 $t_i\mathbf p$，且 $\|\mathbf p\|=1$，这样不会靠拉长方向作弊。影子的 variance（方差）是离中心的坐标平方的平均，即 $\mathrm{Var}=\frac1{26}\sum_i t_i^2$；先试 $a=0^\circ$，$\mathbf p=(1,0)$，方差就是横坐标的方差 $2$。",
+            r"蓝点是 26 个数据点，已经做过 centering（中心化）：每一列减去自己的均值，所以中心落在原点，$\bar{\bx}=\mathbf0$。黄线是一个待比较的方向，每个蓝点沿灰色细线垂直落到黄线上，留下黄色影子，这叫 projection（投影）。**方向用单位向量 $\mathbf p=(\cos a,\sin a)$ 表示，影子的坐标就是 $t_i=\mathbf p'\bx_i$，落点是 $t_i\mathbf p$。**一撇表示转置，$\mathbf p'\bx$ 就是 c03 的点积；要求 $\|\mathbf p\|=1$，是为了不能靠把 $\mathbf p$ 拉长来让影子变大。影子有多分散，用 variance（方差）衡量：中心在原点，所以方差就是影子坐标平方的平均，$\mathrm{Var}=\frac1{26}\sum_i t_i^2$。先试 $a=0^\circ$：$\mathbf p=(1,0)$，影子坐标就是每个点的横坐标，算出 $\mathrm{Var}=2$。",
             '先移到中心，再把每个点投到线上', stage=0)
         left_axes = VGroup(
             Line(P(56, 174), P(298, 174), color=GREY, stroke_opacity=0.3),
@@ -164,7 +164,7 @@ class Pca(StepScene):
         self.wait(1.5)
 
         self.step(
-            r'转动同一条黄线，影子先铺开、再挤紧，右边同时画出每个方向的分散程度。对这团固定的数据，$\mathrm{Var}(a)=2+\sin(2a)$：$0^\circ,45^\circ,90^\circ,135^\circ,180^\circ$ 依次给出 $2+0=2,\ 2+1=3,\ 2+0=2,\ 2-1=1,\ 2+0=2$。半圈已经试完所有直线方向，因为 $\mathbf p$ 和 $-\mathbf p$ 的影子落在同一条线上，平方后的方差也一样。',
+            r'现在让黄线绕原点转半圈：左边的影子先铺开、再挤紧，右边把每个角度的方差画成曲线。**同一团数据，换一个方向，影子的方差就不一样。**对这团数据算出来是 $\mathrm{Var}(a)=2+\sin(2a)$（后面会从协方差矩阵推出来）：$a=0^\circ,45^\circ,90^\circ,135^\circ,180^\circ$ 时，$2a=0^\circ,90^\circ,180^\circ,270^\circ,360^\circ$，正弦值依次是 $0,1,0,-1,0$，所以方差依次是 $2,3,2,1,2$。只转半圈就够了：$\mathbf p$ 和 $-\mathbf p$ 是同一条线，影子坐标只差一个负号，平方后方差一样。',
             '转动同一条线，右图同步记录影子的分散', stage=1)
         graph_axes = VGroup(
             Line(gp(0, 0), gp(180, 0), color=GREY, stroke_width=1.5),
@@ -195,7 +195,7 @@ class Pca(StepScene):
         self.wait(1.2)
 
         self.step(
-            r'让影子铺得最开的方向留下来：回到 $45^\circ$，曲线最高，影子最分散，$\mathrm{Var}=2+\sin90^\circ=2+1=3$。这就是 principal component analysis（主成分分析，PCA）找的 first principal component（第一主成分，PC1），青色沿 $(1,1)$，单位方向是 $\mathbf p_1=(1,1)/\sqrt2$，因为长度 $\sqrt{1^2+1^2}=\sqrt2$。从此青色标记最优方向，黄色仍标记当前影子和读数。',
+            r'黄线转回 $45^\circ$，停在曲线最高点：影子最分散，$\mathrm{Var}=2+\sin90^\circ=2+1=3$。这个方向叫 first principal component（第一主成分，PC1），是 principal component analysis（主成分分析，PCA）要找的方向。**PCA 留下的，就是让影子方差最大的方向。**线变成青色，沿 $(1,1)$ 方向；这个向量长 $\sqrt{1^2+1^2}=\sqrt2$，除以长度得单位方向 $\mathbf p_1=(1,1)/\sqrt2$。从这里开始，青色标记最优方向，黄色仍标记当前的影子和读数。',
             '影子铺得最开，这个方向叫第一主成分', stage=2)
         self.play(angle.animate.set_value(45), run_time=1.8)
         rotating_line.clear_updaters()
@@ -212,7 +212,7 @@ class Pca(StepScene):
         self.wait(2.4)
 
         self.step(
-            r"这个最高点可以直接从数据形状算出来：covariance（协方差）矩阵 $\Sigma_x=\frac1n\sum_i\bx_i\bx_i'=\begin{bmatrix}2&1\\1&2\end{bmatrix}$，两个 $2$ 是各坐标的方差，两个 $1$ 是它们一起变化的程度；这里用 $1/n$，不是 $1/(n-1)$。$\mathrm{Var}=\frac1n\sum_i(\mathbf p'\bx_i)^2=\mathbf p'\Sigma_x\mathbf p$，其中 $\mathbf p$ 选方向，$\Sigma_x$ 描述数据的形状。写成 $\mathbf p=(\cos a,\sin a)$，四格相加得 $2\cos^2a+\cos a\sin a+\sin a\cos a+2\sin^2a=2+2\sin a\cos a=2+\sin2a$。在 $45^\circ$，两个分量都是 $1/\sqrt2$，所以每格乘 $1/2$，$\frac12(2+1+1+2)=6/2=3$。",
+            r"这个最高点不用转线去试，可以直接从数据的形状算出来。左下角是 covariance（协方差）矩阵 $\Sigma_x=\frac1n\sum_i\bx_i\bx_i'=\begin{bmatrix}2&1\\1&2\end{bmatrix}$：两个 $2$ 是两个坐标各自的方差，两个 $1$ 表示两个坐标一起变化的程度；这里除以 $n$，不是 $n-1$。**影子的方差可以写成 $\mathrm{Var}=\mathbf p'\Sigma_x\mathbf p$：$\mathbf p$ 选方向，$\Sigma_x$ 描述数据的形状。**来由是 $(\mathbf p'\bx_i)^2=\mathbf p'\bx_i\bx_i'\mathbf p$，求平均时把 $\mathbf p$ 提到外面，就得 $\frac1n\sum_i(\mathbf p'\bx_i)^2=\mathbf p'\Sigma_x\mathbf p$。代入 $\mathbf p=(\cos a,\sin a)$，矩阵每一格乘上它所在行、所在列的分量再相加：$2\cos^2a+\cos a\sin a+\sin a\cos a+2\sin^2a=2+2\sin a\cos a=2+\sin2a$（用到 $\cos^2a+\sin^2a=1$ 和 $2\sin a\cos a=\sin2a$），正是右边曲线的公式。在 $45^\circ$，两个分量都是 $1/\sqrt2$，每格乘 $\frac1{\sqrt2}\times\frac1{\sqrt2}=\frac12$，所以 $\frac12(2+1+1+2)=6/2=3$。",
             '方向和数据形状一起决定影子有多分散', stage=3)
         covariance = M(r'\Sigma_x=\begin{bmatrix}2&1\\1&2\end{bmatrix}', 29, BLUE).move_to(P(84, 323))
         calculation = M(r'\tfrac12(2+1+1+2)=3', 27, TEAL).move_to(P(246, 324))
@@ -231,7 +231,7 @@ class Pca(StepScene):
         self.wait(2.0)
 
         self.step(
-            r'换成与青线垂直的方向，影子挤得更紧：$135^\circ=45^\circ+90^\circ$，$\mathbf p_2=(-1,1)/\sqrt2$，内积 $(1\cdot(-1)+1\cdot1)/2=0$。这是 second principal component（第二主成分，PC2），紫色标记；本例只有二维，所以它也是方差最小的方向：$2+\sin270^\circ=2-1=1$。也可逐格计算：对角项乘 $1/2$、交叉项乘 $-1/2$，得 $\frac12(2-1-1+2)=2/2=1$；c37 写的 $(1,-1)/\sqrt2$ 只差一个负号，是同一条轴。',
+            r'青色虚线留作参照，黄线转到和它垂直的 $135^\circ=45^\circ+90^\circ$，影子挤得更紧，线变成紫色。这个方向是 $\mathbf p_2=(-1,1)/\sqrt2$，叫 second principal component（第二主成分，PC2）；它和 $\mathbf p_1$ 的内积 $(1\cdot(-1)+1\cdot1)/2=0$，两者垂直。**PC2 和 PC1 垂直；本例只有二维，所以 PC2 也是方差最小的方向：$2+\sin270^\circ=2-1=1$。**逐格算也一样：两个分量是 $-1/\sqrt2$ 和 $1/\sqrt2$，对角两格乘 $\frac12$，另外两格乘 $-\frac12$，得 $\frac12(2-1-1+2)=2/2=1$。c37 写的 $(1,-1)/\sqrt2$ 和它只差一个负号，是同一条轴。',
             '转到垂直方向，影子挤在一起，只剩方差一', stage=3)
         d1 = px(102) * np.array([1., 1., 0.]) / np.sqrt(2)
         pc1_reference = DashedLine(origin - d1, origin + d1, color=TEAL,
@@ -254,7 +254,7 @@ class Pca(StepScene):
         self.wait(2.0)
 
         self.step(
-            r"不必一直试方向：铺得最开的青色方向，正是 c04 特征向量视频里“只拉伸、不转向”的方向；这叫 eigenvector（特征向量），倍数叫 eigenvalue（特征值）。矩阵乘法给出 $\Sigma_x(1,1)=(2+1,1+2)=(3,3)=3(1,1)$，以及 $\Sigma_x(-1,1)=(-2+1,-1+2)=(-1,1)=1(-1,1)$，除以 $\sqrt2$ 后仍有 $\Sigma_x\mathbf p_1=3\mathbf p_1,\ \Sigma_x\mathbf p_2=1\mathbf p_2$。因 $\mathbf p'\mathbf p=1$，沿特征方向的方差 $\mathbf p'\Sigma_x\mathbf p=\lambda\mathbf p'\mathbf p=\lambda$，所以取最大特征值 $3$，这正是 c37 的结论 $\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1$。只保留 PC1，把二维压成一维，保留方差 $3/(3+1)=3/4=75\%$；总方差 $2+2=3+1=4$，勾股定理给出平均重建误差 $4-3=1$，因此最大化投影方差也就是最小化平方重建误差。",
+            r"其实不必一个个方向去试：线转回青色的 $45^\circ$，下方写出 $\Sigma_x\mathbf p_1=3\mathbf p_1$ 和 $\Sigma_x\mathbf p_2=1\mathbf p_2$，矩阵乘上这两个方向只拉伸、不转向，正是 c04 特征向量视频里的 eigenvector（特征向量），拉伸倍数叫 eigenvalue（特征值）。验算：$\Sigma_x(1,1)=(2+1,\ 1+2)=(3,3)=3(1,1)$，$\Sigma_x(-1,1)=(-2+1,\ -1+2)=(-1,1)=1(-1,1)$，两边同除以 $\sqrt2$ 就是上面两式。沿特征方向，方差就等于特征值：$\mathbf p'\Sigma_x\mathbf p=\lambda\mathbf p'\mathbf p=\lambda$（因为 $\mathbf p'\mathbf p=1$）。**所以方差最大的方向，就是最大特征值（这里是 $3$）对应的特征向量，即 c37 的结论 $\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1$。**只留 PC1、把二维压成一维，保留的方差比例是 $3/(3+1)=3/4=75\%$。丢掉的部分也能算：总方差是两个坐标的方差之和，也等于两个特征值之和，$2+2=3+1=4$；按勾股定理，每个点到原点距离的平方 = 影子坐标的平方 + 点到线距离的平方，平均下来平方重建误差是 $4-3=1$，所以最大化投影方差，也就是最小化平方重建误差。",
             '最宽方向就是最大特征值的方向', stage=4)
         d2 = px(102) * np.array([-1., 1., 0.]) / np.sqrt(2)
         pc2_reference = DashedLine(origin - d2, origin + d2, color=PURPLE,
@@ -278,6 +278,6 @@ class Pca(StepScene):
         for mob in (rotating_line, guides, shadows, angle_read, curve, moving_dot, var_read):
             mob.clear_updaters()
         self.takeaway(
-            r"先中心化，再投影比较影子的分散，留下方差最大的单位方向。考试记住 $\max_{\|\mathbf p\|=1}\mathbf p'\Sigma_x\mathbf p$ 的解是最大特征值的单位特征向量，$\Sigma_x\mathbf p=\lambda\mathbf p$；本例最大方差 $3$、另一方向方差 $1$，只留 PC1 解释 $3/(3+1)=75\%$ 的方差。",
+            r"一句话：PCA 先中心化，再把数据投影到各个单位方向上，留下影子方差最大的那个方向。**$\max_{\|\mathbf p\|=1}\mathbf p'\Sigma_x\mathbf p$ 的解是最大特征值对应的单位特征向量，满足 $\Sigma_x\mathbf p=\lambda\mathbf p$，最大方差就等于这个特征值。**考试要记住的就是这个结论。本例最大方差 $3$、另一方向方差 $1$，只留 PC1 就解释 $3/(3+1)=75\%$ 的方差。",
             ['留下影子最分散的方向', '取最大特征值对应的单位方向',
              '本例只留第一主成分，保留四分之三'])

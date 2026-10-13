@@ -66,6 +66,9 @@ C_LASSO = 2.5180
 # Layout scaling: 46 px per coordinate unit
 S_PX = 46.0
 
+# Axis names and tick numbers: light grey so they stay readable at 1280x720
+AXIS_C = '#9aa3b2'
+
 # Panel origin coordinates in layout px (y down)
 X0_L = 95.0
 Y0_L = 225.0
@@ -89,21 +92,28 @@ def make_ellipse(x0, y0, c_val, color=BLUE, stroke_width=2.2):
     return Polygon(*pts, stroke_color=color, stroke_width=stroke_width, fill_opacity=0)
 
 
-def build_axes(x0, y0):
-    r"""Build coordinate axes w1 \in [-1.3, 3.8], w2 \in [-1.3, 2.2] for one panel."""
-    x_axis = Line(P(x0 - 1.3 * S_PX, y0), P(x0 + 3.8 * S_PX, y0), color=DIM, stroke_width=1.8)
+def build_axes(x0, y0, t1_dir=DOWN):
+    r"""Build coordinate axes w1 \in [-1.3, 4.15], w2 \in [-1.3, 2.2] for one panel.
+
+    The w1 axis runs past the largest ellipse (lasso reaches w1 = 3.90) so its name sits to the right of
+    every contour. Tick '1' on w2 sits above-right of its tick (the circle / diamond pass through (0, 1));
+    tick '1' on w1 goes below (lasso: between diamond edge and ellipse) or below-right (ridge: the circle is
+    vertical there). Returns (axes, w1 tick label) so the lasso panel can hand that tick over to its contact label."""
+    x_end = x0 + 4.15 * S_PX
+    x_axis = Line(P(x0 - 1.3 * S_PX, y0), P(x_end, y0), color=DIM, stroke_width=1.8)
     y_axis = Line(P(x0, y0 + 1.3 * S_PX), P(x0, y0 - 2.2 * S_PX), color=DIM, stroke_width=1.8)
-    lab_w1 = M(r'w_1', 18, GREY).next_to(P(x0 + 3.8 * S_PX, y0), DR, buff=0.06)
-    lab_w2 = M(r'w_2', 18, GREY).next_to(P(x0, y0 - 2.2 * S_PX), UR, buff=0.06)
+    lab_w1 = M(r'w_1', 20, AXIS_C).next_to(P(x_end, y0), RIGHT, buff=0.1)
+    lab_w2 = M(r'w_2', 20, AXIS_C).next_to(P(x0, y0 - 2.2 * S_PX), UR, buff=0.06)
 
     # Unit tick marks
     tick_w1 = Line(P(x0 + S_PX, y0 - 3), P(x0 + S_PX, y0 + 3), color=DIM, stroke_width=1.5)
-    lab_t1 = M('1', 15, GREY).next_to(tick_w1, DOWN, buff=0.08)
+    lab_t1 = M('1', 20, AXIS_C).next_to(tick_w1, t1_dir, buff=0.08)
     tick_w2 = Line(P(x0 - 3, y0 - S_PX), P(x0 + 3, y0 - S_PX), color=DIM, stroke_width=1.5)
-    lab_t2 = M('1', 15, GREY).next_to(tick_w2, LEFT, buff=0.08)
-    lab_zero = M('0', 14, GREY).next_to(P(x0, y0), DL, buff=0.08)
+    lab_t2 = M('1', 20, AXIS_C).next_to(tick_w2, UR, buff=0.1)
+    lab_zero = M('0', 18, AXIS_C).next_to(P(x0, y0), DL, buff=0.08)
 
-    return VGroup(x_axis, y_axis, lab_w1, lab_w2, tick_w1, lab_t1, tick_w2, lab_t2, lab_zero)
+    axes = VGroup(x_axis, y_axis, lab_w1, lab_w2, tick_w1, lab_t1, tick_w2, lab_t2, lab_zero)
+    return axes, lab_t1
 
 
 class RidgeLasso(StepScene):
@@ -114,7 +124,7 @@ class RidgeLasso(StepScene):
     def construct(self):
         # 0. Opening question card
         self.question(
-            r'Ridge 和 lasso 都能防止过拟合，但只有 lasso 会把无关特征的权重**压成恰好等于 0**，自动做特征选择。为什么换一种惩罚会有这么大差异？从几何上看一清二楚。',
+            r'Ridge（岭回归）和 lasso 都在最小二乘的损失后面加一个惩罚项，这叫 regularisation（正则化），用来防止 overfitting（过拟合）：ridge 罚权重的平方和 $\|\bw\|_2^2=w_1^2+w_2^2$，lasso 罚权重的绝对值之和 $\|\bw\|_1=|w_1|+|w_2|$。两者都把权重往 $0$ 压，但 ridge 通常只把权重压小，lasso 却能把一些权重压成恰好 $0$，等于自动扔掉这些特征，叫 feature selection（特征选择）。只换了一种惩罚，为什么差这么多？**把两种惩罚画在权重平面上，答案就在形状里：一个是光滑的圆，一个是带尖角的菱形。**',
             [
                 '同是控制过拟合的正则化，',
                 '为什么只有 lasso 能把权重压成恰好 0？',
@@ -123,11 +133,11 @@ class RidgeLasso(StepScene):
         )
 
         # Dividing line between panels (x = 320 px)
-        div_line = Line(P(320, 48), P(320, 312), color=DIM, stroke_width=1.5)
+        div_line = Line(P(320, 48), P(320, 338), color=DIM, stroke_width=1.5)
 
-        # Coordinate axes
-        axes_L = build_axes(X0_L, Y0_L)
-        axes_R = build_axes(X0_R, Y0_R)
+        # Coordinate axes (ridge tick '1' on w1 goes below-right, clear of the circle)
+        axes_L, _ = build_axes(X0_L, Y0_L, t1_dir=DR)
+        axes_R, tick1_R = build_axes(X0_R, Y0_R)
 
         # Panel titles & role annotations
         title_ridge = VGroup(
@@ -168,7 +178,7 @@ class RidgeLasso(StepScene):
         rss_tag_L = VGroup(
             M(r'\text{RSS}', 17, BLUE),
             T('等高线', 15, BLUE)
-        ).arrange(RIGHT, buff=0.06).next_to(pos_ols_L, UR, buff=0.32)
+        ).arrange(RIGHT, buff=0.06).next_to(P(222, 168), RIGHT, buff=0)   # outside the outer demo contour
 
         # Constraint regions (radius t = 1 for both)
         # Ridge: circle ||w||_2^2 <= 1
@@ -191,7 +201,7 @@ class RidgeLasso(StepScene):
         # Step 1: Unconstrained OLS solution & RSS contours
         # -------------------------------------------------------------
         self.step(
-            r'左右两边分别是 ridge 与 lasso 在权重空间 $(w_1, w_2)$ 上的示意图。白点 $\hat\bw=(2.2,\ 0.55)$ 是未加惩罚时的最小二乘解（OLS）。蓝色椭圆是残差平方和 $\text{RSS}(\bw)$ 的等高线：同一个椭圆上的权重残差相同，离中心越远 RSS 越大。',
+            r'左右两块面板画的是同一个问题：横轴 $w_1$、纵轴 $w_2$，平面上每个点代表一组权重 $(w_1,w_2)$。白点 $\hat\bw=(2.2,\ 0.55)$ 是不加惩罚时的解，即 ordinary least squares（最小二乘，OLS）解：它让 residual sum of squares（残差平方和，RSS）$\text{RSS}(\bw)=\|\by-\mathbf X\bw\|_2^2$ 最小。两边浅蓝色的椭圆是 RSS 的等高线，以白点为中心。**同一个椭圆上的权重 RSS 相同，椭圆越大（离白点越远），RSS 越大。**两个标题里的不等式是下一步要加的约束。',
             '白点 ŵ 是无约束解，蓝色椭圆是残差平方和 RSS 等高线',
             stage=0,
         )
@@ -218,7 +228,7 @@ class RidgeLasso(StepScene):
         # Step 2: Constraint regions (same radius t = 1) & role annotations
         # -------------------------------------------------------------
         self.step(
-            r'加惩罚等价于约束解必须落在某个区域内（约束形式）：两边设定相同的约束半径 $t=1$。Ridge 的 $L_2$ 约束 $\|\bw\|_2^2\le 1$ 是一个光滑的圆；Lasso 的 $L_1$ 约束 $\|\bw\|_1\le 1$ 则是菱形。注意：圆没有尖角，而菱形的尖角恰好落在坐标轴上。',
+            r'浅色椭圆淡出，两边各画出一块允许区域。加惩罚 $\text{RSS}+\lambda\cdot\text{惩罚}$ 可以等价地改写成约束形式：只在区域“惩罚 $\le t$”里面找 RSS 最小的点；适当选 $t$，两种写法得到同一个解。两边都取 $t=1$。左边 ridge 的 $L_2$ 约束 $\|\bw\|_2^2=w_1^2+w_2^2\le1$ 是半径为 $1$ 的圆（青色）。右边 lasso 的 $L_1$ 约束 $\|\bw\|_1=|w_1|+|w_2|\le1$ 是菱形（橙色）：在第一象限它的边界就是直线 $w_1+w_2=1$，从 $(1,0)$ 连到 $(0,1)$，四个象限拼起来正好四条边。**圆处处光滑、没有尖角；菱形的四个尖角 $(\pm1,0)$、$(0,\pm1)$ 正好落在坐标轴上。**',
             '两边使用相同约束半径 t = 1：ridge 是圆，lasso 是菱形',
             stage=1,
         )
@@ -243,7 +253,7 @@ class RidgeLasso(StepScene):
         # Step 3: Linked contour expansion -> Ridge makes first contact
         # -------------------------------------------------------------
         self.step(
-            r'带约束的最优解，就是从 $\hat\bw$ 慢慢放大椭圆，**第一次碰到约束区域**的那一点。两边椭圆同步放大（同一个参数驱动），等高线同步向外膨胀：当膨胀到 $c\approx 1.841$ 时，左边椭圆首先碰到了圆周。触点约在 $(0.883,\ 0.470)$——两个权重都被连续缩小，但都不为 $0$。',
+            r'两边的蓝色椭圆从白点开始同步长大，由同一个数 $c$ 控制：$c$ 是这一圈等高线的值，$c$ 越大，椭圆越大，RSS 越大。**带约束的解，就是椭圆第一次碰到约束区域的那个点。**原因是：碰到之前，椭圆里面的权重 RSS 更小，但都不在区域里；碰到的那一刻，这个点就是区域里 RSS 最小的点。$c$ 长到约 $1.84$ 时，左边椭圆先碰到圆，切点（黄点）约为 $(0.883,\ 0.470)$，屏幕上写作 $(0.88,\ 0.47)$；验算它在圆上：$0.883^2+0.470^2\approx0.780+0.221\approx1.00$。和 $\hat\bw=(2.2,\ 0.55)$ 相比，两个权重都被压小了，但都不是 $0$。这时右边的椭圆还没碰到菱形：菱形整个装在圆里面，椭圆要再长大一些才够得着。',
             '从 ŵ 同步放大椭圆：ridge 在 (0.88, 0.47) 首次相切',
             stage=2,
         )
@@ -263,8 +273,10 @@ class RidgeLasso(StepScene):
         # Ridge contact point ~ (0.883, 0.470)
         pos_rc = P(X0_L + 0.883 * S_PX, Y0_L - 0.469 * S_PX)
         dot_rc = Dot(pos_rc, radius=0.09, color=YELLOW)
-        lab_rc = M(r'(0.88,\, 0.47)', 22, YELLOW).move_to(P(70, 150))
-        sub_rc = T('w₁、w₂ 都不为 0', 16, WHITE).next_to(lab_rc, DOWN, buff=0.06)
+        # label block sits left of the w2 axis (right edge x = 90 px) and above the w2 tick label
+        sub_rc = T('w₁、w₂ 都不为 0', 16, WHITE)
+        lab_rc = M(r'(0.88,\, 0.47)', 22, YELLOW).next_to(sub_rc, UP, buff=0.06)
+        VGroup(lab_rc, sub_rc).move_to(P(47, 148))
         lead_rc = Line(sub_rc.get_bottom() + DOWN * 0.04, pos_rc, color=YELLOW, stroke_width=1.5)
 
         self.play(
@@ -281,7 +293,7 @@ class RidgeLasso(StepScene):
         # Step 4: Lasso continues expanding -> hits diamond corner (1, 0)
         # -------------------------------------------------------------
         self.step(
-            r'此时 lasso 区域还未触碰，右边椭圆继续膨胀到 $c\approx 2.518$。它第一次碰到菱形的位置，恰好是长在坐标轴上的尖角 $(1,\ 0)$！这意味着第二个特征的权重 $w_2=0$，该特征被彻底剔除，实现了稀疏性（sparsity）。',
+            r'左边停在切点不动；右边椭圆继续长大，到 $c\approx2.518$ 时第一次碰到菱形，碰到的正好是坐标轴上的尖角 $(1,\ 0)$（黄点）。验算它在菱形的边界上：$|1|+|0|=1$。**这个解里 $w_2$ 恰好等于 $0$，第二个特征被整个扔掉了。**一部分权重恰好为 $0$ 的解叫 sparse（稀疏）解，这种性质叫 sparsity（稀疏性）。',
             'lasso 椭圆继续膨胀，在尖角 (1, 0) 首次接触：w₂ = 0',
             stage=3,
         )
@@ -293,18 +305,26 @@ class RidgeLasso(StepScene):
         pos_lc = P(X0_R + 1.0 * S_PX, Y0_R)
         dot_lc = Dot(pos_lc, radius=0.09, color=YELLOW)
         lab_lc = VGroup(
-            M(r'(1,\, 0)', 18, YELLOW),
-            T(' ⇒ ', 16, YELLOW),
-            M(r'w_2 = 0', 18, YELLOW)
-        ).arrange(RIGHT, buff=0.06).next_to(pos_lc, DR, buff=0.18)
-        sub_lc = T('恰好在轴上（稀疏）', 16, GREEN).next_to(lab_lc, DOWN, buff=0.06)
-        bg_lc = BackgroundRectangle(VGroup(lab_lc, sub_lc), color=BG, fill_opacity=0.9, buff=0.06)
+            M(r'(1,\, 0)', 20, YELLOW),
+            T(' ⇒ ', 17, YELLOW),
+            M(r'w_2 = 0', 20, YELLOW)
+        ).arrange(RIGHT, buff=0.06)
+        sub_lc = T('恰好在轴上（稀疏）', 17, GREEN).next_to(lab_lc, DOWN, buff=0.06)
+        # The label hangs below the wedge between the diamond edge and the ellipse arc (both leave the corner
+        # downwards), so its box covers neither; a short vertical leader ties it to the corner. The lone tick
+        # '1' under the corner fades out: the label now names that point as (1, 0).
+        block_lc = VGroup(lab_lc, sub_lc)
+        block_lc.next_to(P(480, 268), DOWN, buff=0.06)
+        bg_lc = BackgroundRectangle(block_lc, color=BG, fill_opacity=0.9, buff=0.06)
+        lead_lc = Line(pos_lc + DOWN * 0.1, P(X0_R + S_PX, 268), color=YELLOW, stroke_width=1.5)
 
         self.play(
+            FadeOut(tick1_R),
             FadeIn(bg_lc),
             FadeIn(dot_lc),
             FadeIn(lab_lc),
             FadeIn(sub_lc),
+            Create(lead_lc),
             Flash(dot_lc, color=YELLOW, line_length=0.15, flash_radius=0.25),
             run_time=0.8,
         )
@@ -318,7 +338,7 @@ class RidgeLasso(StepScene):
         # Step 5: Geometric insight & contrast: sharp corner vs smooth circle
         # -------------------------------------------------------------
         self.step(
-            r'几何本质在于形状：菱形的四个尖角直接长在坐标轴上。由于尖角向外凸出，不同斜率与偏置的数据等高线膨胀过来时，往往会先撞上尖角，从而使解具有稀疏性（但非绝对保证）。而圆周处处光滑，法向连续变化，触点恰好落在轴上纯属巧合，因此 ridge 通常只做连续收缩。',
+            r'菱形的四个尖角被标成橙点，下方是两边的小结。为什么 lasso 常常碰在尖角上？尖角向外凸出，椭圆从很多不同的位置长过来，最先碰到的往往就是凸出的尖角；尖角都在坐标轴上，碰到尖角就有一个权重为 $0$。但这不是保证：$\hat\bw$ 在某些位置时，椭圆也会先碰到菱形的一条边，这时两个权重都不为 $0$。圆周处处光滑，没有哪个点特别凸出，切点随 $\hat\bw$ 的位置连续移动，恰好落在坐标轴上只是巧合，所以 ridge 通常只是把权重连续压小。**菱形的尖角向外凸、又正好在坐标轴上，这就是 lasso 常得到稀疏解的原因。**',
             '菱形尖角在坐标轴上，往往先被碰到；圆周平滑，碰在轴上只是巧合',
             stage=4,
         )
@@ -333,8 +353,8 @@ class RidgeLasso(StepScene):
         corner_dots = VGroup(*[Dot(p, radius=0.06, color=ORANGE) for p in corners])
 
         # Bottom summary pills inside each panel
-        pill_ridge = pill('Ridge：连续收缩，碰在轴上纯属巧合', fill=DIM, color=WHITE, size=15).move_to(P(160, 298))
-        pill_lasso = pill('Lasso：尖角外凸，更容易压成恰好 0', fill=DIM, color=YELLOW, size=15).move_to(P(480, 298))
+        pill_ridge = pill('Ridge：连续收缩，碰在轴上纯属巧合', fill=DIM, color=WHITE, size=15).move_to(P(160, 326))
+        pill_lasso = pill('Lasso：尖角外凸，更容易压成恰好 0', fill=DIM, color=YELLOW, size=15).move_to(P(480, 326))
 
         self.play(
             FadeIn(corner_dots),
@@ -352,7 +372,7 @@ class RidgeLasso(StepScene):
         # Takeaway card
         # -------------------------------------------------------------
         self.takeaway(
-            r'总结：约束形式下，带惩罚的解就是 RSS 椭圆与约束区域的**第一次接触点**。$L_1$ 范数区域是菱形，尖角长在坐标轴上，椭圆从很大一片方向膨胀过来都会先撞在尖角上，因此常常让某些权重恰好为 $0$（稀疏性与特征选择，但不保证）；$L_2$ 范数区域是光滑的圆，没有尖角，解连续收缩，碰在轴上纯属巧合。二者使用相同约束半径 $t=1$。',
+            r'一句话：带惩罚的解，就是 RSS 椭圆从 $\hat\bw$ 往外长、第一次碰到约束区域的那个点。Lasso 的区域 $\|\bw\|_1\le t$ 是菱形，尖角在坐标轴上，椭圆常常先撞上尖角，于是某些权重恰好为 $0$（本例 $w_2=0$），得到稀疏解、自动做特征选择，但不保证每次都这样；ridge 的区域 $\|\bw\|_2^2\le t$ 是光滑的圆，权重只是连续变小，落在坐标轴上只是巧合。本例两边都取 $t=1$。**$L_1$ 的菱形有尖角在坐标轴上，所以 lasso 常得到恰好为 $0$ 的权重；$L_2$ 的圆没有尖角，ridge 只把权重压小。**复习时要能画出这张“圆 vs 菱形”的图，并用它解释为什么 $L_1$ 惩罚会产生稀疏解。',
             [
                 '菱形的尖角在坐标轴上，碰点常常就是尖角',
                 '‖w‖₁ ≤ t ⇒ 常得稀疏解（本例 w₂ = 0）',

@@ -19,6 +19,7 @@ python3 tests/serve.py 8765
 ```bash
 node tests/site.check.js      # 结构、公式、视频、链接
 node tests/core.test.js       # 计算核心单元测试
+node tests/check_timings.js   # 视频旁白里的公式（不需重建索引）
 ```
 
 ## 重新渲染视频
