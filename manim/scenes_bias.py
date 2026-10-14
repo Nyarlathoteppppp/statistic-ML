@@ -243,7 +243,7 @@ class BiasVariance(StepScene):
         # ----------------------------------------------------
         self.step(
             "两边都用最小二乘法拟合周一的数据。左边直线只有 2 个参数，弯不过来，明显跟不上白线，这叫 underfitting（欠拟合）；"
-            "右边 7 次多项式有 8 个参数，几乎贴着每个蓝点走。"
+            "右边 7 次多项式有 8 个参数（$x^0$ 到 $x^7$ 各一个系数），几乎贴着每个蓝点走。"
             f"用残差的均方根（每个点到曲线的竖直距离先平方、再平均、再开根号）衡量贴得多紧：直线 {resid1:.2f}，多项式只有 {resid7:.2f}。",
             '用周一数据拟合：直线欠拟合，多项式几乎贴着每个点',
             stage=1,
@@ -441,9 +441,13 @@ class BiasVariance(StepScene):
 
         self.step(
             r"**期望测试误差拆成三项：$\mathrm{E}[(Y-\hat f)^2] = \text{bias}^2 + \text{variance} + \mathrm{Var}[Y]$。**"
+            r"先认符号：$\hat f$ 是模型在 $x_0$ 的预测；$Y$ 是测试时真正观测到的值 = 真值 $f(x_0)$ + 一次新的随机噪声，所以它自己也会晃，"
+            rf"晃的方差就是第 2 步的噪声方差 $\sigma^2={SD}^2={SD ** 2:.4f}$（本章写作 $\mathrm{{Var}}[Y]$）；"
+            rf"$\mathrm E[\cdot]$ 就是“对无数份训练数据（和测试噪声）取平均”，第 8 步把训练数据换了 {N_SIM} 次，就是在近似其中对训练数据的那部分平均。"
             r"上方公式里，$\text{bias}^2$ 是平均预测偏离真值的平方，$\text{variance}$ 是换数据时预测晃动的方差（标准差的平方），"
-            r"$\mathrm{Var}[Y]$ 是数据本身的噪声的方差，本例里就是第一步噪声标准差的平方 $\sigma^2$（公式下方注释写着 σ²），叫 irreducible error（不可约误差），任何模型都消不掉。"
-            r"中间是示意图：模型越复杂，黄线 $\text{bias}^2$ 越低、绿线 $\text{variance}$ 越高，加上灰色虚线 $\mathrm{Var}[Y]$，红色的总误差通常呈 U 形。"
+            r"$\mathrm{Var}[Y]$ 就是这个噪声方差 $\sigma^2$（公式下方注释写着 σ²），叫 irreducible error（不可约误差），任何模型都消不掉。"
+            r"为什么能这样拆，正文“数学定义”一节的“推导”用 $\mathrm E[Z^2]=\mathrm{Var}[Z]+(\mathrm EZ)^2$ 推出。"
+            r"中间是示意图：横轴是模型复杂度（本例用多项式次数衡量），模型越复杂，黄线 $\text{bias}^2$ 越低、绿线 $\text{variance}$ 越高，加上灰色虚线 $\mathrm{Var}[Y]$，红色的总误差通常呈 U 形。"
             rf"下方是本例在 $x_0$ 处模拟 {N_SIM} 天的结果：1 次 ≈ {sim_err[1]:.2f}，3 次 ≈ {sim_err[3]:.2f}（最低），"
             rf"7 次 ≈ {sim_err[7]:.2f}，9 次 ≈ {sim_err[9]:.2f}：直线输在偏差，9 次输在方差，中间的 3 次最好。"
             rf"每个数都是三项相加（用未取整的偏差和标准差算；拿两位小数手算 1 次会得 $0.16$），以 7 次为例：${abs(sim_bias[7]):.2f}^2+{sim_sd[7]:.2f}^2+{SD}^2\approx{sim_err[7]:.2f}$。",
@@ -475,7 +479,7 @@ class BiasVariance(StepScene):
             axis_config={'include_numbers': False, 'include_tip': True, 'tip_width': 0.16, 'tip_height': 0.16,
                          'stroke_color': GREY, 'stroke_width': 1.4, 'stroke_opacity': 0.6},
         ).move_to(P(320, 212))
-        lab_x = T('模型复杂度 (自由度)', 14, WHITE).next_to(ax_u.x_axis, DOWN, buff=0.12)
+        lab_x = T('模型复杂度（多项式次数）', 14, WHITE).next_to(ax_u.x_axis, DOWN, buff=0.12)
         lab_y = T('误差', 14, WHITE).next_to(ax_u.y_axis.get_top(), LEFT, buff=0.08)
 
         def f_bias(u):

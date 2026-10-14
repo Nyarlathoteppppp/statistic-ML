@@ -5,7 +5,7 @@ set entries are variable indices, and edge weights count shared variables.
 """
 from manim import (
     Circle, Circumscribe, Create, DashedLine, Dot, FadeIn, FadeOut,
-    Indicate, Line, RoundedRectangle, Transform, UP, VGroup,
+    Indicate, Line, ReplacementTransform, RoundedRectangle, Transform, UP, VGroup,
 )
 from common import (
     BG, BLUE, GREEN, GREY, M, ORANGE, P, PURPLE, RED, StepScene,
@@ -13,10 +13,26 @@ from common import (
 )
 
 
+def message_table():
+    """The message c2 -> c3 opened up: a 2x2 table over the separator {x3, x4} (x3 down the rows, x4 across),
+    one number (a yellow dot) per hot/cold combination. Sits right of the c3 card, under the {x3,x4} label.
+    Returns (dots, frame) so the travelling dot can split into the four dots."""
+    xs, ys = [488, 505, 524, 543], [302, 316, 331, 346]      # layout px: label / 热冷 / value columns and rows
+    title = T('发往 c₃ 的消息', 16, YELLOW).move_to(P(515, 285))
+    rv = T('x₃', 17, WHITE).move_to(P(xs[0], (ys[2] + ys[3]) / 2))
+    cv = T('x₄', 17, WHITE).move_to(P((xs[2] + xs[3]) / 2, ys[0]))
+    rh = [T(w, 15, '#b8c0cc').move_to(P(xs[1], ys[2 + k])) for k, w in enumerate('热冷')]
+    ch = [T(w, 15, '#b8c0cc').move_to(P(xs[2 + k], ys[1])) for k, w in enumerate('热冷')]
+    hl = Line(P(xs[1] - 7, (ys[1] + ys[2]) / 2), P(xs[3] + 8, (ys[1] + ys[2]) / 2), color='#4a5060', stroke_width=1.5)
+    vl = Line(P((xs[1] + xs[2]) / 2, ys[1] - 7), P((xs[1] + xs[2]) / 2, ys[3] + 7), color='#4a5060', stroke_width=1.5)
+    dots = VGroup(*[Dot(P(xs[2 + c], ys[2 + r]), radius=px(4.5), color=YELLOW) for r in range(2) for c in range(2)])
+    return dots, VGroup(title, rv, cv, *rh, *ch, hl, vl).set_z_index(4)
+
+
 class ElimJt(StepScene):
     ID = 'elim-jt'
     TITLE = '消元找团：把有环的图变成团的树'
-    FLOW = ['连邻居记团', '消完变量', '留极大团', '数共享变量', '连树传消息']
+    FLOW = ['连邻居记团', '消完变量', '留极大团', '数共享变量', '删边成树', '交集传消息']
 
     def construct(self):
         self.question(
@@ -119,7 +135,7 @@ class ElimJt(StepScene):
         eliminate(5, [])
 
         self.step(
-            r'右边 5 条记录里，$c_4,c_5$ 被红线划掉：$\{5\}\subset\{4,5\}\subset\{3,4,5\}$，它们的变量全在 $c_3$ 里。被大团完全包含的小团，不必单独成为树上的节点，它们的因子可以并进大团。五条记录去掉两条，$5-2=3$，留下绿色的 $c_1,c_2,c_3$。**不被其他团严格包含的团叫 maximal clique（极大团），三个都要留，不是只挑最大的一个。**',
+            r'右边 5 条记录里，$c_4,c_5$ 被红线划掉：$\{5\}\subset\{4,5\}\subset\{3,4,5\}$，它们的变量全在 $c_3$ 里。被大团完全包含的小团，不必单独成为树上的节点，它们的因子可以并进大团（以后每个团要配一张打分表；小团的表直接乘进包含它的大团的表里）。五条记录去掉两条，$5-2=3$，留下绿色的 $c_1,c_2,c_3$。**不被其他团严格包含的团叫 maximal clique（极大团），三个都要留，不是只挑最大的一个。**',
             '被别的团包含的，不必单独保留', stage=2,
         )
         self.play(Circumscribe(rows[2], color=GREEN), run_time=0.8)
@@ -163,9 +179,10 @@ class ElimJt(StepScene):
             weights[a, b] = shared
         self.wait(1.2)
 
+        # 8a. delete the wrong edge vs. keep the maximum-weight spanning tree
         self.step(
-            r'要变成树，得删一条边，但不能随便删。先看红色的错误做法：删掉 $c_1$—$c_2$，留下的树总权重 $2+1=3$；$x_2$ 在 $c_1$ 和 $c_2$ 里都有，可从 $c_1$ 到 $c_2$ 必须经过不含 $x_2$ 的 $c_3$，关于 $x_2$ 的信息就断了。**正确做法是取 maximum-weight spanning tree（最大权重生成树）：保留共享变量最多、又不成环的边。** 3 个节点需要 $3-1=2$ 条边，留下两条权重 2 的边，总权重 $2+2=4>3$，删掉权重 1 的边，就得到 junction tree（联结树）$c_1$—$c_2$—$c_3$；边上的交集 $\{x_2,x_3\}$、$\{x_3,x_4\}$ 叫 separator（分隔集）。$x_3$ 沿 $c_1$—$c_2$—$c_3$ 连续出现，$x_2$ 在相邻的前两团，$x_4$ 在相邻的后两团，同一变量沿树不断线，这叫 running intersection property（连续交集性质）；用消元（连同填补边）得到的极大团，按交集大小取最大权重生成树，就能保住这个性质。最后沿边移动的黄点代表 message（消息）：它不是变量名本身，而是 separator 变量的函数，例如发往 $c_3$ 的消息只依赖 $x_3,x_4$，其余变量都已求和掉。',
-            '共享变量沿树不断线，消息只带交集', stage=4,
+            r'要变成树，得删一条边，但不能随便删。先看红色的错误做法：删掉 $c_1$—$c_2$，留下的树总权重 $2+1=3$；$x_2$ 在 $c_1$ 和 $c_2$ 里都有，可从 $c_1$ 到 $c_2$ 必须经过不含 $x_2$ 的 $c_3$，关于 $x_2$ 的信息就断了。**正确做法是取 maximum-weight spanning tree（最大权重生成树）：保留共享变量最多、又不成环的边。** 生成树 = 用最少的边把所有团都连起来、而且没有环（$n$ 个团正好 $n-1$ 条边）；最大权重 = 在所有这种选法里，挑边权总和最大的那一个。这里 3 个团需要 $3-1=2$ 条边，三条边里选两条共 3 种选法：留下两条权重 2 的边，总权重 $2+2=4$；另外两种都是 $2+1=3$。所以删掉权重 1 的边，得到 junction tree（联结树）$c_1$—$c_2$—$c_3$。',
+            '连起所有团、不成环，再挑边权总和最大的那棵树', stage=4,
         )
         score = M(r'2+1=3', 24, RED).move_to(P(468, 78))
         self.play(jt_edges[1, 2].animate.set_opacity(0.12),
@@ -177,11 +194,20 @@ class ElimJt(StepScene):
         self.play(Circumscribe(rows[2], color=RED), run_time=0.6)
         self.wait(1.2)
         self.play(jt_edges[1, 2].animate.set_opacity(1).set_color(GREEN),
+                  Transform(weights[1, 2], M('2', 24, TEAL).move_to(P(484, 139))),
                   jt_edges[2, 3].animate.set_color(GREEN),
                   FadeOut(jt_edges[1, 3]), FadeOut(weights[1, 3]),
                   Transform(score, M(r'2+2=4', 24, GREEN).move_to(P(468, 78))),
                   Transform(header, T('保留共享最多、又不成环的边', 19, GREEN).move_to(P(463, 55))),
                   run_time=0.8)
+        change_note('生成树：连起所有团、无环，3 团 2 条边', GREEN)
+        self.wait(1.8)
+
+        # 8b. separators, running intersection, and what a message is
+        self.step(
+            r'树边上的权重 2 换成了两团的交集 $\{x_2,x_3\}$、$\{x_3,x_4\}$，叫 separator（分隔集）。接着三个团一起闪动：$x_3$ 沿 $c_1$—$c_2$—$c_3$ 连续出现，屏幕上写成 $x_3\in c_1,c_2,c_3$（$\in$ 读作‘属于’）；$x_2$ 在相邻的前两团，$x_4$ 在相邻的后两团。**同一变量沿树不断线，这叫 running intersection property（连续交集性质）。** 用消元（连同填补边）得到的极大团，按交集大小取最大权重生成树，就能保住这个性质（课件给的结论，考试直接用，不要求证明）。最后沿边移动的黄点代表 message（消息），到达后展开成一张小表：例如发往 $c_3$ 的消息是一张小表：$x_3,x_4$ 的 4 种冷热组合各一个数（c57 的消息只依赖收件人一个变量，所以是 2 个数）；其余变量 $x_1,x_2$ 都已求和掉。',
+            '共享变量沿树不断线；消息是交集变量的小表', stage=5,
+        )
         # Explicitly bounded labels, well inside x=626 (especially {x_3,x_4}).
         for key, tex, at in [((1, 2), r'\{x_2,x_3\}', (505, 135)),
                              ((2, 3), r'\{x_3,x_4\}', (505, 261))]:
@@ -190,27 +216,34 @@ class ElimJt(StepScene):
                 target.scale_to_fit_width(px(116))
             target.move_to(P(*at)).set_z_index(4)
             self.play(Transform(weights[key], target), run_time=0.5)
+        self.play(Transform(header, T('边上的交集：separator', 20, YELLOW).move_to(P(463, 55))),
+                  FadeOut(score), run_time=0.5)
         change_note('边上的交集：消息只依赖这些变量', YELLOW)
         self.wait(1.2)
-        self.play(*[Indicate(rows[i], color=YELLOW, scale_factor=1.03) for i in range(3)],
+        # flash the labels only: Indicate on the whole card would paint its dark fill solid yellow
+        self.play(*[Indicate(rows[i][1], color=YELLOW, scale_factor=1.12) for i in range(3)],
                   Indicate(jt_edges[1, 2], color=YELLOW),
                   Indicate(jt_edges[2, 3], color=YELLOW), run_time=0.8)
         continuity = M(r'x_3\in c_1,\ c_2,\ c_3', 23, YELLOW).move_to(P(468, 78))
-        self.play(Transform(score, continuity),
+        self.play(FadeIn(continuity),
                   Transform(header, T('同一变量沿树不断线', 20, YELLOW).move_to(P(463, 55))),
                   run_time=0.5)
-        # Light travelling along the edge represents a table indexed by the separator.
+        self.wait(1.2)
+        # The light travelling along the edge is a message; on arrival it opens into a 2x2 table over the separator
+        # {x3, x4}: one number (a yellow dot) per hot/cold combination.
         packet = Dot(P(*cp[2]), radius=px(5), color=YELLOW).set_z_index(5)
         self.play(FadeIn(packet), run_time=0.5)
         self.play(packet.animate.move_to(P(*cp[3])), run_time=1.2)
-        self.play(FadeOut(packet), Circumscribe(weights[2, 3], color=YELLOW), run_time=0.5)
-        self.wait(1.4)
+        msg_dots, msg_frame = message_table()
+        self.play(ReplacementTransform(packet, msg_dots.set_z_index(5)), FadeIn(msg_frame),
+                  Circumscribe(weights[2, 3], color=YELLOW), run_time=0.8)
+        self.wait(1.8)
 
         # StepScene's closing veil uses the default layer; let it cover the diagram.
         for mob in self.mobjects:
             mob.set_z_index(0)
         self.takeaway(
-            r'一句话：**按顺序消元，每消一个变量先把它当前的邻居两两连上、记下“它 + 邻居”这个团；只留极大团；按共享变量个数连成团图，取最大权重生成树，就得到 junction tree。** 本例五条记录留下三个极大团，团图边权 $2,2,1$，保留 $c_1$—$c_2$—$c_3$，两条 separator 分别是 $\{x_2,x_3\}$ 与 $\{x_3,x_4\}$；消息是 separator 变量的函数。考试做这类题要逐步检查：当前邻居（已消掉的不算）、填补边、子团包含关系，以及 running intersection 是否成立。',
+            r'一句话：**按顺序消元，每消一个变量先把它当前的邻居两两连上、记下“它 + 邻居”这个团；只留极大团；按共享变量个数连成团图，取最大权重生成树，就得到 junction tree。** 本例五条记录留下三个极大团，团图边权 $2,2,1$，保留 $c_1$—$c_2$—$c_3$，两条 separator 分别是 $\{x_2,x_3\}$ 与 $\{x_3,x_4\}$；消息是一张只依赖 separator 变量的小表。考试做这类题要逐步检查：当前邻居（已消掉的不算）、填补边、子团包含关系，以及 running intersection 是否成立。',
             ['先连当前邻居，记团，再消元',
              '只留极大团，按共享变量数连树',
              '分隔集承载消息，共享变量不断线'],

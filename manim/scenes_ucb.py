@@ -12,7 +12,7 @@ from manim import (
     Arrow, BackgroundRectangle, Circumscribe, Create, DashedLine, DL, Dot, DOWN, DR,
     FadeIn, FadeOut, Flash, GrowFromEdge, Indicate, LEFT, Line, ORIGIN, Rectangle,
     ReplacementTransform, RIGHT, RoundedRectangle, SurroundingRectangle, Transform, UL, UP, UR,
-    ValueTracker, VGroup, always_redraw,
+    VGroup,
 )
 from common import (
     BG, BLUE, DIM, GREEN, GREY, GRID, INK, LIFT, M, MT, ORANGE, P, pill,
@@ -231,86 +231,86 @@ class Ucb(StepScene):
         # STEP 3: Keep Pulling Arm 3 (12 More Pulls) — ValueTracker (Stage 3)
         # -----------------------------------------------------------------
         self.step(
-            r'假设接下来把臂 3 连拉 12 次，奖励交替为 $1, 0, 1, 0, \dots$，看柱子怎么变。'
-            r'拉完后 $N_3 = 4+12 = 16$，12 次里有 6 次得 1，奖励总和 $2+6 = 8$，平均仍是 $8/16 = 0.500$（画面下方写着这个假设），所以蓝色的均值柱一动不动，变矮的只有黄色的 bonus；轮号 $t = 85+12 = 97$，$\ln 97 \approx 4.5747$。'
-            r'臂 3 的 bonus 缩水到 $\sqrt{2\ln 97 / 16} \approx 0.756$，$Q_3 = 0.500 + 0.756 \approx 1.256$；'
-            r'臂 2 也是 $N=16$，bonus 同样是 $0.756$，但平均更高，$Q_2 = 0.625 + 0.756 \approx 1.381$，反超臂 3'
-            r'（其实 $N_3$ 到 12 时 $Q_2$ 就已更大、标签变绿，真跑 UCB 那一轮就会改拉臂 2；这里拉满 12 次是为了看清趋势）。'
+            r'假设接下来把臂 3 连拉 12 次，奖励依次为 $1, 0, 1, 0, \dots$（画面下方写着这个假设），右边的小牌子报出每次拉到的奖励；每拉一次，臂 3 的 $N$、$s$、平均和顶部的轮号 $t$ 都更新一次。'
+            r'第 1 次得 1：$N_3 = 5$，$s_3 = 3$，平均 $3/5 = 0.600$，蓝柱先涨一点；第 2 次得 0：平均 $3/6 = 0.500$，又落回去。所以蓝柱只在 0.5 附近小幅晃动，一路往下缩的是黄色的 bonus。'
+            r'连拉到第 8 次（$N_3 = 4+8 = 12$，$s_3 = 6$，$t = 93$）时，$Q_2 \approx 0.625 + 0.753 = 1.378$ 已超过 $Q_3 \approx 0.500 + 0.869 = 1.369$，$Q_2$ 的标签变绿：真跑 UCB 的话，第 93 轮就会改拉臂 2；这里拉满 12 次是为了看清趋势。'
+            r'拉满 12 次后 $N_3 = 16$，奖励总和 $2+6 = 8$，平均 $8/16 = 0.500$；轮号 $t = 85+12 = 97$，$\ln 97 \approx 4.5747$。'
+            r'臂 3 的 bonus 缩水到 $\sqrt{2\ln 97 / 16} \approx 0.756$，$Q_3 = 0.500 + 0.756 = 1.256$；'
+            r'臂 2 也是 $N=16$，bonus 同样是 $0.756$，但平均更高，$Q_2 = 0.625 + 0.756 = 1.381$。'
             r'**多试几次，对臂 3 的不确定消失了，bonus 变小，算法自己纠正了对它的偏爱。**',
             '连试12次臂3：不确定性收窄，Bonus缩水，臂2以1.38超车！',
             stage=3
         )
 
-        # the assumption behind the 12 pulls: the mean stays 0.500, only the bonus can shrink
-        pulls_note = T('假设这 12 次里 6 次得奖（均值仍为 8/16 = 0.500）', 15, BLUE).move_to(P(505, 323))
+        # the assumption behind the 12 pulls: rewards alternate 1, 0, 1, 0, ...
+        pulls_note = T('假设臂 3 这 12 次的奖励依次为 1, 0, 1, 0, …', 15, BLUE).move_to(P(505, 323))
         self.play(FadeOut(arm3_box), FadeOut(pick_badge), FadeIn(pulls_note, shift=UP * 0.1), run_time=0.5)
 
-        # Clean static objects before introducing continuous always_redraw
-        self.remove(
-            bar_b1_init, bar_b2_init, bar_b3_init,
-            lbl_b1_init, lbl_b2_init, lbl_b3_init,
-            lbl_q1_init, lbl_q2_init, lbl_q3_init,
-            header_step1, arm3_init_footer
-        )
-
-        tracker = ValueTracker(0.0)
-
-        def make_dynamic_bandit(p):
-            # p from 0 to 12
-            n1 = 64.0
-            n2 = 16.0
-            n3 = 4.0 + p
-            s3 = 2.0 + 0.5 * p
-            t = 85.0 + p
-
-            ln_t = math.log(t)
-            two_ln_t = 2.0 * ln_t
-
-            b1 = math.sqrt(two_ln_t / n1)
-            b2 = math.sqrt(two_ln_t / n2)
+        def bandit_state(k):
+            """Everything that changes while arm 3 is pulled, after k extra pulls (exact values, no fractions)."""
+            n3 = 4 + k
+            s3 = 2 + (k + 1) // 2            # rewards 1, 0, 1, 0, ... -> ceil(k/2) ones
+            t = 85 + k                       # the round about to be played
+            two_ln_t = 2.0 * math.log(t)
+            mu3 = s3 / n3
+            b1 = math.sqrt(two_ln_t / 64)
+            b2 = math.sqrt(two_ln_t / 16)
             b3 = math.sqrt(two_ln_t / n3)
+            r = lambda v: round(v, 3)      # noqa: E731
+            q1, q2, q3 = r(0.625) + r(b1), r(0.625) + r(b2), r(mu3) + r(b3)   # = the shown parts added up
 
-            q1 = 0.625 + b1
-            q2 = 0.625 + b2
-            q3 = 0.500 + b3
+            top3 = Y_BASE - mu3 * SCALE_Y
+            rect_mu3 = bar_rect(X_ARMS[2], Y_BASE, mu3 * SCALE_Y, BLUE, fill_opacity=0.95)
+            txt_mu3 = T(f'{mu3:.3f}', 16, WHITE).move_to(rect_mu3.get_center())
 
-            hb1 = b1 * SCALE_Y
-            hb2 = b2 * SCALE_Y
-            hb3 = b3 * SCALE_Y
-
-            rect_b1 = bar_rect(X_ARMS[0], top_mu1, hb1, YELLOW, fill_opacity=0.75, stroke_color=YELLOW, stroke_width=1.2)
-            rect_b2 = bar_rect(X_ARMS[1], top_mu2, hb2, YELLOW, fill_opacity=0.75, stroke_color=YELLOW, stroke_width=1.2)
-            rect_b3 = bar_rect(X_ARMS[2], top_mu3, hb3, YELLOW, fill_opacity=0.75, stroke_color=YELLOW, stroke_width=1.2)
+            rect_b1 = bar_rect(X_ARMS[0], top_mu1, b1 * SCALE_Y, YELLOW, fill_opacity=0.75, stroke_color=YELLOW, stroke_width=1.2)
+            rect_b2 = bar_rect(X_ARMS[1], top_mu2, b2 * SCALE_Y, YELLOW, fill_opacity=0.75, stroke_color=YELLOW, stroke_width=1.2)
+            rect_b3 = bar_rect(X_ARMS[2], top3, b3 * SCALE_Y, YELLOW, fill_opacity=0.75, stroke_color=YELLOW, stroke_width=1.2)
 
             txt_b1 = T(f'+{b1:.3f}', 14, YELLOW).move_to(rect_b1.get_center())
             txt_b2 = T(f'+{b2:.3f}', 15, YELLOW).move_to(rect_b2.get_center())
             txt_b3 = T(f'+{b3:.3f}', 15, YELLOW).move_to(rect_b3.get_center())
 
-            y_top1 = top_mu1 - hb1
-            y_top2 = top_mu2 - hb2
-            y_top3 = top_mu3 - hb3
+            arm2_ahead = 0.625 + b2 > mu3 + b3
+            txt_q1 = T(f'Q₁ ≈ {q1:.3f}', 15, WHITE).move_to(P(X_ARMS[0], top_mu1 - b1 * SCALE_Y - 13))
+            txt_q2 = T(f'Q₂ ≈ {q2:.3f}', 16, GREEN if arm2_ahead else WHITE).move_to(P(X_ARMS[1], top_mu2 - b2 * SCALE_Y - 13))
+            txt_q3 = T(f'Q₃ ≈ {q3:.3f}', 16, WHITE if arm2_ahead else GREEN).move_to(P(X_ARMS[2], top3 - b3 * SCALE_Y - 13))
 
-            col1 = WHITE
-            col2 = GREEN if q2 > q3 else WHITE
-            col3 = GREEN if q3 >= q2 else WHITE
+            hdr = pill(f'轮数 t = {t}（臂3试拉 {k} 次） 2 ln t = {two_ln_t:.2f}', '#242a35', YELLOW, 15).move_to(P(290, 52))
+            foot3 = T(f'N={n3}, s={s3}', 14, YELLOW if k > 0 else GREY).move_to(P(X_ARMS[2], 299))
 
-            txt_q1 = T(f'Q₁ ≈ {q1:.3f}', 15, col1).move_to(P(X_ARMS[0], y_top1 - 13))
-            txt_q2 = T(f'Q₂ ≈ {q2:.3f}', 16, col2).move_to(P(X_ARMS[1], y_top2 - 13))
-            txt_q3 = T(f'Q₃ ≈ {q3:.3f}', 16, col3).move_to(P(X_ARMS[2], y_top3 - 13))
+            return VGroup(rect_mu3, txt_mu3, rect_b1, rect_b2, rect_b3, txt_b1, txt_b2, txt_b3,
+                          txt_q1, txt_q2, txt_q3, hdr, foot3)
 
-            hdr = pill(f'轮数 t = {int(t)}（臂3试拉 {int(p)} 次） 2 ln t = {two_ln_t:.2f}', '#242a35', YELLOW, 15).move_to(P(290, 52))
-            foot3 = T(f'N={int(n3)}, s={s3:.1f}', 14, YELLOW if p > 0 else GREY).move_to(P(X_ARMS[2], 299))
-
-            return VGroup(rect_b1, rect_b2, rect_b3, txt_b1, txt_b2, txt_b3, txt_q1, txt_q2, txt_q3, hdr, foot3)
-
-        dyn_bandit = always_redraw(lambda: make_dynamic_bandit(tracker.get_value()))
+        # Swap the static step-2/3 objects for the state group (identical numbers at k = 0)
+        mean_group.remove(bar_mu3, lbl_mu3)
+        self.remove(
+            bar_mu3, lbl_mu3,
+            bar_b1_init, bar_b2_init, bar_b3_init,
+            lbl_b1_init, lbl_b2_init, lbl_b3_init,
+            lbl_q1_init, lbl_q2_init, lbl_q3_init,
+            header_step1, arm3_init_footer
+        )
+        dyn_bandit = bandit_state(0)
         self.add(dyn_bandit)
 
-        # Smooth parameter animation over 4.5 seconds
-        self.play(tracker.animate.set_value(12.0), run_time=4.5)
-        self.play(Indicate(lbl_mu3, color=WHITE, scale_factor=1.35), Indicate(pulls_note, color=BLUE, scale_factor=1.05),
+        # 12 discrete pulls: every landing shows exact N, s, t, mean, bonus and Q
+        reward_tag = None
+        ahead_tag = None
+        for k in range(1, 13):
+            reward = k % 2
+            tag = pill(f'第 {k} 次：奖励 {reward}', GREEN if reward else '#3a4252', INK if reward else WHITE, 14).move_to(P(572, 245))
+            tag_anim = FadeIn(tag, shift=DOWN * 0.1) if reward_tag is None else ReplacementTransform(reward_tag, tag)
+            reward_tag = tag
+            slow = k <= 2                    # the first two pulls slowly: the mean bar goes up, then back down
+            self.play(Transform(dyn_bandit, bandit_state(k)), tag_anim, run_time=0.6 if slow else 0.3)
+            self.wait(0.35 if slow else 0.05)
+            if k == 8:                       # first landing where Q2 > Q3: UCB would switch to arm 2 here
+                ahead_tag = pill('第 8 次后 Q₂ > Q₃', GREEN, INK, 14).move_to(P(X_ARMS[1], 118))
+                self.play(Indicate(dyn_bandit[9], color=GREEN, scale_factor=1.25), FadeIn(ahead_tag), run_time=0.6)
+        self.play(Indicate(dyn_bandit[1], color=WHITE, scale_factor=1.35), Indicate(pulls_note, color=BLUE, scale_factor=1.05),
                   run_time=0.8)
-        self.wait(0.4)
+        self.wait(0.3)
 
         # Highlight Arm 2 overtaking Arm 3
         final_top2 = top_mu2 - math.sqrt(2.0 * math.log(97.0) / 16.0) * SCALE_Y
@@ -324,7 +324,8 @@ class Ucb(StepScene):
         ).move_to(P(X_ARMS[1], 200))
         overtake_badge = pill('臂 2 成功超车！Q₂=1.381 > Q₃=1.256', GREEN, INK, 16).next_to(arm2_win_box, UP, buff=0.14)
 
-        self.play(Create(arm2_win_box), FadeIn(overtake_badge), Flash(P(X_ARMS[1], final_top2), color=GREEN), run_time=0.9)
+        self.play(Create(arm2_win_box), FadeOut(ahead_tag), FadeIn(overtake_badge), Flash(P(X_ARMS[1], final_top2), color=GREEN),
+                  run_time=0.9)
         self.wait(1.8)
 
         # -----------------------------------------------------------------
@@ -341,7 +342,6 @@ class Ucb(StepScene):
         )
 
         # Clear dynamic updater and bars to present cleanly annotated formula
-        dyn_bandit.clear_updaters()
         self.play(
             FadeOut(dyn_bandit),
             FadeOut(arm2_win_box),
@@ -357,6 +357,7 @@ class Ucb(StepScene):
             FadeOut(arm12_footers),
             FadeOut(legend),
             FadeOut(pulls_note),
+            FadeOut(reward_tag),
             run_time=0.7
         )
 
@@ -399,7 +400,7 @@ class Ucb(StepScene):
         self.takeaway(
             r'一句话：**UCB 每轮给每个臂算 $Q = \hat\mu + \sqrt{2\ln t / N}$，拉 $Q$ 最大的臂。**'
             r'试得越少 bonus 越大；时间越长，被冷落的臂 bonus 慢慢变大。'
-            r'所以它先给有潜力的臂机会，多试之后不确定消失，又自然让位给真正好的臂；累积 regret（和一直拉最好的臂相比，少拿的期望奖励）只按 $O(\log t)$ 对数增长。'
+            r'所以它先给有潜力的臂机会，多试之后不确定消失，又自然让位给真正好的臂；累积 regret（和一直拉最好的臂相比，少拿的期望奖励）只按 $O(\log t)$ 对数增长。意思是 regret 大约按 $\log t$ 涨：轮数翻 10 倍，regret 只多一个常数；而固定 $\varepsilon$ 的 ε-greedy 每轮都拿固定比例去盲探，regret 随轮数线性增长，轮数翻 10 倍、regret 也翻 10 倍。'
             r'考试计算题（T2）就照本视频的顺序：$t$ = 已拉总次数 + 1，算每个臂的平均和 bonus，相加后选 $Q$ 最大的臂，并写一句原因。',
             [
                 'UCB：Q = 均值 + √(2 ln t / N)，选 Q 最大的臂',

@@ -453,7 +453,7 @@
     ],
     example: [
       { t: 'h3', text: '手算 attention' },
-      T`三个隐藏状态 $\mathbf h^{(1)}=(1,0)$，$\mathbf h^{(2)}=(0,1)$，$\mathbf h^{(3)}=(1,1)$；得分 $e=(1,2,0)$。`,
+      T`三个隐藏状态 $\mathbf h^{(1)}=(1,0)$，$\mathbf h^{(2)}=(0,1)$，$\mathbf h^{(3)}=(1,1)$；得分 $e=(1,2,0)$。这里的分数和权重与上面的视频相同，但三条 $\mathbf h$ 不同，所以 $\mathbf c$ 也和视频里的不同。`,
       { t: 'steps', items: [
         T`$\exp(e_1)=\exp(1)\approx2.718$，$\exp(e_2)=\exp(2)\approx7.389$，$\exp(e_3)=\exp(0)=1$；和 $\approx11.107$。`,
         T`每个除以和：$\alpha_1=2.718/11.107\approx0.245$，$\alpha_2=7.389/11.107\approx0.665$，$\alpha_3=1/11.107\approx0.090$（三者和为 1）。`,

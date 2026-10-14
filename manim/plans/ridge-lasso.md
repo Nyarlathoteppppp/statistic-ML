@@ -21,6 +21,7 @@
    - Math attached：`‖w‖₂² → 圆（没有尖角）`，`‖w‖₁ → 菱形（尖角在坐标轴上）`。
    - short caption：两边使用相同约束半径 t = 1：ridge 是圆，lasso 是菱形
    - Technical notes：两边均使用相同约束半径 $t=1$，半径尺寸完全一致。
+   - Narration（新手补丁）：λ 首次出现注明“正则化强度，c16”；补一句为什么惩罚形式 ⇔ 约束形式：设惩罚形式的解为 $\bw_\lambda$（不用 $\hat\bw$，因为本视频 $\hat\bw$ 是 OLS 白点），令 $t$ = 它的惩罚值；区域内若有 RSS 更小的点，它的 RSS+λ·惩罚 也更小，矛盾 ⇒ $\bw_\lambda$ 也是约束形式的解；λ 越大，对应的 t 越小（或不变）。
 3. **等高线同步膨胀（Ridge 相切）**
    - Purpose：单一 ValueTracker 驱动同步膨胀，展示 Ridge 的首次相切。
    - Visual：单一 ValueTracker 从 $0.04$ 增长到 $c_{\text{ridge}}\approx 1.841$，两边椭圆同步膨胀；左侧椭圆首先切于圆周，亮黄触点与数值标签出现。

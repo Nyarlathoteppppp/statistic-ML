@@ -173,7 +173,7 @@ class PerceptronScene(StepScene):
 
         # 2. Stage 0: Setup geometry & annotated update rule
         self.step(
-            r"左边是数据：蓝色圆点 $(1,1)$ 是负类 $y=-1$，两个红色方块 $(2,1)$、$(1.5,0.5)$ 是正类 $y=+1$。感知机是一个 linear classifier（线性分类器）：先算得分 $s=w_1x_1+w_2x_2+w_0$，$s\ge0$ 判正类 $+1$（浅红区域），$s<0$ 判负类 $-1$，绿线就是 $s=0$ 的分界线。$w_0$ 是 bias（偏置）：按课件 L10 的写法，给每个样本末尾补一个固定的 $1$（bias 输入 $x_0=1$），写成 $\mathbf x=(x_1,x_2,1)$，权重按 $(w_1,w_2,w_0)$ 排，得分就是点积 $s=\mathbf w'\mathbf x$。标着 $\mathbf w$ 的黄色箭头画的是 $(w_1,w_2)$，它垂直于分界线、指向正类一侧。右边是学习规则：$y\,s>0$ 表示得分的正负号和标签一致，分对，不动；$y\,s\le0$ 表示分错（或正好压在线上），这时更新。**只在 $y\,s\le0$ 时更新：$\mathbf w\leftarrow\mathbf w+\eta\,y\,\mathbf x$。**$\eta=0.1$ 是 learning rate（学习率，卡片上写作步长）；$y=\pm1$ 决定往哪边推；$\mathbf x$ 决定沿哪个方向推。初始权重 $(w_1,w_2,w_0)=(0.2,\ 0,\ -0.1)$，分界线 $0.2x_1+0\cdot x_2-0.1=0$，即 $x_1=0.1/0.2=0.5$，是一条竖线，三个点都在它右边的浅红区域里。",
+            r"左边是数据：蓝色圆点 $(1,1)$ 是负类 $y=-1$，两个红色方块 $(2,1)$、$(1.5,0.5)$ 是正类 $y=+1$。感知机是一个 linear classifier（线性分类器）：先算得分 $s=w_1x_1+w_2x_2+w_0$，$s\ge0$ 判正类 $+1$（浅红区域），$s<0$ 判负类 $-1$，绿线就是 $s=0$ 的分界线。$w_0$ 是 bias（偏置）：按课件 L10 的写法，给每个样本末尾补一个固定的 $1$（bias 输入 $x_0=1$），写成 $\mathbf x=(x_1,x_2,1)$，权重按 $(w_1,w_2,w_0)$ 排，得分就是点积 $s=\mathbf w'\mathbf x$。标着 $\mathbf w$ 的黄色箭头画的是 $(w_1,w_2)$，它垂直于分界线、指向正类一侧（c03：$(w_1,w_2)$ 是分界线的法向量；沿它的方向走，得分 $s=\mathbf w'\mathbf x$ 变大，所以箭头指向 $s>0$ 的浅红一侧）。右边是学习规则：$y\,s>0$ 表示得分的正负号和标签一致，分对，不动；$y\,s\le0$ 表示分错（或正好压在线上），这时更新。**只在 $y\,s\le0$ 时更新：$\mathbf w\leftarrow\mathbf w+\eta\,y\,\mathbf x$。**$\eta=0.1$ 是 learning rate（学习率，卡片上写作步长）；$y=\pm1$ 决定往哪边推；$\mathbf x$ 决定沿哪个方向推。初始权重 $(w_1,w_2,w_0)=(0.2,\ 0,\ -0.1)$，分界线 $0.2x_1+0\cdot x_2-0.1=0$，即 $x_1=0.1/0.2=0.5$，是一条竖线，三个点都在它右边的浅红区域里。",
             short='初始线 x₁ = 0.5：得分 s = w₁x₁ + w₂x₂ + w₀',
             stage=0,
         )
@@ -287,7 +287,7 @@ class PerceptronScene(StepScene):
 
         # 3. Stage 1: sample 1: (1, 1), y = -1 (misclassified)
         self.step(
-            r'黄圈圈出第 1 个样本 $(1,1)$，真实标签 $y=-1$。得分 $s=0.2\times1+0\times1+(-0.1)=0.1\ge0$，模型判 $+1$，和标签相反：$y\,s=(-1)\times0.1=-0.1\le0$，分错，要更新。$y=-1$，所以规则变成减去 $0.1\times\mathbf x$，这里 $\mathbf x=(1,1,1)$：$(w_1,w_2,w_0)\leftarrow(0.2,\ 0,\ -0.1)+0.1\times(-1)\times(1,1,1)=(0.2-0.1,\ 0-0.1,\ -0.1-0.1)=(0.1,\ -0.1,\ -0.2)$。分界线变成 $0.1x_1-0.1x_2-0.2=0$，即 $x_2=x_1-2$，转到了右下角；$(1,1)$ 落到浅红区域外面，判 $-1$，分对了，两个红方块也跟着出去了，后面再处理。**更新后，这个点的得分变成 $s+\eta\,y\,\|\mathbf x\|^2$，朝它的标签那边移动。**验算：直接算新得分 $0.1\times1+(-0.1)\times1+(-0.2)=-0.2$；用公式 $0.1+0.1\times(-1)\times(1^2+1^2+1^2)=0.1-0.3=-0.2$，一样。',
+            r"黄圈圈出第 1 个样本 $(1,1)$，真实标签 $y=-1$。得分 $s=0.2\times1+0\times1+(-0.1)=0.1\ge0$，模型判 $+1$，和标签相反：$y\,s=(-1)\times0.1=-0.1\le0$，分错，要更新。$y=-1$，所以规则变成减去 $0.1\times\mathbf x$，这里 $\mathbf x=(1,1,1)$：$(w_1,w_2,w_0)\leftarrow(0.2,\ 0,\ -0.1)+0.1\times(-1)\times(1,1,1)=(0.2-0.1,\ 0-0.1,\ -0.1-0.1)=(0.1,\ -0.1,\ -0.2)$。分界线变成 $0.1x_1-0.1x_2-0.2=0$，即 $x_2=x_1-2$，转到了右下角；$(1,1)$ 落到浅红区域外面，判 $-1$，分对了，两个红方块也跟着出去了，后面再处理。为什么这样改一定把得分往对的方向推：新得分 $=(\mathbf w+\eta y\mathbf x)'\mathbf x=\mathbf w'\mathbf x+\eta y\,\mathbf x'\mathbf x=s+\eta y\|\mathbf x\|^2$；$\mathbf x'\mathbf x=\|\mathbf x\|^2$ 是各分量平方和（这里 $1^2+1^2+1^2=3$），而且末位总是 $1$，所以它至少是 $1$，永远为正。**所以得分一定朝 $y$ 的符号移动：$y=-1$ 时变小，$y=+1$ 时变大。**右边卡片下方两行就是这个验算：用公式 $0.1+0.1\times(-1)\times3=0.1-0.3=-0.2$；直接算新得分 $0.1\times1+(-0.1)\times1+(-0.2)=-0.2$，一样，$-0.2<0$，判 $-1$。",
             short='点 (1,1) 标签 −1 却判 +1：分界线推向该点',
             stage=1,
         )
@@ -308,7 +308,20 @@ class PerceptronScene(StepScene):
 
         # (w1, w2, w0) = (0.1, -0.1, -0.2)
         move_to_weights([0.1, -0.1, -0.2])
-        self.wait(1.3)
+        self.wait(0.6)
+
+        # Why the score of this point must move towards y: new score = s + eta*y*||x||^2 (||x||^2 = 3 > 0).
+        why = VGroup(
+            VGroup(T('新得分', 19, YELLOW), M(r"=(\mathbf w+\eta y\mathbf x)'\mathbf x=s+\eta\,y\,\|\mathbf x\|^2", size=23))
+            .arrange(RIGHT, buff=0.14),
+            M([r'=0.1+0.1\times(-1)\times', '3', '=-0.2'], size=24, color=YELLOW),
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.16)
+        why[1].shift(RIGHT * (why[0][1].get_left()[0] - why[1].get_left()[0]))     # "=" under "="
+        # the 3 is ||x||^2 = 1^2 + 1^2 + 1^2 (the bias input 1 keeps it positive)
+        why.add(M(r'\|\mathbf x\|^2', size=21, color='#a3aab6').next_to(why[1][1], DOWN, buff=0.05))
+        why.next_to(card2, DOWN, buff=0.34, aligned_edge=LEFT)
+        self.play(FadeIn(why, shift=UP * 0.1), run_time=0.6)
+        self.wait(1.4)
 
         # 4. Stage 2: sample 2: (2, 1), y = +1 (misclassified)
         self.step(
@@ -327,7 +340,7 @@ class PerceptronScene(StepScene):
             M(r'= (0.3,\ 0,\ -0.1)', size=27, color=YELLOW),
         ])
 
-        self.play(ReplacementTransform(card2, card3), run_time=0.5)
+        self.play(ReplacementTransform(card2, card3), FadeOut(why), run_time=0.5)
         self.wait(1.0)
 
         # (w1, w2, w0) = (0.3, 0, -0.1)

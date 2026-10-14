@@ -97,7 +97,7 @@ class Eigen(StepScene):
         self.play(FadeIn(ihat), FadeIn(jhat), FadeIn(il), FadeIn(jl), run_time=0.6)
 
         # ---- 1 · a matrix stretches the whole plane
-        self.step(r'这是平面上的网格（背后暗色的网格是变换前的样子，留作对照），绿色 $\hat\imath=(1,0)$、红色 $\hat\jmath=(0,1)$。矩阵 $\mathbf A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ 是一种**变换**：把每个点 $\mathbf v$ 搬到 $\mathbf A\mathbf v$。看整张网格被拉扯——$\hat\imath$ 落到 $\mathbf A\begin{bmatrix}1\\0\end{bmatrix}=\begin{bmatrix}2\cdot1+1\cdot0\\1\cdot1+2\cdot0\end{bmatrix}=\begin{bmatrix}2\\1\end{bmatrix}$，正好是 $\mathbf A$ 的第 1 列；$\hat\jmath$ 同理落到第 2 列 $(1,2)$。',
+        self.step(r'这是平面上的网格（背后暗色的网格是变换前的样子，留作对照），绿色 $\hat\imath=(1,0)$、红色 $\hat\jmath=(0,1)$（读作 i-hat、j-hat，只是 $x$、$y$ 方向上长度为 1 的箭头的名字，和“估计值”的帽子无关）。矩阵 $\mathbf A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ 是一种**变换**：把每个点 $\mathbf v$ 搬到 $\mathbf A\mathbf v$。矩阵乘向量的算法：结果第 1 个数 = $\mathbf A$ 的第 1 行和 $\mathbf v$ 做点积（对应相乘再相加），第 2 个数 = 第 2 行和 $\mathbf v$ 做点积。看整张网格被拉扯——$\hat\imath$ 落到 $\mathbf A\begin{bmatrix}1\\0\end{bmatrix}=\begin{bmatrix}2\cdot1+1\cdot0\\1\cdot1+2\cdot0\end{bmatrix}=\begin{bmatrix}2\\1\end{bmatrix}$，正好是 $\mathbf A$ 的第 1 列；$\hat\jmath$ 同理落到第 2 列 $(1,2)$。',
                   '矩阵 = 对整个平面的拉扯：î、ĵ 落到 A 的两列 (2,1)、(1,2)', stage=0)
         lab = mlabel('A', A)
         self.play(FadeIn(lab))
@@ -152,7 +152,7 @@ class Eigen(StepScene):
         self.wait(1.4)
 
         # ---- 5 · naming: A v = λ v (v ≠ 0); λ may be positive, negative or 0
-        self.step(r'青色和紫色的共同点：变换后仍在自己原来那条直线上，只是被乘了一个数（$3$ 和 $1$）。给它们起名字：**一个非零向量 $\mathbf v$ 如果满足 $\mathbf A\mathbf v=\lambda\mathbf v$，它就叫 eigenvector（特征向量），那个数 $\lambda$ 叫 eigenvalue（特征值）。**左边 $\mathbf A\mathbf v$ 是变换后的 $\mathbf v$，右边 $\lambda\mathbf v$ 是原来的 $\mathbf v$ 乘以 $\lambda$。必须要求 $\mathbf v\neq\mathbf 0$：零向量对任何 $\lambda$ 都满足 $\mathbf A\mathbf 0=\lambda\mathbf 0$，说明不了什么。$\lambda$ 可以是正数、负数或 $0$（左下小图，淡色是 $\mathbf v$，亮色是 $\lambda\mathbf v$）：$\lambda>0$ 同方向伸缩，$\lambda<0$ 翻到反方向（仍在同一条直线上），$\lambda=0$ 被压成零点。所以这里 $\mathbf A$ 的特征值是 $3$ 和 $1$。（正文 ⑤ 会用特征值的正负来定义 PSD / PD。）',
+        self.step(r'青色和紫色的共同点：变换后仍在自己原来那条直线上，只是被乘了一个数（$3$ 和 $1$）。给它们起名字：**一个非零向量 $\mathbf v$ 如果满足 $\mathbf A\mathbf v=\lambda\mathbf v$，它就叫 eigenvector（特征向量），那个数 $\lambda$ 叫 eigenvalue（特征值）。**左边 $\mathbf A\mathbf v$ 是变换后的 $\mathbf v$，右边 $\lambda\mathbf v$ 是原来的 $\mathbf v$ 乘以 $\lambda$。必须要求 $\mathbf v\neq\mathbf 0$：零向量对任何 $\lambda$ 都满足 $\mathbf A\mathbf 0=\lambda\mathbf 0$，说明不了什么。$\lambda$ 可以是正数、负数或 $0$（左下小图，淡色是 $\mathbf v$，亮色是 $\lambda\mathbf v$）：$\lambda>0$ 同方向伸缩，$\lambda<0$ 翻到反方向（仍在同一条直线上），$\lambda=0$ 被压成零点。所以这里 $\mathbf A$ 的特征值是 $3$ 和 $1$。（正文 ⑤ 会用特征值的正负来定义 PSD（positive semidefinite，半正定）/ PD（positive definite，正定）。）',
                   '非零向量 v 满足 A·v = λ·v：v 叫特征向量，λ 叫特征值', stage=3)
         self.play(Transform(k1, tag('λ = 3', ORIGIN, RIGHT, TEAL, 32).move_to(k1, aligned_edge=LEFT)),
                   Transform(k2, tag('λ = 1', ORIGIN, RIGHT, PURPLE, 32).move_to(k2, aligned_edge=LEFT)))

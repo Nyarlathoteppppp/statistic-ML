@@ -18,6 +18,7 @@
 - **Purpose**: 建立 2000 人的总人群基底。
 - **Visual**: 50×40 紧凑方块网格（2000 个小方块，灰色）平滑淡入左侧；右侧出现总体卡片。
 - **Math attached**: 总人数 $N = 2000$。
+- **Narration**: 三个已知数带英文术语：prevalence（患病率）、sensitivity（灵敏度，也叫 true positive rate）、false positive rate（误报率）。
 - **short**: `总人群 2000 人：绝大多数都是健康人`
 
 ### Step 2: 患病基础率 1%

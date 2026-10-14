@@ -175,7 +175,7 @@ class Backprop(StepScene):
             return m
 
         # ------------------------------------------------ 1 · forward: weighted sums and ReLU
-        self.step(r'最左边是两个输入：$x_0=1$ 是 bias（偏置），$x_1=1$；每条边旁的灰字是它的 weight（权重）。蓝点从输入出发，经过边上的权重后，带着“输入 × 权重”流向隐藏单元。流进 $u_1$ 的两份是 $x_0v_{01}=1\times0.5$ 和 $x_1v_{11}=1\times1$，相加得到 weighted sum（加权和）：$r_1=x_0v_{01}+x_1v_{11}=1\times0.5+1\times1=1.5$。再过 ReLU 门 $g(r)=\max(0,r)$，正数原样通过：$u_1=g(1.5)=1.5$。$u_2$ 同理：$r_2=x_0v_{02}+x_1v_{12}=1\times(-0.5)+1\times1=0.5$，$u_2=g(0.5)=0.5$。**黄色标签是前向时记下来的中间值，反向时还要用。**',
+        self.step(r'最左边是两个输入：$x_0=1$ 是 bias（偏置），$x_1=1$；每条边旁的灰字是它的 weight（权重）。$v$ 的第一个下标是起点输入、第二个是终点隐藏单元：$v_{02}$ 是 $x_0\to u_2$ 那条边。蓝点从输入出发，经过边上的权重后，带着“输入 × 权重”流向隐藏单元。流进 $u_1$ 的两份是 $x_0v_{01}=1\times0.5$ 和 $x_1v_{11}=1\times1$，相加得到 weighted sum（加权和）：$r_1=x_0v_{01}+x_1v_{11}=1\times0.5+1\times1=1.5$。再过 ReLU 门 $g(r)=\max(0,r)$，正数原样通过：$u_1=g(1.5)=1.5$。$u_2$ 同理：$r_2=x_0v_{02}+x_1v_{12}=1\times(-0.5)+1\times1=0.5$，$u_2=g(0.5)=0.5$。**黄色标签是前向时记下来的中间值，反向时还要用。**',
                   '前向：输入×权重相加得 r，过 ReLU 得 u，并记下来', stage=0)
         self.forward([('x0', 'u1', 0.5, 0.8, '1×0.5', True, 28), ('x1', 'u1', 0.45, 0.8, '1×1', False, 28)], 'u1')
         r1sum = show_sum('r₁ = 1×0.5 + 1×1 = 1.5', (268, 132))
@@ -220,7 +220,7 @@ class Backprop(StepScene):
         self.wait(0.8)
 
         # ------------------------------------------------ 3 · δ leaves the loss box
-        self.step(r'反向从损失盒开始。先问：输出的加权和 $s$ 变一点点，损失 $L$ 变多少？这个 sensitivity（敏感度）记作 $\delta=\dfrac{\partial L}{\partial s}$。平方损失对 $z$ 求导得 $z-y$，恒等输出 $z=s$ 的导数是 1，所以 $\delta=(z-y)\times1=1-0=1$。**$\delta$ 只算这一次，后面所有梯度都会复用它。**',
+        self.step(r'反向从损失盒开始。先问：输出的加权和 $s$ 变一点点，损失 $L$ 变多少？这个 sensitivity（敏感度）记作 $\delta=\dfrac{\partial L}{\partial s}$。平方损失 $\frac12(z-y)^2$ 对 $z$ 求导：平方带下来一个 2，和 $\frac12$ 抵消，剩 $z-y$（这正是损失前放 $\frac12$ 的原因）；恒等输出 $z=s$ 的导数是 1，所以 $\delta=(z-y)\times1=1-0=1$。课件把 $\delta$（和后面的 $\varepsilon$）叫 error term（误差项）：本例 $\delta=z-y$ 恰好是预测减真值，所以得名；它的本义是敏感度 $\partial L/\partial s$。**$\delta$ 只算这一次，后面所有梯度都会复用它。**',
                   'δ 从损失盒出来：s 动一点点，L 跟着动多少', stage=2)
         self.play(*[e.animate.set_color(DIM) for e in edge.values()], zarrow.animate.set_color(DIM),
                   yarrow.animate.set_color(DIM), box.animate.set_stroke(RED, width=3), run_time=0.4)
@@ -304,7 +304,7 @@ class Backprop(StepScene):
         self.wait(0.8)
 
         # ------------------------------------------------ 6 · input-layer gradients: ε_j meets x_i
-        self.step(r'同样的“相遇”再做一次：红点带着 $\varepsilon_j$ 从隐藏单元往回走，黄点带着输入 $x_i$ 往前走，$\dfrac{\partial L}{\partial v_{ij}}=\varepsilon_j\,x_i$。四条边：$\partial L/\partial v_{01}=1\times1=1$，$\partial L/\partial v_{11}=1\times1=1$，$\partial L/\partial v_{02}=(-1)\times1=-1$，$\partial L/\partial v_{12}=(-1)\times1=-1$。$\varepsilon_1$ 被连向 $u_1$ 的两条边复用，$\varepsilon_2$ 也一样，这就是反向传播省力的原因。**全部梯度算完，再统一更新权重**：更新用的是同一组旧权重算出的梯度。',
+        self.step(r'同样的“相遇”再做一次：红点带着 $\varepsilon_j$ 从隐藏单元往回走，黄点带着输入 $x_i$ 往前走，$\dfrac{\partial L}{\partial v_{ij}}=\varepsilon_j\,x_i$。为什么是这两个相乘？$v_{ij}$ 变一点点，$r_j$ 变 $x_i$ 倍（因为 $r_j=\sum_ix_iv_{ij}$）；$r_j$ 变一点点，$L$ 变 $\varepsilon_j$ 倍；相乘得 $\varepsilon_j x_i$。四条边：$\partial L/\partial v_{01}=1\times1=1$，$\partial L/\partial v_{11}=1\times1=1$，$\partial L/\partial v_{02}=(-1)\times1=-1$，$\partial L/\partial v_{12}=(-1)\times1=-1$。$\varepsilon_1$ 被连向 $u_1$ 的两条边复用，$\varepsilon_2$ 也一样，这就是反向传播省力的原因。**全部梯度算完，再统一更新权重**：更新用的是同一组旧权重算出的梯度。',
                   '输入层梯度 = ε<sub>j</sub> × x<sub>i</sub>：同一个 ε 被两条边复用', stage=5)
         vspot = {(a, b): along(a, b, V_PILL) for a, b, _, _ in VE}
         specs = [(rim(b, a), vspot[(a, b)], a + b, None, 0, RED) for a, b in vspot]
@@ -329,7 +329,7 @@ class Backprop(StepScene):
         self.wait(0.8)
 
         # ------------------------------------------------ 7 · check: nudge v02 by 0.01
-        self.step(r'回到开头的问题：把 $v_{02}$ 改一点点，损失变多少？画面上 $v_{02}$ 变成绿色的 $-0.49$，绿点把这个改动一路往前传：$r_2$、$u_2$、$z$ 和损失盒里的数都跟着变。梯度说 $\partial L/\partial v_{02}=-1$，所以预测 $\Delta L\approx(-1)\times0.01=-0.01$。真的改一下：$v_{02}=-0.5+0.01=-0.49$，$r_2=1\times(-0.49)+1\times1=0.51$，$u_2=0.51$，$s=0\times1+1\times1.5+(-1)\times0.51=0.99$，$z=0.99$，$L=\frac12(0.99-0)^2=\frac12\times0.9801=0.49005$。实际变化 $0.49005-0.5=-0.00995$，**和梯度的预测 $-0.01$ 几乎一样**（差的 $0.00005$ 来自二阶小项）。这里只是单独改 $v_{02}$ 来检验梯度，不是训练时的权重更新。',
+        self.step(r'回到开头的问题：把 $v_{02}$ 改一点点，损失变多少？画面上 $v_{02}$ 变成绿色的 $-0.49$，绿点把这个改动一路往前传：$r_2$、$u_2$、$z$ 和损失盒里的数都跟着变。梯度说 $\partial L/\partial v_{02}=-1$，所以预测 $\Delta L\approx(-1)\times0.01=-0.01$。真的改一下：$v_{02}=-0.5+0.01=-0.49$，$r_2=1\times(-0.49)+1\times1=0.51$，$u_2=0.51$，$s=0\times1+1\times1.5+(-1)\times0.51=0.99$，$z=0.99$，$L=\frac12(0.99-0)^2=\frac12\times0.9801=0.49005$。实际变化 $0.49005-0.5=-0.00995$，**和梯度的预测 $-0.01$ 几乎一样**。差的 $0.00005$ 从哪来？$L=\frac12(0.99)^2=\frac12(1-0.01)^2=\frac12(1-2\times0.01+0.01^2)=\frac12-0.01+\frac12\times0.01^2=0.5-0.01+0.00005$：梯度把 $L$ 的变化当成一条直线来估，只给出前面的 $-0.01$；最后的 $0.00005$ 是二阶小项，正是直线近似漏掉的部分。这里只是单独改 $v_{02}$ 来检验梯度，不是训练时的权重更新。',
                   'v₀₂ 加 0.01，L 少了约 0.01：正是梯度 −1 的预测', stage=6)
         check = card(colored([r'\Delta L=0.49005-0.5=', r'-0.00995'], 24, {0: GREEN, 1: GREEN}),
                      colored([r'\approx', r'\frac{\partial L}{\partial v_{02}}', r'\times0.01=(-1)\times0.01=-0.01'], 24,

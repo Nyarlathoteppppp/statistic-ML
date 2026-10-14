@@ -15,6 +15,7 @@
 - Visual: axes and the same 26 blue points appear; mean marker, then horizontal yellow line; copies of all points travel to their feet.
 - Math attached: 均值 = 0；a = 0°；Var = 2.00；投影位置 t = p′x，p 为单位方向，‖p‖ = 1。
 - Short: 先移到中心，再把每个点投到线上。
+- Narration: centering = 每个坐标（x₁、x₂）各减去自己的平均。
 - Technical: reproduce browser sine-hash + Box–Muller, center, symmetric inverse-square-root whitening, recolour to [[2,1],[1,2]]; common x/y scale.
 ## Step 2 — stage 1
 - Question / Purpose: 转动方向，影子的分散程度会怎样变？
@@ -33,19 +34,21 @@
 - Visual: keep PC1 and cloud; bring in covariance beside cloud and formula under curve, then arithmetic beside peak.
 - Math attached: Σ_x = [[2,1],[1,2]]；Var = p′Σ_x p；Var = 影子的分散；p = 方向，‖p‖ = 1；Σ_x = 数据的形状（协方差）；½(2+1+1+2)=3。
 - Short: 方向和数据形状一起决定影子有多分散。
-- Technical: roles are plain text; covariance convention is 1/n, not 1/(n−1); say derives 2+sin(2a).
+- Technical: roles are plain text; covariance convention is 1/n (say: 有的书除以 n−1，只是整体缩放，不影响哪个方向最大); say derives 2+sin(2a).
+- Narration additions: two Σ (Σ_x = matrix name, Σ_i = sum); x_i x_i′ = column × row = [[x_i1², x_i1x_i2],[x_i2x_i1, x_i2²]]; 右上角的 1 = 所有点“横坐标 × 纵坐标”的平均（点多在右上、左下 → 正；本数据 off-diagonal = 1 by construction）; (p′x_i)² = (p′x_i)(x_i′p) via c03 “点积不分先后”.
 ## Step 5 — stage 3
 - Question / Purpose: 换成垂直方向，会留下多少？
 - Visual: preserve faint PC1, rotate same line/shadows to 135°, colour PURPLE; low point marked on the full curve.
 - Math attached: PC2 · 135°；最小方差 1；½(2−1−1+2)=1。
 - Short: 转到垂直方向，影子挤在一起，只剩方差一。
-- Technical: (-1,1)/√2 is the negative of chapter's (1,-1)/√2, hence the same axis; PC2 is minimum here because dimension is two.
+- Technical: (-1,1)/√2 is the negative of the chapter's (1,-1)/√2 (say: “本章下文写成 (1,−1)/√2”), hence the same axis; PC2 is minimum here because dimension is two.
 ## Step 6 — stage 4
 - Question / Purpose: 为什么无需一直试方向？
 - Visual: return same line to PC1; leave faint perpendicular PC2; reveal eigen identities beside cloud, then retained-variance label.
 - Math attached: Σ_x p₁=3p₁；Σ_x p₂=1p₂；λ = 该方向的方差；保留 3/(3+1)=75%。
 - Short: 最宽方向就是最大特征值的方向。
-- Technical: say links the c04 eigen video and states c37's Σ_x p₁ = λ₁p₁; derives both matrix-vector products and reconstruction error 4−3=1. PC2 marker sits on the full curve's minimum.
+- Technical: say links the c04 eigen video and states c37's Σ_x p₁ = λ₁p₁; derives both matrix-vector products and reconstruction error 4−3=1; total variance explained as 点到原点距离平方的平均 = x₁ 方差 + x₂ 方差 = 4 and = 3+1 via c04 (特征值之和 = trace). PC2 marker sits on the full curve's minimum.
 ## Colour meanings / Takeaway
 - BLUE data and covariance; YELLOW candidate direction/shadows and current curve; TEAL PC1 (browser/eigen continuity); PURPLE PC2; GREEN retained information; GREY context/guides.
+- Takeaway say also reads out max_{‖p‖=1}: 在所有长度为 1 的方向 p 里找让 p′Σ_x p 最大的那个.
 - Takeaway: 留下影子最分散的方向 / 取最大特征值对应的单位方向 / 本例只留第一主成分，保留四分之三。

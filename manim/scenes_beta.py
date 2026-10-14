@@ -11,7 +11,8 @@ Visualizes Bayesian belief updating for coin tossing:
   - MLE: 7/10 = 0.700 (ORANGE line)
   - MAP: (9-1)/(9+5-2) = 8/12 approx 0.667 (YELLOW line at peak)
   - Posterior mean: 9/14 approx 0.643 (GREEN line)
-  - Intuition: Beta(2, 2) acts as 2 pseudo-observations (1H, 1T) pulling toward 0.5
+  - Intuition: Beta(2, 2) acts like pseudo-flips pulling toward 0.5 (1H+1T for the MAP, 2H+2T for the mean)
+- The prior stays on screen from the first flip on as a grey dashed reference ("先验（对照）").
 - Conjugacy formula:
   Beta(alpha, beta) -> Beta(alpha + k, beta + n - k) with Chinese role labels.
 """
@@ -19,8 +20,10 @@ import numpy as np
 from manim import (
     Axes,
     Circle,
+    Arrow,
     Create,
     DashedLine,
+    DashedVMobject,
     Dot,
     DOWN,
     FadeIn,
@@ -197,7 +200,7 @@ class BetaCoin(StepScene):
 
         # ---------------------------------------------------------------- Step 1: Prior Beta(2, 2)
         self.step(
-            r'横轴是正面概率 $q$（从 0 到 1），纵轴是密度 $p(q)$：曲线越高的地方，那个 $q$ 越可信。抛硬币之前，用 $\mathrm{Beta}(2,2)$ 作 prior（先验）：$\mathrm{Beta}(\alpha,\beta)$ 的密度正比于 $q^{\alpha-1}(1-q)^{\beta-1}$，这里就是 $q(1-q)$，在 $q=0.5$ 最高（虚线），表示“大致公平”。**但曲线很宽，$q=0.2$、$0.8$ 处也不低，说明我们对 $q$ 并没有多大把握。** 右边方框记录当前的分布和已看到的正反次数，现在是 0 正 0 反。',
+            r'横轴是正面概率 $q$（从 0 到 1），纵轴是密度 $p(q)$：曲线越高的地方，那个 $q$ 越可信。抛硬币之前，用 $\mathrm{Beta}(2,2)$ 作 prior（先验）：$\mathrm{Beta}(\alpha,\beta)$ 的密度正比于 $q^{\alpha-1}(1-q)^{\beta-1}$，这里就是 $q(1-q)$，在 $q=0.5$ 最高（虚线），表示“大致公平”。**但曲线很宽，$q=0.2$、$0.8$ 处也不低，说明我们对 $q$ 并没有多大把握。** 右边方框记录当前的分布和已看到的正反次数，现在是 0 正 0 反。方框里的“当前后验”指 posterior（后验，看过数据之后的看法）；还没看数据时，“当前后验”就是先验。',
             '先验 Beta(2,2)：大致公平（峰值 0.5），两边宽表示不确定',
             stage=0,
         )
@@ -222,17 +225,22 @@ class BetaCoin(StepScene):
             FadeIn(status_box),
             run_time=1.0,
         )
-        self.remove(initial_curve)
+        self.remove(initial_curve[0], initial_curve[1])     # Create/FadeIn added the two parts, not the group
         self.add(dynamic_curve, dist_readout, count_readout)
         self.wait(1.4)
 
         # ---------------------------------------------------------------- Step 2: First 3 flips (Slow)
         self.step(
-            r'前 3 次依次是 正、正、反，看右上方的硬币一枚枚出现。每出现一次正面，$\alpha$ 加 1，曲线往右偏；出现反面，$\beta$ 加 1，曲线被拉回左边：$\mathrm{Beta}(2,2)\to\mathrm{Beta}(3,2)\to\mathrm{Beta}(4,2)\to\mathrm{Beta}(4,3)$。原因是：看到一次正面，就给曲线乘上“出正面的概率” $q$；看到反面就乘 $(1-q)$。乘完后 $q$ 或 $(1-q)$ 的指数正好多 1，形状还是 Beta。**所以 $(\alpha,\beta)$ 就是正、反面次数的计数器。**',
+            r'前 3 次依次是 正、正、反，看右上方的硬币一枚枚出现。图上不动的灰色虚线是原来的先验 $\mathrm{Beta}(2,2)$，留作对照；会动的那条是当前后验。每出现一次正面，$\alpha$ 加 1，曲线往右偏；出现反面，$\beta$ 加 1，曲线被拉回左边：$\mathrm{Beta}(2,2)\to\mathrm{Beta}(3,2)\to\mathrm{Beta}(4,2)\to\mathrm{Beta}(4,3)$。原因是：看到一次正面，就给曲线乘上“出正面的概率” $q$；看到反面就乘 $(1-q)$。这就是“后验 ∝ 似然 × 先验”（∝ 读作“正比于”）：一次正面的 likelihood（似然）是 $q$，一次反面是 $1-q$；乘完后整体缩放，让曲线下面积回到 1。乘完后 $q$ 或 $(1-q)$ 的指数正好多 1，形状还是 Beta：比如 $q(1-q)\times q=q^{2}(1-q)$，正是 $\mathrm{Beta}(3,2)$ 的样子（指数比参数少 1）。**所以 $(\alpha,\beta)$ 就是正、反面次数的计数器。**',
             '前 3 次（正、正、反）：出正 α+1 曲线右偏，出反 β+1 曲线左拉',
             stage=1,
         )
-        self.play(FadeOut(prior_center_guide), FadeOut(prior_tag), run_time=0.4)
+        # the prior stays as a fixed grey dashed reference; only the blue posterior moves from here on
+        prior_ref = DashedVMobject(get_beta_mobs(2.0, 2.0)[1], num_dashes=44, dashed_ratio=0.55)
+        prior_ref.set_stroke(GREY, width=2.4)
+        prior_ref_tag = T('先验（对照）', 13, GREY).move_to(ax.c2p(0.16, 1.36))
+        self.play(FadeOut(prior_center_guide), FadeOut(prior_tag), FadeIn(prior_ref), FadeIn(prior_ref_tag),
+                  run_time=0.5)
 
         # Flip 1: H
         coin0 = make_coin('H', (coin_x_coords[0], 76))
@@ -257,7 +265,7 @@ class BetaCoin(StepScene):
 
         # ---------------------------------------------------------------- Step 3: Remaining 7 flips (Faster)
         self.step(
-            r'剩下 7 次快速放完：正、正、反、正、正、反、正，曲线每次照样右偏或左拉。10 次合计 7 正 3 反，所以 $\alpha=2+7=9$，$\beta=2+3=5$，posterior（后验）是 $\mathrm{Beta}(9,5)$。**数据越多，曲线越窄、越高，表示对 $q$ 越来越有把握。** 曲线下的面积始终是 1，所以变窄的同时也会变高。',
+            r'剩下 7 次快速放完：正、正、反、正、正、反、正，曲线每次照样右偏或左拉。10 次合计 7 正 3 反，所以 $\alpha=2+7=9$，$\beta=2+3=5$，后验是 $\mathrm{Beta}(9,5)$。**数据越多，曲线越窄、越高，表示对 $q$ 越来越有把握。** 曲线下的面积始终是 1，所以变窄的同时也会变高。',
             '后 7 次快速完成：数据变多，曲线显著变窄、变高（更确信）',
             stage=2,
         )
@@ -277,7 +285,7 @@ class BetaCoin(StepScene):
 
         # ---------------------------------------------------------------- Step 4: Three estimates at Beta(9, 5)
         self.step(
-            r'后验是一整条曲线；要报一个数时，有三种常见读法，就是图上的三条竖线。MLE（maximum likelihood estimate，最大似然估计）只看数据：$7/10=0.70$（橙线）。MAP（maximum a posteriori，最大后验估计）取曲线最高点，也就是众数：$\mathrm{Beta}(9,5)$ 正比于 $q^{8}(1-q)^{4}$，最高点在 $\frac{9-1}{9+5-2}=\frac{8}{12}\approx0.667$（黄线）。后验均值是曲线的平均位置：$\frac{9}{9+5}=\frac{9}{14}\approx0.643$（绿线）。**MAP 和均值都小于 0.7，因为先验 $\mathrm{Beta}(2,2)$ 就像预先多加的假想抛掷，把估计拉向 0.5。** 右边卡片说的“2 次预置抛掷（1 正 1 反）”对应 MAP：$\frac{8}{12}=\frac{7+1}{10+2}$；均值 $\frac{9}{14}=\frac{7+2}{10+4}$ 则像多加了 2 正 2 反。',
+            r'后验是一整条曲线；要报一个数时，有三种常见读法，就是图上的三条竖线。MLE（maximum likelihood estimate，最大似然估计）只看数据：$7/10=0.70$（橙线）。MAP（maximum a posteriori，最大后验估计）取曲线最高点，也就是众数：$\mathrm{Beta}(9,5)$ 正比于 $q^{8}(1-q)^{4}$。$q^a(1-q)^b$ 的最高点在 $q=\frac{a}{a+b}$（取对数得 $a\ln q+b\ln(1-q)$，求导令它等于 0：$\frac{a}{q}-\frac{b}{1-q}=0$，即 $a(1-q)=bq$）。这里 $a=8,b=4$，所以峰值在 $\frac{8}{8+4}=\frac{8}{12}\approx0.667$（黄线），也就是公式 $\frac{9-1}{9+5-2}$。后验均值是曲线的平均位置：$\frac{9}{9+5}=\frac{9}{14}\approx0.643$（绿线）。**MAP 和均值都小于 0.7，因为先验 $\mathrm{Beta}(2,2)$ 就像预先多加的假想抛掷，把估计拉向 0.5。** 右边卡片下方两行：对 MAP，先验像多了 1 正 1 反，$\frac{8}{12}=\frac{7+1}{10+2}$；对均值，像多了 2 正 2 反，$\frac{9}{14}=\frac{7+2}{10+4}$。',
             '三种估计：MLE=0.70，MAP=0.67，均值=0.64；先验将其拉向 0.5',
             stage=3,
         )
@@ -343,22 +351,23 @@ class BetaCoin(StepScene):
         compare_box = RoundedRectangle(
             corner_radius=0.12,
             width=px(204),
-            height=px(150),
+            height=px(160),
             fill_color='#1c202a',
             fill_opacity=0.96,
             stroke_color=DIM,
             stroke_width=1.5,
-        ).move_to(P(512, 235))
+        ).move_to(P(512, 240))
 
         card_title = T('三种点估计对比', 15, WHITE, weight='BOLD').move_to(P(512, 172))
         card_mle = M(r'\hat{q}_{\text{MLE}} = \frac{7}{10} = 0.700', 16, ORANGE).move_to(P(512, 196))
         card_map = M(r'q_{\text{MAP}} = \frac{8}{12} \approx 0.667', 16, YELLOW).move_to(P(512, 222))
         card_mean = M(r'E[q] = \frac{9}{14} \approx 0.643', 16, GREEN).move_to(P(512, 248))
-        card_note1 = T('先验像 2 次预置抛掷(1正1反)', 12, '#a0b0c4').move_to(P(512, 280))
-        card_note2 = T('温和将估计拉向 0.5', 12, '#a0b0c4').move_to(P(512, 296))
+        card_note1 = T('对 MAP：像多 1 正 1 反', 13, '#e6d58c').move_to(P(512, 274))
+        card_note2 = T('对均值：像多 2 正 2 反', 13, '#a8d49a').move_to(P(512, 291))
+        card_note3 = T('先验温和地把估计拉向 0.5', 12, '#a0b0c4').move_to(P(512, 308))
 
         compare_card_group = VGroup(
-            compare_box, card_title, card_mle, card_map, card_mean, card_note1, card_note2,
+            compare_box, card_title, card_mle, card_map, card_mean, card_note1, card_note2, card_note3,
         )
 
         self.play(
@@ -387,6 +396,8 @@ class BetaCoin(StepScene):
             FadeOut(static_count),
             FadeOut(status_box),
             static_curve.animate.set_opacity(0.18),
+            prior_ref.animate.set_stroke(opacity=0.18),
+            prior_ref_tag.animate.set_opacity(0.18),
             axes_group.animate.set_opacity(0.18),
             coins_all.animate.set_opacity(0.25),
             coins_title.animate.set_opacity(0.25),
@@ -406,17 +417,20 @@ class BetaCoin(StepScene):
 
         conj_badge = pill('Beta–Binomial 共轭更新', fill=PURPLE, color=WHITE, size=17).move_to(P(320, 142))
 
-        formula = M(
-            [
-                r'\text{Beta}(\alpha,\beta)',
-                r'\ \xrightarrow{\ k\ \text{heads},\ n-k\ \text{tails}\ }\ ',
-                r'\text{Beta}(\alpha+k,\ \beta+n-k)',
-            ],
-            size=24,
-        ).move_to(P(320, 190))
-        formula[0].set_color(BLUE)
-        formula[1].set_color(YELLOW)
-        formula[2].set_color(GREEN)
+        # MathTex cannot hold Chinese, so the arrow label is T() + M() pieces sitting on a plain arrow
+        arrow_lab = VGroup(
+            M(r'k', 20, YELLOW), T('次正面，', 16, YELLOW), M(r'n-k', 20, YELLOW), T('次反面', 16, YELLOW),
+        ).arrange(RIGHT, buff=0.07)
+        arrow_lab[2:].shift(RIGHT * 0.14)     # Text boxes are ink-tight: give the full-width comma its space back
+        half = arrow_lab.width / 2 + 0.2
+        f_arrow = Arrow(LEFT * half, RIGHT * half, buff=0, color=YELLOW, stroke_width=3,
+                        max_tip_length_to_length_ratio=0.1)
+        formula = VGroup(
+            M(r'\text{Beta}(\alpha,\beta)', 24, BLUE),
+            f_arrow,
+            M(r'\text{Beta}(\alpha+k,\ \beta+n-k)', 24, GREEN),
+        ).arrange(RIGHT, buff=0.22).move_to(P(320, 194))
+        arrow_lab.next_to(f_arrow, UP, buff=0.1)
 
         prior_role = T('先验', 16, BLUE, weight='BOLD').next_to(formula[0], DOWN, buff=0.18)
         data_role = T('数据', 16, YELLOW, weight='BOLD').next_to(formula[1], DOWN, buff=0.18)
@@ -425,9 +439,9 @@ class BetaCoin(StepScene):
 
         summary_note = T('后验参数直接等于先验计数加实际计数，无需繁琐积分！', 15, '#c8d4e4').move_to(P(320, 245))
 
-        banner_group = VGroup(conj_box, conj_badge, formula, roles, summary_note)
+        banner_group = VGroup(conj_box, conj_badge, formula, arrow_lab, roles, summary_note)
 
-        self.play(FadeIn(conj_box), FadeIn(conj_badge), FadeIn(formula), run_time=0.8)
+        self.play(FadeIn(conj_box), FadeIn(conj_badge), FadeIn(formula), FadeIn(arrow_lab), run_time=0.8)
         self.play(FadeIn(roles), FadeIn(summary_note), run_time=0.7)
         self.play(Indicate(post_role), run_time=1.0)
         self.wait(2.2)

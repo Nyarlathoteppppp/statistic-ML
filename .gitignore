@@ -6,3 +6,8 @@ reference/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Manim caches created when running from inside manim/
+manim/media/
+media/Tex/
+media/texts/
