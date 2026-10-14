@@ -59,7 +59,7 @@ Curiosity (Step 1: Can 2 sweeps really compute all marginals?) → Partial clari
 ## Takeaway Lines
 1. `两阶段BP：一收一发，2(n−1) 条消息得到全部边缘`
 2. `发信规则：乘除收件人外的其他来信，再把发送者加掉`
-3. `边缘计算：每点所有来信相乘，未归一化和恒为配分函数 Z`
+3. `边缘计算：每点所有来信相乘，无观测时未归一化和都等于 Z`
 
 ## Takeaway narration
 Message count phrased without O-notation: “$n$ 个节点的树有 $n-1$ 条边，每条边两个方向各一条消息，共 $2(n-1)$ 条，和节点数成正比”.

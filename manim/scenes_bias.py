@@ -151,6 +151,7 @@ class BiasVariance(StepScene):
         sim_bias = {d: float(p.mean() - y0_true) for d, p in sim.items()}
         sim_sd = {d: float(p.std()) for d, p in sim.items()}
         sim_err = {d: sim_bias[d] ** 2 + sim_sd[d] ** 2 + SD ** 2 for d in sim}
+        n_above1 = int((sim[1] > y0_true).sum())  # lines predicting above the truth at x0
         best_deg = min(sim_err, key=sim_err.get)
 
         # the captions below make these claims; fail loudly if a seed change breaks them
@@ -158,6 +159,7 @@ class BiasVariance(StepScene):
         assert range_deg7 > 2.5 * range_deg1 and range_deg7 > 0.4, 'polynomials must spread far more than lines'
         assert min(val_deg7) < y0_true < max(val_deg7) and abs(bias_deg7) < 0.08, 'polys must straddle the truth'
         assert sim_bias[1] < -0.2 and sim_sd[7] > 1.5 * sim_sd[1], 'simulation must back the 3-day picture'
+        assert n_above1 < 0.01 * N_SIM, 'step-8 subtitle says lines are almost always below the truth'
         assert best_deg == 3 and sim_err[9] > sim_err[1], 'U-shape claim in the decomposition step'
 
         # ----------------------------------------------------
@@ -364,7 +366,7 @@ class BiasVariance(StepScene):
             rf"它们的平均值（黄色短线）是 $({val_deg1[0]:.2f}+{val_deg1[1]:.2f}+{val_deg1[2]:.2f})/3\approx{mean_deg1:.3f}$，屏幕上显示为 {mean_deg1:.2f}。"
             rf"平均预测减真值叫 bias（偏差）：${mean_deg1:.3f}-{y0_true:.3f}\approx-{abs(bias_deg1):.2f}$，"
             rf"也就是低了 {abs(bias_deg1):.2f}（黄色色带），三天全都偏低。"
-            "**直线弯不过来，换多少份数据都一样偏：这就是高偏差、低方差。**",
+            "**直线弯不过来，换数据也改不掉平均偏低：这就是高偏差、低方差。**",
             f'直线：三天挤在一起，但平均偏 {sgn(bias_deg1)} ⇒ 低方差、高偏差',
             stage=3,
         )
@@ -417,10 +419,10 @@ class BiasVariance(StepScene):
 
         self.step(
             rf"只看 3 天，也可能是碰巧。所以把同样的实验重复 {N_SIM} 次：{N_SIM} 份独立的训练数据各拟合一次，数轴上的灰点画出其中 {N_CLOUD} 天在 $x_0$ 处的预测。"
-            rf"直线在 $x_0$ 处平均偏 {sgn(sim_bias[1])}，上下晃动的标准差是 ±{sim_sd[1]:.2f}；"
+            rf"直线在 $x_0$ 处平均偏 {sgn(sim_bias[1])}，上下晃动的标准差是 ±{sim_sd[1]:.2f}，{N_SIM} 条直线里只有 {n_above1} 条高于真值；"
             rf"7 次多项式平均偏 {sgn(sim_bias[7])}，标准差是 ±{sim_sd[7]:.2f}。"
             "**长期规律和这 3 天一致：直线稳定地偏（高偏差、低方差），多项式围着真值大幅晃动（低偏差、高方差）。**",
-            f'不是巧合：换 {N_SIM} 份数据，直线总是偏低，多项式总在真值两侧晃',
+            f'不是巧合：换 {N_SIM} 份数据，直线几乎总偏低，多项式在真值两侧晃',
             stage=3,
         )
         self.play(FadeIn(cloud_l), FadeIn(cloud_r), run_time=0.9)
