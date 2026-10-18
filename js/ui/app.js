@@ -96,6 +96,7 @@
     if (!SML.catalog.meta[id] && !pages[id]) id = 'home';
     const main = document.getElementById('main');
     const y = root.scrollY;
+    updateCountdown();
     const page = pageFor(id);
     current = id;
     main.innerHTML = '';
@@ -106,7 +107,7 @@
     document.querySelectorAll('.nav-link').forEach((a) => a.classList.toggle('active', a.dataset.id === id));
     const crumb = document.getElementById('crumb');
     if (crumb) crumb.innerHTML = SML.md.inline((metaOf(id).tag ? metaOf(id).tag + ' · ' : '') + metaOf(id).title);
-    document.title = metaOf(id).title + ' · SML 期末复习';
+    document.title = metaOf(id).title + ' · SML 期末（11/6 考试）';
     if (!metaOf(id).pending) SML.store.mark(id, 'read');
     buildNav(); updateProgressPill();
     document.querySelectorAll('.nav-link').forEach((a) => a.classList.toggle('active', a.dataset.id === id));
@@ -141,7 +142,18 @@
     if (btn) btn.textContent = t === 'dark' ? '☀ 浅色' : '☾ 深色';
   }
 
+  /* Header countdown: whole calendar days from today to the exam date in #countdown[data-exam] (local time). */
+  function updateCountdown() {
+    const el = document.getElementById('countdown');
+    if (!el || !el.dataset.exam) return;
+    const [y, m, d] = el.dataset.exam.split('-').map(Number);
+    const now = new Date();
+    const days = Math.round((new Date(y, m - 1, d) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+    el.textContent = days > 0 ? '还剩 ' + days + ' 天' : days === 0 ? '今天考试' : '已考完';
+  }
+
   function start() {
+    updateCountdown();
     applyTheme(SML.store.get('theme', 'light'));
     document.getElementById('theme').addEventListener('click', () => {
       const cur = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';

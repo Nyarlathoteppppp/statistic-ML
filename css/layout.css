@@ -8,6 +8,7 @@
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
+.app-header .countdown { font-weight: 700; color: var(--key); white-space: nowrap; font-size: .95rem; }
 .app-header .brand { font-family: var(--display); font-weight: 700; font-size: 1.05rem; white-space: nowrap; color: var(--ink); text-decoration: none; }
 .app-header .crumb { flex: 1; min-width: 0; color: var(--muted); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .app-header .hbtn {
@@ -104,3 +105,4 @@
 .search-results a b { display: block; font-size: .9rem; }
 .search-results a span { display: block; font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 640px) { .search { width: 7em; } .search:focus { width: 10em; } .app-header #fontsize { display: none; } }
+@media (max-width: 420px) { .search { width: 3.4em; } .app-header { gap: 5px; } .app-header .countdown { font-size: .82rem; } }
