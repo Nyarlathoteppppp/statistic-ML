@@ -987,6 +987,7 @@
    * ===================================================================== */
   add({
     id: 'c08', week: 'W1', lec: 'L02', pages: 'L02 p20–p27', star: 3,
+    genesis: T`c06 的 MLE 只看数据：一枚硬币抛 3 次全是正面，MLE 给出正面概率 $\hat\theta=3/3=1$，等于说"以后永远是正面"。没人会信——你早就知道硬币大多接近公平，可 MLE 里没有地方放这份"早就知道"。Bayesian 的想法是：**把"对参数的看法"也写成一个概率分布（先验），看到数据后用 Bayes rule 更新成后验。** 数据少时，先验把估计往常识那边拉；数据多了，数据说了算。（Bayes rule 来自 Thomas Bayes 的遗作，1763 年由 Richard Price 整理发表。）`,
     title: 'Bayesian：先验、后验、边缘似然、MAP', en: 'Bayesian statistics: prior, posterior, marginal likelihood, MAP',
     summary: '把参数当随机变量：先验 × 似然 ∝ 后验。分母是 **marginal likelihood**（往年原题）。只要一个数时取后验均值或 MAP；均匀先验下 MAP = MLE。',
     prereq: ['c02', 'c06'],

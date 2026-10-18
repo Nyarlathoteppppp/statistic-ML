@@ -2,6 +2,7 @@
  *
  *   SML.chapter({
  *     id, week, lec, pages, star: 3|2|1, notExam: md, title, en, summary,
+ *     genesis: md,                                      // 为什么会有它：没有它时卡在哪（发生法，放在第 1 节前）
  *     goals: [md], prereq: [chapterId], types: [T-page ids], symbols: [[md symbol, md meaning]],
  *     what, why, intuition, math: md | [blocks],      // sections 1–4
  *     fx: [fxBlock],                                    // 5 公式逐项解释
@@ -33,6 +34,8 @@
     // header box: exam badge, goals, prereq, section nav
     const star = STAR[c.star] || STAR[2];
     B.push({ t: 'chapterHead', star: star, notExam: c.notExam, goals: c.goals || [], prereq: c.prereq || [], types: c.types || [], pages: c.pages, symbols: c.symbols || [], sections: present.map(([k, label], i) => ({ id: k, n: i + 1, label: label })) });
+
+    if (c.genesis) B.push({ t: 'callout', cls: 'genesis', title: '为什么会有它', md: c.genesis });
 
     present.forEach(([k, label], i) => {
       B.push({ t: 'h2', id: k, text: (i + 1) + ' · ' + label });

@@ -158,6 +158,8 @@ button.term:hover { color: var(--accent); background: var(--accent-soft); }
 .term-pop .tp-foot { display: flex; justify-content: space-between; gap: 10px; margin-top: 6px; font-size: .8rem; flex-wrap: wrap; }
 
 /* learning blocks (js/ui/learn.js) */
+.callout.genesis { border-color: #6b5bd6; background: color-mix(in srgb, #6b5bd6 7%, var(--card)); }
+.callout.genesis .ctitle { color: #6b5bd6; }
 .callout.story { border-color: #b07a2a; background: color-mix(in srgb, #b07a2a 8%, var(--card)); }
 .callout.story .ctitle { color: #9a6720; }
 .callout.story .ctitle::before { content: "📜"; }

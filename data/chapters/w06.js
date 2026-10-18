@@ -150,6 +150,7 @@
    * ===================================================================== */
   add({
     id: 'c34', week: 'W6', lec: 'L11', pages: 'L11 p25–p31', star: 3,
+    genesis: T`训练网络要知道每个权重的梯度：这个权重动一点，损失变多少。最笨的办法是一个一个试：把某个权重加 0.001，整个网络重新算一遍损失，看变了多少。网络有一百万个权重，更新一步就要跑一百万次前向，根本训练不动。仔细看链式法则会发现，不同权重的导数里有一大段是相同的：输出端的误差项会被它前面所有的权重共用。**反向传播就是把这些共用的部分从输出往回只算一次、反复使用**，算出全部梯度的代价只是跑一次前向的几倍。（1986 年 Rumelhart、Hinton、Williams 在 *Nature* 上的论文让它流行起来；更早已有人提出过类似的方法。）`,
     title: 'Backpropagation', en: 'Backpropagation (chain rule through the network)',
     summary: '训练网络要 $\\partial L/\\partial$ 每个权重。**Backpropagation（反向传播）** 就是沿着网络用链式法则：先前向算出所有中间值，再从输出端算误差 $\\delta=z-y$，往回传：$\\partial L/\\partial w_j=\\delta u_j$，$\\varepsilon_j=\\delta w_jg\'(r_j)$，$\\partial L/\\partial v_{ij}=\\varepsilon_jx_i$。往年 2021 Q13(b) 考过推导（T10）。',
     prereq: ['c13', 'c33'],

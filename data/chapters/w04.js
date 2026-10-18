@@ -134,6 +134,7 @@
    * ===================================================================== */
   add({
     id: 'c23', week: 'W4', lec: 'L07', pages: 'L07 p22–p29', star: 3,
+    genesis: T`c22 把"无穷多个分类器"换成了"在 $n$ 个点上最多分得出几种标签"，即 growth function $S_\mathcal F(n)$。可它是一整串数（$n=1,2,3,\dots$ 各一个），每个都要单独去算。观察这串数会发现：$n$ 小的时候 $S_\mathcal F(n)=2^n$，什么标签都分得出；一旦在某个 $n$ 上做不到 $2^n$，之后更大的 $n$ 也再做不到（$n+1$ 个点要被打散，其中任意 $n$ 个点得先被打散）。**这个分界点就是 VC 维：用一个数概括模型类有多灵活。** c24 的 Sauer–Shelah 引理再用这一个数给整串 growth function 一个上界。`,
     title: 'Shattering 与 VC 维', en: 'Shattering and the VC dimension',
     summary: '**Shatter（打散）**：一组点的所有 $2^n$ 种标签都能被某个分类器实现。**VC dimension（VC 维）** = 能被 shatter 的最大点集的大小。往年每年都考：给一张 dichotomy 表，求 VC 维并写出一个被 shatter 的点集（T1）。',
     prereq: ['c22'],
