@@ -317,6 +317,7 @@ class VCShatter(StepScene):
             self.play(FadeIn(ln), done.animate.set_value(k + 1), run_time=0.45)
         self.wait(0.5)
         final = T('8 / 8 全做到 ⇒ 这 3 个点被打散 ⇒ VC ≥ 3', 20, YELLOW).move_to(P(320, 322))
+        self.sfx('good', -18)
         self.play(ReplacementTransform(count, final), run_time=0.5)
         self.wait(2.0)
 
@@ -348,10 +349,10 @@ class VCShatter(StepScene):
                            for p, b in zip(pts, lab) if side(n, c, p) != b])
             if cur is None:
                 self.play(FadeIn(ln), run_time=0.5)
-                self.play(Create(bad), run_time=0.4)
             else:
                 self.play(ReplacementTransform(cur, ln), FadeOut(rings), run_time=0.7)
-                self.play(Create(bad), run_time=0.4)
+            self.sfx('bad', -20)
+            self.play(Create(bad), run_time=0.4)
             cur, rings = ln, bad
             self.wait(0.5)
         self.play(FadeOut(cur), FadeOut(rings), run_time=0.4)
@@ -478,6 +479,7 @@ class VCShatter(StepScene):
                 self.play(ReplacementTransform(hl, box), FadeIn(out), run_time=0.22 if fast else 0.3)
             hl = box
             if pat in slots.seen:
+                self.sfx('bad', -22)
                 strike = Line(out.get_left(), out.get_right(), color=RED, stroke_width=3)
                 tag = T('重复', 14, RED).next_to(out, RIGHT, buff=0.12)
                 self.play(Create(strike), FadeIn(tag), Indicate(slots.boxes[pat], color=RED, scale_factor=1.1),
@@ -485,6 +487,7 @@ class VCShatter(StepScene):
                 outs.add(strike, tag)
             else:
                 slots.seen.add(pat)
+                self.sfx('good', -24)
                 fly = out.copy()
                 self.play(fly.animate.move_to(slots.texts[pat]).set_opacity(0),
                           slots.boxes[pat].animate.set_fill(GREEN, 0.4).set_stroke(GREEN),
@@ -544,6 +547,7 @@ class VCShatter(StepScene):
         hole = slots.boxes['101']
         miss = VGroup(left_at(T('只有 7 种，缺 101 ⇒ 没被打散', 17, RED), 306, 196),
                       left_at(T('预筛：每列 0、1 各要 ≥ 4 个，只有 x₃、x₄ 够', 16, WHITE), 306, 220))
+        self.sfx('bad', -18)
         self.play(hole.animate.set_stroke(RED, 3), Indicate(slots.texts['101'], color=RED), FadeIn(miss[0]),
                   run_time=0.7)
         self.play(FadeIn(miss[1]), run_time=0.4)

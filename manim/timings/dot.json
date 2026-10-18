@@ -1,34 +1,34 @@
 {
  "id": "dot",
  "title": "点积：代数乘积与几何投影的统一",
- "dur": 42.77,
+ "dur": 100.37,
  "steps": [
   {
    "t": 0.0,
    "say": "两个向量的点积有两种算法：按坐标算，对应位置相乘再相加；按几何算，用两个向量的长度和它们的夹角。两个算式看起来毫不相干，为什么总给出同一个数？这个视频转动一个向量，让两种算法并排比较。**最后会看到：线性分类器判断一个点在哪一侧，靠的就是点积。**"
   },
   {
-   "t": 3.9,
+   "t": 9.43,
    "say": "蓝色箭头是固定向量 $\\mathbf u=(3,1)$，长度 $\\|\\mathbf u\\|=\\sqrt{3^2+1^2}=\\sqrt{10}\\approx3.16$，沿着它的虚线是 $\\mathbf u$ 所在的直线。黄色箭头 $\\mathbf v$ 长度固定为 $2.5$，现在指向 $45^\\circ$，等会儿会绕原点转。点积课件写作 $\\mathbf u'\\mathbf v$（一撇表示 transpose（转置）；也常写成 $\\mathbf u\\cdot\\mathbf v$，是同一个数）。右边卡片是两种定义。代数式：$\\mathbf u'\\mathbf v=u_1v_1+u_2v_2=3v_1+1\\cdot v_2$，对应坐标相乘再相加。几何式：$\\mathbf u'\\mathbf v=\\|\\mathbf u\\|\\,\\|\\mathbf v\\|\\cos\\theta$，$\\theta$ 是两个箭头之间的夹角。**$\\|\\mathbf v\\|\\cos\\theta$ 是 $\\mathbf v$ 在 $\\mathbf u$ 方向上的影子，叫 scalar projection（标量投影），所以几何式就是“$\\mathbf u$ 的长度 × $\\mathbf v$ 的影子”。**"
   },
   {
-   "t": 9.23,
+   "t": 28.37,
    "say": "现在把影子画出来：从 $\\mathbf v$ 的箭头尖向 $\\mathbf u$ 所在的直线作垂线（灰色虚线），原点到垂足这一段（绿色粗线）就是影子。右下的卡片同时用两种方法算点积。代数：长度 $2.5$、方向 $45^\\circ$ 的箭头，横坐标是 $2.5\\cos45^\\circ$、纵坐标是 $2.5\\sin45^\\circ$（以箭头为斜边的直角三角形的邻边和对边），所以 $\\mathbf v=2.5(\\cos45^\\circ,\\ \\sin45^\\circ)\\approx(1.768,\\ 1.768)$，$3\\times1.768+1\\times1.768=4\\times1.768\\approx7.07$。几何：$\\mathbf u$ 的方向角是 $\\arctan(1/3)\\approx18.43^\\circ$，$\\arctan(1/3)$ 就是“正切等于 $1/3$ 的角”：$\\mathbf u$ 向右 $3$ 格、向上 $1$ 格，它和 $x_1$ 轴的夹角的正切就是 $1/3$，这个角是 $18.43^\\circ$。夹角 $\\theta\\approx45^\\circ-18.43^\\circ=26.57^\\circ$，$\\cos\\theta\\approx0.8944$，影子 $=\\|\\mathbf v\\|\\cos\\theta=2.5\\times0.8944\\approx2.236$，点积 $=3.162\\times2.236\\approx7.07$。**两种完全不同的算法，给出同一个数 $7.07$。**屏幕上的数都四舍五入到两位，直接拿 $3\\times1.77+1.77$ 或 $3.16\\times2.24$ 会得到 $7.08$，差的 $0.01$ 只是四舍五入造成的。夹角是锐角，影子和 $\\mathbf u$ 同向，所以点积为正，下方标签写着“锐角 · 影子同向”。"
   },
   {
-   "t": 14.17,
+   "t": 43.03,
    "say": "让 $\\mathbf v$ 绕原点匀速转一整圈（$360^\\circ$），盯住影子和右边的两行读数。夹角小于 $90^\\circ$（锐角）时，影子和 $\\mathbf u$ 同向，画成绿色，点积为正；夹角大于 $90^\\circ$（钝角）时，影子落到原点另一侧、和 $\\mathbf u$ 反向，画成红色，点积为负，因为这时 $\\cos\\theta<0$。$\\mathbf v$ 和 $\\mathbf u$ 同向时影子最长，就是 $\\mathbf v$ 的全长 $2.5$，点积最大 $3.162\\times2.5\\approx7.91$；方向相反时最小，约 $-7.91$。**转到任何角度，代数读数和几何读数都相等：两种定义算的是同一个量。**原因是高中的余弦定理：三角形两边是 $\\mathbf u$、$\\mathbf v$，第三边是 $\\mathbf u-\\mathbf v$，所以 $\\|\\mathbf u-\\mathbf v\\|^2=\\|\\mathbf u\\|^2+\\|\\mathbf v\\|^2-2\\|\\mathbf u\\|\\|\\mathbf v\\|\\cos\\theta$。左边按坐标展开：$(u_1-v_1)^2+(u_2-v_2)^2=(u_1^2+u_2^2)+(v_1^2+v_2^2)-2(u_1v_1+u_2v_2)=\\|\\mathbf u\\|^2+\\|\\mathbf v\\|^2-2(u_1v_1+u_2v_2)$；两边消掉相同的平方项再除以 $-2$，正好剩 $u_1v_1+u_2v_2=\\|\\mathbf u\\|\\|\\mathbf v\\|\\cos\\theta$。本章只要求会用两种式子计算，不要求这个证明。"
   },
   {
-   "t": 22.7,
+   "t": 55.4,
    "say": "$\\mathbf v$ 停在和 $\\mathbf u$ 垂直的位置。它的方向是 $(-1,3)$，长度 $2.5$。$(-1,3)$ 本身的长度是 $\\sqrt{(-1)^2+3^2}=\\sqrt{10}$，除以它变成长度 $1$ 的方向，再乘 $2.5$：$\\mathbf v=2.5\\times(-1,3)/\\sqrt{10}\\approx(-0.79,\\ 2.37)$。代数：$3\\times(-0.79)+1\\times2.37=-2.37+2.37=0$；只看方向更清楚，$3\\times(-1)+1\\times3=0$。几何：垂线正好落在原点，影子长 $0$，所以 $3.16\\times0=0$，这也就是 $\\cos90^\\circ=0$。原点处的黄色直角记号标出垂直，卡片标题换成“$\\mathbf u'\\mathbf v=0\\Leftrightarrow$ 正交”。**两个非零向量的点积为 $0$，当且仅当它们互相垂直，这叫 orthogonal（正交）。**"
   },
   {
-   "t": 28.03,
+   "t": 65.3,
    "say": "现在把 $\\mathbf u$ 当成分类器的权重向量，改名为 $\\mathbf w=(3,1)$。因为 $\\mathbf w'\\mathbf x=\\|\\mathbf w\\|\\times$（$\\mathbf x$ 在 $\\mathbf w$ 方向上的影子），所有满足 $\\mathbf w'\\mathbf x=c$ 的点，影子长度都是 $c/\\|\\mathbf w\\|$，于是排成一条和 $\\mathbf w$ 垂直的直线（等值线）。图上画了三条：紫线 $\\mathbf w'\\mathbf x=0$（过原点）、黄线 $\\mathbf w'\\mathbf x=3$、青线 $\\mathbf w'\\mathbf x=6$。验证青线：$\\mathbf x_A=(1.5,1.5)$ 给 $3\\times1.5+1\\times1.5=6$，$\\mathbf x_B=(2,0)$ 给 $3\\times2+1\\times0=6$；两点的影子都是 $6/\\sqrt{10}\\approx1.90$，所以垂线落在同一点：垂足 = 影子长 × 单位方向（长度为 $1$ 的方向 $(3,1)/\\sqrt{10}$）$=\\frac{6}{\\sqrt{10}}\\cdot\\frac{(3,1)}{\\sqrt{10}}=\\frac{6}{10}(3,1)=(1.8,\\ 0.6)$。黄线 $\\mathbf w'\\mathbf x-3=0$ 就是 decision boundary（决策边界）$\\mathbf w'\\mathbf x+b=0$，这里 $b=-3$；$\\mathbf w$ 垂直于它，叫 normal vector（法向量）。右边的分类器 $\\hat y=\\sgn(\\mathbf w'\\mathbf x+b)$（$\\sgn$ 是取正负号）：$\\mathbf x$ 沿 $\\mathbf w$ 的方向越过黄线，$\\mathbf w'\\mathbf x+b>0$，判正类；在黄线的反方向一侧，$\\mathbf w'\\mathbf x+b<0$，判负类（右边卡片最后两行）。**线性分类器就是在问：$\\mathbf x$ 沿法向量 $\\mathbf w$ 的方向走了多远，有没有越过分界线。**"
   },
   {
-   "t": 36.57,
+   "t": 86.77,
    "say": "一句话：**点积 $\\mathbf u'\\mathbf v=u_1v_1+u_2v_2=\\|\\mathbf u\\|\\,\\|\\mathbf v\\|\\cos\\theta$，也就是“$\\mathbf u$ 的长度 × $\\mathbf v$ 在 $\\mathbf u$ 方向上的影子”，坐标算法和几何算法给出同一个数。**锐角时点积为正，钝角时为负；两个非零向量点积为 $0$，当且仅当它们垂直（正交）。线性分类器 $\\hat y=\\sgn(\\mathbf w'\\mathbf x+b)$ 看的就是 $\\mathbf x$ 沿法向量 $\\mathbf w$ 走了多远：$\\mathbf w'\\mathbf x+b=0$ 是分界线，$\\mathbf w$ 垂直于它，越过分界线判正类。复习时要会用两种式子算点积、用 $\\mathbf u'\\mathbf v=0$ 判断垂直，并且看到 $\\mathbf w'\\mathbf x+b=0$ 能说出 $\\mathbf w$ 垂直于它、正负号决定点在哪一侧。"
   }
  ]

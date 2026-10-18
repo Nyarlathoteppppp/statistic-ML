@@ -207,6 +207,7 @@ svg.graph .edge.hl { stroke: var(--accent); stroke-width: 3; }
 .video-track { position: relative; height: 8px; background: #2a2e37; cursor: pointer; }
 .video-fill { position: absolute; left: 0; top: 0; bottom: 0; background: #F4D35E; width: 0; pointer-events: none; }
 .video-tick { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #16171c; pointer-events: none; }
+.video-sound { min-width: 2.4rem; }
 .video-clock { margin-left: auto; font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .video-hint { padding: .5rem .9rem; font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); background: var(--sunk); }
 .video-steps { list-style: none; counter-reset: vs; margin: 0; padding: .35rem .5rem .6rem; background: var(--sunk); }
