@@ -204,3 +204,34 @@ details.deep.notexam { border-color: var(--line); background: transparent; }
 details.deep.notexam > summary { color: var(--muted); font-weight: 500; }
 details.deep.storyfold { border-color: color-mix(in srgb, #b07a2a 40%, var(--line)); background: transparent; }
 details.deep.storyfold > summary { color: #b07a2a; font-weight: 500; }
+
+/* printable outline (js/ui/outline.js) */
+.outline .ol-bar { display: flex; gap: 12px; align-items: center; margin: 0 0 1rem; }
+.outline .ol-row { display: grid; grid-template-columns: 1fr 34%; gap: 14px; }
+.outline .ol-notes { border-left: 1px dashed var(--line-2); background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.6em - 1px), var(--line) calc(1.6em - 1px), var(--line) 1.6em); }
+.outline .ol-week { margin-top: 1.6rem; }
+.outline .ol-wtitle { border-bottom: 2px solid var(--ink); padding-bottom: 4px; }
+.outline .ol-ch { border-top: 1px solid var(--line-2); padding: 8px 0 10px; }
+.outline .ol-ctitle { font-size: 1.02em; }
+.outline .ol-meta { color: var(--muted); font-size: .82em; font-weight: 400; }
+.outline .ol-check { color: var(--muted); font-size: .85em; margin: 2px 0 4px; letter-spacing: .02em; }
+.outline .ol-label { display: inline-block; font-size: .78em; font-weight: 700; color: var(--accent); margin-right: 6px; }
+.outline .ol-item { margin: 4px 0; }
+.outline .ol-item p { display: inline; margin: 0; }
+.outline .ol-fx { margin: 2px 0 2px 1em; }
+.outline .ol-fxt { font-size: .85em; color: var(--muted); }
+.outline .ol-fx .katex-display { margin: .15em 0; text-align: left; }
+.outline .ol-pit, .outline .ol-steps { margin: 2px 0 0 1.2em; padding: 0; }
+.outline .ol-map { width: 100%; margin-top: 10px; }
+.outline .ol-story { font-size: .95em; }
+@media print {
+  .noprint { display: none !important; }
+  @page { size: A4; margin: 13mm 11mm; }
+  .outline { font-size: 9.5pt; color: #000; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .outline .ol-notes { background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.6em - 1px), #c8c8c8 calc(1.6em - 1px), #c8c8c8 1.6em); border-left-color: #999; }
+  .outline .ol-week { break-before: page; }
+  .outline .ol-ch { break-inside: avoid; }
+  .outline .ol-label { color: #000; }
+  body:has(.outline) .page-head .lead { display: none; }
+  html:has(.outline), body:has(.outline), body:has(.outline) .shell, body:has(.outline) .main, body:has(.outline) .page { background: #fff !important; }
+}

@@ -4,6 +4,7 @@
   const meta = {
     home: { title: '考试导航', tag: '', eyebrow: 'COMP90051 · 2026 S2', countable: false },
     route: { title: '复习路线与时间分配', countable: false },
+    outline: { title: '打印版：脉络与知识点', countable: false },
     daily: { title: '今日复习（间隔重复）', countable: false },
 
     T01: { tag: 'T1', title: 'VC 维：dichotomy 表', en: 'VC dimension from a table of dichotomies', hot: 3, lec: ['L07'] },
@@ -130,7 +131,7 @@
   root.SML.catalog = {
     meta: meta,
     zones: [
-      { id: 'guide', title: '考试导航', items: ['home', 'daily', 'route'] },
+      { id: 'guide', title: '考试导航', items: ['home', 'daily', 'route', 'outline'] },
       {
         id: 'course', title: '课程（按周学习）', units: [
           { title: 'W1 · 概率、统计学派', items: ['c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'c07', 'c08', 'c09', 'r01'] },

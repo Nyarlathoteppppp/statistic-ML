@@ -564,7 +564,9 @@
       T`收敛定理是第一个"算法一定能学会"的保证，也解释了为什么可分性和 margin 重要（margin 越大，收敛越快——又一次说明 margin 的价值）。kernel perceptron 则说明 kernel trick 不是 SVM 独有的（c30 的 representer theorem）。`,
     ],
     intuition: [
+      { t: 'fold', title: '收敛定理的证明思路（L10 p31）', blocks: [
       T`**证明思路**（p31）：每次更新，$\bw^{(k)}$ 在 $\bw^*$ 方向上至少前进 $\gamma\|\bw^*\|$（所以 $\bw^{*\prime}\bw^{(k)}\ge k\gamma\|\bw^*\|$，线性增长）；而长度平方每次最多增加 $R^2$：$\|\bw+y_i\bx_i\|^2=\|\bw\|^2+2y_i\bw'\bx_i+\|\bx_i\|^2$，中间项 $\le0$（因为只在分错、$y_i\bw'\bx_i\le0$ 时才更新），最后一项 $\le R^2$；所以 $\|\bw^{(k)}\|^2\le kR^2$，长度只按 $\sqrt k$ 增长。夹角余弦 $\ge\frac{k\gamma}{\sqrt kR}=\sqrt k\frac\gamma R$，但余弦 $\le1$ ⇒ $k\le R^2/\gamma^2$。`,
+      ] },
       { t: 'think', q: T`L10 p43：样本 1、7、29、1 依次被分错（$\eta$ 任意）。之后 $\bw=?$`, a: T`$\bw=2\eta y_1\bx_1+\eta y_7\bx_7+\eta y_{29}\bx_{29}$。样本 1 错了两次，所以 $\alpha_1=2\eta$。这就是"$\bw$ 是训练点的线性组合"。` },
       { t: 'story', title: '收敛证明', md: '感知机收敛定理通常归功于 Albert Novikoff 1962 年的证明。它是机器学习里最早的"有限步保证"之一，证明只用到两条不等式和余弦 ≤ 1。' },
     ],

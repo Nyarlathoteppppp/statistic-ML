@@ -659,7 +659,7 @@
     goals: [
       '写出有限类泛化界，逐项解释（$|\\mathcal F|$、$\\delta$、$n$ 的作用）',
       '代数字算 $\\varepsilon$；用 SRM 在两个模型类之间做选择',
-      '知道证明思路的三个积木：union bound、Hoeffding、对所有 $f$ 一致（不要求会证）',
+      '（了解，不考）证明思路的三个积木：union bound、Hoeffding、对所有 $f$ 一致；内容在"数学定义"里的折叠框',
       '说出这个界的局限（只对有限类；损失须在 $[0,1]$；可能很悲观）',
     ],
     types: ['T12'],
@@ -691,6 +691,7 @@
       { t: 'story', title: 'Hoeffding 与 PAC', md: 'Hoeffding 不等式来自 Wassily Hoeffding 1963 年的论文。把它和 union bound 结合来分析学习算法，是 Leslie Valiant 1984 年提出的 PAC（Probably Approximately Correct）学习框架的核心思想——"大概率（probably）近似正确（approximately correct）"正是这个界的形状。Valiant 因此获得 2010 年图灵奖。' },
     ],
     math: [
+      { t: 'fold', title: '有限类泛化界的证明思路（L06 p20–p31）', blocks: [
       { t: 'h3', text: '证明思路（了解即可，L06 p20–p31）' },
       { t: 'ol', items: [
         T`**Union bound（联合界）**（p21–p22）：$\Pr[A_1\text{ or }\cdots\text{ or }A_k]\le\sum_j\Pr[A_j]$（重叠部分被重复计算，所以是上界）。`,
@@ -698,6 +699,7 @@
         T`对**固定**的 $f$，$l(y_i,f(\bx_i))$ 就是这样的 $Z_i$，所以 $\Pr[R[f]-\hat R_D[f]>\varepsilon]\le e^{-2n\varepsilon^2}$（p30）。`,
         T`但 $\hat f_D$ 依赖数据，不是固定的。所以要求**对所有** $f\in\mathcal F$ 同时成立（"最高的人都不比 X 高，那么所有人都不比 X 高"，p25–p26）。坏事件"某个 $f$ 偏差 $>\varepsilon$"用 union bound：概率 $\le|\mathcal F|e^{-2n\varepsilon^2}$（p29–p31）。`,
         T`令 $\delta=|\mathcal F|e^{-2n\varepsilon^2}$，解出 $\varepsilon=\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$（p31）。`,
+      ] },
       ] },
       { t: 'h3', text: '局限（L06 p32–p33）' },
       { t: 'ul', items: [
@@ -724,7 +726,7 @@
       { t: 'h3', text: '例 2：SRM' },
       T`$n=100$，要求整体 90% 置信。单特征类 $|\mathcal F|=4$，最好的经验风险 0.20；多特征类 $|\mathcal F|=8$，最好的经验风险 0.15。`,
       { t: 'steps', items: [
-        T`**同时比较两个类**：两个界都要成立，用 union bound 把 $\delta=0.1$ 分给两个类，各 $\delta_j=0.05$（$\ln(1/0.05)=\ln20$）。`,
+        T`**同时比较两个类**：两个界都要成立，用 union bound（几件坏事至少发生一件的概率 ≤ 各自概率之和）把 $\delta=0.1$ 分给两个类，各 $\delta_j=0.05$（$\ln(1/0.05)=\ln20$）。`,
         T`（考试会给对数值：$\ln4\approx1.386$，$\ln8\approx2.079$，$\ln20\approx2.996$。）单特征：$\varepsilon=\sqrt{\frac{\ln4+\ln20}{200}}=\sqrt{\frac{4.382}{200}}=\sqrt{0.0219}\approx0.148$，上界 $0.20+0.148=0.348$`,
         T`多特征：$\varepsilon=\sqrt{\frac{\ln8+\ln20}{200}}=\sqrt{\frac{5.075}{200}}=\sqrt{0.0254}\approx0.159$，上界 $0.15+0.159=0.309$`,
         T`SRM 选上界更小的**多特征类**。（课件 p18 只示意比较两类，没讨论同时置信度；严格做法是候选类事先固定，并让 $\sum_j\delta_j\le\delta$。）`,
@@ -769,7 +771,7 @@
       { type: 'num', q: '$|\\mathcal F|=1$，$\\delta=e^{-4}$，$n=8$。$\\varepsilon=?$', answer: 0.5, explain: T`要算有限类泛化界里的惩罚项 $\varepsilon=\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$（log 是自然对数 ln）。逐项代入：$|\mathcal F|=1$ ⇒ $\ln1=0$；$\delta=e^{-4}$ ⇒ $1/\delta=e^{4}$ ⇒ $\ln(1/\delta)=4$；$n=8$ ⇒ $2n=16$。$\varepsilon=\sqrt{(0+4)/16}=\sqrt{0.25}=0.5$。含义：以至少 $1-e^{-4}\approx98\%$ 的概率，真实风险最多比训练风险高 0.5。**陷阱是分母忘了乘 2**，用 8 会得到 $\sqrt{0.5}\approx0.707$。`, qzh: T`已知 $|\mathcal F|=1$，$\delta=e^{-4}$，$n=8$，求 $\varepsilon$。` },
       { type: 'mc', q: '$n$ 变为原来的 9 倍，$\\varepsilon$ 变为：', options: ['1/9', '1/3', '1/81', '不变'], answer: 1, explain: T`惩罚项 $\varepsilon=\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$ 里 $n$ 在根号下的分母，所以 $\varepsilon\propto1/\sqrt n$。$n$ 变成 $9n$，$\varepsilon$ 就变成原来的 $1/\sqrt9=1/3$。**陷阱是忘了根号，选 1/9**。同理，想把 $\varepsilon$ 减半，样本要增加到 4 倍。` },
       { type: 'mc', q: 'SRM 选择的是：', options: ['经验风险最小的类', '模型类最小的类', '经验风险 + 复杂度惩罚最小的类', '测试误差最小的类'], answer: 2, explain: T`SRM（structural risk minimisation，结构风险最小化）在几个候选模型类之间选择时，看的是泛化界的右边 $\hat R_D[\hat f_D]+\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$，即经验风险加复杂度惩罚。简单类经验风险大、惩罚小，复杂类正好相反，**SRM 选两者之和最小的类**。只看经验风险会总选最复杂的类（过拟合）；只看类的大小会偏向太简单的类（欠拟合）；测试误差不能拿来做选择。L06 p18。` },
-      { type: 'mc', q: '证明里为什么要对**所有** $f\\in\\mathcal F$ 同时成立？', options: ['因为 $\\hat f_D$ 依赖数据，事先不知道是哪个', '为了让界更紧', '因为 Hoeffding 只对一个 $f$ 成立就够了', '因为 $|\\mathcal F|$ 无穷'], answer: 0, explain: 'L06 p25–p28。' },
+      { type: 'mc', q: '（了解，不考）证明里为什么要对**所有** $f\\in\\mathcal F$ 同时成立？', options: ['因为 $\\hat f_D$ 依赖数据，事先不知道是哪个', '为了让界更紧', '因为 Hoeffding 只对一个 $f$ 成立就够了', '因为 $|\\mathcal F|$ 无穷'], answer: 0, explain: 'L06 p25–p28。' },
       { type: 'show', q: '（英文）Why does the finite-class bound not apply to linear classifiers with real weights?', answer: T`The class $\{\mathrm{sgn}(\mathbf w'\mathbf x)\}$ with real-valued weights is infinite (uncountable), so $\log|\mathcal F|=\infty$ and the bound is vacuous. We need a complexity measure that stays finite for infinite classes, such as the growth function / VC dimension (L07).`, qzh: '为什么有限函数类的泛化界（finite-class bound）不适用于权重为实数的线性分类器（linear classifiers）？', azh: T`权重取实数值时，函数类 $\{\mathrm{sgn}(\mathbf w'\mathbf x)\}$ 是无限的（不可数，uncountable），所以 $\log|\mathcal F|=\infty$，这个界变得没有意义（vacuous）。我们需要一种对无限函数类也保持有限的复杂度度量，例如增长函数（growth function）/ VC 维（VC dimension）（L07）。` },
     ],
   });

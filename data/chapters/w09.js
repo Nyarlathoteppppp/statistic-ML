@@ -432,7 +432,7 @@
       T`**只要众数（MAP）**：分母 $p(\by\mid\mathbf X)$ 和 $\bw$ 无关，最大化分子就行——这就是 ridge regression（c16），$\lambda=\sigma^2/\gamma^2$。**要整个后验**：必须算出分母，即 **marginal likelihood / evidence（边缘似然 / 证据）** $\int p(\by\mid\mathbf X,\bw)p(\bw)\,d\bw$（L18 p16）。`,
       T`**Conjugate prior（共轭先验）**（L18 p17）：似然 × 先验的结果和先验是**同一族**分布。Normal 似然 × Normal 先验 = Normal 后验，分母直接由 Normal 的归一化常数给出。结果（L18 p18）：`,
       { t: 'math', tex: T`p(\bw\mid\mathbf X,\by,\sigma^2)=\mathrm{Normal}(\bw\mid\bw_N,\mathbf V_N),\qquad\mathbf V_N=\sigma^2\Big(\mathbf X'\mathbf X+\frac{\sigma^2}{\gamma^2}\mathbf I_D\Big)^{-1},\qquad\bw_N=\frac{1}{\sigma^2}\mathbf V_N\mathbf X'\by` },
-      T`**这串矩阵公式怎么用？** 考试只要求会**代入**，不要求推导（配方推导见下面"不考"）。只有一个权重（一维、无 bias）时，$\mathbf X'\mathbf X$ 就是 $\sum x_i^2$，$\mathbf X'\by$ 就是 $\sum x_iy_i$，整串公式退化成两个分数：$V_N=\sigma^2/(\sum x_i^2+\sigma^2/\gamma^2)$，$w_N=\sum x_iy_i/(\sum x_i^2+\sigma^2/\gamma^2)$。下面"例子"一节就是用它手算。`,
+      T`**这串矩阵公式怎么用？** 考试只要求会**代入**，不要求推导（配方推导不考，见本章开头"不考的部分"）。只有一个权重（一维、无 bias）时，$\mathbf X'\mathbf X$ 就是 $\sum x_i^2$，$\mathbf X'\by$ 就是 $\sum x_iy_i$，整串公式退化成两个分数：$V_N=\sigma^2/(\sum x_i^2+\sigma^2/\gamma^2)$，$w_N=\sum x_iy_i/(\sum x_i^2+\sigma^2/\gamma^2)$。下面"例子"一节就是用它手算。`,
       { t: 'slide', src: 'L18/p19', caption: '① 先验：以 0 为中心的圆；② 观测数据；③ 后验：被数据拉偏、变窄的椭圆；④ 从后验抽出的直线：在数据附近挤在一起，远处散开。' },
       { t: 'h3', text: '⑤ 一个一个点地更新：sequential updating（L18 p20–p21）' },
       T`今天的后验就是明天的先验：从先验出发，看到一个新数据点，算后验；这个后验作为下一步的先验，再看下一个点……一次看完所有数据，和一个一个看，结果**完全一样**。一般形式（先验 $\mathrm{Normal}(\bw_0,\mathbf V_0)$）：`,
