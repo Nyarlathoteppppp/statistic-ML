@@ -1310,7 +1310,7 @@
     quiz: [
       { type: 'mc', q: 'Logistic regression 是：', options: ['generative, parametric', 'discriminative, parametric', 'generative, non-parametric', 'discriminative, non-parametric'], answer: 1, explain: '建模 $P(y\\mid\\bx)$，参数是固定维度的 $\\bw$。' },
       { type: 'mc', q: 'k-nearest neighbours 是 non-parametric，因为：', options: ['没有超参数', '要保存全部训练数据，"参数"随 $n$ 增长', '它是生成式', '它不用距离'], answer: 1, explain: '预测时要用所有训练点。' },
-      { type: 'num', q: '先验 $P(A)=0.5$，$P(\\bx\\mid A)=0.2$，$P(\\bx\\mid B)=0.6$。生成式分类器给出 $P(A\\mid\\bx)$ = ?', answer: 0.25, explain: '$0.1/(0.1+0.3)=0.25$。' },
+      { type: 'num', q: '只有 A、B 两类。先验 $P(A)=0.5$，$P(\\bx\\mid A)=0.2$，$P(\\bx\\mid B)=0.6$。生成式分类器给出 $P(A\\mid\\bx)$ = ?', answer: 0.25, explain: T`① 只有两类，$P(B)=1-0.5=0.5$。② 每一类算"先验 × 似然"：$P(A,\bx)=0.5\times0.2=0.1$，$P(B,\bx)=0.5\times0.6=0.3$。③ 相加得 $P(\bx)=0.1+0.3=0.4$。④ $P(A\mid\bx)=0.1/0.4=0.25$，所以判成 B（0.75）。换成人数：1000 个样本 A、B 各 500；A 里 20% 长成 $\bx$ 即 100 个，B 里 60% 即 300 个；长成 $\bx$ 的 400 个里 A 占 100 个 = 25%。` },
       { type: 'show', q: '用英文解释 generative 和 discriminative 的区别，并各举一例。', answer: T`A generative model learns the joint $P(\mathbf x,y)$ and classifies via Bayes' rule (e.g. naive Bayes); a discriminative model learns $P(y\mid\mathbf x)$ or a decision boundary directly (e.g. logistic regression, SVM).` },
     ],
   });
