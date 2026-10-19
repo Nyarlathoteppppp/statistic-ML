@@ -66,6 +66,10 @@
       {
         t: 'past', src: '2026 S2 practice Q5', marks: 8, topic: 'L22 p6–p22',
         q: 'Consider the following Markov Random Field. Assume the following node elimination order: $T, X, Z, U, W, V, Y$. What are the cliques in the junction tree (by using the above elimination order)?',
+        qzh: '考虑下面的马尔可夫随机场（Markov Random Field）。假设节点消元顺序（elimination order）为：$T, X, Z, U, W, V, Y$。（使用上述消元顺序时）联结树（junction tree）中的团（clique）有哪些？',
+        azh: T`按顺序 $T,X,Z,U,W,V,Y$ 消元（把每个被消去节点的剩余邻居两两相连），会加上填补边（fill-in edge）$U$–$W$、$U$–$Y$、$W$–$Y$，并产生团 $\{T,U,W\}$、$\{U,X,Y\}$、$\{V,W,Y,Z\}$、$\{U,V,W,Y\}$、$\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$。去掉包含在更大团中的那些，联结树的团为
+$\{T,U,W\},\ \{U,X,Y\},\ \{V,W,Y,Z\},\ \{U,V,W,Y\}$。
+一棵合法的树：$\{U,V,W,Y\}$ 分别连接 $\{T,U,W\}$（分隔集（separator）$\{U,W\}$）、$\{U,X,Y\}$（分隔集 $\{U,Y\}$）和 $\{V,W,Y,Z\}$（分隔集 $\{V,W,Y\}$）。`,
         blocks: [{ t: 'fig', src: 'assets/figures/ex2026_q5_mrf.png', w: 240 }],
         sol: [
           '边：$T$—$U$，$T$—$W$，$U$—$V$，$U$—$X$，$V$—$W$，$V$—$Y$，$V$—$Z$，$W$—$Z$，$X$—$Y$，$Y$—$Z$。',
@@ -98,6 +102,7 @@ A valid tree: $\{U,V,W,Y\}$ connected to $\{T,U,W\}$ (separator $\{U,W\}$), $\{U
       {
         t: 'past', src: '2021 S1 exam Q18(b)', marks: 8, topic: 'L21 消息记法；HMM 本身课件未讲',
         q: 'We wish to use the elimination algorithm to perform inference in the multiple-chain HMM given observed $x$. Show the first two steps of the algorithm, for eliminating $X_1=x_1$ then $A_1$. As part of your answer, state the formulation of the $\\psi$ and $m$ functions and the linear algebraic operations used in each step.',
+        qzh: T`我们希望在给定观测 $x$ 的情况下，用消元算法（elimination algorithm）在多链 HMM 中做推断（inference）。写出算法的前两步：先消去 $X_1=x_1$，再消去 $A_1$。作为答案的一部分，写出 $\psi$ 和 $m$ 函数的表达式，以及每一步用到的线性代数运算。`,
         blocks: [{ t: 'graph', nodes: { a1: [40, 40], a2: [150, 40], a3: [260, 40], x1: [40, 130], x2: [150, 130], x3: [260, 130], b1: [40, 220], b2: [150, 220], b3: [260, 220] }, labels: { a1: 'a₁', a2: 'a₂', a3: 'a₃', x1: 'x₁', x2: 'x₂', x3: 'x₃', b1: 'b₁', b2: 'b₂', b3: 'b₃' }, edges: 'a1>a2 a2>a3 b1>b2 b2>b3 a1>x1 b1>x1 a2>x2 b2>x2 a3>x3 b3>x3', cls: { x1: 'given', x2: 'given', x3: 'given' }, w: 320, caption: '同一个双链 HMM（只画前 3 步）。这一问 $x$ 全部已观测（灰色）；先消 $X_1$，再消 $A_1$。' }],
         sol: [
           { t: 'ext', md: '今年 L21 讲了同样的思路：消掉一个变量 = 把含它的因子相乘再对它求和，得到一条消息 $m$（L21 p12–p22）；观测变量用指示函数把因子"切片"（p24–p27）。HMM 这个模型本身今年没讲，下面按同样记法写。' },

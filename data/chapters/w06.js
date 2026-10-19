@@ -137,11 +137,11 @@
     ],
     quiz: [
       { type: 'num', q: '全连接网络 5 输入 → 3 隐藏 → 1 输出（都有 bias）。参数总数？', answer: 22, explain: T`Fully connected（全连接）层里，每个单元连着上一层的每个输入，外加 1 个 bias，所以每个单元有"输入数 + 1"个参数。隐藏层：3 个单元，每个连 5 个输入 + 1 个 bias，共 $(5+1)\times3=18$；输出层：1 个单元，连 3 个隐藏单元 + 1 个 bias，共 $(3+1)\times1=4$。合计 $18+4=22$。**漏算 bias 会得到 $5\times3+3\times1=18$。**` },
-      { type: 'num', q: 'ReLU：$f(-3)=?$', answer: 0, explain: T`ReLU（rectified linear unit，线性整流）是 $f(s)=\max(0,s)$：正数原样输出，负数一律变成 0。$-3<0$，所以 $f(-3)=\max(0,-3)=0$。别答成 3（那是取绝对值）或 $-3$（那是原样输出）。负半轴输出恒为 0、导数也为 0，所以这样的输入会让 ReLU 单元"关闭"。` },
+      { type: 'num', q: 'ReLU：$f(-3)=?$', answer: 0, explain: T`ReLU（rectified linear unit，线性整流）是 $f(s)=\max(0,s)$：正数原样输出，负数一律变成 0。$-3<0$，所以 $f(-3)=\max(0,-3)=0$。别答成 3（那是取绝对值）或 $-3$（那是原样输出）。负半轴输出恒为 0、导数也为 0，所以这样的输入会让 ReLU 单元"关闭"。`, qzh: 'ReLU 激活函数：$f(-3)$ 等于多少？' },
       { type: 'mc', q: '下面哪个**不能**单靠一个 perceptron 实现？', options: ['AND', 'OR', 'NOT', 'XOR'], answer: 3, explain: T`一个 perceptron 是线性分类器，只能用一条直线把两类分开。XOR 的正类是 $(0,1),(1,0)$、负类是 $(0,0),(1,1)$，同类点在对角上，**没有任何一条直线能把它们分开（线性不可分）**。AND（如 $x_1+x_2-1.5\ge0$）、OR（$x_1+x_2-0.5\ge0$）都能被一条直线分开；NOT 只有一个输入，$g(-x_1)$ 就够。XOR 需要两层：先算 OR 和 AND，再组合成"OR 且 非 AND"。` },
       { type: 'mc', q: 'L11 p22 说深网络相比单个很宽的隐藏层：', options: ['理论上更强', '经验上通常更准确', '没有梯度消失', '参数一定更少'], answer: 1, explain: '理论上一层就够，经验上深更好。' },
-      { type: 'show', q: '（英文）Why do neural networks need non-linear activation functions?', answer: T`Without them every layer is a linear map, and a composition of linear maps is linear, so the whole network would be equivalent to a single linear model and could not represent non-linearly separable functions such as XOR. Non-linear activations make the composition non-linear, giving universal approximation capability.` },
-      { type: 'show', q: '（英文）If one wide hidden layer is a universal approximator, why use deep networks?', answer: T`Universal approximation only says a network with one hidden layer of sufficient width exists; it may need very many units and says nothing about learning it. Deep networks represent compositional structure more efficiently (simple features combined into more complex ones layer by layer) and work better in practice, at the cost of harder optimisation such as vanishing gradients.` },
+      { type: 'show', q: '（英文）Why do neural networks need non-linear activation functions?', answer: T`Without them every layer is a linear map, and a composition of linear maps is linear, so the whole network would be equivalent to a single linear model and could not represent non-linearly separable functions such as XOR. Non-linear activations make the composition non-linear, giving universal approximation capability.`, qzh: '为什么神经网络（neural networks）需要非线性激活函数（non-linear activation functions）？', azh: '没有非线性激活时，每一层都是线性映射（linear map），而线性映射的复合仍是线性的，因此整个网络等价于单个线性模型，无法表示 XOR 这类非线性可分（non-linearly separable）的函数。非线性激活使复合变成非线性，从而让网络具备万能逼近（universal approximation）能力。' },
+      { type: 'show', q: '（英文）If one wide hidden layer is a universal approximator, why use deep networks?', answer: T`Universal approximation only says a network with one hidden layer of sufficient width exists; it may need very many units and says nothing about learning it. Deep networks represent compositional structure more efficiently (simple features combined into more complex ones layer by layer) and work better in practice, at the cost of harder optimisation such as vanishing gradients.`, qzh: '如果一个足够宽的隐藏层（hidden layer）就已经是万能逼近器（universal approximator），为什么还要用深度网络（deep networks）？', azh: '万能逼近（universal approximation）只说明存在一个宽度足够的单隐藏层网络；它可能需要非常多的单元（units），而且完全没有说明怎样把它学出来。深度网络能更高效地表示组合结构（compositional structure），即简单特征逐层组合成更复杂的特征，实践中效果也更好，代价是优化更困难，例如梯度消失（vanishing gradients）。' },
     ],
   });
 
@@ -379,7 +379,7 @@
       { type: 'num', q: 'Momentum $\\alpha=0.5$，$\\eta=1$，$v=2$，当前梯度 1。新的 $v=?$', answer: 2, explain: T`Momentum（动量）更新速度 $v\leftarrow\alpha v+\eta\nabla L$：上一步的速度保留 $\alpha$ 的比例，再加上这一步的梯度。代入 $\alpha=0.5$、旧的 $v=2$、$\eta=1$、当前梯度 1：$0.5\times2+1\times1=1+1=2$。参数接着走 $\theta\leftarrow\theta-v$，这一步走 2，比普通梯度下降的 $\eta\times1=1$ 多，多出来的就是"惯性"。**旧速度要先乘 $\alpha$**，直接相加会得到 3。` },
       { type: 'mc', q: 'Mini-batch SGD 的主要好处：', options: ['梯度精确', '在稳定性和计算量之间折中，可并行', '保证全局最优', '不需要学习率'], answer: 1, explain: T`课件对比三种做法：SGD 每次只用 1 个样本，更新快但梯度方差大、很抖；GD 每次用全部数据，稳定但慢、计算贵；mini-batch（小批量）每次用 $1<b<N$ 个样本（如 $b=100$），**在计算量和稳定性之间折中**，而且一批样本可以在 GPU 上并行算。误选"梯度精确"：只有用全部数据的 GD 才算出精确梯度，mini-batch 仍是估计。它也不保证全局最优，也照样需要学习率。L12 p9。` },
       { type: 'mc', q: 'Adam 结合了：', options: ['SGD 和 Newton', 'momentum 和自适应学习率', 'dropout 和 weight decay', 'GD 和 early stopping'], answer: 1, explain: T`Adam 的 $\mathbf m$ 是梯度的滑动平均，作用和 momentum 的速度一样（记住方向、带惯性）；$\mathbf v$ 是梯度平方的滑动平均，用 $\eta/\sqrt{\hat{\mathbf v}+\epsilon}$ 给每个参数单独定步长，这就是 Adagrad 式的自适应学习率。**所以 Adam = momentum + 自适应学习率**，课件这一页的第一句就是这么说的。误选"SGD 和 Newton"：Adam 只用一阶梯度（和它的平方），不算 Newton 法需要的二阶导（Hessian）。L12 p14。` },
-      { type: 'show', q: '（英文）Compare batch gradient descent, SGD and mini-batch SGD.', answer: T`Batch GD uses the gradient of the loss over the whole training set: each step is accurate and stable but expensive for large data. SGD uses the gradient of a single example: each update is very cheap but noisy (high variance), which can also help escape shallow local optima and saddle points. Mini-batch SGD averages the gradient over a small batch: it reduces the noise relative to SGD while keeping updates cheap, and it uses vectorised / parallel hardware efficiently, so it is the standard choice for training neural networks.` },
+      { type: 'show', q: '（英文）Compare batch gradient descent, SGD and mini-batch SGD.', answer: T`Batch GD uses the gradient of the loss over the whole training set: each step is accurate and stable but expensive for large data. SGD uses the gradient of a single example: each update is very cheap but noisy (high variance), which can also help escape shallow local optima and saddle points. Mini-batch SGD averages the gradient over a small batch: it reduces the noise relative to SGD while keeping updates cheap, and it uses vectorised / parallel hardware efficiently, so it is the standard choice for training neural networks.`, qzh: '比较批量梯度下降（batch gradient descent）、随机梯度下降（SGD）和小批量随机梯度下降（mini-batch SGD）。', azh: '批量梯度下降（batch GD）使用整个训练集上损失的梯度：每一步准确、稳定，但数据量大时开销高。SGD 使用单个样本的梯度：每次更新非常便宜，但噪声大（方差高，high variance），这也有助于跳出较浅的局部最优（local optima）和鞍点（saddle points）。小批量 SGD（mini-batch SGD）在一个小批次上对梯度取平均：相比 SGD 降低了噪声，同时保持更新便宜，并且能高效利用向量化 / 并行硬件（vectorised / parallel hardware），因此是训练神经网络的标准选择。' },
     ],
   });
 
@@ -609,17 +609,17 @@
     recall: [
       { q: '五种激活函数？', a: 'step、sign、logistic $\\frac1{1+e^{-s}}$、tanh、ReLU $\\max(0,s)$。', ch: 'c33' },
       { q: '为什么需要非线性激活？', a: '线性的复合还是线性，多层等于一层，学不了 XOR。', ch: 'c33' },
-      { q: 'Universal approximation theorem？', a: '激活满足温和条件时，一个有限隐藏层就能任意精度逼近连续函数（只说存在）。', ch: 'c33' },
+      { q: 'Universal approximation theorem？', a: '激活满足温和条件时，一个有限隐藏层就能任意精度逼近连续函数（只说存在）。', ch: 'c33', qzh: '万能逼近定理（universal approximation theorem）说的是什么？' },
       { q: '数全连接网络参数：3→4→2（含 bias）？', a: '$(3+1)4+(4+1)2=26$。', ch: 'c33' },
       { q: 'Backprop 的四个公式（平方损失 + 恒等输出）？', a: T`$\delta=z-y$；$\partial L/\partial w_j=\delta u_j$；$\varepsilon_j=\delta w_jg'(r_j)$；$\partial L/\partial v_{ij}=\varepsilon_jx_i$。`, ch: 'c34' },
       { q: '（2021 Q13b）$L$ 不直接依赖隐藏层权重，怎么求导？', a: '沿 $v_{ij}\\to r_j\\to u_j\\to s\\to z\\to L$ 用链式法则相乘；先算输出误差 $\\delta$，再往回传复用。', ch: 'c34' },
       { q: 'Sigmoid 的导数？', a: T`$\sigma(r)(1-\sigma(r))$，最大 0.25。`, ch: 'c34' },
-      { q: 'GD vs SGD vs mini-batch？', a: '全部数据（稳慢）/ 1 个（快、方差大）/ $1<b<N$（折中、可并行）。', ch: 'c35' },
+      { q: 'GD vs SGD vs mini-batch？', a: '全部数据（稳慢）/ 1 个（快、方差大）/ $1<b<N$（折中、可并行）。', ch: 'c35', qzh: '梯度下降（GD）、随机梯度下降（SGD）与小批量（mini-batch）梯度下降有什么区别？' },
       { q: 'Momentum 和 Adagrad 的更新式？', a: T`$\mathbf v=\alpha\mathbf v+\eta\nabla L$，$\boldsymbol\theta\mathrel{-}=\mathbf v$；$g_i\mathrel{+}=(\nabla L)_i^2$，$\theta_i\mathrel{-}=\frac{\eta}{\sqrt{g_i+\epsilon}}(\nabla L)_i$。`, ch: 'c35' },
-      { q: 'Adam = ?', a: 'momentum（一阶矩）+ 自适应步长（二阶矩）+ 偏差校正。', ch: 'c35' },
+      { q: 'Adam = ?', a: 'momentum（一阶矩）+ 自适应步长（二阶矩）+ 偏差校正。', ch: 'c35', qzh: 'Adam 优化器等于什么（由哪几部分组成）？' },
       { q: 'DNN 的三种正则化？', a: 'early stopping、weight decay（$L_2$）、dropout。', ch: 'c36' },
       { q: 'Dropout 为什么有效？测试时怎么做？', a: '迫使冗余表示、相当于指数多个子网络的集成、权重更小；测试时不屏蔽并按保留概率缩放权重。', ch: 'c36' },
-      { q: 'Undercomplete vs overcomplete autoencoder？', a: '瓶颈比输入窄（被迫压缩）vs 宽（可直接复制）。', ch: 'c37' },
+      { q: 'Undercomplete vs overcomplete autoencoder？', a: '瓶颈比输入窄（被迫压缩）vs 宽（可直接复制）。', ch: 'c37', qzh: '欠完备（undercomplete）与过完备（overcomplete）自编码器（autoencoder）有什么区别？' },
       { q: 'PCA 的推导结论？', a: T`最大化 $\mathbf p'\Sigma\mathbf p$ s.t. $\|\mathbf p\|=1$ ⇒ $\Sigma\mathbf p=\lambda\mathbf p$，取最大特征值；方差 = $\lambda$。`, ch: 'c37' },
     ],
     formulas: [
@@ -643,7 +643,7 @@
       { type: 'num', q: 'Adagrad：$\\eta=1$，$\\epsilon\\approx0$，同一个参数前两步的梯度是 3、4，第三步梯度是 5。第三步的步长？', answer: 0.7071, tol: 0.002, explain: '累加梯度平方：$g=3^2+4^2+5^2=9+16+25=50$。步长 $=\\eta\\times5/\\sqrt{g}=5/\\sqrt{50}$；$\\sqrt{50}=5\\sqrt2\\approx7.071$，所以 $\\approx0.707$。' },
       { type: 'num', q: 'PCA：$\\Sigma=\\begin{bmatrix}5&0\\\\0&5\\end{bmatrix}$，PC1 解释方差比例？', answer: 0.5, explain: '两个特征值相等，各 50%（方向不唯一）。' },
       { type: 'mc', q: '下面哪个说法**错误**？', options: ['dropout 测试时不屏蔽', 'early stopping 看验证误差', 'weight decay 等价于 Laplace 先验', 'Adam 有偏差校正'], answer: 2, explain: 'Weight decay（$L_2$）对应 Gaussian 先验。' },
-      { type: 'show', q: '（英文）Explain the vanishing gradient problem in deep networks.', answer: T`Backpropagated gradients are products of many local derivatives; with saturating activations such as sigmoid ($\sigma'\le0.25$) or tanh, these factors are often small, so gradients for early layers shrink exponentially with depth and those layers learn very slowly. ReLU (derivative 1 for positive inputs) and architectures such as LSTMs/residual connections mitigate this.` },
+      { type: 'show', q: '（英文）Explain the vanishing gradient problem in deep networks.', answer: T`Backpropagated gradients are products of many local derivatives; with saturating activations such as sigmoid ($\sigma'\le0.25$) or tanh, these factors are often small, so gradients for early layers shrink exponentially with depth and those layers learn very slowly. ReLU (derivative 1 for positive inputs) and architectures such as LSTMs/residual connections mitigate this.`, qzh: '解释深度网络中的梯度消失问题（vanishing gradient problem）。', azh: T`反向传播（backpropagation）得到的梯度是许多局部导数的乘积；使用 sigmoid（$\sigma'\le0.25$）或 tanh 这类饱和激活函数（saturating activations）时，这些因子往往很小，于是靠前各层的梯度随深度呈指数级缩小，这些层学得非常慢。ReLU（正输入时导数为 1）以及 LSTM / 残差连接（residual connections）等结构可以缓解这一问题。` },
     ],
     next: '下一周（W7）：CNN 和 RNN/Transformer。CNN 参数计数（T3）是往年必考计算题。',
   }));

@@ -66,6 +66,10 @@ Pull arm 3: it has the largest UCB value. Its empirical mean is the lowest, but 
       {
         t: 'past', src: '2026 S2 practice Q2', marks: 6, topic: 'L17 p18',
         q: 'You are running a multi-armed bandit problem with 3 arms. The rewards from each arm are binary (0 or 1), and so far you have pulled the arms with the following results: Arm 1: pulled 64 times, with 40 rewards of 1. Arm 2: pulled 16 times, with 10 rewards of 1. Arm 3: pulled 4 times, with 2 rewards of 1. Using the UCB algorithm, calculate the value of each arm based on the given results. Based on your calculations, which arm should you pull next, and why?\n\n*Useful values:* $\\ln 4\\approx1.4$, $\\ln 16\\approx2.8$, $\\ln 64\\approx4.2$, $\\ln 84\\approx4.5$, $\\ln 85\\approx4.5$ …',
+        qzh: T`你在运行一个有 3 个臂（arm）的多臂老虎机（multi-armed bandit）问题。每个臂的奖励是二元的（0 或 1），到目前为止拉臂的结果如下：臂 1：拉了 64 次，其中 40 次奖励为 1。臂 2：拉了 16 次，其中 10 次奖励为 1。臂 3：拉了 4 次，其中 2 次奖励为 1。用 UCB 算法，根据这些结果计算每个臂的值。根据你的计算，下一次应该拉哪个臂，为什么？*有用的数值：* $\ln 4\approx1.4$，$\ln 16\approx2.8$，$\ln 64\approx4.2$，$\ln 84\approx4.5$，$\ln 85\approx4.5$ …`,
+        azh: T`$t = 64+16+4+1 = 85$，$\ln 85\approx4.5$，所以 $2\ln t\approx 9$。
+$Q(1)=\tfrac{40}{64}+\sqrt{9/64}=0.625+0.375=1.0$；$Q(2)=\tfrac{10}{16}+\sqrt{9/16}=0.625+0.75=1.375$；$Q(3)=\tfrac{2}{4}+\sqrt{9/4}=0.5+1.5=2.0$。
+拉臂 3：它的 UCB 值最大。它的经验均值（empirical mean）最低，但只被拉了 4 次，所以它的探索奖励（exploration bonus，即不确定性）占主导——面对不确定性保持乐观（optimism in the face of uncertainty）。`,
         sol: [
           {
             t: 'table', head: ['', 'Arm 1', 'Arm 2', 'Arm 3'], rows: [
@@ -83,6 +87,9 @@ Pull arm 3: it has the largest UCB value. Its empirical mean is the lowest, but 
       {
         t: 'past', src: '2021 S1 exam Q17', marks: 8, topic: 'L17 p8–p9, p18',
         q: 'Describe two mechanisms used by the Upper Confidence Bound (UCB) multi-armed bandit (MAB) to explore arms that so far have no demonstrated high rewards. *(Formula given: $Q_{t-1}(i)=\\hat\\mu_{t-1}(i)+\\sqrt{\\rho\\log t/N_{t-1}(i)}$; unobserved arms are initialised with value estimate $Q_0$, a hyperparameter.)*',
+        qzh: T`描述上置信界（Upper Confidence Bound, UCB）多臂老虎机（multi-armed bandit, MAB）用来探索那些目前还没有表现出高奖励的臂的两种机制。*（给定公式：$Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log t/N_{t-1}(i)}$；未被观测过的臂用值估计 $Q_0$ 初始化，$Q_0$ 是一个超参数（hyperparameter）。）*`,
+        azh: T`(1) 乐观初始化（optimistic initialisation）：从未被拉过的臂取值 $Q_0$；当 $Q_0=+\infty$（大于任何可达到的值）时，在开始利用（exploitation）之前，每个臂都至少会被尝试一次。
+(2) 探索奖励（exploration bonus）$\sqrt{\rho\log t/N_{t-1}(i)}$：一个臂被拉的次数少时它很大；而且对一个被冷落的臂，$\log t$ 不断增长而 $N_{t-1}(i)$ 保持不变，所以它的奖励项会一直增大，直到它最终再次被拉。$\rho$ 越大，探索越多。`,
         sol: [
           '（这道题的 bonus 写成 $\\sqrt{\\rho\\log t/N}$：课件写 $\\log$、真题近似值写 $\\ln$，是同一种自然对数；前面公式里的常数 2 在这里换成可调的 $\\rho$，越大越爱探索。这道题只问机制，不用代数。）',
           {

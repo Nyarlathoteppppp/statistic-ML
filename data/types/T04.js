@@ -71,6 +71,8 @@
       {
         t: 'past', src: '2021 S1 exam Q2', marks: 4, topic: 'L08 p17–p21',
         q: 'For the hard-margin support vector machine, data points that are support vectors have a margin of 1 from the decision boundary. Explain how this can be the case even when support vectors are further than 1 unit away from the decision boundary in Euclidean space.',
+        qzh: '对于硬间隔支持向量机（hard-margin support vector machine），作为支持向量（support vector）的数据点到决策边界（decision boundary）的间隔（margin）为 1。请解释：即使在欧氏空间中支持向量到决策边界的距离超过 1 个单位，这为什么仍然成立。',
+        azh: T`"间隔为 1"指的是函数间隔（functional margin）$y_i(\mathbf w'\mathbf x_i+b)=1$，而不是欧氏距离。因为把 $(\mathbf w,b)$ 乘以任意正常数都不改变决策边界，SVM 固定了这个尺度，使最近的点的函数间隔恰好为 1（规范形式，canonical form）。它们到边界的欧氏距离是 $y_i(\mathbf w'\mathbf x_i+b)/\|\mathbf w\| = 1/\|\mathbf w\|$，根据 $\|\mathbf w\|$ 的大小，这个距离可以大于（或小于）1。`,
         sol: [
           '"margin 为 1"说的是 **functional margin** $y_i(\\bw\'\\bx_i+b)=1$，不是欧氏距离。欧氏距离是 functional margin 除以 $\\|\\bw\\|$，即 $1/\\|\\bw\\|$。因为 $(\\bw,b)$ 乘任意正数不改变边界，SVM 用 canonical scaling 把最近点的 functional margin 固定为 1，真实距离由 $\\|\\bw\\|$ 决定。',
           {
@@ -81,6 +83,8 @@
       {
         t: 'past', src: '2021 S1 exam Q3', marks: 4, topic: 'L09 p10, p13, p21–p23',
         q: 'For a support vector machine with a quadratic kernel, in what situation, if any, would it be better to use the primal program instead of the dual program for training?',
+        qzh: '对于使用二次核（quadratic kernel）的支持向量机，在什么情况下（如果存在的话）用原问题（primal program）训练比用对偶问题（dual program）更好？',
+        azh: T`对偶问题的计算代价随训练样本数 $n$ 增长（大约 $O(n^3)$，需要一个 $n\times n$ 的核矩阵（kernel matrix）），而原问题的代价随特征维数增长。对 $m$ 个输入特征，二次核对应的显式特征映射（feature map）只有 $O(m^2)$ 维。所以当样本数非常大、原始特征很少（$n \gg m^2$）时，更好的做法是显式展开特征并求解原问题。（对于 RBF 这样的无穷维核，原问题不可行。）`,
         sol: [
           '课件结论：一般方法求解 dual 的代价随**样本数** $n$ 增长（$O(n^3)$），primal 随**特征维数** $d$ 增长（$O(d^3)$）（L09 p10、p13）。二次核对应的显式特征空间维数大约是原维数的平方量级（$m$ 维输入 → $O(m^2)$ 个二次单项式，L09 p32）。（二次单项式 = 每对特征相乘 $x_ix_j$，$i\\le j$，约 $m(m+1)/2$ 个，所以是 $O(m^2)$；$O(n^3)$ 的意思是样本数翻倍，计算量约变成 8 倍）',
           '所以：当**样本很多、原始特征很少**时（$n\\gg m^2$），直接在显式的二次特征上解 primal 更便宜；反之（高维、样本少，或用 RBF 这类无穷维核）就用 dual + kernel。',

@@ -4,6 +4,7 @@
  *   { type:'num',  q, answer: number, tol, unit, explain }
  *   { type:'set',  q, answer:[tokens], explain }            // e.g. support vectors "1,2,4" — order-free
  *   { type:'show', q, answer: md, explain }                 // self-check: reveal model answer
+ *   any item may add qzh (题意, shown under the question) and azh (中文意思 of an English answer)
  * Practice block: { t:'practice', gen:'id', title, opts }; generator lives in SML.practice.generators[id]
  *   and returns { q: blocks, check: { type, answer, tol, options }, sol: blocks }. */
 (function (root) {
@@ -34,6 +35,7 @@
     const qbody = el('div');
     if (Array.isArray(q.q)) qbody.appendChild(renderBlocks(q.q, ctx)); else qbody.innerHTML = md(q.q);
     box.appendChild(qbody);
+    if (q.qzh) box.appendChild(el('div', 'qzh', md('题意：' + q.qzh)));
     const explain = el('div', 'qexplain'); explain.hidden = true;
     const showExplain = (verdict) => {
       explain.hidden = false;
@@ -41,6 +43,7 @@
       if (verdict != null) explain.appendChild(el('div', 'qverdict ' + (verdict ? 'right' : 'wrong'), verdict ? '✓ 正确' : '✗ 不对'));
       const ansMd = q.answerText || ((q.type || (q.options ? 'mc' : 'show')) === 'show' && typeof q.answer === 'string' ? q.answer : null);
       if (ansMd) explain.appendChild(el('div', null, md('**答案：** ' + ansMd)));
+      if (q.azh) explain.appendChild(el('div', 'azh', md('中文意思：' + q.azh)));
       if (Array.isArray(q.explain)) explain.appendChild(renderBlocks(q.explain, ctx));
       else if (q.explain) explain.appendChild(el('div', null, md(q.explain)));
     };

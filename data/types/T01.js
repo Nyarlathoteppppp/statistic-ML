@@ -64,6 +64,8 @@
       {
         t: 'past', src: '2026 S2 practice Q3（= 2025 S1 practice Q3）', marks: 8, topic: 'L07 p29',
         q: 'Consider an input domain of five points $x_1,\\dots,x_5$, and binary classifier family $\\mathcal G$ defined by the table of dichotomies given below. Calculate $\\mathrm{VC}(\\mathcal G)$ and show a corresponding shattered set of points.',
+        qzh: T`考虑一个由五个点 $x_1,\dots,x_5$ 组成的输入域（input domain），以及由下表中的二分（dichotomy）定义的二元分类器族（binary classifier family）$\mathcal G$。计算 $\mathrm{VC}(\mathcal G)$，并给出一个相应的被打散的点集（shattered set）。`,
+        azh: T`$\mathrm{VC}(\mathcal G)=2$。集合 $\{x_1,x_3\}$ 被打散（shattered）：只看 $(x_1,x_3)$ 时，这些二分给出 $00,01,10,11$，即全部 $2^2$ 种标注（labelling）。没有任何 3 个点的集合被打散：任何含 $x_5$ 的三元组都不行，因为 $x_5=0$ 只出现在一行；其余的三元组 $\{x_1,x_2,x_3\},\{x_1,x_2,x_4\},\{x_1,x_3,x_4\},\{x_2,x_3,x_4\}$ 各自实现的不同模式都少于 $2^3=8$ 种。因此更大的集合也不会被打散，$\mathrm{VC}(\mathcal G)=2$。`,
         blocks: [{
           t: 'table', cls: 'mono compact', head: ['$x_1$', '$x_2$', '$x_3$', '$x_4$', '$x_5$'],
           rows: ['00001', '10001', '01010', '01101', '01011', '10111', '11101', '01111'].map((r) => r.split('')),
@@ -97,6 +99,7 @@
       {
         t: 'past', src: '2021 S1 exam Q16', marks: '5 + 7', topic: 'L07 p23, p29',
         q: 'Consider an input domain of six points $x_1,\\dots,x_6$ and binary classifier family $\\mathcal F$ defined by the table of dichotomies below. (a) Calculate $\\mathrm{VC}(\\mathcal F)$ and show a corresponding shattered set of points. (b) List all shattered sets of points. How many are there in total?',
+        qzh: T`考虑一个由六个点 $x_1,\dots,x_6$ 组成的输入域（input domain），以及由下表中的二分（dichotomy）定义的二元分类器族 $\mathcal F$。(a) 计算 $\mathrm{VC}(\mathcal F)$，并给出一个相应的被打散的点集（shattered set）。(b) 列出所有被打散的点集。总共有多少个？`,
         blocks: [{
           t: 'table', cls: 'mono compact', head: ['$x_1$', '$x_2$', '$x_3$', '$x_4$', '$x_5$', '$x_6$'],
           rows: ['101110', '000011', '010110', '001011', '001110', '100001', '100100', '111011'].map((r) => r.split('')),

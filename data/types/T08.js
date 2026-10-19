@@ -30,6 +30,11 @@
       {
         t: 'past', src: '2021 S1 exam Q15', marks: 12, topic: 'L09 p21, p33',
         q: 'If $k_1(\\mathbf a,\\mathbf a\')$ and $k_2(\\mathbf b,\\mathbf b\')$ are both valid kernels over vector valued inputs of size $d_1$ and $d_2$ respectively, prove that $k_3\\left(\\begin{bmatrix}\\mathbf a\\\\\\mathbf b\\end{bmatrix},\\begin{bmatrix}\\mathbf a\'\\\\\\mathbf b\'\\end{bmatrix}\\right)=k_1(\\mathbf a,\\mathbf a\')+k_2(\\mathbf b,\\mathbf b\')$ is also a valid kernel over vectors of size $d_1+d_2$. (Prime means "prime", not transpose; $[\\mathbf a;\\mathbf b]$ is concatenation.)',
+        qzh: T`如果 $k_1(\mathbf a,\mathbf a')$ 和 $k_2(\mathbf b,\mathbf b')$ 分别是定义在维数为 $d_1$ 和 $d_2$ 的向量输入上的合法核（valid kernel），证明 $k_3\left(\begin{bmatrix}\mathbf a\\\mathbf b\end{bmatrix},\begin{bmatrix}\mathbf a'\\\mathbf b'\end{bmatrix}\right)=k_1(\mathbf a,\mathbf a')+k_2(\mathbf b,\mathbf b')$ 也是维数为 $d_1+d_2$ 的向量上的合法核。（撇号表示"撇"（prime），不表示转置；$[\mathbf a;\mathbf b]$ 表示拼接（concatenation）。）`,
+        azh: T`由于 $k_1$ 和 $k_2$ 是合法核，存在特征映射（feature map）$\varphi_1,\varphi_2$，使得 $k_1(\mathbf a,\mathbf a')=\varphi_1(\mathbf a)^\top\varphi_1(\mathbf a')$，$k_2(\mathbf b,\mathbf b')=\varphi_2(\mathbf b)^\top\varphi_2(\mathbf b')$。
+对 $\mathbf x=[\mathbf a;\mathbf b]\in\mathbb R^{d_1+d_2}$，定义拼接的特征映射 $\varphi_3(\mathbf x)=\begin{bmatrix}\varphi_1(\mathbf a)\\ \varphi_2(\mathbf b)\end{bmatrix}$。则
+$$\varphi_3(\mathbf x)^\top\varphi_3(\mathbf x')=\varphi_1(\mathbf a)^\top\varphi_1(\mathbf a')+\varphi_2(\mathbf b)^\top\varphi_2(\mathbf b')=k_1(\mathbf a,\mathbf a')+k_2(\mathbf b,\mathbf b')=k_3(\mathbf x,\mathbf x').$$
+所以 $k_3$ 是 $\varphi_3$ 特征空间中的内积（inner product），因此是合法核。`,
         sol: [
           '（注意：这道题里 $\\mathbf a\'$ 的撇表示"另一个输入 $\\mathbf a\'$"，不是转置——本题的转置一律写成 $^\\top$。本页其他地方 $\\bu\'\\bv$ 的撇仍是转置 = 点积。）',
           '思路：$k_1,k_2$ 合法 ⇒ 各有特征映射 $\\varphi_1,\\varphi_2$。把两个特征**拼接**起来，拼接向量的点积 = 两部分点积之和——点积只把**同一位置**的分量相乘再相加，前半段对前半段、后半段对后半段，没有交叉项。例：$[p,q,r]^\\top[p\',q\',r\']=pp\'+qq\'+rr\'$，前两项是 $\\varphi_1$ 部分的点积，最后一项是 $\\varphi_2$ 部分的点积。',
@@ -50,6 +55,8 @@ So $k_3$ is an inner product in the feature space of $\varphi_3$ and is therefor
       {
         t: 'past', src: 'Worksheet 6（同类练习）', marks: '—', topic: 'WK06, L09',
         q: 'Prove that $k(A_1,A_2)=|A_1\\cap A_2|$ is a valid kernel for subsets $A_1,A_2$ of a finite set $\\Omega$.',
+        qzh: T`证明对有限集合 $\Omega$ 的子集 $A_1,A_2$，$k(A_1,A_2)=|A_1\cap A_2|$ 是合法核（valid kernel）。`,
+        azh: T`令 $\Omega=\{\omega_1,\dots,\omega_N\}$，定义 $\varphi(A)=(\mathbb 1[\omega_1\in A],\dots,\mathbb 1[\omega_N\in A])^\top$。则 $\varphi(A_1)^\top\varphi(A_2)=\sum_j \mathbb 1[\omega_j\in A_1]\mathbb 1[\omega_j\in A_2]=|A_1\cap A_2|$，所以 $k$ 是特征向量的内积（inner product），因此是合法核。`,
         sol: [
           '构造指示向量：$\\Omega=\\{\\omega_1,\\dots,\\omega_N\\}$，$\\varphi(A)\\in\\{0,1\\}^N$，第 $j$ 维是 $\\mathbb 1[\\omega_j\\in A]$。两个指示向量的点积就是同时属于两个集合的元素个数。',
           { t: 'exam', md: T`Let $\Omega=\{\omega_1,\dots,\omega_N\}$ and define $\varphi(A)=(\mathbb 1[\omega_1\in A],\dots,\mathbb 1[\omega_N\in A])^\top$. Then $\varphi(A_1)^\top\varphi(A_2)=\sum_j \mathbb 1[\omega_j\in A_1]\mathbb 1[\omega_j\in A_2]=|A_1\cap A_2|$, so $k$ is an inner product of feature vectors and hence a valid kernel.` },
@@ -76,6 +83,8 @@ So $k_3$ is an inner product in the feature space of $\varphi_3$ and is therefor
       {
         t: 'past', src: '2025 S1 practice Q2', marks: 10, topic: 'L03 p24',
         q: 'Consider a 2-dimensional dataset with binary features and the XOR label: $(0,0,0)$, $(0,1,1)$, $(1,0,1)$, $(1,1,0)$ as $(x_1,x_2,y)$. Design a feature space transformation that would make the data linearly separable.',
+        qzh: '考虑一个二值特征的二维数据集，标签为 XOR：以 $(x_1,x_2,y)$ 表示为 $(0,0,0)$、$(0,1,1)$、$(1,0,1)$、$(1,1,0)$。设计一个特征空间变换（feature space transformation），使数据线性可分（linearly separable）。',
+        azh: T`XOR 在 $(x_1,x_2)$ 中不是线性可分的。使用基函数展开（basis expansion）$\varphi(\mathbf x)=(x_1,\,x_2,\,x_1x_2)$。取 $\mathbf w=(1,1,-2)$、$b=-0.5$，则对 $(0,0),(0,1),(1,0),(1,1)$，分数 $\mathbf w^\top\varphi(\mathbf x)+b$ 分别为 $-0.5,\ 0.5,\ 0.5,\ -0.5$，所以"分数为正时预测 $y=1$"能把四个点全部分对：数据在新特征空间中线性可分。（等价地，用到四个角点的距离特征 $\varphi_i(\mathbf x)=\|\mathbf x-\mathbf z_i\|$，取 $\mathbf w=(1,0,0,1)$，类 0 的分数为 $\sqrt2$，类 1 的分数为 $2$。）`,
         sol: [
           { t: 'h4', text: '解法一：课件 L03 p24 原样（最稳）' },
           '用到 4 个中心的距离作为特征：$\\varphi_i(\\bx)=\\|\\bx-\\bm z_i\\|$，$\\bm z_1=(0,0)$，$\\bm z_2=(0,1)$，$\\bm z_3=(1,0)$，$\\bm z_4=(1,1)$。取 $\\bw=(1,0,0,1)$（凑出来的：只用"到 $(0,0)$ 的距离 + 到 $(1,1)$ 的距离"）。距离怎么算：如 $(0,0)$ 到 $(1,1)$ 是 $\\sqrt{1^2+1^2}=\\sqrt2$，到 $(0,1)$ 是 1：',

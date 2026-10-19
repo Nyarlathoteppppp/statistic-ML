@@ -47,6 +47,9 @@
       {
         t: 'past', src: '2025 S1 practice Q1(d)(e)', marks: '5 + 5', topic: 'L20 p9–p11',
         q: '(d) 4 Boolean random variables $X,Y,Z,V$, no independence assumed: how many rows in the probability table of the joint distribution? (e) If $X,Y,Z$ are independent of each other and $V$ depends on $X,Y$, how many rows do we need?',
+        qzh: '(d) 4 个布尔随机变量 $X,Y,Z,V$，不假设任何独立性：联合分布（joint distribution）的概率表有多少行？(e) 如果 $X,Y,Z$ 彼此独立，且 $V$ 依赖于 $X,Y$，我们需要多少行？',
+        azh: T`(d) $2^4=16$ 行（每种联合赋值一行；由于概率之和为 1，自由参数（free parameter）为 15 个）。
+(e) 联合分布分解为 $P(X)P(Y)P(Z)P(V\mid X,Y)$，所以需要存储 $2+2+2+2^3=14$ 行（自由参数只有 $1+1+1+4=7$ 个）。`,
         blocks: [{ t: 'graph', nodes: { X: [40, 40], Y: [150, 40], Z: [260, 40], V: [95, 150] }, edges: 'X>V Y>V', w: 300, caption: '(e) 的图：$X,Y,Z$ 互相独立（没有父节点），$V$ 的父节点是 $X,Y$。每个节点存一张"给定父节点"的表。' }],
         sol: [
           '(d) 全联合表：4 个布尔变量，$2^4=2\\times2\\times2\\times2=$ **16** 行（概率加起来为 1，所以 $16-1=15$ 个自由参数）。',
@@ -61,6 +64,12 @@
       {
         t: 'past', src: '2026 S2 practice Q6（2025 S1 practice Q6 同题，多 (d)(e)）', marks: '10（2025：20）', topic: 'L20 p14, p27',
         q: 'Design a system for alerting residents of the Dandenongs that they should evacuate for an impending bushfire. If any of three sensors $S_1,S_2,S_3$ are ‘on’ then residents should evacuate. However if either of the closer sensors $C_1,C_2$ are ‘on’ then residents should stay put. (a) Model the problem as a directed PGM relating $S_1,S_2,S_3,C_1,C_2$ and an additional random variable $A$ for alerting residents to evacuate. (b) How many CPTs should be specified, and what should these tables’ dimensions be? (c) Suppose the sensors are always accurate. What could you say about your CPTs? *(2025 also:)* (d) How would you change your model if sensor $S_1$ is not perfectly accurate? (e) Given this final model, how would you use it to drive the alarm?',
+        qzh: '设计一个系统，在山火（bushfire）即将来临时提醒丹德农山区（Dandenongs）的居民撤离。如果三个传感器 $S_1,S_2,S_3$ 中任意一个为"开"（on），居民就应撤离。但如果较近的两个传感器 $C_1,C_2$ 中任意一个为"开"，居民就应留在原地。(a) 把这个问题建模为一个有向概率图模型（directed PGM），关联 $S_1,S_2,S_3,C_1,C_2$ 以及一个额外的随机变量 $A$（提醒居民撤离）。(b) 需要指定多少张条件概率表（CPT），这些表的维度应是多少？(c) 假设传感器总是准确的。关于你的 CPT 能说些什么？*（2025 年还有：）* (d) 如果传感器 $S_1$ 不是完全准确的，你会怎样修改模型？(e) 有了这个最终模型，你会如何用它来驱动警报？',
+        azh: T`(a) 节点 $S_1,S_2,S_3,C_1,C_2,A$；边 $S_1\to A$、$S_2\to A$、$S_3\to A$、$C_1\to A$、$C_2\to A$，即 $P(S_1)P(S_2)P(S_3)P(C_1)P(C_2)P(A\mid S_1,S_2,S_3,C_1,C_2)$。
+(b) 六张 CPT：五张传感器的 $2\times1$ 表，以及一张给定五个父节点时 $A$ 的 $2\times2^5=2\times32$ 表。
+(c) $A$ 的 CPT 变成确定性的（deterministic，所有条目都是 0 或 1）：当且仅当至少一个 $S_i$ 为开、且 $C_1,C_2$ 都为关时，$P(A=1\mid\cdot)=1$；传感器的先验（prior）不受影响。
+(d) 加一个隐变量（latent variable）$F_1$（$S_1$ 附近是否真的有火），边为 $F_1\to S_1$，并用 $F_1\to A$ 替换 $S_1\to A$；$P(S_1\mid F_1)$ 对误报（false positive）和漏报（false negative）建模。
+(e) 观测所有传感器读数，通过对 $F_1$ 求和（边缘化，marginalising）计算 $P(A=1\mid s_1,s_2,s_3,c_1,c_2)$；超过阈值就发出警报。`,
         sol: [
           { t: 'h4', text: '(a) 画图' },
           '五个传感器都是根节点，都指向 $A$：$S_1,S_2,S_3,C_1,C_2\\to A$。$A$ 的规则：$A=1$ 当且仅当 $(S_1\\lor S_2\\lor S_3)\\land\\lnot C_1\\land\\lnot C_2$（$\\lor$ = 或，$\\land$ = 并且，$\\lnot$ = 非：三个远处传感器至少一个响，并且两个近处传感器都不响）。',
@@ -99,6 +108,8 @@
       {
         t: 'past', src: '2025 S1 practice Q4', marks: '5 + 5 + 5', topic: 'L20 p9–p11, L02 MLE',
         q: 'Consider the directed PGM $A\\to C\\leftarrow B$ with Boolean variables. (a) Write the format (with empty values) of the conditional probability tables. (b) Suppose we observe $n$ sets of values of $A,B,C$ (complete observations). What does the maximum-likelihood principle say to do? (c) Suppose we observe 5 training examples for $(A,B,C)$: $(F,F,F)$; $(F,F,T)$; $(F,T,F)$; $(T,F,T)$; $(T,T,T)$. Determine maximum-likelihood estimates for your tables.',
+        qzh: T`考虑布尔变量的有向概率图模型（directed PGM）$A\to C\leftarrow B$。(a) 写出条件概率表（conditional probability table）的格式（数值留空）。(b) 假设我们观测到 $n$ 组 $A,B,C$ 的取值（完整观测，complete observations）。最大似然原则（maximum-likelihood principle）要求怎么做？(c) 假设我们观测到 5 个 $(A,B,C)$ 训练样本：$(F,F,F)$；$(F,F,T)$；$(F,T,F)$；$(T,F,T)$；$(T,T,T)$。求你的表的最大似然估计（maximum-likelihood estimate）。`,
+        azh: T`(b) 选择使观测数据的似然（likelihood）$\prod_{i=1}^{n}P(a_i)P(b_i)P(c_i\mid a_i,b_i)$ 最大（等价地，使对数似然最大）的 CPT 条目，约束是每个分布之和为 1。在完整数据下，这个问题按表分解（decouple），解就是相对频率（relative frequency）：每个条目等于该取值（在该父节点配置下）的计数除以该父节点配置的计数。`,
         blocks: [{ t: 'fig', src: 'assets/figures/ex2025_q4_bn.png', w: 220 }],
         sol: [
           { t: 'h4', text: '(a) 表格格式' },
@@ -131,6 +142,8 @@
       {
         t: 'past', src: '2021 S1 exam Q14(b)', marks: 6, topic: 'Gibbs sampling（L1–L22 课件未讲；用 L20 的因子分解推导）',
         q: 'For the Bayesian network $P(A)P(B)P(C\\mid A)P(D\\mid A,B)P(E\\mid D)P(F\\mid C,E)$ (all Boolean), Gibbs sampling resamples one variable at a time given the current values of all the others. Give the distribution used to resample $E$, simplified as far as possible.',
+        qzh: T`对于贝叶斯网络 $P(A)P(B)P(C\mid A)P(D\mid A,B)P(E\mid D)P(F\mid C,E)$（全部为布尔变量），吉布斯抽样（Gibbs sampling）每次在给定其他所有变量当前值的条件下重新抽样一个变量。给出用于重新抽样 $E$ 的分布，并尽可能化简。`,
+        azh: T`从 $E$ 的完全条件分布（full conditional）中重新抽样 $E$，它正比于所有含 $E$ 的因子之积（其他因子全部约掉）：$P(E=e\mid A,B,C,D,F)=\dfrac{P(e\mid D)\,P(F\mid C,e)}{\sum_{e'}P(e'\mid D)\,P(F\mid C,e')}$。它只依赖于 $E$ 的马尔可夫毯（Markov blanket）$\{D,C,F\}$；计算两个未归一化的权重，归一化，然后抽样。`,
         blocks: [{ t: 'graph', nodes: { A: [60, 30], B: [200, 30], C: [30, 130], D: [170, 130], E: [170, 230], F: [60, 300] }, edges: 'A>C A>D B>D D>E C>F E>F', cls: { E: 'cur', D: 'hl', F: 'hl', C: 'hl' }, w: 240, caption: '$P(A)P(B)P(C\\mid A)P(D\\mid A,B)P(E\\mid D)P(F\\mid C,E)$ 的图。黄 = 要重新抽样的 $E$；蓝 = 它的 Markov blanket（父 $D$、子 $F$、子的另一个父 $C$）。' }],
         sol: [
           '**思路**：Gibbs 每次从"给定其他所有变量时 $E$ 的条件分布"里抽 $E$。联合分布里不含 $E$ 的因子在分子分母里一样，会约掉，只剩含 $E$ 的因子：$P(E\\mid D)$ 和 $P(F\\mid C,E)$。具体：分子是 $P(A)P(B)P(C\\mid A)P(D\\mid A,B)P(E=e\\mid D)P(F\\mid C,E=e)$，分母是把 $e$ 换成 0 和 1 的两个式子相加；$P(A)P(B)P(C\\mid A)P(D\\mid A,B)$ 上下都有、约掉。"归一化"就是除以这两项之和，让 $e=0,1$ 的两个概率加起来等于 1。',
@@ -143,6 +156,8 @@
       {
         t: 'past', src: '2021 S1 exam Q14(c)', marks: 4, topic: 'L04 logistic, L20 CPT',
         q: 'Instead of implementing $P(D\\mid A,B)$ as a large conditional probability table, we decide to use a logistic regression model with three parameters (one for each of the two conditioning variables, and a bias term). Besides reducing the number of parameters, state another important consequence of this change.',
+        qzh: T`我们不把 $P(D\mid A,B)$ 实现为一张大的条件概率表，而是决定使用一个有三个参数的逻辑回归（logistic regression）模型（两个条件变量各一个参数，外加一个偏置项（bias term））。除了减少参数数量之外，说出这一改变的另一个重要后果。`,
+        azh: T`CPT 可以表示父节点配置上的任意条件分布，而逻辑回归 $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ 把对数几率（log-odds）限制为 $A$ 和 $B$ 的线性函数。因此模型失去了表达能力（expressiveness）：$A$ 和 $B$ 之间的交互作用（例如类似 XOR 的依赖关系）不再能被表示，也就是说模型的偏差（bias）更大。作为交换，参数在不同父节点配置之间共享，所以估计更稳定，训练中从未出现过的配置也能得到合理的概率。`,
         sol: [
           '中文要点：$\\sigma(s)=1/(1+e^{-s})$ 把分数压到 0 和 1 之间；logistic 的分数只有 $w_0+w_AA+w_BB$（$A,B$ 取 0 或 1），$A$ 和 $B$ 的影响只能**相加**。CPT 可以给 4 种父节点组合各填一个任意概率；logistic 做不到"$A,B$ 不同时 $D=1$、相同时 $D=0$"这种 XOR 式的依赖。',
           { t: 'exam', md: T`The CPT can represent any conditional distribution over the parent configurations, whereas logistic regression $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ restricts the log-odds to be linear in $A$ and $B$. So the model loses expressiveness: interactions between $A$ and $B$ (e.g. an XOR-like dependence) can no longer be represented, i.e. the model is more biased. In exchange, parameters are shared across parent configurations, so estimates are more stable and configurations never seen in training still get sensible probabilities.` },

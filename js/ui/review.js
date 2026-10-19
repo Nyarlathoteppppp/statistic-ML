@@ -90,12 +90,14 @@
     const { md } = SML.md;
     const box = el('div', 'rcard ' + srs.cls(k));
     const q = el('div', 'rq'); q.appendChild(el('div', null, md(it.q)));
+    if (it.qzh) q.appendChild(el('div', 'qzh', md('题意：' + it.qzh)));
     const a = el('div', 'ra'); a.hidden = true;
     let built = false;
     const open = (v) => {
       if (!built) {
         built = true;
         if (Array.isArray(it.a)) a.appendChild(renderBlocks(it.a, ctx)); else a.appendChild(el('div', null, md(it.a)));
+        if (it.azh) a.appendChild(el('div', 'azh', md('中文意思：' + it.azh)));
         const row = el('div', 'rbtn');
         const yes = el('button', 'btn', '✓ 会了'); yes.type = 'button';
         const no = el('button', 'btn', '再看'); no.type = 'button';

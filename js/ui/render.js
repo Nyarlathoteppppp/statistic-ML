@@ -172,6 +172,7 @@
         (b.marks ? '<span class="marks">' + esc(b.marks) + ' marks</span>' : '')));
       const q = el('div', 'past-q');
       q.appendChild(el('div', 'en', md(b.q)));
+      if (b.qzh) q.appendChild(el('div', 'qzh', md('题意：' + b.qzh)));
       if (b.blocks) q.appendChild(renderBlocks(b.blocks, ctx));
       box.appendChild(q);
       if (b.sol) {
@@ -179,7 +180,7 @@
         d.appendChild(el('summary', null, '查看完整解答'));
         const body = el('div', 'sol-body');
         let built = false;
-        d.addEventListener('toggle', () => { if (d.open && !built) { built = true; body.appendChild(renderBlocks(b.sol, ctx)); } });
+        d.addEventListener('toggle', () => { if (d.open && !built) { built = true; body.appendChild(renderBlocks(b.sol, ctx)); if (b.azh) body.appendChild(el('div', 'azh', md('英文答案的中文意思：' + b.azh))); } });
         d.appendChild(body);
         box.appendChild(d);
       }

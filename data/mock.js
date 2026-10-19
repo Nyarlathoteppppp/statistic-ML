@@ -24,8 +24,8 @@
     paint();
   });
 
-  const Q = (src, marks, q, figure, where) => ({
-    t: 'past', src: src, marks: marks, q: q,
+  const Q = (src, marks, q, figure, where, qzh, azh) => ({
+    t: 'past', src: src, marks: marks, q: q, qzh: qzh, azh: azh,
     blocks: (figure ? [{ t: 'fig', src: figure, w: 360 }] : []).concat([{ t: 'chips', items: [{ text: '做完后对答案 → ' + where[1], href: where[0] }] }]),
   });
 
@@ -36,17 +36,26 @@
     blocks: [
       { t: 'viz', id: 'mock-timer', opts: { minutes: 50 } },
       { t: 'h2', text: 'Section A: Short Answer Questions [10 marks]', id: 'a' },
-      Q('Q1(a)', 2, 'In words or a mathematical expression, what quantity is minimised by *linear regression*?', null, ['#/T13/past', 'T13']),
-      Q('Q1(b)', 2, 'In words or a mathematical expression, what is the *marginal likelihood* for a Bayesian probabilistic model?', null, ['#/T13/past', 'T13']),
-      Q('Q1(c)', 3, 'Consider the data shown below with hard-margin linear SVM decision boundary shown between the classes. The right half is classified as red squares and the left half as blue circles. Which points (by index 1–6) would be the support vectors of the SVM?', 'assets/figures/ex2026_q1c_svm.png', ['#/T04/read', 'T4']),
-      Q('Q1(d)', 3, 'How many parameters does the following convolutional neural network have (exclude the bias)?', 'assets/figures/ex2026_q1d_cnn.png', ['#/T03/steps', 'T3']),
+      Q('Q1(a)', 2, 'In words or a mathematical expression, what quantity is minimised by *linear regression*?', null, ['#/T13/past', 'T13'],
+        '用文字或数学表达式回答：*线性回归（linear regression）* 最小化的是什么量？'),
+      Q('Q1(b)', 2, 'In words or a mathematical expression, what is the *marginal likelihood* for a Bayesian probabilistic model?', null, ['#/T13/past', 'T13'],
+        '用文字或数学表达式回答：对于贝叶斯概率模型（Bayesian probabilistic model），*边缘似然（marginal likelihood）* 是什么？'),
+      Q('Q1(c)', 3, 'Consider the data shown below with hard-margin linear SVM decision boundary shown between the classes. The right half is classified as red squares and the left half as blue circles. Which points (by index 1–6) would be the support vectors of the SVM?', 'assets/figures/ex2026_q1c_svm.png', ['#/T04/read', 'T4'],
+        '考虑下图所示的数据，两类之间画出了硬间隔线性 SVM（hard-margin linear SVM）的决策边界（decision boundary）。右半边被分类为红色方块，左半边被分类为蓝色圆圈。哪些点（用编号 1–6 表示）会是该 SVM 的支持向量（support vectors）？'),
+      Q('Q1(d)', 3, 'How many parameters does the following convolutional neural network have (exclude the bias)?', 'assets/figures/ex2026_q1d_cnn.png', ['#/T03/steps', 'T3'],
+        '下面这个卷积神经网络（convolutional neural network）有多少个参数？不计偏置（bias）。'),
       { t: 'h2', text: 'Section B: Method & Calculation Questions [30 marks]', id: 'b' },
-      Q('Q2', 6, 'You are running a multi-armed bandit problem with 3 arms; rewards are binary. Arm 1: pulled 64 times, 40 rewards of 1. Arm 2: pulled 16 times, 10 rewards of 1. Arm 3: pulled 4 times, 2 rewards of 1. Using the UCB algorithm, calculate the value of each arm. Which arm should you pull next, and why? *(ln 4 ≈ 1.4, ln 5 ≈ 1.6, ln 16 ≈ 2.8, ln 17 ≈ 2.8, ln 64 ≈ 4.2, ln 65 ≈ 4.2, ln 84 ≈ 4.5, ln 85 ≈ 4.5; $Q_{t-1}(i)=\\hat\\mu_{t-1}(i)+\\sqrt{2\\ln t/N_{t-1}(i)}$)*', null, ['#/T02/past', 'T2']),
-      Q('Q3', 8, 'Consider an input domain of five points $x_1,\\dots,x_5$ and binary classifier family $\\mathcal G$ defined by the table of dichotomies (rows): 00001, 10001, 01010, 01101, 01011, 10111, 11101, 01111. Calculate $\\mathrm{VC}(\\mathcal G)$ and show a corresponding shattered set of points.', null, ['#/T01/past', 'T1']),
-      Q('Q4', 8, 'Consider the following Bayesian network. Does the conditional independence statement $S\\perp Z\\mid V,W$ hold?', 'assets/figures/ex2026_q4_bn.png', ['#/T05/past', 'T5']),
-      Q('Q5', 8, 'Consider the following Markov random field. Assume the node elimination order $T,X,Z,U,W,V,Y$. What are the cliques in the junction tree (using this elimination order)?', 'assets/figures/ex2026_q5_mrf.png', ['#/T06/past', 'T6']),
+      Q('Q2', 6, 'You are running a multi-armed bandit problem with 3 arms; rewards are binary. Arm 1: pulled 64 times, 40 rewards of 1. Arm 2: pulled 16 times, 10 rewards of 1. Arm 3: pulled 4 times, 2 rewards of 1. Using the UCB algorithm, calculate the value of each arm. Which arm should you pull next, and why? *(ln 4 ≈ 1.4, ln 5 ≈ 1.6, ln 16 ≈ 2.8, ln 17 ≈ 2.8, ln 64 ≈ 4.2, ln 65 ≈ 4.2, ln 84 ≈ 4.5, ln 85 ≈ 4.5; $Q_{t-1}(i)=\\hat\\mu_{t-1}(i)+\\sqrt{2\\ln t/N_{t-1}(i)}$)*', null, ['#/T02/past', 'T2'],
+        '你在处理一个有 3 个臂的多臂老虎机（multi-armed bandit）问题，奖励是二值的（binary）。臂 1（Arm 1）：拉了 64 次，其中 40 次奖励为 1。臂 2：拉了 16 次，其中 10 次奖励为 1。臂 3：拉了 4 次，其中 2 次奖励为 1。用 UCB 算法计算每个臂的值。下一步应该拉哪个臂？为什么？*(ln 4 ≈ 1.4, ln 5 ≈ 1.6, ln 16 ≈ 2.8, ln 17 ≈ 2.8, ln 64 ≈ 4.2, ln 65 ≈ 4.2, ln 84 ≈ 4.5, ln 85 ≈ 4.5; $Q_{t-1}(i)=\\hat\\mu_{t-1}(i)+\\sqrt{2\\ln t/N_{t-1}(i)}$)*'),
+      Q('Q3', 8, 'Consider an input domain of five points $x_1,\\dots,x_5$ and binary classifier family $\\mathcal G$ defined by the table of dichotomies (rows): 00001, 10001, 01010, 01101, 01011, 10111, 11101, 01111. Calculate $\\mathrm{VC}(\\mathcal G)$ and show a corresponding shattered set of points.', null, ['#/T01/past', 'T1'],
+        '考虑由五个点 $x_1,\\dots,x_5$ 构成的输入域（input domain），以及由下列二分（dichotomies）表（每行一个二分）定义的二分类器族（binary classifier family）$\\mathcal G$：00001, 10001, 01010, 01101, 01011, 10111, 11101, 01111。计算 $\\mathrm{VC}(\\mathcal G)$，并给出一个相应的被打散（shattered）的点集。'),
+      Q('Q4', 8, 'Consider the following Bayesian network. Does the conditional independence statement $S\\perp Z\\mid V,W$ hold?', 'assets/figures/ex2026_q4_bn.png', ['#/T05/past', 'T5'],
+        '考虑下面的贝叶斯网络（Bayesian network）。条件独立（conditional independence）陈述 $S\\perp Z\\mid V,W$ 是否成立？'),
+      Q('Q5', 8, 'Consider the following Markov random field. Assume the node elimination order $T,X,Z,U,W,V,Y$. What are the cliques in the junction tree (using this elimination order)?', 'assets/figures/ex2026_q5_mrf.png', ['#/T06/past', 'T6'],
+        '考虑下面的马尔可夫随机场（Markov random field）。假设节点消元顺序（elimination order）为 $T,X,Z,U,W,V,Y$。使用这个消元顺序时，联结树（junction tree）中的团（cliques）有哪些？'),
       { t: 'h2', text: 'Section C: Design and Application Questions [10 marks]', id: 'c' },
-      Q('Q6', 10, 'Design a system for alerting residents of the Dandenongs to evacuate for an impending bushfire. If any of three sensors $S_1,S_2,S_3$ are ‘on’ residents should evacuate; however if either of the closer sensors $C_1,C_2$ are ‘on’ residents should stay put. (a) Model the problem as a directed PGM relating $S_1,S_2,S_3,C_1,C_2$ and a variable $A$ for alerting residents to evacuate. [4] (b) How many CPTs should be specified, and what should their dimensions be? [3] (c) Suppose the sensors are always accurate. What could you say about your CPTs? [3]', null, ['#/T07/bushfire', 'T7']),
+      Q('Q6', 10, 'Design a system for alerting residents of the Dandenongs to evacuate for an impending bushfire. If any of three sensors $S_1,S_2,S_3$ are ‘on’ residents should evacuate; however if either of the closer sensors $C_1,C_2$ are ‘on’ residents should stay put. (a) Model the problem as a directed PGM relating $S_1,S_2,S_3,C_1,C_2$ and a variable $A$ for alerting residents to evacuate. [4] (b) How many CPTs should be specified, and what should their dimensions be? [3] (c) Suppose the sensors are always accurate. What could you say about your CPTs? [3]', null, ['#/T07/bushfire', 'T7'],
+        '设计一个系统，在山火（bushfire）即将来临时提醒丹德农（Dandenongs）地区的居民撤离。如果三个传感器 $S_1,S_2,S_3$ 中任意一个处于“开”（on）状态，居民应当撤离；但如果两个较近的传感器 $C_1,C_2$ 中任意一个处于“开”状态，居民应当原地不动。(a) 把这个问题建模为一个有向 PGM（directed PGM），关联 $S_1,S_2,S_3,C_1,C_2$ 以及一个表示提醒居民撤离的变量 $A$。[4] (b) 应当指定多少个 CPT（条件概率表），它们的维度分别应是多少？[3] (c) 假设传感器总是准确的。关于你的 CPT，你能得出什么结论？[3]'),
       { t: 'good', title: '对完答案以后', md: '做错的题回到对应题型页，把"随机练习"连续做对 3 题再算过关。限时内没做完的题型，说明步骤还不够熟。' },
     ],
   });

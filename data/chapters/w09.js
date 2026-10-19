@@ -157,7 +157,7 @@
       { type: 'num', q: '$\\mu=(0.1,0.4,0.9)$，$T=100$ 轮里各被拉 $(10,10,80)$ 次。期望 regret？', answer: 13, explain: '最好的臂均值 $\\mu^*=0.9$。臂 1 每拉一次比最优少 $0.9-0.1=0.8$，臂 2 少 $0.9-0.4=0.5$，臂 3 就是最优、差 0。期望 regret $=10\\times0.8+10\\times0.5+80\\times0=13$。' },
       { type: 'mc', q: 'Greedy、$Q_0=-\\infty$，第 1 轮拉了臂 2。之后：', options: ['每个臂各拉一次', '永远拉臂 2', '随机拉', '轮流拉'], answer: 1, explain: '臂 2 的有限平均值总大于 $-\\infty$（L17 p8）。' },
       { type: 'num', q: 'ε-greedy，$\\varepsilon=0.3$，$k=3$。拉当前最好臂的概率？', answer: 0.8, explain: T`ε-greedy 有两条路拉到当前最好的臂。利用：概率 $1-\varepsilon=1-0.3=0.7$，直接拉它。探索：概率 $\varepsilon=0.3$ 在全部 $k=3$ 个臂里均匀随机挑，挑中它的概率是 $1/3$，贡献 $0.3\times\frac13=0.1$。两条路相加 $0.7+0.1=0.8$。**易漏的是第二条路**：探索时也可能恰好抽到最好的臂，只答 0.7 就错了。` },
-      { type: 'show', q: '（英文）What is the main weakness of ε-greedy that UCB addresses?', answer: T`ε-greedy explores blindly: with probability ε it picks an arm uniformly at random, ignoring how promising or how uncertain each arm is, and when it exploits it ignores how reliable each average is. Optimistic initialisation only helps at the start. UCB directs exploration by adding a bonus that is large for arms pulled few times, so it tries arms that could still be good and stops trying clearly bad, well-estimated arms.` },
+      { type: 'show', q: '（英文）What is the main weakness of ε-greedy that UCB addresses?', answer: T`ε-greedy explores blindly: with probability ε it picks an arm uniformly at random, ignoring how promising or how uncertain each arm is, and when it exploits it ignores how reliable each average is. Optimistic initialisation only helps at the start. UCB directs exploration by adding a bonus that is large for arms pulled few times, so it tries arms that could still be good and stops trying clearly bad, well-estimated arms.`, qzh: 'UCB 解决了 ε-greedy 的什么主要缺点？', azh: 'ε-greedy 的探索是盲目的：它以概率 ε 均匀随机地选一个臂（arm），不考虑每个臂有多大希望、有多不确定；而在利用（exploit）时，它也不考虑每个平均值有多可靠。乐观初始化（optimistic initialisation）只在开始时有帮助。UCB 通过加一个探索奖励（bonus）来引导探索，这个奖励对拉得少的臂很大，所以它会去尝试仍可能很好的臂，并停止尝试那些明显很差、估计已经很准的臂。' },
     ],
   });
 
@@ -555,7 +555,7 @@
       { type: 'num', q: '接上，$x_*=3$ 的预测方差？', answer: 4, explain: T`predictive variance（预测方差）$\sigma_N^2(x_*)=\sigma^2+x_*^2V_N$ 是两块相加：$\sigma^2=1$ 是数据本身的噪声，处处一样；$x_*^2V_N$ 是"对 $w$ 还不确定"带来的部分。代入测试点 $x_*=3$ 和上一题的 $V_N=1/3$：$x_*^2V_N=9\times\frac13=3$。预测方差 $=1+3=4$。**$x_*$ 离 0 越远，第二项越大**；只答 $\sigma^2=1$ 是 MLE/MAP 的固定方差，忘了把 $x_*$ 平方会得到 $1+3\times\frac13=2$。` },
       { type: 'mc', q: 'Bayesian 线性回归的后验均值 $\\bw_N$ 等于：', options: ['MLE', '$\\lambda=\\sigma^2/\\gamma^2$ 的 ridge 解', 'lasso 解', '0'], answer: 1, explain: 'Normal 后验的均值 = 众数 = MAP = ridge。' },
       { type: 'mc', q: '哪类测试点的预测方差通常最大？', options: ['训练数据最密的地方', '落在训练数据没约束住的权重方向上（典型：远离数据外推）', '处处相同', '原点'], answer: 1, explain: '$\\bx_*\'\\mathbf V_N\\bx_*$ 在数据没约束住的方向上大（L18 p25）。' },
-      { type: 'show', q: '（英文）What is sequential Bayesian updating?', answer: T`Start from the prior; after observing a data point, compute the posterior; then use that posterior as the prior for the next data point, and repeat: $p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$. With conditionally independent observations this gives exactly the same posterior as processing all data at once, and the posterior becomes more peaked as data accumulate.` },
+      { type: 'show', q: '（英文）What is sequential Bayesian updating?', answer: T`Start from the prior; after observing a data point, compute the posterior; then use that posterior as the prior for the next data point, and repeat: $p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$. With conditionally independent observations this gives exactly the same posterior as processing all data at once, and the posterior becomes more peaked as data accumulate.`, qzh: '什么是序贯贝叶斯更新（sequential Bayesian updating）？', azh: T`从先验（prior）出发；观测到一个数据点后，计算后验（posterior）；再把这个后验作为下一个数据点的先验，如此重复：$p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$。当观测条件独立时，这样得到的后验与一次性处理全部数据完全相同；并且随着数据积累，后验会变得越来越尖（peaked）。` },
     ],
   });
 
@@ -590,7 +590,7 @@
       { q: 'Bayesian 线性回归的后验？', a: T`$\mathrm{Normal}(\bw_N,\mathbf V_N)$，$\mathbf V_N=\sigma^2(\mathbf X'\mathbf X+\frac{\sigma^2}{\gamma^2}\mathbf I_D)^{-1}$，$\bw_N=\frac1{\sigma^2}\mathbf V_N\mathbf X'\by$。`, ch: 'c50' },
       { q: '预测分布和预测方差？', a: T`$\mathrm{Normal}(\bx_*'\bw_N,\ \sigma^2+\bx_*'\mathbf V_N\bx_*)$；第二项随测试点变化，远离数据时大。`, ch: 'c50' },
       { q: '为什么 MAP 不需要共轭？（2021 Q10）', a: 'MAP 只求众数，evidence 和参数无关会抵消，只需优化 log 似然 + log 先验；共轭是为了闭式的完整后验。', ch: 'c50' },
-      { q: 'Fisher information（线性回归）？', a: T`$\mathcal I=\frac1{\sigma^2}\mathbf X'\mathbf X$：负对数似然的曲率，越大点估计越稳。`, ch: 'c50' },
+      { q: 'Fisher information（线性回归）？', a: T`$\mathcal I=\frac1{\sigma^2}\mathbf X'\mathbf X$：负对数似然的曲率，越大点估计越稳。`, ch: 'c50', qzh: '线性回归的 Fisher 信息（Fisher information）是什么？' },
     ],
     formulas: [
       ['$\\mu^*T-\\sum_tE[R_{i_t}(t)]$', 'cumulative regret', 'L17 p6'],
@@ -611,7 +611,7 @@
       { type: 'num', q: '$\\mu=(0.6,0.9)$，$T=50$，臂 1 拉了 10 次。期望 regret？', answer: 3, explain: '$10\\times0.3$。' },
       { type: 'num', q: '$y=wx$，$\\sigma^2=1$，$\\gamma^2=1$，一个数据点 $x=1,y=3$。$w_N=?$', answer: 1.5, explain: '一维公式 $w_N=\\frac{\\sum x_iy_i}{\\sum x_i^2+\\sigma^2/\\gamma^2}$：分子 $x\\cdot y=1\\times3=3$，分母 $1^2+1/1=2$，$w_N=3/2=1.5$。' },
       { type: 'mc', q: '假设新数据在测试点涉及的权重方向上提供越来越多的信息（$\\bx_*\'\\mathbf V_N\\bx_*\\to0$），Bayesian 线性回归的预测方差趋于：', options: ['0', '$\\sigma^2$', '$\\gamma^2$', '无穷大'], answer: 1, explain: '$\\mathbf V_N\\to0$，只剩噪声。' },
-      { type: 'show', q: '（英文）Why can a UCB bandit try an arm whose average reward so far is low?', answer: T`Because UCB plays the arm with the largest upper confidence bound $\hat\mu_{t-1}(i)+\sqrt{2\ln t/N_{t-1}(i)}$, not the largest mean. An arm pulled only a few times has a large exploration bonus, so its optimistic estimate can exceed the others even if its empirical mean is low ("optimism in the face of uncertainty"); its bonus also grows with $\ln t$ while it is not pulled.` },
+      { type: 'show', q: '（英文）Why can a UCB bandit try an arm whose average reward so far is low?', answer: T`Because UCB plays the arm with the largest upper confidence bound $\hat\mu_{t-1}(i)+\sqrt{2\ln t/N_{t-1}(i)}$, not the largest mean. An arm pulled only a few times has a large exploration bonus, so its optimistic estimate can exceed the others even if its empirical mean is low ("optimism in the face of uncertainty"); its bonus also grows with $\ln t$ while it is not pulled.`, qzh: '为什么 UCB 老虎机（bandit）会去尝试一个目前平均奖励较低的臂？', azh: T`因为 UCB 选择的是上置信界（upper confidence bound）$\hat\mu_{t-1}(i)+\sqrt{2\ln t/N_{t-1}(i)}$ 最大的臂，而不是均值最大的臂。只被拉过几次的臂有很大的探索奖励（exploration bonus），所以即使它的经验均值较低，它的乐观估计也可能超过其他臂（"面对不确定性保持乐观"，optimism in the face of uncertainty）；而且在它没被拉的期间，它的奖励项还会随 $\ln t$ 增长。` },
     ],
     next: '下一周（W10）：Bayesian 分类（Beta–Binomial 共轭、Bayesian logistic regression）和概率图模型（Bayesian network、D-separation）。',
   }));

@@ -140,7 +140,7 @@
       { type: 'num', q: '接上题，求 $a$。', answer: 1.5, explain: T`截距用 $a=(\sum y_i-b\sum x_i)/n$，也就是 $a=\bar y-b\bar x$（由方程组第一行 $na+b\sum x_i=\sum y_i$ 移项得到）。上题已经算出 $\sum y=9$、$\sum x=3$、$b=1.5$，且 $n=3$。$a=(9-1.5\times3)/3=(9-4.5)/3=4.5/3=1.5$。所以拟合直线是 $\hat y=1.5+1.5x$。**最小二乘直线一定穿过均值点** $(\bar x,\bar y)=(1,3)$，可以用来检验：$1.5+1.5\times1=3$ ✓。` },
       { type: 'num', q: '只用常数项 $\\hat y=w_0$ 拟合 $y=(1,2,6)$，最小二乘解 $w_0$？', answer: 3, explain: T`只有常数项时，模型对每个点都预测同一个数 $w_0$，要最小化的是 RSS（residual sum of squares，残差平方和）$\sum_i(y_i-w_0)^2$。对 $w_0$ 求导并令它为 0：$-2\sum_i(y_i-w_0)=0$，即 $\sum_iy_i=nw_0$，所以 $w_0=\bar y$。代入 $y=(1,2,6)$：$w_0=(1+2+6)/3=9/3=3$。**没有特征时，平方损失下最好的常数预测就是平均值**（如果换成绝对误差，答案会变成中位数 2）。` },
       { type: 'mc', q: 'Dummy feature $x_0=1$ 的作用是：', options: ['防止过拟合', '把截距 $w_0$ 写进点积 $\\bx\'\\bw$', '归一化特征', '让 $\\mathbf X\'\\mathbf X$ 可逆'], answer: 1, explain: T`模型本来是 $\hat y=w_0+\sum_{j=1}^m x_jw_j$，截距 $w_0$ 不乘任何特征，没法和其他项一起写成点积。加一个恒等于 1 的 dummy feature（哑特征）$x_0=1$ 后，$w_0=x_0w_0$，于是 $\hat y=\sum_{j=0}^m x_jw_j=\bx'\bw$，**截距变成了一个普通权重**，后面的矩阵公式不用再单独处理它。它不是正则化，所以不防止过拟合；它也不会让 $\mathbf X'\mathbf X$ 变得可逆，可逆与否取决于各列是否线性相关。L03 p9。` },
-      { type: 'show', q: '（往年原题 2026 Q1a / 2025 Q1a）In words or a mathematical expression, what quantity is minimised by linear regression?', answer: T`The sum of squared residuals between the observed targets and the model's predictions, $\sum_{i=1}^n (y_i-\mathbf x_i'\mathbf w)^2=\|\mathbf y-\mathbf X\mathbf w\|^2$.` },
+      { type: 'show', q: '（往年原题 2026 Q1a / 2025 Q1a）In words or a mathematical expression, what quantity is minimised by linear regression?', answer: T`The sum of squared residuals between the observed targets and the model's predictions, $\sum_{i=1}^n (y_i-\mathbf x_i'\mathbf w)^2=\|\mathbf y-\mathbf X\mathbf w\|^2$.`, qzh: '用文字或数学表达式说明：线性回归（linear regression）最小化的是什么量？', azh: T`观测目标值与模型预测值之间的残差平方和（sum of squared residuals）：$\sum_{i=1}^n (y_i-\mathbf x_i'\mathbf w)^2=\|\mathbf y-\mathbf X\mathbf w\|^2$。` },
     ],
   });
 
@@ -384,7 +384,7 @@
     ],
     quiz: [
       { type: 'num', q: '一维 $x=3$，用基 $[1,x,x^2,x^3]$，特征向量的最后一个分量是？', answer: 27, explain: T`Basis expansion（基函数展开）把一个数 $x$ 变成特征向量 $\varphi(x)=[1,x,x^2,x^3]'$，每个分量就是把 $x$ 代进对应的基函数。题目 $x=3$，最后一个基函数是 $x^3$。所以最后一个分量 $=3^3=3\times3\times3=27$，**完整的特征向量是 $[1,3,9,27]'$**。` },
-      { type: 'num', q: 'RBF $\\varphi(\\bx)=\\|\\bx-\\mathbf z\\|$，$\\mathbf z=(1,2)$，$\\bx=(4,6)$。$\\varphi=?$', answer: 5, explain: T`这个 RBF（radial basis function，径向基函数）的值就是 $\bx$ 到中心 $\mathbf z$ 的欧氏距离 $\|\bx-\mathbf z\|$。先算差向量：$\bx-\mathbf z=(4-1,\ 6-2)=(3,4)$。再求 $L_2$ 长度：$\sqrt{3^2+4^2}=\sqrt{9+16}=\sqrt{25}=5$。**要先相减再求长度**，不是 $\|\bx\|-\|\mathbf z\|$。` },
+      { type: 'num', q: 'RBF $\\varphi(\\bx)=\\|\\bx-\\mathbf z\\|$，$\\mathbf z=(1,2)$，$\\bx=(4,6)$。$\\varphi=?$', answer: 5, explain: T`这个 RBF（radial basis function，径向基函数）的值就是 $\bx$ 到中心 $\mathbf z$ 的欧氏距离 $\|\bx-\mathbf z\|$。先算差向量：$\bx-\mathbf z=(4-1,\ 6-2)=(3,4)$。再求 $L_2$ 长度：$\sqrt{3^2+4^2}=\sqrt{9+16}=\sqrt{25}=5$。**要先相减再求长度**，不是 $\|\bx\|-\|\mathbf z\|$。`, qzh: T`径向基函数（RBF）$\varphi(\bx)=\|\bx-\mathbf z\|$，其中 $\mathbf z=(1,2)$，$\bx=(4,6)$，求 $\varphi$。` },
       { type: 'mc', q: '关于 XOR，下面正确的是：', options: ['原空间里可以用一条直线分开', '用 $\\varphi_1+\\varphi_4$（到 $(0,0)$ 和 $(1,1)$ 的距离和）后可以用阈值分开', '必须用非线性的 $\\bw$', 'basis expansion 后需要梯度下降才能求解'], answer: 1, explain: 'L03 p24：A 得分 $\\sqrt2$，B 得分 2。' },
       { type: 'show', q: '用英文写出 basis expansion 的思想及一个局限。', answer: T`Basis expansion maps the input through fixed non-linear functions $\varphi(\mathbf x)$ and fits a linear model $\varphi(\mathbf x)'\mathbf w$ in the new feature space; the model stays linear in the parameters (so least squares still applies) but can be non-linear in $\mathbf x$, e.g. making XOR linearly separable. A limitation is that the basis (number, centres, widths) must be chosen in advance, and using one basis function per training point gives $n$ features, which scales poorly.` },
     ],
@@ -627,7 +627,7 @@
     quiz: [
       { type: 'num', q: '$L(\\theta)=2\\theta^2-8\\theta$，$\\theta_0=10$，Newton 一步后 $\\theta=?$', answer: 2, explain: '$L\'=4\\theta-8=32$，$L\'\'=4$，$10-8=2$，就是最优点（二次函数一步到位）。' },
       { type: 'mc', q: '参数 $p=10^6$ 的神经网络为什么不用 Newton？', options: ['Hessian 不存在', '存储 $p^2$、求逆 $O(p^3)$ 太贵', 'Newton 只适用于一维', 'Newton 需要学习率'], answer: 1, explain: 'L04 p16–p18。' },
-      { type: 'num', q: '$L\'(\\theta_t)=3$，$L\'\'(\\theta_t)=6$，$\\theta_t=1$。$\\theta_{t+1}=?$', answer: 0.5, explain: T`一维 Newton–Raphson 的一步是 $\theta_{t+1}=\theta_t-L'(\theta_t)/L''(\theta_t)$：用一阶导除以二阶导来决定走多远，不需要学习率。题目给 $\theta_t=1$、$L'(\theta_t)=3$、$L''(\theta_t)=6$。$\theta_{t+1}=1-3/6=1-0.5=0.5$。和 GD 对比：GD 减去 $\eta L'$，Newton 用曲率 $L''$ 代替了 $1/\eta$，**弯得越厉害（$L''$ 越大），步子越小**。` },
+      { type: 'num', q: '$L\'(\\theta_t)=3$，$L\'\'(\\theta_t)=6$，$\\theta_t=1$。$\\theta_{t+1}=?$', answer: 0.5, explain: T`一维 Newton–Raphson 的一步是 $\theta_{t+1}=\theta_t-L'(\theta_t)/L''(\theta_t)$：用一阶导除以二阶导来决定走多远，不需要学习率。题目给 $\theta_t=1$、$L'(\theta_t)=3$、$L''(\theta_t)=6$。$\theta_{t+1}=1-3/6=1-0.5=0.5$。和 GD 对比：GD 减去 $\eta L'$，Newton 用曲率 $L''$ 代替了 $1/\eta$，**弯得越厉害（$L''$ 越大），步子越小**。`, qzh: T`已知 $L'(\theta_t)=3$，$L''(\theta_t)=6$，$\theta_t=1$，求 $\theta_{t+1}$。` },
     ],
   });
 
@@ -757,7 +757,7 @@
     quiz: [
       { type: 'num', q: '$\\bx\'\\bw=0$ 时 $P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: T`Logistic regression 的模型是 $P(Y=1\mid\bx)=\sigma(\bx'\bw)$，其中 sigmoid（S 形函数）$\sigma(s)=\frac{1}{1+e^{-s}}$。题目说得分 $s=\bx'\bw=0$，代入：$\sigma(0)=\frac1{1+e^{0}}=\frac1{1+1}=0.5$。**得分为 0 的点正好在决策边界上，两类各占一半可能**，这也是为什么 logistic regression 的边界是 $\bx'\bw=0$。` },
       { type: 'num', q: '$\\sigma(s)=0.8$，求 $\\sigma(-s)$。', answer: 0.2, explain: T`Sigmoid 有对称性 $\sigma(-s)=1-\sigma(s)$。推导：$\sigma(-s)=\frac1{1+e^{s}}$，分子分母同乘 $e^{-s}$ 得 $\frac{e^{-s}}{e^{-s}+1}=1-\frac1{1+e^{-s}}=1-\sigma(s)$。题目给 $\sigma(s)=0.8$，所以 $\sigma(-s)=1-0.8=0.2$。含义：**得分取反，就是把 $P(Y=1)$ 和 $P(Y=0)$ 对调**。` },
-      { type: 'num', q: '$\\bw=(1,-2)$（含 bias），$\\bx=(1,0.5)$。$P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: T`先算线性得分 $s=\bx'\bw$，再代入 sigmoid。"含 bias"的意思是：$\bx$ 的第一个分量是 dummy feature $x_0=1$，$\bw$ 的第一个分量是截距 $w_0=1$。$s=1\times1+(-2)\times0.5=1-1=0$，所以 $P(Y=1\mid\bx)=\sigma(0)=0.5$，这个点正好在决策边界上。**陷阱是漏掉 bias 项**：只算 $-2\times0.5=-1$ 会得到 $\sigma(-1)\approx0.269$。` },
+      { type: 'num', q: '$\\bw=(1,-2)$（含 bias），$\\bx=(1,0.5)$。$P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: T`先算线性得分 $s=\bx'\bw$，再代入 sigmoid。"含 bias"的意思是：$\bx$ 的第一个分量是 dummy feature $x_0=1$，$\bw$ 的第一个分量是截距 $w_0=1$。$s=1\times1+(-2)\times0.5=1-1=0$，所以 $P(Y=1\mid\bx)=\sigma(0)=0.5$，这个点正好在决策边界上。**陷阱是漏掉 bias 项**：只算 $-2\times0.5=-1$ 会得到 $\sigma(-1)\approx0.269$。`, qzh: T`已知 $\bw=(1,-2)$，其中含偏置项（bias）；$\bx=(1,0.5)$。求 $P(Y=1\mid\bx)$。` },
       { type: 'mc', q: 'Logistic regression 的训练目标等价于：', options: ['最小化 RSS', '最小化 cross-entropy（负对数似然）', '最大化 margin', '最小化 0-1 loss'], answer: 1, explain: 'L04 p29–p31。' },
       { type: 'show', q: '用英文说明为什么 logistic regression 是线性分类器。', answer: T`It predicts class 1 when $P(y=1\mid\mathbf x)=\sigma(\mathbf x'\mathbf w)\ge\frac12$. Since $\sigma(s)=\frac12\iff s=0$, the decision boundary is $\mathbf x'\mathbf w=0$, a hyperplane with normal vector $\mathbf w$; the sigmoid only maps the linear score to a probability.` },
     ],
@@ -786,7 +786,7 @@
       T`两条推导路线再次汇合：**MLE（概率假设）= ERM（损失函数）**。下一周（W3）加入第三条：给 $\bw$ 先验做 MAP = 正则化。`,
     ],
     recall: [
-      { q: '（原题）What quantity is minimised by linear regression?', a: T`Sum of squared residuals $\sum_i(y_i-\mathbf x_i'\mathbf w)^2=\|\mathbf y-\mathbf X\mathbf w\|^2$.`, ch: 'c10' },
+      { q: '（原题）What quantity is minimised by linear regression?', a: T`Sum of squared residuals $\sum_i(y_i-\mathbf x_i'\mathbf w)^2=\|\mathbf y-\mathbf X\mathbf w\|^2$.`, ch: 'c10', qzh: '线性回归（linear regression）最小化的是什么量？', azh: T`残差平方和（sum of squared residuals）$\sum_i(y_i-\mathbf x_i'\mathbf w)^2=\|\mathbf y-\mathbf X\mathbf w\|^2$。` },
       { q: '1D 最小二乘：写出 $b$ 的公式。', a: T`$b=\frac{n\sum xy-\sum x\sum y}{n\sum x^2-(\sum x)^2}$，$a=\bar y-b\bar x$。`, ch: 'c10' },
       { q: '线性回归的概率模型？为什么 MLE = 最小二乘？', a: T`$y=\bx'\bw+\varepsilon$，$\varepsilon\sim\mathcal N(0,\sigma^2)$；对数似然 $=-\frac{1}{2\sigma^2}\text{RSS}+C$。`, ch: 'c11' },
       { q: 'Normal equations 和闭式解？什么时候失效？', a: T`$\mathbf X'\mathbf X\bw=\mathbf X'\by$，$\hat\bw=(\mathbf X'\mathbf X)^{-1}\mathbf X'\by$；$\mathbf X$ 列线性相关（如重复特征、$n<m+1$）时不可逆。`, ch: 'c11' },
@@ -823,13 +823,13 @@
     ],
     quiz: [
       { type: 'num', q: '点 $(1,1),(2,2),(3,6)$ 最小二乘斜率 $b=?$', answer: 2.5, explain: '$\\sum x=6,\\sum y=9,\\sum x^2=14,\\sum xy=1+4+18=23$，$D=6$，$b=(69-54)/6=2.5$。' },
-      { type: 'num', q: '$\\mathbf X\'\\mathbf X=\\begin{bmatrix}4&0\\\\0&2\\end{bmatrix}$，$\\mathbf X\'\\by=\\begin{bmatrix}8\\\\3\\end{bmatrix}$，$\\hat w_0=?$', answer: 2, explain: '$8/4=2$。' },
+      { type: 'num', q: '$\\mathbf X\'\\mathbf X=\\begin{bmatrix}4&0\\\\0&2\\end{bmatrix}$，$\\mathbf X\'\\by=\\begin{bmatrix}8\\\\3\\end{bmatrix}$，$\\hat w_0=?$', answer: 2, explain: '$8/4=2$。', qzh: T`已知 $\mathbf X'\mathbf X=\begin{bmatrix}4&0\\0&2\end{bmatrix}$，$\mathbf X'\by=\begin{bmatrix}8\\3\end{bmatrix}$，求 $\hat w_0$。` },
       { type: 'num', q: '$L(\\theta)=(\\theta-5)^2$，$\\theta=1$，$\\eta=0.25$，GD 一步后？', answer: 3, explain: '$L\'=-8$，$1+2=3$。' },
       { type: 'num', q: '$L(\\theta)=3\\theta^2-6\\theta$，Newton 从 $\\theta=7$ 一步后？', answer: 1, explain: '$L\'=36$，$L\'\'=6$，$7-6=1$（二次函数一步到最优）。' },
       { type: 'num', q: 'logistic：$\\bx=(1,4)$，$y=0$，当前 $\\theta(\\bx)=0.25$。对数似然梯度的第二分量？', answer: -1, explain: '$(0-0.25)\\times4=-1$。' },
       { type: 'mc', q: 'XOR 四个点在 $\\varphi_1+\\varphi_4$ 下的得分是：', options: ['A: 0，B: 1', 'A: $\\sqrt2$，B: 2', 'A: 2，B: $\\sqrt2$', '全部相同'], answer: 1, explain: 'L03 p24。' },
       { type: 'mc', q: '下面哪个**没有**闭式解？', options: ['线性回归', '多项式基的线性回归', 'logistic regression', 'ridge regression'], answer: 2, explain: 'L04 p27。' },
-      { type: 'show', q: '（英文）Why might you use gradient descent rather than Newton–Raphson?', answer: T`Newton–Raphson needs the Hessian and its inverse at every step, costing $O(p^2)$ memory and $O(p^3)$ time, which is infeasible for many parameters; gradient descent only needs the gradient ($O(p)$ per step) and scales to large models, at the cost of more iterations and a tuned learning rate.` },
+      { type: 'show', q: '（英文）Why might you use gradient descent rather than Newton–Raphson?', answer: T`Newton–Raphson needs the Hessian and its inverse at every step, costing $O(p^2)$ memory and $O(p^3)$ time, which is infeasible for many parameters; gradient descent only needs the gradient ($O(p)$ per step) and scales to large models, at the cost of more iterations and a tuned learning rate.`, qzh: '为什么可能会选择梯度下降（gradient descent）而不是 Newton–Raphson 方法？', azh: 'Newton–Raphson 每一步都需要 Hessian 矩阵（Hessian）及其逆，内存开销 $O(p^2)$、时间开销 $O(p^3)$，参数很多时不可行；梯度下降（gradient descent）只需要梯度（每步 $O(p)$），能扩展到大模型，代价是迭代次数更多，而且要调好学习率（learning rate）。' },
     ],
     next: '下一周（W3）：正则化与泛化。你会看到 c11 里 $\\mathbf X\'\\mathbf X$ 不可逆的问题怎么用 ridge 解决，以及 c12 的多项式次数拉太高会怎样（过拟合）。',
   }));

@@ -136,6 +136,7 @@ function validateQuizItem(item, pageId, loc) {
   if (!item || typeof item !== 'object') { addProblem(pageId, loc, 'Quiz item must be an object'); return; }
   if (Array.isArray(item.q)) validateBlocks(item.q, pageId, `${loc}.q`); else checkMarkdownString(item.q, pageId, `${loc}.q`);
   checkMarkdownString(item.answerText, pageId, `${loc}.answerText`);
+  checkMarkdownString(item.qzh, pageId, `${loc}.qzh`); checkMarkdownString(item.azh, pageId, `${loc}.azh`);
   if (Array.isArray(item.explain)) validateBlocks(item.explain, pageId, `${loc}.explain`);
   else checkMarkdownString(item.explain, pageId, `${loc}.explain`);
   const type = item.type || (item.options ? 'mc' : 'show');
@@ -215,6 +216,7 @@ function validateBlock(b, pageId, loc) {
   if (b.t === 'past') {
     if (b.topic) checkMarkdownString(b.topic, pageId, `${loc}.topic`);
     if (b.q) checkMarkdownString(b.q, pageId, `${loc}.q`);
+    checkMarkdownString(b.qzh, pageId, `${loc}.qzh`); checkMarkdownString(b.azh, pageId, `${loc}.azh`);
   }
   if (b.t === 'quiz') (b.items || []).forEach((item, idx) => validateQuizItem(item, pageId, `${loc}.items[${idx}]`));
   if (b.t === 'chapterHead') { (b.goals || []).forEach((g, i) => checkMarkdownString(g, pageId, `${loc}.goals[${i}]`)); if (b.notExam) checkMarkdownString(b.notExam, pageId, `${loc}.notExam`); (b.symbols || []).forEach((r, i) => { checkMarkdownString(r[0], pageId, `${loc}.symbols[${i}][0]`); checkMarkdownString(r[1], pageId, `${loc}.symbols[${i}][1]`); }); (b.prereq || []).forEach((p) => { if (!meta[p]) addProblem(pageId, loc, `prereq ${p} not in catalogue`); }); }
@@ -227,6 +229,7 @@ function validateBlock(b, pageId, loc) {
   }); });
   if (b.t === 'kp') (b.items || []).forEach((k, i) => { checkMarkdownString(k[0], pageId, `${loc}.items[${i}]`); if (k[1] && !meta[k[1]]) addProblem(pageId, loc, `keypoint link ${k[1]} not in catalogue`); });
   if (b.t === 'recall') (b.items || []).forEach((it, i) => {
+    checkMarkdownString(it.qzh, pageId, `${loc}.items[${i}].qzh`); checkMarkdownString(it.azh, pageId, `${loc}.items[${i}].azh`);
     checkMarkdownString(it.q, pageId, `${loc}.items[${i}].q`);
     if (Array.isArray(it.a)) validateBlocks(it.a, pageId, `${loc}.items[${i}].a`); else checkMarkdownString(it.a, pageId, `${loc}.items[${i}].a`);
     if (!it.a) addProblem(pageId, loc, `recall item ${i} has no answer`);

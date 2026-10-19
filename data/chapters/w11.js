@@ -531,7 +531,7 @@
       { type: 'num', q: '当前图里要消的变量有 3 个邻居，它们之间已有 1 条边。要加几条 fill-in 边？', answer: 2, explain: '3 个邻居两两之间共 3 条，已有 1 条。' },
       { type: 'num', q: '同上，记录的团有几个变量？', answer: 4, explain: T`消元时记录的团 = 被消的变量自己 ∪ 它当前的所有邻居。上一题这个变量有 3 个邻居，加上它自己：$1+3=4$ 个变量。加完 fill-in（填补边）后，这 4 个点两两相连，正好构成一个团。陷阱：只数邻居答 3，漏了被消的变量本身。` },
       { type: 'mc', q: 'Junction tree 的 separator 是：', options: ['任意两团的交集', '相邻两团的交集', '最大的团', '被删掉的团'], answer: 1, explain: T`separator（分隔集）是 junction tree（联结树）里**相邻**两个团的交集，画在两团之间的连线上。例：L22 的树 $c_1=\{x_1,x_2,x_3\}$—$c_2=\{x_2,x_3,x_4\}$—$c_3=\{x_3,x_4,x_5\}$，separator 是 $\{x_2,x_3\}$ 和 $\{x_3,x_4\}$；团之间的消息只依赖 separator 里的变量。"任意两团的交集"不对：$c_1$ 和 $c_3$ 共享 $x_3$，但它们在树里不相邻、之间没有边，这个交集不是 separator。L22 p22。` },
-      { type: 'show', q: '（英文）State the running intersection property and why it matters.', answer: T`If two cliques of the junction tree share a variable, that variable appears in every clique on the path between them. This guarantees that information about a shared variable can flow along the tree through separators, so the beliefs about that variable in different cliques are consistent after message passing.` },
+      { type: 'show', q: '（英文）State the running intersection property and why it matters.', answer: T`If two cliques of the junction tree share a variable, that variable appears in every clique on the path between them. This guarantees that information about a shared variable can flow along the tree through separators, so the beliefs about that variable in different cliques are consistent after message passing.`, qzh: '陈述交集连通性质（running intersection property），并说明它为什么重要。', azh: '如果联结树（junction tree）中的两个团（clique）共享某个变量，那么这个变量出现在它们之间路径上的每一个团中。这保证了关于共享变量的信息能沿着树、经由分隔集（separator）传递，因此消息传递（message passing）之后，不同团中关于该变量的信念（belief）是一致的。' },
     ],
   });
 
@@ -674,7 +674,7 @@
       { q: '有环的图怎么推断？', a: 'junction tree（精确）或 loopy BP（近似）。', ch: 'c57' },
       { q: '消元找团的一步怎么做？', a: '取下一个变量，把它当前的邻居两两连上（fill-in），记录团 = 它 + 邻居，再删掉它。', ch: 'c58' },
       { q: '从团到 junction tree？', a: '只留极大团；共享变量的团之间连边、权 = 共享个数；取最大权重生成树；相邻团交集 = separator。', ch: 'c58' },
-      { q: 'Running intersection property？', a: '两个团共有的变量也出现在它们之间路径上的每个团里；保证信念一致。', ch: 'c58' },
+      { q: 'Running intersection property？', a: '两个团共有的变量也出现在它们之间路径上的每个团里；保证信念一致。', ch: 'c58', qzh: '什么是交集连通性质（running intersection property）？' },
       { q: '为什么消元顺序重要？怎么选？', a: '复杂度随最大团大小指数增长，团由顺序决定；最优顺序难找；myopic：每步消产生最小团的变量。', ch: 'c59' },
     ],
     formulas: [
@@ -695,7 +695,7 @@
       { type: 'num', q: '树有 10 个节点，BP 一共几条消息？', answer: 18, explain: '$9\\times2$。' },
       { type: 'num', q: '消元时要消的变量有 4 个邻居、它们之间已有 2 条边。fill-in 几条？', answer: 4, explain: '$\\binom42-2=4$。' },
       { type: 'mc', q: '下面哪一步**不属于**构造 junction tree？', options: ['moralize', '按顺序消元记录团', '去掉非极大团', '对团按大小排序后连成链'], answer: 3, explain: '应该取 clique graph 的最大权重生成树。' },
-      { type: 'show', q: '（英文）Why is loopy belief propagation only approximate?', answer: T`Belief propagation is exact on trees because removing a node separates the graph, so each message summarises an independent part of the graph. In a graph with cycles, information sent from a node can travel around a loop and come back to it, so evidence is counted more than once and the messages are no longer exact summaries; the fixed point (if it converges) only approximates the true marginals. Exact inference instead clusters the variables into a junction tree.` },
+      { type: 'show', q: '（英文）Why is loopy belief propagation only approximate?', answer: T`Belief propagation is exact on trees because removing a node separates the graph, so each message summarises an independent part of the graph. In a graph with cycles, information sent from a node can travel around a loop and come back to it, so evidence is counted more than once and the messages are no longer exact summaries; the fixed point (if it converges) only approximates the true marginals. Exact inference instead clusters the variables into a junction tree.`, qzh: '为什么环状信念传播（loopy belief propagation）只是近似的？', azh: '信念传播（belief propagation）在树上是精确的，因为删掉一个节点就会把图分开，所以每条消息概括的是图中一个独立的部分。在有环的图中，从一个节点发出的信息可以绕环一圈再回到它自己，于是证据被重复计算，消息不再是精确的概括；（如果收敛的话）不动点（fixed point）也只是近似真实的边缘分布（marginals）。精确推断则是把变量聚成一棵联结树（junction tree）。' },
     ],
     next: 'W12（L23–L24）课件发布后补充。到这里 L1–L22 的所有考点都覆盖了：去 [今日复习](#/daily) 做间隔复习卡，或去 [模拟卷](#/mock) 计时练习。',
   }));

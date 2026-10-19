@@ -76,6 +76,8 @@
       {
         t: 'past', src: '2026 S2 practice Q4', marks: 8, topic: 'L20 p17',
         q: 'Consider the following Bayesian network. Does the conditional independence statement $S\\perp Z\\mid V,W$ hold in this Bayesian network?',
+        qzh: T`考虑下面的贝叶斯网络（Bayesian network）。在这个贝叶斯网络中，条件独立性（conditional independence）命题 $S\perp Z\mid V,W$ 是否成立？`,
+        azh: T`不成立。$\{S,Z,V,W\}$ 的祖先图（ancestral graph）包含所有节点。道德化（moralise）会加上 $S$–$U$ 和 $S$–$T$（分别是 $V$ 和 $W$ 的父节点）、$U$–$X$（$Y$ 的父节点），以及 $V$–$W$、$V$–$Y$、$W$–$Y$（$Z$ 的父节点）。去掉方向并删除条件节点 $V,W$ 后，路径 $S$–$U$–$Y$–$Z$ 仍然连接 $S$ 和 $Z$。因此给定 $\{V,W\}$ 时 $S$ 和 $Z$ 没有被分隔，$S\perp Z\mid V,W$ **不**成立。`,
         blocks: [{ t: 'fig', src: 'assets/figures/ex2026_q4_bn.png', w: 260 }],
         sol: [
           { t: 'h4', text: '第 0 步：边' },
@@ -107,6 +109,8 @@
       {
         t: 'past', src: '2021 S1 exam Q18(a)', marks: 6, topic: 'L20 p17（HMM 本身课件未讲）',
         q: 'A multiple-chain HMM has hidden chains $a_1\\to a_2\\to\\dots\\to a_T$ and $b_1\\to b_2\\to\\dots\\to b_T$, and observations $x_t$ with parents $a_t$ and $b_t$. What random variables are marginally independent of $a_1$? As we are considering marginal independence, no values of $x_t$ are observed. Explain your answer.',
+        qzh: T`一个多链 HMM（multiple-chain HMM）有隐藏链（hidden chain）$a_1\to a_2\to\dots\to a_T$ 和 $b_1\to b_2\to\dots\to b_T$，以及观测 $x_t$，其父节点为 $a_t$ 和 $b_t$。哪些随机变量与 $a_1$ 边缘独立（marginally independent）？由于考虑的是边缘独立，$x_t$ 的值都没有被观测。解释你的答案。`,
+        azh: T`$b_1,\dots,b_T$ 全部（且只有它们）。两条链只通过 $x_t$ 相连，而 $x_t$ 是 $a_t$ 和 $b_t$ 的共同孩子（对撞点，collider）。在没有任何观测时，$\{a_1,b_t\}$ 的祖先图中不包含任何 $x$ 节点，所以不会加道德边（moral edge），$a_1$ 与 $b$ 链不连通：对每个 $t$ 都有 $a_1\perp b_t$。每个 $a_t$ 和 $x_t$ 都通过 $a$ 链与 $a_1$ 相连，所以它们与 $a_1$ 相关。`,
         blocks: [{ t: 'graph', nodes: { a1: [40, 40], a2: [150, 40], a3: [260, 40], x1: [40, 130], x2: [150, 130], x3: [260, 130], b1: [40, 220], b2: [150, 220], b3: [260, 220] }, labels: { a1: 'a₁', a2: 'a₂', a3: 'a₃', x1: 'x₁', x2: 'x₂', x3: 'x₃', b1: 'b₁', b2: 'b₂', b3: 'b₃' }, edges: 'a1>a2 a2>a3 b1>b2 b2>b3 a1>x1 b1>x1 a2>x2 b2>x2 a3>x3 b3>x3', cls: { a1: 'x' }, w: 320, caption: '双链 HMM（只画前 3 步）：上面一条链 $a$，下面一条链 $b$，每个观测 $x_t$ 有两个父节点 $a_t,b_t$。这一问**没有观测任何 $x$**，问哪些变量和 $a_1$（蓝圈）独立。' }],
         sol: [
           '用同一个四步法，条件集为空：',

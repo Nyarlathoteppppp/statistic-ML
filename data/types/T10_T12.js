@@ -70,6 +70,10 @@
         {
           t: 'past', src: '2021 S1 exam Q13(b)', marks: 6, topic: 'L11 p27–p31',
           q: 'Given that the output loss of a feed-forward network, $L$, is not a direct function of hidden-layer weights $w$, how is the derivative of loss with respect to hidden-layer weights, $\\partial L/\\partial w$, calculated in backpropagation? As part of your answer include the formulation of $\\partial L/\\partial w_j$ where $j$ is the index of a single weight parameter.',
+          qzh: T`前馈网络（feed-forward network）的输出损失 $L$ 不是隐藏层权重 $w$ 的直接函数。那么在反向传播（backpropagation）中，损失对隐藏层权重的导数 $\partial L/\partial w$ 是怎么计算的？作为答案的一部分，写出 $\partial L/\partial w_j$ 的表达式，其中 $j$ 是单个权重参数的下标。`,
+          azh: T`（在课件记号中，题目里的隐藏层权重 $w_j$ 就是 $v_{ij}$，即从输入 $i$ 到隐藏单元 $j$ 的权重；输出层权重是 $w_j$。）$L$ 只是通过隐藏权重所连接的单元间接地依赖于它：$v_{ij}\to r_j\to u_j\to s\to z\to L$。反向传播沿这条路径应用链式法则（chain rule）：
+$$\frac{\partial L}{\partial v_{ij}}=\frac{\partial L}{\partial z}\frac{\partial z}{\partial s}\frac{\partial s}{\partial u_j}\frac{\partial u_j}{\partial r_j}\frac{\partial r_j}{\partial v_{ij}}=\delta\,w_j\,g'(r_j)\,x_i,$$
+其中 $\delta=\partial L/\partial s$（例如平方损失加恒等输出时为 $z-y$）先在输出端算出，再向后传播；每一层复用上一层的误差项（error term），所以在一次保存了 $r_j,u_j$ 的前向传播之后，一次反向传播就能得到所有梯度。（如果有多个输出单元或下一层单元，则对它们的贡献求和。）`,
           sol: [
             '要点：(1) $L$ 通过"权重 → 隐藏单元输入 → 激活 → 输出层 → loss"间接依赖隐藏层权重；(2) 用链式法则沿这条路径把局部导数相乘；(3) 输出端的误差 $\\delta$ 先算出来，再逐层往回传、复用（这就是 back-propagation）。',
             {
