@@ -538,6 +538,18 @@
       ['界里的 log 是以 2 为底', 'L16 p18 起用自然对数。'],
     ],
     quiz: [
+      {
+        type: 'mc', q: T`（平时小测原题）Weighted Majority with $n$ experts, best expert makes $m$ mistakes, learning rate $\epsilon>0$: $M\le2(1+\epsilon)m+\frac{2\ln n}{\epsilon}$. Assume $n\ge10^4$ and $m\le3$. Which statement is TRUE about the bound and the optimal choice of $\epsilon$?`,
+        qzh: T`Weighted Majority 有 $n$ 个专家，最好的专家犯 $m$ 次错，学习率 $\epsilon>0$，算法错误次数的上界是 $M\le2(1+\epsilon)m+\frac{2\ln n}{\epsilon}$。设 $n\ge10^4$、$m\le3$。关于这个界和最优的 $\epsilon$，哪句话对？`,
+        options: [
+          T`Increasing $\epsilon$ always decreases $M$ until the bound becomes independent of $n$, hence taking $\epsilon$ very large is optimal.`,
+          T`Letting $\epsilon\to0^+$ minimises the bound because the term $\frac{2\ln n}{\epsilon}$ becomes negligible compared with $2(1+\epsilon)m$.`,
+          T`The bound is minimised at $\epsilon=\frac{\ln n}{m}$. For $n=10^4$ and $m=3$, this gives $\epsilon\approx3.07$.`,
+          T`The bound is minimised (for $\epsilon>0$) at $\epsilon=\sqrt{\frac{\ln n}{m}}$; this gives $\epsilon\gtrsim1.75$. This choice balances the two terms $2(1+\epsilon)m$ and $\frac{2\ln n}{\epsilon}$.`,
+        ],
+        answer: 3,
+        explain: T`界里有两项在拉扯：$2(1+\epsilon)m$ 随 $\epsilon$ 变大而变大，$\frac{2\ln n}{\epsilon}$ 随 $\epsilon$ 变大而变小，所以 $\epsilon$ 太大太小都不好（排除前两项；第二项还说反了，$\epsilon\to0$ 时 $\frac{2\ln n}{\epsilon}\to\infty$）。求最小值：对 $\epsilon$ 求导令其为 0，$2m-\frac{2\ln n}{\epsilon^2}=0$，得 **$\epsilon=\sqrt{\ln n/m}$**。代入 $n=10^4$、$m=3$：$\ln10^4=4\ln10\approx9.21$，$9.21/3\approx3.07$，开方 $\approx1.75$。第三个选项忘了开方，3.07 只是根号里面的数。`,
+      },
       { type: 'num', q: 'Weighted majority：$m=5$，$\\ln n=2$，$\\varepsilon=0.5$。上界？', answer: 23, explain: T`把数代进 weighted majority（加权多数）的错误界 $M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}$。第一项用最好专家的错误数 $m=5$：$2\times(1+0.5)\times5=2\times1.5\times5=15$。第二项用专家个数，题目直接给了 $\ln n=2$：$2\times2/0.5=4/0.5=8$。上界 $15+8=23$，即学习者最多错 23 次。注意界里是自然对数 $\ln$，不要换成 $\log_2$。` },
       { type: 'num', q: 'Probabilistic experts：$\\ln n=1$，$\\varepsilon=0.25$，$L^*=8$。上界？', answer: 14, explain: T`probabilistic experts（随机化专家）的期望总损失界是 $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$。题目给 $\ln n=1$、$\varepsilon=0.25$、最好专家的总损失 $L^*=8$。第一项 $1/0.25=4$；第二项 $(1+0.25)\times8=1.25\times8=10$；上界 $4+10=14$。和 weighted majority 比，$L^*$ 前的系数是 $1+\varepsilon$ 而不是 $2(1+\varepsilon)$，第一项也没有 2：随机选专家让对手无法预判你。` },
       { type: 'mc', q: 'L16 p19 的下界例子说明：', options: ['随机化没用', '确定性加权多数对 $m$ 的系数至少是 2', '专家越多越好', 'halving 是最优的'], answer: 1, explain: '对手让确定性学习者天天错：$M=T\\ge2m$。' },

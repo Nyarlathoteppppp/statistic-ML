@@ -126,6 +126,12 @@
       d._build = build;
       return d;
     },
+    // Not-examinable material: collapsed like deep, marked 不考 (title says what it is).
+    fold: (b, ctx) => {
+      const d = R.deep(Object.assign({}, b, { title: '不考 · ' + (b.title || '展开'), hint: b.hint || '了解即可，点开看' }), ctx);
+      d.classList.add('notexam');
+      return d;
+    },
     fig: (b) => {
       const f = el('figure');
       const img = el('img'); img.src = b.src; img.alt = b.alt || b.caption || ''; img.loading = 'lazy';
@@ -201,7 +207,13 @@
     video: (b) => SML.video.mount(b),
     pending: (b) => el('div', 'pending-box', md(b.md || '这一部分正在编写。')),
   };
-  ['note', 'warn', 'good', 'errata', 'ext'].forEach((k) => { R[k] = R.callout; });
+  ['note', 'warn', 'good', 'errata'].forEach((k) => { R[k] = R.callout; });
+  // 延伸（课件未讲，不考）: collapsed by default
+  R.ext = (b, ctx) => {
+    const d = R.deep({ title: '延伸（课件未讲）' + (b.title ? ' · ' + b.title : ''), hint: '了解即可，点开看', blocks: b.blocks || [b.md] }, ctx);
+    d.classList.add('notexam');
+    return d;
+  };
 
   function renderBlock(b, ctx) {
     if (typeof b === 'string') return R.p({ md: b }, ctx);

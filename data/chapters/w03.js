@@ -128,6 +128,16 @@
       ['ill-posed 和 ill-conditioned 是一回事', '一个是解不唯一/不存在，一个是解唯一但数值不稳定。'],
     ],
     quiz: [
+      {
+        type: 'set',
+        q: [
+          T`（平时小测原题）Irrelevant features can cause problems with computation, interpretation and statistical performance. The table shows three features (columns) for four instances (rows). Which features can be written as a linear combination of the other two? (Select all: 1 = $x_1$, 2 = $x_2$, 3 = $x_3$.)`,
+          { t: 'table', head: ['$x_1$', '$x_2$', '$x_3$'], rows: [['−2', '−2', '1'], ['0.5', '1', '−0.5'], ['8', '8', '−4'], ['−6', '−6', '3']] },
+        ],
+        qzh: T`无关或多余的特征会给计算、解释和统计效果带来麻烦。表里是 4 个样本（行）的 3 个特征（列）。哪些特征能写成另外两个特征的线性组合？（多选，填编号：1 = $x_1$，2 = $x_2$，3 = $x_3$。）`,
+        answer: ['2', '3'],
+        explain: T`"能写成线性组合"就是存在系数 $a,b$ 让这一列 $=a\times$另一列 $+b\times$第三列。逐行比：$x_2=(-2,1,8,-6)$ 正好是 $x_3=(1,-0.5,-4,3)$ 的 $-2$ 倍，所以 $x_2=0\cdot x_1-2x_3$，反过来 $x_3=0\cdot x_1-0.5x_2$。$x_1$ 不行：$x_2$、$x_3$ 指向同一个方向，它们怎么组合都只是 $x_3$ 的倍数，而 $x_1$ 和 $x_3$ 的逐项比值是 $-2,-1,-2,-2$，不全相等，不是 $x_3$ 的倍数。**答案 2、3**。这种"列线性相关"会让 $\mathbf X'\mathbf X$ 不可逆，正是本章 ridge 要解决的问题。`,
+      },
       { type: 'num', q: '$\\mathbf X\'\\mathbf X$ 的特征值是 4 和 0，$\\lambda=0.5$。$\\mathbf X\'\\mathbf X+\\lambda\\mathbf I$ 的最小特征值？', answer: 0.5, explain: '每个特征值加 $\\lambda$：4.5 和 0.5。' },
       { type: 'num', q: '一维无截距 ridge：$\\bx\'\\bx=10$，$\\bx\'\\by=20$，$\\lambda=10$。$w=?$', answer: 1, explain: T`一维无截距的 ridge regression（岭回归）的解是 $w=\dfrac{\bx'\by}{\bx'\bx+\lambda}$：和最小二乘 $w=\bx'\by/\bx'\bx$ 相比，只是分母多加了 $\lambda$。题目给 $\bx'\by=20$、$\bx'\bx=10$、$\lambda=10$。$w=\dfrac{20}{10+10}=\dfrac{20}{20}=1$。对比最小二乘 $w=20/10=2$：**惩罚把权重从 2 压到了 1**，这就是 shrinkage（收缩）。` },
       { type: 'mc', q: '下面哪个**不是** L05 p3 列出的正则化作用？', options: ['改善 ill-conditioning', '防止 overfitting', '加入先验知识', '保证训练误差为 0'], answer: 3, explain: '正则化通常会**增加**训练误差。' },

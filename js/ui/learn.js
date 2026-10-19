@@ -9,8 +9,11 @@
   const SML = root.SML;
   const R = SML.render.blocks;
 
+  // Stories are background, not examined: collapsed to one line, open on click.
   R.story = function (b, ctx) {
-    return R.callout(Object.assign({ cls: 'story', title: b.title ? '小故事 · ' + b.title : '小故事' }, b), ctx);
+    const d = R.deep({ title: '小故事' + (b.title ? ' · ' + b.title : ''), hint: '背景，不考，点开看', blocks: [{ t: 'callout', cls: 'story', md: b.md }] }, ctx);
+    d.classList.add('storyfold');
+    return d;
   };
 
   R.think = function (b, ctx) {

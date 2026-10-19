@@ -259,6 +259,16 @@
       ['问"一共有几个 shattered set"时忘了空集和单点', '空集按定义被 shatter（$2^0=1$ 种标签）；某列里 0 和 1 都出现过，这个单点就被 shatter。答题时写明"含空集 / 不含空集"两个数（2021 Q16(b)，见 T1）。'],
     ],
     quiz: [
+      {
+        type: 'set',
+        q: [
+          T`（平时小测原题）The table lists all 9 unique dichotomies of a family $\mathcal F$ on $\mathcal X=\{x_1,x_2,x_3,x_4\}$ (labels in $\{0,1\}$). Select all true facts about $\mathrm{VC}(\mathcal F)$ that can be deduced from the table (you are not asked for the exact value). 1: Based on the number of rows, the VC dimension cannot be more than 3. 2: $\mathcal F$ shatters $\{x_1,x_3\}$. 3: $\mathcal F$ shatters $\{x_2,x_4\}$.`,
+          { t: 'table', cls: 'mono compact', head: ['$x_1$', '$x_2$', '$x_3$', '$x_4$'], rows: ['0001', '0101', '0110', '0111', '1001', '1011', '1101', '1110', '1111'].map((r) => r.split('')) },
+        ],
+        qzh: T`表里是分类器族 $\mathcal F$ 在 4 个点上能做出的全部 9 种不同标签。下面哪些结论能从表里推出（不要求算出确切的 VC 维）？1：按行数，VC 维不超过 3。2：$\mathcal F$ 打散 $\{x_1,x_3\}$。3：$\mathcal F$ 打散 $\{x_2,x_4\}$。`,
+        answer: ['1', '2'],
+        explain: T`1 对：打散 4 个点要 $2^4=16$ 种不同的行，这里只有 9 行；$2^3=8\le9$，所以 VC 最多 3（这只是上界）。2 对：只看 $x_1,x_3$ 两列，读出 00、00、01、01、10、11、10、11、11，四种组合都出现，被打散。3 错：只看 $x_2,x_4$，读出 01、11、10、11、01、01、11、10、11，**缺 00**，没被打散。答案 1、2。`,
+      },
       { type: 'num', q: '$\\mathbb R^5$ 中线性分类器的 VC 维？', answer: 6, explain: T`$\mathbb R^d$ 中线性分类器的 VC 维是 $d+1$（L07 p33）。这里输入是 5 维，$d=5$，所以 VC $=5+1=6$。直觉：分类器 $\sgn(\bw'\bx+b)$ 有 5 个权重加 1 个截距 $b$，共 6 个可调参数，正好能 shatter（打散）6 个位置合适的点。**常见错误是答 5，漏掉了截距 $b$ 带来的那 1 个自由度。**` },
       { type: 'num', q: 'dichotomy 表有 7 个不同的行。VC 维最多？', answer: 2, explain: T`要 shatter（打散）$k$ 个点，表里只看这 $k$ 列时必须凑齐全部 $2^k$ 种 0/1 组合；而只看其中几列时，不同的行只会合并变少，不会超过原来的 7 行。所以需要 $2^k\le7$：$2^2=4\le7$ 可以，$2^3=8>7$ 不行，最大 $k=2$，即 $\lfloor\log_27\rfloor=2$。**这只是上界**：还要真的找到 2 列同时出现 00、01、10、11 四种，VC 维才是 2，否则更小。` },
       { type: 'mc', q: '三个**共线**的点不能被直线 shatter。这说明：', options: ['直线的 VC < 3', '直线的 VC 可能仍是 3（只要有别的 3 点能被 shatter）', '直线的 VC = 2', '直线不能分类 3 个点'], answer: 1, explain: 'L07 p26–p28。' },

@@ -198,3 +198,9 @@ details.ch-sym td.sym { white-space: nowrap; width: 1%; text-align: center; }
 .qzh p { margin: 0; }
 .azh { margin-top: .5rem; padding: .45rem .7rem; background: var(--sunk); border-left: 3px solid var(--line); border-radius: 6px; font-size: .95em; }
 .azh p { margin: 0 0 .3rem; } .azh p:last-child { margin-bottom: 0; }
+
+/* collapsed not-examinable material (fold / ext) and stories */
+details.deep.notexam { border-color: var(--line); background: transparent; }
+details.deep.notexam > summary { color: var(--muted); font-weight: 500; }
+details.deep.storyfold { border-color: color-mix(in srgb, #b07a2a 40%, var(--line)); background: transparent; }
+details.deep.storyfold > summary { color: #b07a2a; font-weight: 500; }
