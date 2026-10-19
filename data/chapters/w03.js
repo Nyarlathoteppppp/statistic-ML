@@ -129,7 +129,7 @@
     ],
     quiz: [
       { type: 'num', q: '$\\mathbf X\'\\mathbf X$ 的特征值是 4 和 0，$\\lambda=0.5$。$\\mathbf X\'\\mathbf X+\\lambda\\mathbf I$ 的最小特征值？', answer: 0.5, explain: '每个特征值加 $\\lambda$：4.5 和 0.5。' },
-      { type: 'num', q: '一维无截距 ridge：$\\bx\'\\bx=10$，$\\bx\'\\by=20$，$\\lambda=10$。$w=?$', answer: 1, explain: '$20/20=1$（最小二乘是 2）。' },
+      { type: 'num', q: '一维无截距 ridge：$\\bx\'\\bx=10$，$\\bx\'\\by=20$，$\\lambda=10$。$w=?$', answer: 1, explain: T`一维无截距的 ridge regression（岭回归）的解是 $w=\dfrac{\bx'\by}{\bx'\bx+\lambda}$：和最小二乘 $w=\bx'\by/\bx'\bx$ 相比，只是分母多加了 $\lambda$。题目给 $\bx'\by=20$、$\bx'\bx=10$、$\lambda=10$。$w=\dfrac{20}{10+10}=\dfrac{20}{20}=1$。对比最小二乘 $w=20/10=2$：**惩罚把权重从 2 压到了 1**，这就是 shrinkage（收缩）。` },
       { type: 'mc', q: '下面哪个**不是** L05 p3 列出的正则化作用？', options: ['改善 ill-conditioning', '防止 overfitting', '加入先验知识', '保证训练误差为 0'], answer: 3, explain: '正则化通常会**增加**训练误差。' },
       { type: 'mc', q: '只有 1 个训练点却要拟合 $y=w_0+w_1x$，最小二乘会：', options: ['唯一解', '无解', '无穷多解（欠定）', '解是 0'], answer: 2, explain: 'L05 p10：过一个点的直线有无穷多条。' },
       { type: 'show', q: '（英文）What is the difference between an ill-posed and an ill-conditioned problem?', answer: T`An ill-posed problem has no solution or no unique solution (e.g. $\mathbf X'\mathbf X$ singular because of collinear features or $n<p$). An ill-conditioned problem has a unique solution, but $\mathbf X'\mathbf X$ has near-zero eigenvalues, so tiny perturbations of the data cause large changes in the solution.` },
@@ -261,8 +261,8 @@
     quiz: [
       { type: 'mc', q: '哪个惩罚会产生稀疏解？', options: ['$\\lambda\\|\\bw\\|_2^2$', '$\\lambda\\|\\bw\\|_1$', '两者都会', '两者都不会'], answer: 1, explain: '$L_1$ 的菱形尖角在坐标轴上。' },
       { type: 'mc', q: 'Ridge regression 等价于哪种先验下的 MAP？', options: ['均匀先验', 'Laplace 先验', '零均值 Gaussian 先验', 'Beta 先验'], answer: 2, explain: 'L05 p15–p16。' },
-      { type: 'num', q: '一维 lasso：$\\bx\'\\bx=4$，$\\bx\'\\by=10$，$\\lambda=8$。$w=?$', answer: 1.5, explain: '$(10-4)/4=1.5$。' },
-      { type: 'num', q: '同上，$\\lambda$ 至少多大时 $w=0$？', answer: 20, explain: '$\\lambda/2\\ge10$ ⇒ $\\lambda\\ge20$。' },
+      { type: 'num', q: '一维 lasso：$\\bx\'\\bx=4$，$\\bx\'\\by=10$，$\\lambda=8$。$w=?$', answer: 1.5, explain: T`一维 lasso 的解是软阈值：$w=\dfrac{\text{soft}(\bx'\by,\lambda/2)}{\bx'\bx}$，即先把 $\bx'\by$ 往 0 的方向减去 $\lambda/2$（减过头就停在 0），再除以 $\bx'\bx$。题目给 $\bx'\by=10$，$\lambda=8$ 所以 $\lambda/2=4$，$\bx'\bx=4$。$\text{soft}(10,4)=10-4=6$，$w=6/4=1.5$。阈值是 $\lambda/2$ 而不是 $\lambda$，因为目标 $\|\by-w\bx\|^2+\lambda|w|$ 对 $w>0$ 求导时，平方项带出系数 2：$-2\bx'\by+2w\bx'\bx+\lambda=0$。**陷阱是减去整个 $\lambda$**，得到 $(10-8)/4=0.5$。` },
+      { type: 'num', q: '同上，$\\lambda$ 至少多大时 $w=0$？', answer: 20, explain: T`Lasso 的权重变成 0 的条件是：软阈值把 $\bx'\by$ 减到 0 或以下，即 $|\bx'\by|\le\lambda/2$。题目 $\bx'\by=10$，所以需要 $\lambda/2\ge10$，即 $\lambda\ge2\times10=20$。**这就是 lasso 产生稀疏解的机制：$\lambda$ 够大时权重恰好等于 0**；ridge 的 $w=\bx'\by/(\bx'\bx+\lambda)$ 无论 $\lambda$ 多大都只会趋近 0。答 10 是忘了阈值里的 $\frac12$。` },
       { type: 'show', q: '（英文）Show that ridge regression is MAP estimation with a Gaussian prior.', answer: T`With likelihood $y\mid\mathbf x,\mathbf w\sim\mathcal N(\mathbf x'\mathbf w,\sigma^2)$ and prior $\mathbf w\sim\mathcal N(\mathbf 0,\lambda^{-1}\mathbf I)$, the log-posterior is $-\frac{1}{2\sigma^2}\|\mathbf y-\mathbf X\mathbf w\|^2-\frac{\lambda}{2}\|\mathbf w\|^2+\text{const}$. Maximising it is equivalent (taking $\sigma^2=1$) to minimising $\|\mathbf y-\mathbf X\mathbf w\|^2+\lambda\|\mathbf w\|^2$, the ridge objective.` },
     ],
   });
@@ -367,7 +367,7 @@
       ['正则化只能用于线性模型', '对任何参数化模型都适用（多项式、神经网络……）。'],
     ],
     quiz: [
-      { type: 'mc', q: '训练误差 0.01，测试误差 3.5。最可能是：', options: ['underfitting', 'overfitting', '刚好', '数据有错'], answer: 1, explain: '训练好、测试差。' },
+      { type: 'mc', q: '训练误差 0.01，测试误差 3.5。最可能是：', options: ['underfitting', 'overfitting', '刚好', '数据有错'], answer: 1, explain: T`训练误差 0.01 几乎为 0，测试误差 3.5 是它的 350 倍：模型在训练集上表现极好，换到没见过的数据就很差。这正是 overfitting（过拟合）：**模型把训练数据里的噪声也背了下来，所以训练误差小、测试误差大**。underfitting（欠拟合）的特征是训练误差和测试误差都大，而这里训练误差很小，所以排除。` },
       { type: 'mc', q: 'Bishop 例子中 $\\ln\\lambda=0$ 的 9 次多项式：', options: ['剧烈振荡', '平滑贴近真实', '几乎是水平线', '穿过所有点'], answer: 2, explain: '惩罚太强 ⇒ 权重被压到接近 0 ⇒ underfit。' },
       { type: 'mc', q: '下面哪个可以降低过拟合？', options: ['增加多项式次数', '减小 $\\lambda$', '增加训练数据', '只看训练误差选模型'], answer: 2, explain: '更多数据降低 variance。' },
       { type: 'show', q: '（英文）Define overfitting and underfitting.', answer: T`Underfitting: the model class is too simple to capture the underlying pattern, so both training and test errors are high. Overfitting: the model is so flexible that it fits the noise in the training data, giving low training error but high test (generalisation) error.` },
@@ -491,9 +491,9 @@
       ['推导里 $\\mathbb E[Y\\hat f]=\\mathbb EY\\,\\mathbb E\\hat f$ 总成立', '需要 $Y$ 与训练集独立（新的测试点）。'],
     ],
     quiz: [
-      { type: 'num', q: '$\\mathbb E Y=5$，$\\mathrm{Var}Y=1$，$\\mathbb E\\hat f=4$，$\\mathrm{Var}\\hat f=0.5$。期望测试误差？', answer: 2.5, explain: '$1+0.5+1=2.5$。' },
-      { type: 'mc', q: '增大 ridge 的 $\\lambda$ 通常会：', options: ['bias↑ variance↑', 'bias↑ variance↓', 'bias↓ variance↑', 'bias↓ variance↓'], answer: 1, explain: '更强约束。' },
-      { type: 'mc', q: '下面哪项**不能**通过换模型减小？', options: ['bias²', 'variance', 'irreducible error', '训练误差'], answer: 2, explain: '噪声与模型无关。' },
+      { type: 'num', q: '$\\mathbb E Y=5$，$\\mathrm{Var}Y=1$，$\\mathbb E\\hat f=4$，$\\mathrm{Var}\\hat f=0.5$。期望测试误差？', answer: 2.5, explain: T`平方损失下，期望测试误差 = bias² + variance + irreducible error（不可约误差），即 $(\mathbb E[Y]-\mathbb E[\hat f])^2+\mathrm{Var}[\hat f]+\mathrm{Var}[Y]$。从题目读出：$\mathbb EY=5$、$\mathbb E\hat f=4$，所以 bias² $=(5-4)^2=1$；variance $=\mathrm{Var}\hat f=0.5$；噪声 $=\mathrm{Var}Y=1$。合计 $1+0.5+1=2.5$。**陷阱是漏掉噪声项 $\mathrm{Var}Y$**，得到 1.5。` },
+      { type: 'mc', q: '增大 ridge 的 $\\lambda$ 通常会：', options: ['bias↑ variance↑', 'bias↑ variance↓', 'bias↓ variance↑', 'bias↓ variance↓'], answer: 1, explain: T`$\lambda$ 越大，对权重的惩罚越强，权重被压向 0，模型变得不灵活。这有两个后果：换一批训练数据，学出来的 $\hat f$ 变化更小，所以 variance（方差）↓；但模型也更难贴近真实函数，平均预测系统性地偏离，所以 bias（偏差）↑。**正则化是用 bias 的上升换 variance 的下降**，两者不会同时变小，所以"bias↓ variance↓"不对。极端情况 $\lambda\to\infty$ 时 $\hat\bw\to\mathbf 0$：预测完全不随数据变（variance 为 0），偏差最大。` },
+      { type: 'mc', q: '下面哪项**不能**通过换模型减小？', options: ['bias²', 'variance', 'irreducible error', '训练误差'], answer: 2, explain: T`Irreducible error（不可约误差）就是 $\mathrm{Var}[Y]$，即标签本身带的噪声。它的公式里根本没有 $\hat f$，**所以不管换成什么模型，这一项都不变**。bias² 和 variance 都含有 $\hat f$，换模型（改复杂度、加正则化）就能调节；训练误差更是可以用很复杂的模型压到接近 0。` },
       { type: 'show', q: '（英文）What happens to bias and variance as model complexity increases?', answer: T`As complexity increases, bias decreases (the model class can fit the true function better on average) while variance increases (predictions become more sensitive to the particular training set). Test error = bias$^2$ + variance + noise is therefore U-shaped, minimised at an intermediate complexity.` },
     ],
   });
@@ -623,9 +623,9 @@
       ['L06 的 8 个分类器有权重要学', '没有，它们是固定规则；"学习"就是从中挑一个。'],
     ],
     quiz: [
-      { type: 'num', q: 'L06 的多特征类有多少个分类器？', answer: 8, explain: '4 个单特征 + 4 个 $\\sgn(\\pm x_1\\pm x_2)$。' },
-      { type: 'num', q: '分类器在 20 个训练样本上错了 3 个。0-1 loss 下经验风险？', answer: 0.15, explain: '$3/20$。' },
-      { type: 'mc', q: '"经验风险小、真实风险大"叫：', options: ['under-fitting', 'over-fitting', 'ERM', 'model selection'], answer: 1, explain: 'L06 p15。' },
+      { type: 'num', q: 'L06 的多特征类有多少个分类器？', answer: 8, explain: T`L06 的多特征类由两部分组成。第一部分是单特征类的 4 个：$\sgn(x_1)$、$\sgn(-x_1)$、$\sgn(x_2)$、$\sgn(-x_2)$。第二部分同时用两个特征：$x_1$、$x_2$ 前面各取 $+$ 或 $-$，共 $2\times2=4$ 种，即 $\sgn(x_1+x_2)$、$\sgn(x_1-x_2)$、$\sgn(-x_1+x_2)$、$\sgn(-x_1-x_2)$。合计 $4+4=8$，所以 $|\mathcal F|=8$。**多特征类包含单特征类的 4 个**，只数后面 4 个是常见错误。` },
+      { type: 'num', q: '分类器在 20 个训练样本上错了 3 个。0-1 loss 下经验风险？', answer: 0.15, explain: T`0-1 loss 下的 empirical risk（经验风险）$\hat R_D[f]$ 就是训练集上的错误率：错一个记 1、对一个记 0，再取平均。题目里错了 3 个，训练样本数 $n=20$。$\hat R_D[f]=3/20=0.15$。注意这是算得出的训练风险，**不是真实风险 $R[f]$**，后者要对未知的数据分布求期望，算不出来。` },
+      { type: 'mc', q: '"经验风险小、真实风险大"叫：', options: ['under-fitting', 'over-fitting', 'ERM', 'model selection'], answer: 1, explain: T`L06 p15 用两种风险定义两种失败：under-fitting（欠拟合）是经验风险 $\hat R_D[f]$ 和真实风险 $R[f]$ 都大；over-fitting（过拟合）是经验风险小、真实风险大。**题目说的"经验风险小、真实风险大"正是 over-fitting**：模型在训练集上看着很好，在没见过的数据上很差。under-fitting 不对，因为它的经验风险也大；ERM 和 model selection 是方法的名字，不是现象。L06 p15。` },
       { type: 'show', q: '（英文）What is the difference between empirical risk and true risk?', answer: T`Empirical risk is the average loss of a classifier on the training sample, $\hat R_D[f]=\frac1n\sum_i l(y_i,f(\mathbf x_i))$, which we can compute. True risk is the expected loss under the (unknown) data distribution, $R[f]=\mathbb E\,l(Y,f(X))$, which measures performance on unseen data but cannot be computed.` },
     ],
   });
@@ -756,9 +756,9 @@
       ['$\\log$ 是以 10 为底', '自然对数 $\\ln$。'],
     ],
     quiz: [
-      { type: 'num', q: '$|\\mathcal F|=1$，$\\delta=e^{-4}$，$n=8$。$\\varepsilon=?$', answer: 0.5, explain: '$\\ln1=0$，$\\ln(1/\\delta)=4$：$\\sqrt{(0+4)/16}=0.5$。' },
-      { type: 'mc', q: '$n$ 变为原来的 9 倍，$\\varepsilon$ 变为：', options: ['1/9', '1/3', '1/81', '不变'], answer: 1, explain: '$1/\\sqrt9$。' },
-      { type: 'mc', q: 'SRM 选择的是：', options: ['经验风险最小的类', '模型类最小的类', '经验风险 + 复杂度惩罚最小的类', '测试误差最小的类'], answer: 2, explain: 'L06 p18。' },
+      { type: 'num', q: '$|\\mathcal F|=1$，$\\delta=e^{-4}$，$n=8$。$\\varepsilon=?$', answer: 0.5, explain: T`要算有限类泛化界里的惩罚项 $\varepsilon=\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$（log 是自然对数 ln）。逐项代入：$|\mathcal F|=1$ ⇒ $\ln1=0$；$\delta=e^{-4}$ ⇒ $1/\delta=e^{4}$ ⇒ $\ln(1/\delta)=4$；$n=8$ ⇒ $2n=16$。$\varepsilon=\sqrt{(0+4)/16}=\sqrt{0.25}=0.5$。含义：以至少 $1-e^{-4}\approx98\%$ 的概率，真实风险最多比训练风险高 0.5。**陷阱是分母忘了乘 2**，用 8 会得到 $\sqrt{0.5}\approx0.707$。` },
+      { type: 'mc', q: '$n$ 变为原来的 9 倍，$\\varepsilon$ 变为：', options: ['1/9', '1/3', '1/81', '不变'], answer: 1, explain: T`惩罚项 $\varepsilon=\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$ 里 $n$ 在根号下的分母，所以 $\varepsilon\propto1/\sqrt n$。$n$ 变成 $9n$，$\varepsilon$ 就变成原来的 $1/\sqrt9=1/3$。**陷阱是忘了根号，选 1/9**。同理，想把 $\varepsilon$ 减半，样本要增加到 4 倍。` },
+      { type: 'mc', q: 'SRM 选择的是：', options: ['经验风险最小的类', '模型类最小的类', '经验风险 + 复杂度惩罚最小的类', '测试误差最小的类'], answer: 2, explain: T`SRM（structural risk minimisation，结构风险最小化）在几个候选模型类之间选择时，看的是泛化界的右边 $\hat R_D[\hat f_D]+\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$，即经验风险加复杂度惩罚。简单类经验风险大、惩罚小，复杂类正好相反，**SRM 选两者之和最小的类**。只看经验风险会总选最复杂的类（过拟合）；只看类的大小会偏向太简单的类（欠拟合）；测试误差不能拿来做选择。L06 p18。` },
       { type: 'mc', q: '证明里为什么要对**所有** $f\\in\\mathcal F$ 同时成立？', options: ['因为 $\\hat f_D$ 依赖数据，事先不知道是哪个', '为了让界更紧', '因为 Hoeffding 只对一个 $f$ 成立就够了', '因为 $|\\mathcal F|$ 无穷'], answer: 0, explain: 'L06 p25–p28。' },
       { type: 'show', q: '（英文）Why does the finite-class bound not apply to linear classifiers with real weights?', answer: T`The class $\{\mathrm{sgn}(\mathbf w'\mathbf x)\}$ with real-valued weights is infinite (uncountable), so $\log|\mathcal F|=\infty$ and the bound is vacuous. We need a complexity measure that stays finite for infinite classes, such as the growth function / VC dimension (L07).` },
     ],

@@ -129,9 +129,9 @@
       ['输出尺寸是 $n-k$', '$\\lfloor(n+2p-k)/s\\rfloor+1$；别漏 +1。'],
     ],
     quiz: [
-      { type: 'num', q: '1D 输入 10 个单元，filter 宽 4，stride 1，无 padding。输出几个单元？', answer: 7, explain: '$10-4+1$。' },
-      { type: 'num', q: '输入 $16\\times16\\times8$，32 个 $3\\times3$ filter，不含 bias。权重数？', answer: 2304, explain: '$32\\times8\\times9$。' },
-      { type: 'num', q: '输入宽 7，filter 宽 3，stride 2，padding 1。输出宽？', answer: 4, explain: '$\\lfloor(7+2-3)/2\\rfloor+1=3+1$。' },
+      { type: 'num', q: '1D 输入 10 个单元，filter 宽 4，stride 1，无 padding。输出几个单元？', answer: 7, explain: T`求的是 filter（滤波器）在输入上能停几个位置，用输出尺寸公式 $\lfloor(n+2p-k)/s\rfloor+1$。代入题目：输入宽 $n=10$，filter 宽 $k=4$，无 padding 即 $p=0$，stride $s=1$：$(10+0-4)/1+1=6+1=7$。直观地数：filter 左端可以放在第 1、2、…、7 格，放在第 7 格时右端正好压在第 10 格。常见错误是只算 $10-4=6$，**漏了最后的 +1**。` },
+      { type: 'num', q: '输入 $16\\times16\\times8$，32 个 $3\\times3$ filter，不含 bias。权重数？', answer: 2304, explain: T`求卷积层的权重个数，公式 $C_{out}\times C_{in}\times K^2$。filter 个数 $C_{out}=32$；输入的第三维 8 是通道数 $C_{in}$，每个 filter 在 8 个通道上各有一套 $3\times3$ 权重，所以一个 filter 有 $8\times9=72$ 个数；32 个 filter 共 $32\times72=2304$ 个。输入的宽高 $16\times16$ 不进公式：**weight sharing（权重共享）让参数个数与图像大小无关**。陷阱：忘乘通道数 8，会得到 $32\times9=288$。` },
+      { type: 'num', q: '输入宽 7，filter 宽 3，stride 2，padding 1。输出宽？', answer: 4, explain: T`用输出尺寸公式 $\lfloor(n+2p-k)/s\rfloor+1$。代入：输入宽 $n=7$；padding $p=1$ 表示两边各补 1 格 0，所以加的是 $2p=2$；filter 宽 $k=3$；stride $s=2$。$(7+2-3)/2=6/2=3$，向下取整仍是 3，再加 1 得 4。核对：补零后长度 9，filter 左端可停在第 1、3、5、7 格，正好 4 个位置。易错点：只加 $p$ 不加 $2p$，或**忘了最后的 +1**。` },
       { type: 'num', q: '（真题）7 输入 → 1D 卷积（宽 3）→ 5 → 全连接 4 → 全连接 5，不含 bias。参数总数？', answer: 43, explain: '卷积层只有一个宽 3 的 filter，所有位置共享：权重 3 个（不是 $5\\times3$）。全连接 5→4：$5\\times4=20$；全连接 4→5：$4\\times5=20$。合计 $3+20+20=43$。' },
       { type: 'mc', q: 'L13 p17 中 6 个 $5\\times5$ filter 作用于 $32\\times32\\times1$ 输入（s=1, p=0），输出是：', options: ['$32\\times32\\times6$', '$28\\times28\\times6$', '$28\\times28\\times1$', '$27\\times27\\times6$'], answer: 1, explain: '$32-5+1=28$，6 个 filter → 6 通道。' },
     ],
@@ -241,9 +241,9 @@
       ['反向传播时 max pooling 把梯度平均分给窗口里每个元素', '只给最大的那个（那是 average pooling 的做法）。'],
     ],
     quiz: [
-      { type: 'num', q: '$24\\times24\\times16$ 经过 $2\\times2$、stride 2 的 max pooling，输出元素总数？', answer: 2304, explain: '$12\\times12\\times16$。' },
-      { type: 'num', q: 'Pooling 层参数个数？', answer: 0, explain: '没有可学参数。' },
-      { type: 'mc', q: 'ResNet 残差连接主要解决：', options: ['参数太多', '很深的网络难以优化（梯度消失）', '平移不变性', '过拟合'], answer: 1, explain: 'L13 p28。' },
+      { type: 'num', q: '$24\\times24\\times16$ 经过 $2\\times2$、stride 2 的 max pooling，输出元素总数？', answer: 2304, explain: T`max pooling（最大池化）把每个 $2\times2$ 小块换成一个最大值；stride 2 表示小块互不重叠，所以宽、高各除以 2：$24/2=12$。pooling 在每个通道上单独做，**通道数不变**，仍是 16。输出是 $12\times12\times16$：$12\times12=144$，$144\times16=2304$ 个元素。常见错误是把通道数也除以 2，或只算 144 忘了乘通道数。` },
+      { type: 'num', q: 'Pooling 层参数个数？', answer: 0, explain: T`pooling（池化）层只做固定的运算：max pooling 取窗口最大值，average pooling 取窗口平均值。这里面没有任何要靠训练调整的权重或 bias，所以**可学参数个数为 0**。它会把宽高变小，从而间接减少后面全连接层的参数，但它自己一个参数也没有。` },
+      { type: 'mc', q: 'ResNet 残差连接主要解决：', options: ['参数太多', '很深的网络难以优化（梯度消失）', '平移不变性', '过拟合'], answer: 1, explain: T`residual connection（残差连接）让每一块输出 $F(\bx)+\bx$：输入沿一条直通路加回输出。反向传播时梯度也能沿这条路直接传回前面的层，不会在几十上百层的连乘里消失，所以**很深的网络（课件里 152 层）也能优化**。"过拟合"不对：不加残差时，深网络连训练误差都降不下来，这是优化问题而不是过拟合；"参数太多"也不对，残差连接并不减少参数。L13 p28。` },
       { type: 'show', q: '（英文）What is transfer learning (pretraining + fine-tuning)?', answer: T`Train a network on a large source dataset (e.g. ImageNet) so that it learns general, reusable features, then reuse those weights for a related target task with less data: replace or add the output layer and continue training (fine-tune) on the target data, often with a small learning rate. This exploits representations learned from abundant data.` },
     ],
   });
@@ -366,10 +366,10 @@
       ['$\\partial\\mathbf h^{(T)}/\\partial\\mathbf h^{(1)}=W^{T-1}$ 对所有 RNN 成立；最大特征值 $<1$ 就消失', '只对线性 RNN 成立（带 tanh 还要乘 $\\mathrm{diag}(1-h^2)$）；看的是特征值的**绝对值**，$W=-2$ 也会爆炸。'],
     ],
     quiz: [
-      { type: 'num', q: '线性标量 RNN，$w=0.8$，$T=11$。$\\partial h^{(T)}/\\partial h^{(1)}=0.8^{?}$，指数是多少？', answer: 10, explain: '$W^{T-1}$。' },
-      { type: 'num', q: 'RNN：$D=2$，$H=3$，$K=1$（含两个 bias）。参数总数？', answer: 22, explain: '$U$：$H\\times D=3\\times2=6$；$W$：$H\\times H=9$；$\\mathbf b$：$H=3$；$V$：$K\\times H=3$；$\\mathbf d$：$K=1$。合计 22。' },
-      { type: 'mc', q: '情感分析（一句话 → 正/负）用哪种结构？', options: ['sequence classification', 'sequence tagging', 'encoder–decoder', '都不行'], answer: 0, explain: 'L14 p9。' },
-      { type: 'mc', q: 'LSTM 缓解梯度消失靠的是：', options: ['ReLU 激活', '由遗忘门缩放的状态"复制"自环', '更大的学习率', 'dropout'], answer: 1, explain: 'L14 p14。' },
+      { type: 'num', q: '线性标量 RNN，$w=0.8$，$T=11$。$\\partial h^{(T)}/\\partial h^{(1)}=0.8^{?}$，指数是多少？', answer: 10, explain: T`线性 RNN 每一步是 $h^{(t)}=w\,h^{(t-1)}+u\,x^{(t)}$，所以 $h^{(t)}$ 对上一步 $h^{(t-1)}$ 的导数就是 $w$。从 $h^{(1)}$ 到 $h^{(11)}$ 要经过 1→2、2→3、…、10→11 共 $T-1=10$ 步，链式法则把 10 个 $w$ 连乘：$\partial h^{(11)}/\partial h^{(1)}=0.8^{10}\approx0.107$。易错点是答 11：**步数是 $T-1$**，起点 $h^{(1)}$ 本身不算一步。$0.8<1$，步数越多梯度越小，这就是 vanishing gradient（梯度消失）。` },
+      { type: 'num', q: 'RNN：$D=2$，$H=3$，$K=1$（含两个 bias）。参数总数？', answer: 22, explain: T`RNN 的参数分五块，每块的大小由"从几维连到几维"决定。输入→隐藏的 $U$：$H\times D=3\times2=6$；隐藏→隐藏的循环矩阵 $W$：$H\times H=3\times3=9$；隐藏层 bias $\mathbf b$：$H=3$；隐藏→输出的 $V$：$K\times H=1\times3=3$；输出 bias $\mathbf d$：$K=1$。合计 $6+9+3+3+1=22$。**所有时间步共享这一组参数**，所以总数与序列长度无关；最容易漏的是循环矩阵 $W$。` },
+      { type: 'mc', q: '情感分析（一句话 → 正/负）用哪种结构？', options: ['sequence classification', 'sequence tagging', 'encoder–decoder', '都不行'], answer: 0, explain: T`情感分析是整句话只要一个标签（正或负）。sequence classification（序列分类）正是这样：RNN 从头读到尾，**只把最后一个隐藏状态 $\mathbf h^{(\tau)}$ 送进分类器**，只有一个 loss。sequence tagging（序列标注）要给每个词各输出一个标签（如词性标注），这里不需要；encoder–decoder（编码器–解码器）用于输出也是一串、长度可变的任务（如翻译）。L14 p9。` },
+      { type: 'mc', q: 'LSTM 缓解梯度消失靠的是：', options: ['ReLU 激活', '由遗忘门缩放的状态"复制"自环', '更大的学习率', 'dropout'], answer: 1, explain: T`普通 RNN 每步把上一步状态乘权重矩阵再过 tanh，反传时梯度被一步步连乘，越来越小。LSTM（long short-term memory，长短期记忆网络）加了一条状态自环：把上一步的状态**复制**过来，只乘一个 sigmoid forget gate（遗忘门）的值，再加上新内容。遗忘门接近 1 时状态几乎原样传下去，梯度也几乎原样传回，所以能处理 100+ 步的依赖（普通 RNN 约 5–10 步）。"ReLU 激活"是前馈网络缓解梯度消失的办法，不是 LSTM 的机制。L14 p14。` },
     ],
   });
 
@@ -493,9 +493,9 @@
       ['Transformer 生成文本时也完全并行', '训练时可并行；自回归生成时仍逐个 token 产生（decoder 用 causal mask）。'],
     ],
     quiz: [
-      { type: 'num', q: '得分 $e=(\\ln4,\\ \\ln1)$，$\\alpha_1=?$', answer: 0.8, explain: '$4/(4+1)$。' },
-      { type: 'num', q: '接上，$h^{(1)}=10$，$h^{(2)}=5$，$c=?$', answer: 9, explain: '$0.8\\times10+0.2\\times5$。' },
-      { type: 'mc', q: 'Transformer 比 RNN 训练快的主要原因：', options: ['参数更少', '序列中各位置可以并行计算', '不需要反向传播', '没有激活函数'], answer: 1, explain: 'L14 p16。' },
+      { type: 'num', q: '得分 $e=(\\ln4,\\ \\ln1)$，$\\alpha_1=?$', answer: 0.8, explain: T`$\alpha_1$ 是位置 1 的 attention weight（注意力权重），等于得分的 softmax：$\alpha_1=\exp(e_1)/\big(\exp(e_1)+\exp(e_2)\big)$。题目给 $e_1=\ln4$、$e_2=\ln1$；exp 和 ln 互为反函数，所以 $\exp(\ln4)=4$，$\exp(\ln1)=1$。$\alpha_1=4/(4+1)=0.8$，相应 $\alpha_2=1/5=0.2$，两者和为 1。陷阱：**先取 exp 再归一化**，直接拿得分相除会得到 $\ln4/(\ln4+0)=1$。` },
+      { type: 'num', q: '接上，$h^{(1)}=10$，$h^{(2)}=5$，$c=?$', answer: 9, explain: T`context vector（上下文向量）$c$ 是隐藏状态按注意力权重的加权平均：$c=\alpha_1h^{(1)}+\alpha_2h^{(2)}$。权重沿用上一题 $\alpha_1=0.8$、$\alpha_2=1-0.8=0.2$，隐藏状态由题目给出 $h^{(1)}=10$、$h^{(2)}=5$。$c=0.8\times10+0.2\times5=8+1=9$。结果更靠近 10，因为位置 1 的权重大：attention 让模型多看得分高的位置。` },
+      { type: 'mc', q: 'Transformer 比 RNN 训练快的主要原因：', options: ['参数更少', '序列中各位置可以并行计算', '不需要反向传播', '没有激活函数'], answer: 1, explain: T`RNN 第 $t$ 步要等第 $t-1$ 步的隐藏状态算完，只能一步一步顺序算。Transformer 用 self-attention（自注意力）代替循环：每个位置的新表示只依赖上一层的所有位置，**同一层里所有位置可以同时算**，正好适合 GPU。"参数更少"不对：快是因为能并行，和参数多少无关（大模型的参数往往更多）；它照样用反向传播训练，也有激活函数。L14 p16 就把 Transformer 定义为用 attention、高度可并行地处理序列的方法。` },
     ],
   });
 

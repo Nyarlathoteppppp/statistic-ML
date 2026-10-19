@@ -122,7 +122,7 @@
       ['只试一个方向', 'stump 有两个方向，都要试（L07 p13–p14）。'],
     ],
     quiz: [
-      { type: 'num', q: 'Decision stumps 的 $S(7)=?$', answer: 14, explain: '$2n$。' },
+      { type: 'num', q: 'Decision stumps 的 $S(7)=?$', answer: 14, explain: T`要算的是 7 个点上 decision stump（决策树桩）最多能给出几种不同的标签组合。把 7 个点从小到大排好，阈值本质上只有"落在哪两个相邻点之间"这 $7+1=8$ 个位置（含最左、最右）；一个方向给 8 种模式，两个方向共 $2\times8=16$ 种。但"全 $+$"和"全 $-$"两个方向都做得出来，各被算了两次，要减 2：$16-2=14$。**这就是 $S(n)=2n=2\times7=14$**，远小于 $2^7=128$，别把 $2^n$ 当成答案。` },
       { type: 'num', q: 'L07 的 6 个样本里，$\\sgn(x-0.5)$ 错几个？', answer: 4, explain: 'p13 表：阈值 0.5 时错 4 个。' },
       { type: 'mc', q: '为什么 $S_\\mathcal F(n)\\le2^n$ 对任何类都成立？', options: ['因为 $\\mathcal F$ 有限', '因为 $n$ 个二元标签最多 $2^n$ 种组合', '因为 Hoeffding', '因为分类器是线性的'], answer: 1, explain: 'L07 p17–p18。' },
       { type: 'show', q: '（英文）Define a dichotomy and the growth function.', answer: T`A dichotomy is the vector of labels $(f(x_1),\dots,f(x_n))\in\{-1,+1\}^n$ that a classifier $f$ assigns to a set of $n$ points. The growth function $S_{\mathcal F}(n)$ is the maximum, over all sets of $n$ points, of the number of distinct dichotomies that classifiers in $\mathcal F$ can produce; it is at most $2^n$.` },
@@ -259,8 +259,8 @@
       ['问"一共有几个 shattered set"时忘了空集和单点', '空集按定义被 shatter（$2^0=1$ 种标签）；某列里 0 和 1 都出现过，这个单点就被 shatter。答题时写明"含空集 / 不含空集"两个数（2021 Q16(b)，见 T1）。'],
     ],
     quiz: [
-      { type: 'num', q: '$\\mathbb R^5$ 中线性分类器的 VC 维？', answer: 6, explain: '$d+1$。' },
-      { type: 'num', q: 'dichotomy 表有 7 个不同的行。VC 维最多？', answer: 2, explain: '$\\lfloor\\log_27\\rfloor=2$。' },
+      { type: 'num', q: '$\\mathbb R^5$ 中线性分类器的 VC 维？', answer: 6, explain: T`$\mathbb R^d$ 中线性分类器的 VC 维是 $d+1$（L07 p33）。这里输入是 5 维，$d=5$，所以 VC $=5+1=6$。直觉：分类器 $\sgn(\bw'\bx+b)$ 有 5 个权重加 1 个截距 $b$，共 6 个可调参数，正好能 shatter（打散）6 个位置合适的点。**常见错误是答 5，漏掉了截距 $b$ 带来的那 1 个自由度。**` },
+      { type: 'num', q: 'dichotomy 表有 7 个不同的行。VC 维最多？', answer: 2, explain: T`要 shatter（打散）$k$ 个点，表里只看这 $k$ 列时必须凑齐全部 $2^k$ 种 0/1 组合；而只看其中几列时，不同的行只会合并变少，不会超过原来的 7 行。所以需要 $2^k\le7$：$2^2=4\le7$ 可以，$2^3=8>7$ 不行，最大 $k=2$，即 $\lfloor\log_27\rfloor=2$。**这只是上界**：还要真的找到 2 列同时出现 00、01、10、11 四种，VC 维才是 2，否则更小。` },
       { type: 'mc', q: '三个**共线**的点不能被直线 shatter。这说明：', options: ['直线的 VC < 3', '直线的 VC 可能仍是 3（只要有别的 3 点能被 shatter）', '直线的 VC = 2', '直线不能分类 3 个点'], answer: 1, explain: 'L07 p26–p28。' },
       { type: 'mc', q: '为什么 4 个点不能被 $\\mathbb R^2$ 的直线 shatter？', options: ['点太多计算不了', 'XOR 那种对角同色的标签无法用一条直线分开', '因为 $2^4$ 太大', '因为 stumps 的 VC 是 2'], answer: 1, explain: 'L07 p27：凸四边形时缺 XOR 两种，只有 14 种 < 16。（若一点在另三点的三角形内部，缺的是"内点与外三点异号"的标签。）$S(4)=14<16$ 说明没有任何 4 点能被 shatter。' },
       { type: 'show', q: '（英文）What does it mean for a set of points to be shattered?', answer: T`A set of $n$ points is shattered by a class $\mathcal F$ if, for every one of the $2^n$ possible labellings of the points, some classifier in $\mathcal F$ produces exactly that labelling.` },
@@ -362,9 +362,9 @@
       ['要会证明 Sauer–Shelah', '不考（L07 p30）。'],
     ],
     quiz: [
-      { type: 'num', q: 'VC = 2，$n=6$。Sauer–Shelah 上界？', answer: 22, explain: '$1+6+15=22$。' },
-      { type: 'mc', q: '有限 VC 维等价于：', options: ['模型类有限', 'PAC 可学', '训练误差为 0', '数据线性可分'], answer: 1, explain: 'L07 p34。' },
-      { type: 'mc', q: 'VC 界中惩罚项的数量级？', options: ['$O(\\sqrt{\\mathrm{VC}/n})$', '$O(\\sqrt{\\mathrm{VC}\\log n/n})$', '$O(2^n)$', '$O(\\mathrm{VC}\\cdot n)$'], answer: 1, explain: 'L07 p33。' },
+      { type: 'num', q: 'VC = 2，$n=6$。Sauer–Shelah 上界？', answer: 22, explain: T`Sauer–Shelah 引理给 growth function（增长函数）一个上界 $S(n)\le\sum_{i=0}^{\mathrm{VC}}\binom{n}{i}$。这里 VC $=2$、$n=6$，要加 $i=0,1,2$ 三项：$\binom{6}{0}=1$，$\binom{6}{1}=6$，$\binom{6}{2}=\frac{6\times5}{2}=15$，合计 $1+6+15=22$。对比 $2^6=64$：点数超过 VC 维以后，能实现的标签组合只按多项式增长。**求和从 $i=0$ 开始、到 $i=\mathrm{VC}$ 为止**，漏掉 $\binom{6}{0}=1$ 就会算成 21。` },
+      { type: 'mc', q: '有限 VC 维等价于：', options: ['模型类有限', 'PAC 可学', '训练误差为 0', '数据线性可分'], answer: 1, explain: T`L07 p34：有限 VC 维等价于 PAC（probably approximately correct，大概率近似正确）可学。原因是一条链：VC 维有限 ⇒ Sauer–Shelah 让 growth function 只按多项式增长 ⇒ VC 界的惩罚项约 $\sqrt{\mathrm{VC}\log n/n}$，随 $n$ 增大趋于 0 ⇒ 样本够多时，真实风险和训练风险的差距以高概率变得任意小。**最诱人的错项是"模型类有限"**：有限类的 VC 维一定有限（$\le\log_2|\mathcal F|$），但反过来不成立——stump、直线都有无穷多个分类器，VC 维却只有 2、3，所以两者不等价。L07 p34。` },
+      { type: 'mc', q: 'VC 界中惩罚项的数量级？', options: ['$O(\\sqrt{\\mathrm{VC}/n})$', '$O(\\sqrt{\\mathrm{VC}\\log n/n})$', '$O(2^n)$', '$O(\\mathrm{VC}\\cdot n)$'], answer: 1, explain: T`VC 界的惩罚项是 $\sqrt{8\,\frac{\mathrm{VC}\log(2n+1)+\log(4/\delta)}{n}}$。看数量级时去掉常数 8；$\log(4/\delta)$ 不随 $n$ 变；$\log(2n+1)$ 和 $\log n$ 同阶。剩下的就是 $O\big(\sqrt{\mathrm{VC}\log n/n}\big)$。最容易误选的是 $O(\sqrt{\mathrm{VC}/n})$：**它漏了 $\log n$，而这个 $\log n$ 来自 Sauer–Shelah 的 $\log S(2n)\le\mathrm{VC}\log(2n+1)$**。L07 p33。` },
     ],
   });
 
@@ -477,9 +477,9 @@
       ['functional margin 就是距离', '要除以 $\\|\\bw\\|$（往年 2021 Q2 就考这个区别）。'],
     ],
     quiz: [
-      { type: 'num', q: '$\\bw=(6,8)$，$b=-10$，点 $(2,1)$ 标签 $+1$。几何距离？', answer: 1, explain: '$(12+8-10)/10=1$。' },
-      { type: 'num', q: '同上，functional margin？', answer: 10, explain: '$1\\times10=10$。' },
-      { type: 'mc', q: '把 $(\\bw,b)$ 都乘 5，几何 margin：', options: ['×5', '÷5', '不变', '×25'], answer: 2, explain: '同一条边界。' },
+      { type: 'num', q: '$\\bw=(6,8)$，$b=-10$，点 $(2,1)$ 标签 $+1$。几何距离？', answer: 1, explain: T`要算点到边界的几何距离（geometric margin，几何间隔）$\frac{y(\bw'\bx+b)}{\|\bw\|}$。代入题目：得分 $\bw'\bx+b=6\times2+8\times1-10=12+8-10=10$；标签 $y=+1$，乘完还是 10；$\|\bw\|=\sqrt{6^2+8^2}=\sqrt{36+64}=10$。距离 $=10/10=1$，结果为正，说明这个点在正确的一侧。**忘了除以 $\|\bw\|$ 就会得到 10**，那是下一题的 functional margin。` },
+      { type: 'num', q: '同上，functional margin？', answer: 10, explain: T`Functional margin（函数间隔）就是距离公式的分子 $y(\bw'\bx+b)$，不除以 $\|\bw\|$。上一题已算出得分 $\bw'\bx+b=10$，标签 $y=+1$，所以 functional margin $=1\times10=10$。它也等于几何距离乘 $\|\bw\|$：$1\times10=10$。**它会随 $(\bw,b)$ 的缩放而变，所以不是真实距离。**` },
+      { type: 'mc', q: '把 $(\\bw,b)$ 都乘 5，几何 margin：', options: ['×5', '÷5', '不变', '×25'], answer: 2, explain: T`把 $(\bw,b)$ 换成 $(5\bw,5b)$，边界 $5\bw'\bx+5b=0$ 和 $\bw'\bx+b=0$ 是**同一条线**，点到它的距离当然不变。用公式看：分子 $y(5\bw'\bx+5b)$ 变成 5 倍，分母 $\|5\bw\|=5\|\bw\|$ 也变成 5 倍，正好抵消。最容易误选"×5"：那是 functional margin $y(\bw'\bx+b)$ 的变化，它没有除以 $\|\bw\|$。` },
       { type: 'show', q: '（英文）Why does the SVM prefer the maximum-margin boundary when several boundaries have zero training error?', answer: T`A boundary far from all training points is more robust: new points drawn near the training data are less likely to fall on the wrong side, so the maximum-margin separator is expected to generalise better than one passing close to some training points.` },
     ],
   });
@@ -585,9 +585,9 @@
       ['数据不可分时 hard-margin 也能给出解', '约束无法满足，问题无解（L08 p29）。'],
     ],
     quiz: [
-      { type: 'num', q: 'Canonical 形式下 $\\|\\bw\\|=0.25$。margin（边界到最近点）？', answer: 4, explain: '$1/0.25=4$。' },
-      { type: 'num', q: '一维：负类 $x=-1$，正类 $x=1$。canonical $w=?$', answer: 1, explain: '$w+b=1$，$-w+b=-1$ ⇒ $w=1,b=0$。' },
-      { type: 'mc', q: '下面哪个点是支持向量？（canonical 形式）', options: ['$y_i(\\bw\'\\bx_i+b)=3$', '$y_i(\\bw\'\\bx_i+b)=1$', '$y_i(\\bw\'\\bx_i+b)=-1$', '$y_i(\\bw\'\\bx_i+b)=0$'], answer: 1, explain: '约束取等号。' },
+      { type: 'num', q: 'Canonical 形式下 $\\|\\bw\\|=0.25$。margin（边界到最近点）？', answer: 4, explain: T`Canonical scaling（规范化缩放）把最近点的 functional margin 固定为 $y_i(\bw'\bx_i+b)=1$，所以最近点到边界的距离就是 $\frac{1}{\|\bw\|}$。代入 $\|\bw\|=0.25$：$1/0.25=4$。**本课的 margin 指边界到最近点（单侧）**；若算成 $2/\|\bw\|=8$，那是两条虚线之间的总宽度。` },
+      { type: 'num', q: '一维：负类 $x=-1$，正类 $x=1$。canonical $w=?$', answer: 1, explain: T`只有两个点时，它们都是支持向量，都满足 canonical 条件 $y(wx+b)=1$。正类 $x=1$、$y=+1$：$(+1)(w\cdot1+b)=1$ ⇒ $w+b=1$；负类 $x=-1$、$y=-1$：$(-1)(w\cdot(-1)+b)=1$ ⇒ $-w+b=-1$。两式相加 $2b=0$ ⇒ $b=0$，代回得 $w=1$。验算：margin $=1/|w|=1$，正好是两点距离 2 的一半，边界在中点 $x=0$。**负类的方程别漏了乘 $y=-1$**，否则会写成 $-w+b=1$。` },
+      { type: 'mc', q: '下面哪个点是支持向量？（canonical 形式）', options: ['$y_i(\\bw\'\\bx_i+b)=3$', '$y_i(\\bw\'\\bx_i+b)=1$', '$y_i(\\bw\'\\bx_i+b)=-1$', '$y_i(\\bw\'\\bx_i+b)=0$'], answer: 1, explain: T`Canonical 形式下，所有点都满足约束 $y_i(\bw'\bx_i+b)\ge1$。**支持向量就是约束取等号（$=1$）的点**：它们正好落在 margin 线（虚线）上，离边界 $1/\|\bw\|$，是最近的点。$=3$ 的点离得更远，不是支持向量；$=0$ 表示点在决策边界上，$=-1$ 表示分错，两者都违反了 hard margin 的约束 $\ge1$，最优解里不会出现。常见误解是以为支持向量在决策边界上（$=0$），其实它们在 margin 线上。` },
       { type: 'mc', q: 'Hard-margin 损失对"分对但离边界太近"的点是：', options: ['0', '1', '∞', '负数'], answer: 2, explain: 'L08 p26–p27：太近也不允许。' },
       { type: 'show', q: '（英文）Write the hard-margin SVM optimisation problem and identify the support vectors.', answer: T`$\min_{\mathbf w,b}\frac12\|\mathbf w\|^2$ subject to $y_i(\mathbf w'\mathbf x_i+b)\ge1$ for $i=1,\dots,n$. The support vectors are the training points for which the constraint is tight, $y_i(\mathbf w'\mathbf x_i+b)=1$, i.e. those lying on the margin boundaries.` },
     ],
@@ -701,10 +701,10 @@
       ['soft margin 和 hard margin 的目标完全不同', '多了 $C\\sum\\xi_i$ 和松弛约束；数据可分时 $C\\to\\infty$ 回到 hard margin。'],
     ],
     quiz: [
-      { type: 'num', q: '$yf(\\bx)=0.3$，hinge loss？', answer: 0.7, explain: '$1-0.3$。' },
-      { type: 'num', q: '$yf(\\bx)=-0.5$，slack $\\xi$ 的最小可行值？', answer: 1.5, explain: '$\\max(0,1.5)$。' },
-      { type: 'mc', q: '增大 $C$ 通常会：', options: ['margin 变宽、违规变多', 'margin 变窄、违规变少', '没有影响', '让问题无解'], answer: 1, explain: '违规更贵。' },
-      { type: 'mc', q: '$\\xi_i=0.4$ 的点：', options: ['在 margin 外分对', '分对但在 margin 内', '分错', '是唯一的支持向量'], answer: 1, explain: '$0<\\xi<1$。' },
+      { type: 'num', q: '$yf(\\bx)=0.3$，hinge loss？', answer: 0.7, explain: T`Hinge loss（合页损失）是 $\max\big(0,\ 1-yf(\bx)\big)$。题目给了 $yf(\bx)=0.3$，所以 $\max(0,\ 1-0.3)=\max(0,\ 0.7)=0.7$。$0<0.3<1$ 说明这个点分对了，但离边界太近、进了 margin，所以仍要罚。**分对不等于损失为 0**：只有 $yf\ge1$ 时 hinge loss 才是 0。` },
+      { type: 'num', q: '$yf(\\bx)=-0.5$，slack $\\xi$ 的最小可行值？', answer: 1.5, explain: T`Soft margin 的约束是 $yf(\bx)\ge1-\xi$ 和 $\xi\ge0$。移项得 $\xi\ge1-yf(\bx)=1-(-0.5)=1.5$，再和 $\xi\ge0$ 一起取较大者：$\max(0,\ 1.5)=1.5$。这个最小值就是该点的 hinge loss；$\xi>1$ 说明点越过了决策边界，分错了。**注意 $1-(-0.5)$ 是加 0.5**，算成 $1-0.5=0.5$ 是最常见的符号错误。` },
+      { type: 'mc', q: '增大 $C$ 通常会：', options: ['margin 变宽、违规变多', 'margin 变窄、违规变少', '没有影响', '让问题无解'], answer: 1, explain: T`目标是 $\frac12\|\bw\|^2+C\sum_i\xi_i$，$C$ 是每单位违规的"罚款单价"。**$C$ 变大 ⇒ 违规更贵 ⇒ 优化宁可让 $\|\bw\|$ 变大，也要把 $\sum\xi_i$ 压小**；margin 宽度 $2/\|\bw\|$ 随之变窄，结果越来越接近 hard margin。"margin 变宽、违规变多"是 $C$ 变小时的情况；把 $C$ 当成正则系数 $\lambda$ 才会选反（课件 $C\propto1/\lambda$）。` },
+      { type: 'mc', q: '$\\xi_i=0.4$ 的点：', options: ['在 margin 外分对', '分对但在 margin 内', '分错', '是唯一的支持向量'], answer: 1, explain: T`由 $\xi=\max(0,\ 1-yf)$，$\xi=0.4$ 意味着 $1-yf=0.4$，即 $yf=0.6$。$yf=0.6>0$：点在正确一侧，分对了；$yf=0.6<1$：点还没到 margin 线，进了 margin 内部。**四种情况的分界：$\xi=0$ 在 margin 外，$0<\xi<1$ 分对但在 margin 内，$\xi=1$ 在边界上，$\xi>1$ 分错。** 误选"分错"是把 $\xi>0$ 当成了分错，其实要 $\xi>1$ 才分错。` },
       { type: 'show', q: '（英文）What is the hinge loss and why is it used in soft-margin SVMs?', answer: T`The hinge loss is $\max(0,1-y(\mathbf w'\mathbf x+b))$: zero for points correctly classified outside the margin and increasing linearly with the margin violation otherwise. It replaces the hard-margin infinite loss, so non-separable data can be handled while still encouraging a margin.` },
     ],
   });

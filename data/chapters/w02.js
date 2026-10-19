@@ -136,10 +136,10 @@
       ['最小化的是平均误差 / 绝对误差', '最小化**平方**误差之和（除以 $n$ 得 MSE，最优解不变）。'],
     ],
     quiz: [
-      { type: 'num', q: '数据 $(0,2),(1,2),(2,5)$，用 $\\hat y=a+bx$。求 $b$。', answer: 1.5, explain: '$\\sum x=3,\\sum y=9,\\sum x^2=5,\\sum xy=0+2+10=12$，$D=6$，$b=(36-27)/6=1.5$。' },
-      { type: 'num', q: '接上题，求 $a$。', answer: 1.5, explain: '$a=(9-1.5\\times3)/3=1.5$。' },
-      { type: 'num', q: '只用常数项 $\\hat y=w_0$ 拟合 $y=(1,2,6)$，最小二乘解 $w_0$？', answer: 3, explain: '对 $\\sum(y_i-w_0)^2$ 求导得 $w_0=\\bar y=3$。' },
-      { type: 'mc', q: 'Dummy feature $x_0=1$ 的作用是：', options: ['防止过拟合', '把截距 $w_0$ 写进点积 $\\bx\'\\bw$', '归一化特征', '让 $\\mathbf X\'\\mathbf X$ 可逆'], answer: 1, explain: 'L03 p9。' },
+      { type: 'num', q: '数据 $(0,2),(1,2),(2,5)$，用 $\\hat y=a+bx$。求 $b$。', answer: 1.5, explain: T`这是一维最小二乘的斜率，公式是 $b=\dfrac{n\sum x_iy_i-\sum x_i\sum y_i}{D}$，其中 $D=n\sum x_i^2-(\sum x_i)^2$。从三个点 $(0,2),(1,2),(2,5)$ 读出：$n=3$，$\sum x=0+1+2=3$，$\sum y=2+2+5=9$，$\sum x^2=0+1+4=5$，$\sum xy=0\times2+1\times2+2\times5=0+2+10=12$。$D=3\times5-3^2=15-9=6$。$b=\dfrac{3\times12-3\times9}{6}=\dfrac{36-27}{6}=\dfrac96=1.5$。**陷阱是漏掉分子第一项的 $n$**（写成 $12-27$），公式里是 $n\sum x_iy_i$。` },
+      { type: 'num', q: '接上题，求 $a$。', answer: 1.5, explain: T`截距用 $a=(\sum y_i-b\sum x_i)/n$，也就是 $a=\bar y-b\bar x$（由方程组第一行 $na+b\sum x_i=\sum y_i$ 移项得到）。上题已经算出 $\sum y=9$、$\sum x=3$、$b=1.5$，且 $n=3$。$a=(9-1.5\times3)/3=(9-4.5)/3=4.5/3=1.5$。所以拟合直线是 $\hat y=1.5+1.5x$。**最小二乘直线一定穿过均值点** $(\bar x,\bar y)=(1,3)$，可以用来检验：$1.5+1.5\times1=3$ ✓。` },
+      { type: 'num', q: '只用常数项 $\\hat y=w_0$ 拟合 $y=(1,2,6)$，最小二乘解 $w_0$？', answer: 3, explain: T`只有常数项时，模型对每个点都预测同一个数 $w_0$，要最小化的是 RSS（residual sum of squares，残差平方和）$\sum_i(y_i-w_0)^2$。对 $w_0$ 求导并令它为 0：$-2\sum_i(y_i-w_0)=0$，即 $\sum_iy_i=nw_0$，所以 $w_0=\bar y$。代入 $y=(1,2,6)$：$w_0=(1+2+6)/3=9/3=3$。**没有特征时，平方损失下最好的常数预测就是平均值**（如果换成绝对误差，答案会变成中位数 2）。` },
+      { type: 'mc', q: 'Dummy feature $x_0=1$ 的作用是：', options: ['防止过拟合', '把截距 $w_0$ 写进点积 $\\bx\'\\bw$', '归一化特征', '让 $\\mathbf X\'\\mathbf X$ 可逆'], answer: 1, explain: T`模型本来是 $\hat y=w_0+\sum_{j=1}^m x_jw_j$，截距 $w_0$ 不乘任何特征，没法和其他项一起写成点积。加一个恒等于 1 的 dummy feature（哑特征）$x_0=1$ 后，$w_0=x_0w_0$，于是 $\hat y=\sum_{j=0}^m x_jw_j=\bx'\bw$，**截距变成了一个普通权重**，后面的矩阵公式不用再单独处理它。它不是正则化，所以不防止过拟合；它也不会让 $\mathbf X'\mathbf X$ 变得可逆，可逆与否取决于各列是否线性相关。L03 p9。` },
       { type: 'show', q: '（往年原题 2026 Q1a / 2025 Q1a）In words or a mathematical expression, what quantity is minimised by linear regression?', answer: T`The sum of squared residuals between the observed targets and the model's predictions, $\sum_{i=1}^n (y_i-\mathbf x_i'\mathbf w)^2=\|\mathbf y-\mathbf X\mathbf w\|^2$.` },
     ],
   });
@@ -257,9 +257,9 @@
       ['展开 $\\|\\by-\\mathbf X\\bw\\|^2$ 时交叉项是 $\\by\'\\mathbf X\\bw$', '是 $-2\\by\'\\mathbf X\\bw$（两个交叉项相等，合并）。'],
     ],
     quiz: [
-      { type: 'mc', q: '在线性回归的概率模型里，最大化似然等价于：', options: ['最小化绝对误差和', '最小化残差平方和', '最大化 $\\|\\bw\\|$', '最小化 $\\sigma^2$'], answer: 1, explain: 'L03 p15。' },
+      { type: 'mc', q: '在线性回归的概率模型里，最大化似然等价于：', options: ['最小化绝对误差和', '最小化残差平方和', '最大化 $\\|\\bw\\|$', '最小化 $\\sigma^2$'], answer: 1, explain: T`L03 p15 假设 $y_i=\bx_i'\bw$ 加 Gaussian 噪声，每个点的似然是 $p(y_i\mid\bx_i)=\frac1{\sqrt{2\pi\sigma^2}}\exp\big(-\frac{(y_i-\bx_i'\bw)^2}{2\sigma^2}\big)$。取对数再对所有点求和，得 $\sum_i\log p(y_i\mid\bx_i)=-\frac1{2\sigma^2}\sum_i(y_i-\bx_i'\bw)^2+C$，其中 $C$ 与 $\bw$ 无关。前面是负号，**所以 log-likelihood（对数似然）最大，就是残差平方和最小**。"最小化绝对误差和"对应的是 Laplace 噪声，不是 Gaussian；$\sigma^2$ 是噪声大小，要学的参数是 $\bw$。L03 p15。` },
       { type: 'num', q: '$\\mathbf X\'\\mathbf X=\\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}$，$\\mathbf X\'\\by=\\begin{bmatrix}6\\\\2\\end{bmatrix}$，求 $\\hat w_1$（第二个分量）。', answer: 0.5, explain: '对角矩阵的逆是对角元取倒数：$\\hat w_1=2/4=0.5$。' },
-      { type: 'mc', q: '下面哪种情况 $\\mathbf X\'\\mathbf X$ **一定**不可逆？', options: ['$n=1000$，$m=5$', '有一个特征恒等于另一个特征的 3 倍', '特征都是正数', '$\\by$ 全是 0'], answer: 1, explain: '列线性相关。' },
+      { type: 'mc', q: '下面哪种情况 $\\mathbf X\'\\mathbf X$ **一定**不可逆？', options: ['$n=1000$，$m=5$', '有一个特征恒等于另一个特征的 3 倍', '特征都是正数', '$\\by$ 全是 0'], answer: 1, explain: T`$\mathbf X'\mathbf X$ 不可逆的原因是 $\mathbf X$ 的列线性相关（c04）。某个特征恒等于另一个的 3 倍，就是第 $j$ 列 $=3\times$ 第 $k$ 列；取 $\bv$ 第 $j$ 位为 1、第 $k$ 位为 $-3$、其余为 0，就有 $\mathbf X\bv=\mathbf 0$，于是 $\mathbf X'\mathbf X$ 有零特征值。**列线性相关 ⇒ 一定不可逆，和样本有多少无关。** $n=1000$、$m=5$ 是样本远多于特征，通常可逆，但不是"一定不可逆"；特征是不是正数与线性相关无关；$\by$ 根本不出现在 $\mathbf X'\mathbf X$ 里。` },
       { type: 'show', q: '用英文解释为什么线性回归可以看作 MLE。', answer: T`Assume $y=\mathbf x'\mathbf w+\varepsilon$ with i.i.d. Gaussian noise $\varepsilon\sim\mathcal N(0,\sigma^2)$. The log-likelihood is $-\frac{1}{2\sigma^2}\sum_i(y_i-\mathbf x_i'\mathbf w)^2+\text{const}$, so maximising it over $\mathbf w$ is equivalent to minimising the sum of squared errors, i.e. least squares.` },
     ],
   });
@@ -383,8 +383,8 @@
       ['特征越多越好', '特征太多会过拟合、计算量大（c18、L03 p26）。'],
     ],
     quiz: [
-      { type: 'num', q: '一维 $x=3$，用基 $[1,x,x^2,x^3]$，特征向量的最后一个分量是？', answer: 27, explain: '$3^3=27$。' },
-      { type: 'num', q: 'RBF $\\varphi(\\bx)=\\|\\bx-\\mathbf z\\|$，$\\mathbf z=(1,2)$，$\\bx=(4,6)$。$\\varphi=?$', answer: 5, explain: '$\\sqrt{9+16}=5$。' },
+      { type: 'num', q: '一维 $x=3$，用基 $[1,x,x^2,x^3]$，特征向量的最后一个分量是？', answer: 27, explain: T`Basis expansion（基函数展开）把一个数 $x$ 变成特征向量 $\varphi(x)=[1,x,x^2,x^3]'$，每个分量就是把 $x$ 代进对应的基函数。题目 $x=3$，最后一个基函数是 $x^3$。所以最后一个分量 $=3^3=3\times3\times3=27$，**完整的特征向量是 $[1,3,9,27]'$**。` },
+      { type: 'num', q: 'RBF $\\varphi(\\bx)=\\|\\bx-\\mathbf z\\|$，$\\mathbf z=(1,2)$，$\\bx=(4,6)$。$\\varphi=?$', answer: 5, explain: T`这个 RBF（radial basis function，径向基函数）的值就是 $\bx$ 到中心 $\mathbf z$ 的欧氏距离 $\|\bx-\mathbf z\|$。先算差向量：$\bx-\mathbf z=(4-1,\ 6-2)=(3,4)$。再求 $L_2$ 长度：$\sqrt{3^2+4^2}=\sqrt{9+16}=\sqrt{25}=5$。**要先相减再求长度**，不是 $\|\bx\|-\|\mathbf z\|$。` },
       { type: 'mc', q: '关于 XOR，下面正确的是：', options: ['原空间里可以用一条直线分开', '用 $\\varphi_1+\\varphi_4$（到 $(0,0)$ 和 $(1,1)$ 的距离和）后可以用阈值分开', '必须用非线性的 $\\bw$', 'basis expansion 后需要梯度下降才能求解'], answer: 1, explain: 'L03 p24：A 得分 $\\sqrt2$，B 得分 2。' },
       { type: 'show', q: '用英文写出 basis expansion 的思想及一个局限。', answer: T`Basis expansion maps the input through fixed non-linear functions $\varphi(\mathbf x)$ and fits a linear model $\varphi(\mathbf x)'\mathbf w$ in the new feature space; the model stays linear in the parameters (so least squares still applies) but can be non-linear in $\mathbf x$, e.g. making XOR linearly separable. A limitation is that the basis (number, centres, widths) must be chosen in advance, and using one basis function per training point gives $n$ features, which scales poorly.` },
     ],
@@ -515,10 +515,10 @@
       ['SGD 每个 epoch 不用打乱', '每个 epoch 前要 shuffle（L04 讲者强调）。'],
     ],
     quiz: [
-      { type: 'num', q: '$L(\\theta)=\\theta^2$，$\\theta=4$，$\\eta=0.25$，GD 一步后 $\\theta=?$', answer: 2, explain: '$4-0.25\\times8=2$。' },
+      { type: 'num', q: '$L(\\theta)=\\theta^2$，$\\theta=4$，$\\eta=0.25$，GD 一步后 $\\theta=?$', answer: 2, explain: T`Gradient descent（梯度下降）一维时的一步是 $\theta^{(i+1)}=\theta^{(i)}-\eta\,L'(\theta^{(i)})$：沿导数的反方向走，步长是学习率 $\eta$ 乘导数。$L(\theta)=\theta^2$ 的导数是 $L'(\theta)=2\theta$，在 $\theta=4$ 处 $L'=2\times4=8$。题目给 $\eta=0.25$，所以新 $\theta=4-0.25\times8=4-2=2$。一步从 4 走到 2，离最小点 0 更近了；**陷阱是用函数值 $L(4)=16$ 代替导数**，那样会得到 $4-0.25\times16=0$。` },
       { type: 'num', q: 'minimize $(z-1)^2$ subject to $z\\ge3$。最小**值**是多少？', answer: 4, explain: 'minimiser $\\hat z=3$，minimum $=(3-1)^2=4$（L04 p3）。' },
       { type: 'mc', q: '$f$ 的 Hessian 处处 PSD，可以推出：', options: ['$f$ 凸，局部最小即全局最小', '$f$ 严格凸', '$f$ 没有最小值', 'GD 对任何 $\\eta$ 都收敛'], answer: 0, explain: 'PSD Hessian ⇔ 凸；严格凸需要更强条件。' },
-      { type: 'mc', q: 'SGD 相比 GD 的主要优点：', options: ['每步梯度更准确', '每步只用少量数据，计算便宜', '保证找到全局最优', '不需要学习率'], answer: 1, explain: 'L04 p10。' },
+      { type: 'mc', q: 'SGD 相比 GD 的主要优点：', options: ['每步梯度更准确', '每步只用少量数据，计算便宜', '保证找到全局最优', '不需要学习率'], answer: 1, explain: T`L04 p10：SGD（stochastic gradient descent，随机梯度下降）每一步只用一个 batch（1 个或几个样本）算梯度，而 GD 每一步都要扫完整个训练集。**所以 SGD 每一步便宜得多**，同样的计算量能走更多步，这是它的主要优点。"每步梯度更准确"恰好说反了：小批量的梯度只是全量梯度的有噪声估计，平均方向对，但单步更不准；SGD 照样需要学习率，也不保证找到全局最优。L04 p10。` },
       { type: 'show', q: '用英文解释为什么凸性对优化很重要。', answer: T`For a convex objective every local minimum is a global minimum (any stationary point is optimal), so gradient-based methods (with a suitable step size) cannot get stuck in a poor local optimum; if the objective is strictly convex and a minimiser exists, it is unique.` },
     ],
   });
@@ -627,7 +627,7 @@
     quiz: [
       { type: 'num', q: '$L(\\theta)=2\\theta^2-8\\theta$，$\\theta_0=10$，Newton 一步后 $\\theta=?$', answer: 2, explain: '$L\'=4\\theta-8=32$，$L\'\'=4$，$10-8=2$，就是最优点（二次函数一步到位）。' },
       { type: 'mc', q: '参数 $p=10^6$ 的神经网络为什么不用 Newton？', options: ['Hessian 不存在', '存储 $p^2$、求逆 $O(p^3)$ 太贵', 'Newton 只适用于一维', 'Newton 需要学习率'], answer: 1, explain: 'L04 p16–p18。' },
-      { type: 'num', q: '$L\'(\\theta_t)=3$，$L\'\'(\\theta_t)=6$，$\\theta_t=1$。$\\theta_{t+1}=?$', answer: 0.5, explain: '$1-3/6=0.5$。' },
+      { type: 'num', q: '$L\'(\\theta_t)=3$，$L\'\'(\\theta_t)=6$，$\\theta_t=1$。$\\theta_{t+1}=?$', answer: 0.5, explain: T`一维 Newton–Raphson 的一步是 $\theta_{t+1}=\theta_t-L'(\theta_t)/L''(\theta_t)$：用一阶导除以二阶导来决定走多远，不需要学习率。题目给 $\theta_t=1$、$L'(\theta_t)=3$、$L''(\theta_t)=6$。$\theta_{t+1}=1-3/6=1-0.5=0.5$。和 GD 对比：GD 减去 $\eta L'$，Newton 用曲率 $L''$ 代替了 $1/\eta$，**弯得越厉害（$L''$ 越大），步子越小**。` },
     ],
   });
 
@@ -755,9 +755,9 @@
       ['数据线性可分时 MLE 存在有限解', '可分时把 $\\|\\bw\\|$ 放大，似然一直增大、没有有限的最大值，$\\bw$ 会发散。这是 MLE 的标准注意事项（加正则化可以解决）；L04 结尾提到正则化的直接原因是共线 / 冗余特征。'],
     ],
     quiz: [
-      { type: 'num', q: '$\\bx\'\\bw=0$ 时 $P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: '$\\sigma(0)=1/2$。' },
-      { type: 'num', q: '$\\sigma(s)=0.8$，求 $\\sigma(-s)$。', answer: 0.2, explain: '$\\sigma(-s)=1-\\sigma(s)$。' },
-      { type: 'num', q: '$\\bw=(1,-2)$（含 bias），$\\bx=(1,0.5)$。$P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: '$s=1-1=0$。' },
+      { type: 'num', q: '$\\bx\'\\bw=0$ 时 $P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: T`Logistic regression 的模型是 $P(Y=1\mid\bx)=\sigma(\bx'\bw)$，其中 sigmoid（S 形函数）$\sigma(s)=\frac{1}{1+e^{-s}}$。题目说得分 $s=\bx'\bw=0$，代入：$\sigma(0)=\frac1{1+e^{0}}=\frac1{1+1}=0.5$。**得分为 0 的点正好在决策边界上，两类各占一半可能**，这也是为什么 logistic regression 的边界是 $\bx'\bw=0$。` },
+      { type: 'num', q: '$\\sigma(s)=0.8$，求 $\\sigma(-s)$。', answer: 0.2, explain: T`Sigmoid 有对称性 $\sigma(-s)=1-\sigma(s)$。推导：$\sigma(-s)=\frac1{1+e^{s}}$，分子分母同乘 $e^{-s}$ 得 $\frac{e^{-s}}{e^{-s}+1}=1-\frac1{1+e^{-s}}=1-\sigma(s)$。题目给 $\sigma(s)=0.8$，所以 $\sigma(-s)=1-0.8=0.2$。含义：**得分取反，就是把 $P(Y=1)$ 和 $P(Y=0)$ 对调**。` },
+      { type: 'num', q: '$\\bw=(1,-2)$（含 bias），$\\bx=(1,0.5)$。$P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: T`先算线性得分 $s=\bx'\bw$，再代入 sigmoid。"含 bias"的意思是：$\bx$ 的第一个分量是 dummy feature $x_0=1$，$\bw$ 的第一个分量是截距 $w_0=1$。$s=1\times1+(-2)\times0.5=1-1=0$，所以 $P(Y=1\mid\bx)=\sigma(0)=0.5$，这个点正好在决策边界上。**陷阱是漏掉 bias 项**：只算 $-2\times0.5=-1$ 会得到 $\sigma(-1)\approx0.269$。` },
       { type: 'mc', q: 'Logistic regression 的训练目标等价于：', options: ['最小化 RSS', '最小化 cross-entropy（负对数似然）', '最大化 margin', '最小化 0-1 loss'], answer: 1, explain: 'L04 p29–p31。' },
       { type: 'show', q: '用英文说明为什么 logistic regression 是线性分类器。', answer: T`It predicts class 1 when $P(y=1\mid\mathbf x)=\sigma(\mathbf x'\mathbf w)\ge\frac12$. Since $\sigma(s)=\frac12\iff s=0$, the decision boundary is $\mathbf x'\mathbf w=0$, a hyperplane with normal vector $\mathbf w$; the sigmoid only maps the linear score to a probability.` },
     ],

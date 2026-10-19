@@ -216,9 +216,9 @@
       ['必须先算出 $Z$', '不用：先算未归一化的，最后统一归一化（$Z$ 是常数）。'],
     ],
     quiz: [
-      { type: 'num', q: '叶子 $x_1$，$\\psi_{12}=\\begin{bmatrix}2&5\\\\1&1\\end{bmatrix}$（打分表：行 = $x_1$ 取 0/1，列 = $x_2$ 取 0/1）。$m_{1\\to2}(x_2=1)=?$', answer: 6, explain: '第二列 $5+1$。' },
+      { type: 'num', q: '叶子 $x_1$，$\\psi_{12}=\\begin{bmatrix}2&5\\\\1&1\\end{bmatrix}$（打分表：行 = $x_1$ 取 0/1，列 = $x_2$ 取 0/1）。$m_{1\\to2}(x_2=1)=?$', answer: 6, explain: T`叶子发出的 message（消息）就是把自己求和掉：$m_{1\to2}(x_2)=\sum_{x_1}\psi_{12}(x_1,x_2)$。固定 $x_2=1$ 就是看第二列（列 = $x_2$ 取 1），再对 $x_1$ 的两种取值相加：$\psi_{12}(0,1)+\psi_{12}(1,1)=5+1=6$。叶子没有其他来信，不用再乘别的。陷阱：加成第二行 $1+1=2$——行是 $x_1$，对 $x_1$ 求和要按列加。` },
       { type: 'num', q: '节点 $x$（取 0/1）收到两条消息 $(2,3)$ 和 $(4,1)$（括号按 $(x=0,\\ x=1)$ 的顺序）。$P(x=0)=?$', answer: 0.7273, tol: 0.002, explain: '两条消息逐项相乘：$(2\\times4,\\ 3\\times1)=(8,3)$；归一化：$8/(8+3)=8/11\\approx0.727$。' },
-      { type: 'mc', q: '在树上消元的顺序应该是：', options: ['从查询节点往叶子', '从叶子往查询节点', '随便', '按编号'], answer: 1, explain: 'L21 p11。' },
+      { type: 'mc', q: '在树上消元的顺序应该是：', options: ['从查询节点往叶子', '从叶子往查询节点', '随便', '按编号'], answer: 1, explain: T`叶子只有一个邻居、只出现在一个因子里，把它求和掉，得到的消息只依赖那一个邻居；剩下的图仍是一棵更小的树，可以接着消下一个叶子，表永远不会变大。最后只剩查询变量，把来信相乘、归一化就是它的边缘。"从查询节点往叶子"不行：查询变量要保留，不能先求和掉；从中间开始消，又会把它的几个邻居绑成一张更大的表。L21 p11（求 $P(x_4)$，从叶子 $x_1,x_3,x_5$ 开始）。` },
     ],
   });
 
@@ -375,8 +375,8 @@
       ['Root 选不同，边缘不同', '任意 root 结果都一样。'],
     ],
     quiz: [
-      { type: 'num', q: '7 个节点的树做 belief propagation，一共发几条消息？', answer: 12, explain: '6 条边 × 2。' },
-      { type: 'num', q: '节点 $x$（取 0/1）有 3 个邻居，来信分别为 $(1,2)$、$(2,1)$、$(3,1)$（括号按 $(x=0,\\ x=1)$）。$P(x=1)=?$', answer: 0.25, explain: '三条来信逐项相乘：$x=0$：$1\\times2\\times3=6$；$x=1$：$2\\times1\\times1=2$。$P(x=1)=2/(6+2)=0.25$。' },
+      { type: 'num', q: '7 个节点的树做 belief propagation，一共发几条消息？', answer: 12, explain: T`belief propagation（信念传播）分两轮：collect（收）从叶子到 root，每条边朝 root 方向发一条消息；distribute（发）从 root 回到叶子，每条边反方向再发一条。所以消息数 = 边数 × 2。$n$ 个节点的树恰好有 $n-1$ 条边：$7-1=6$ 条，消息 $6\times2=12$ 条。陷阱：用节点数算成 $7\times2=14$，要数的是边。` },
+      { type: 'num', q: '节点 $x$（取 0/1）有 3 个邻居，来信分别为 $(1,2)$、$(2,1)$、$(3,1)$（括号按 $(x=0,\\ x=1)$）。$P(x=1)=?$', answer: 0.25, explain: T`要算的是 $x$ 的边缘：$P(x)\propto$ 所有来信的乘积，每个取值分开乘。$x=0$ 取三条来信的第一个数：$1\times2\times3=6$；$x=1$ 取第二个数：$2\times1\times1=2$。乘积只是"正比于"，还要除以两个取值的总和：$P(x=1)=\frac{2}{6+2}=0.25$。陷阱：忘了归一化直接答 2，或者把三条来信相加而不是相乘。` },
       { type: 'mc', q: '在有环的图上直接跑 belief propagation 叫：', options: ['junction tree', 'loopy belief propagation', 'variable elimination', 'Gibbs sampling'], answer: 1, explain: 'L21 p36，结果是近似。' },
     ],
   });
@@ -529,8 +529,8 @@
     ],
     quiz: [
       { type: 'num', q: '当前图里要消的变量有 3 个邻居，它们之间已有 1 条边。要加几条 fill-in 边？', answer: 2, explain: '3 个邻居两两之间共 3 条，已有 1 条。' },
-      { type: 'num', q: '同上，记录的团有几个变量？', answer: 4, explain: '变量自己 + 3 个邻居。' },
-      { type: 'mc', q: 'Junction tree 的 separator 是：', options: ['任意两团的交集', '相邻两团的交集', '最大的团', '被删掉的团'], answer: 1, explain: 'L22 p22。' },
+      { type: 'num', q: '同上，记录的团有几个变量？', answer: 4, explain: T`消元时记录的团 = 被消的变量自己 ∪ 它当前的所有邻居。上一题这个变量有 3 个邻居，加上它自己：$1+3=4$ 个变量。加完 fill-in（填补边）后，这 4 个点两两相连，正好构成一个团。陷阱：只数邻居答 3，漏了被消的变量本身。` },
+      { type: 'mc', q: 'Junction tree 的 separator 是：', options: ['任意两团的交集', '相邻两团的交集', '最大的团', '被删掉的团'], answer: 1, explain: T`separator（分隔集）是 junction tree（联结树）里**相邻**两个团的交集，画在两团之间的连线上。例：L22 的树 $c_1=\{x_1,x_2,x_3\}$—$c_2=\{x_2,x_3,x_4\}$—$c_3=\{x_3,x_4,x_5\}$，separator 是 $\{x_2,x_3\}$ 和 $\{x_3,x_4\}$；团之间的消息只依赖 separator 里的变量。"任意两团的交集"不对：$c_1$ 和 $c_3$ 共享 $x_3$，但它们在树里不相邻、之间没有边，这个交集不是 separator。L22 p22。` },
       { type: 'show', q: '（英文）State the running intersection property and why it matters.', answer: T`If two cliques of the junction tree share a variable, that variable appears in every clique on the path between them. This guarantees that information about a shared variable can flow along the tree through separators, so the beliefs about that variable in different cliques are consistent after message passing.` },
     ],
   });
@@ -636,9 +636,9 @@
       ['计算量和团大小成正比', '和团大小**指数**相关（二元时 $2^k$）。'],
     ],
     quiz: [
-      { type: 'num', q: '一个团有 4 个三值变量（每个 3 种取值），它的 potential 表有多少格？', answer: 81, explain: '$3^4$。' },
-      { type: 'mc', q: 'Myopic 启发式每一步消掉：', options: ['编号最小的', '邻居最多的', '会产生最小团的', '随机一个'], answer: 2, explain: 'L22 p26。' },
-      { type: 'mc', q: '找最优消元顺序：', options: ['有多项式时间的精确算法', '计算上困难，用启发式', '总是先消编号小的', '和推断复杂度无关'], answer: 1, explain: 'L22 p27。' },
+      { type: 'num', q: '一个团有 4 个三值变量（每个 3 种取值），它的 potential 表有多少格？', answer: 81, explain: T`potential（势函数）表给团里变量的每一种取值组合一格。每个变量 3 种取值，4 个变量的组合数是 $3\times3\times3\times3=3^4=81$。一般地，$k$ 个变量、每个 $d$ 种取值就是 $d^k$ 格（二元时 $2^k$），团每多一个变量，表就再乘一个 $d$——这就是推断代价随最大团大小指数增长的原因。陷阱：把底数和指数弄反，算成 $4^3=64$。` },
+      { type: 'mc', q: 'Myopic 启发式每一步消掉：', options: ['编号最小的', '邻居最多的', '会产生最小团的', '随机一个'], answer: 2, explain: T`Myopic heuristic（短视 / 贪心启发式）只看眼前这一步：在还没消的变量里，挑"消掉它时记录的团最小"的那个（也就是当前邻居最少的）先消。这样每一步的团都尽量小，而推断代价随最大团大小指数增长。"邻居最多的"正好相反：先消中心节点会把一大圈邻居连成大团，L22 的例子里先消 $A$，团就是全部 9 个点。L22 p26。` },
+      { type: 'mc', q: '找最优消元顺序：', options: ['有多项式时间的精确算法', '计算上困难，用启发式', '总是先消编号小的', '和推断复杂度无关'], answer: 1, explain: T`同一张图，不同的消元顺序得到大小不同的团，而推断代价取决于最大团的大小，所以想要"最大团最小"的顺序。课件说找这个最优顺序是 computationally hard（计算上困难）：没有已知的高效精确算法，实践中用启发式，比如 myopic：每一步消掉会产生最小团的变量，通常效果不错但不保证最优。"和推断复杂度无关"也不对：顺序决定团，团决定复杂度。L22 p27。` },
     ],
   });
 

@@ -113,10 +113,10 @@
       ['ROC 横轴一定是 false positive rate', '课件 L15 p11 横轴是 specificity；常见画法是 $1-$specificity。两者镜像，AUC 相同。'],
     ],
     quiz: [
-      { type: 'num', q: 'TP=20，FP=5，FN=5，TN=70。Precision？', answer: 0.8, explain: '$20/25$。' },
-      { type: 'num', q: '接上，Specificity？', answer: 0.9333, tol: 0.002, explain: '$70/75$。' },
-      { type: 'num', q: '预测 $(2,4,6)$，真实 $(3,4,8)$。MAE？', answer: 1, explain: '$(1+0+2)/3$。' },
-      { type: 'mc', q: '完美分类器的 AUC 是：', options: ['0', '0.5', '1', '∞'], answer: 2, explain: 'L15 p11。' },
+      { type: 'num', q: 'TP=20，FP=5，FN=5，TN=70。Precision？', answer: 0.8, explain: T`precision（精确率）问的是：**判成正的样本里，有多少真的是正的**。判成正的 = TP + FP $=20+5=25$（TP 判正且真正，FP 判正但其实是负）；其中真正的是 TP $=20$。precision $=20/25=0.8$。陷阱：分母换成 TP + FN 就成了 recall（召回率），本题恰好也是 $20/25$，但问的是另一件事。` },
+      { type: 'num', q: '接上，Specificity？', answer: 0.9333, tol: 0.002, explain: T`specificity（特异度）问的是：真正的负例里，有多少被判对成负。真正的负例 = TN + FP $=70+5=75$（FP 是本来为负、却被判成正的 5 个）；其中判对的是 TN $=70$。specificity $=70/75\approx0.933$。**分母是"真实为负"的全部样本**：FN 本来是正例，不该进分母；也别用全体 100 当分母。` },
+      { type: 'num', q: '预测 $(2,4,6)$，真实 $(3,4,8)$。MAE？', answer: 1, explain: T`MAE（mean absolute error，平均绝对误差）是"每个样本预测差多少（取绝对值），再求平均"。把预测和真实逐个对齐：$|2-3|=1$，$|4-4|=0$，$|6-8|=2$。相加 $1+0+2=3$，除以样本数 3 得 $3/3=1$。绝对值不能省，否则 $-1+0-2=-3$，正负会互相抵消；若题目问 MSE（均方误差），则是 $(1+0+4)/3\approx1.67$。` },
+      { type: 'mc', q: '完美分类器的 AUC 是：', options: ['0', '0.5', '1', '∞'], answer: 2, explain: T`ROC 曲线把每个阈值下的 (specificity, sensitivity) 画成一点，两条轴都在 0 到 1 之间，所以 AUC（area under the curve，曲线下面积）最大就是 $1\times1=1$。完美分类器有一个阈值能让 sensitivity 和 specificity 同时等于 1，曲线贴着正方形的边走，**面积是整个单位正方形 = 1**。0.5 是随机猜（对角线下的面积），不是完美；面积也不可能是 ∞。L15 p11。` },
       { type: 'show', q: '（英文）How is an ROC curve constructed, and what does AUC tell you?', answer: T`A scoring classifier is turned into a decision rule by a threshold. Sweeping the threshold (or a hyperparameter) gives one (specificity, sensitivity) pair per setting; plotting all pairs gives the ROC curve (the lecture plots specificity on the x-axis; the common convention plots $1-$specificity, the false-positive rate, which mirrors the curve without changing the area). It shows the trade-off between catching positives and avoiding false alarms. The area under the curve (AUC) summarises it in one number: 0.5 for random guessing, 1 for a perfect classifier.` },
     ],
   });
@@ -222,9 +222,9 @@
       ['k-fold 的方差除以 $k-1$', 'L15 的公式除以 $k$。'],
     ],
     quiz: [
-      { type: 'num', q: '$n=50$，leave-one-out 需要训练几个模型？', answer: 50, explain: '$k=n$。' },
-      { type: 'num', q: '$n\\to\\infty$ 时 bootstrap 中某样本**没**被抽到的概率（保留 3 位）？', answer: 0.368, tol: 0.002, explain: '$1/e$。' },
-      { type: 'mc', q: 'Nested CV 中内层循环用来：', options: ['报告最终性能', '选超参数', '做特征选择之外的事', '增加训练数据'], answer: 1, explain: 'L15 p21。' },
+      { type: 'num', q: '$n=50$，leave-one-out 需要训练几个模型？', answer: 50, explain: T`leave-one-out（留一法）就是 $k$-fold 交叉验证取 $k=n$：每一折只有 1 个样本。每轮留出 1 个样本测试、用其余 $50-1=49$ 个训练；50 个样本每个都要轮到一次，所以共训练 $n=50$ 个模型。这也是它最贵的原因：模型个数随样本数增长。` },
+      { type: 'num', q: '$n\\to\\infty$ 时 bootstrap 中某样本**没**被抽到的概率（保留 3 位）？', answer: 0.368, tol: 0.002, explain: T`bootstrap（自助抽样）从 $n$ 个样本里有放回地抽 $n$ 次。抽一次没抽到某个样本的概率是 $1-1/n$，$n$ 次都没抽到是 $(1-1/n)^n$；$n\to\infty$ 时它趋于 $1/e\approx1/2.718\approx0.368$。所以约 36.8% 的样本不进训练集、留作测试；反过来，至少被抽到一次的概率约 0.632，这就是"0.632 bootstrap"的名字来历。**题目问的是"没抽到"**，别答成 0.632。` },
+      { type: 'mc', q: 'Nested CV 中内层循环用来：', options: ['报告最终性能', '选超参数', '做特征选择之外的事', '增加训练数据'], answer: 1, explain: T`nested cross-validation（嵌套交叉验证）分两层：**内层在外层的训练部分里试不同超参数**（如 $C=0.1,1,10$）并挑出最好的；外层用挑出的超参数训练，再在从没参与挑选的测试折上报告性能。"报告最终性能"是外层的工作：如果用挑超参数的同一份数据打分，等于偷看了测试数据，报出的数字会偏乐观。L15 p21。` },
       { type: 'show', q: '（英文）Compare k-fold cross-validation with 0.632 bootstrapping. Why "0.632"?', answer: T`k-fold CV splits the data into $k$ disjoint folds; each fold is held out once for testing while the model is trained on the other $k-1$, and the $k$ test scores are averaged (every example is tested exactly once). Bootstrapping instead draws $n$ examples **with replacement** to form a training set and tests on the examples never drawn (out-of-bag), repeated $B$ times. An example is never drawn with probability $(1-1/n)^n\to e^{-1}\approx0.368$, so each bootstrap training set contains about $1-e^{-1}\approx63.2\%$ of the distinct examples — hence the name.` },
     ],
   });
@@ -317,7 +317,7 @@
     ],
     quiz: [
       { type: 'num', q: '$\\hat\\mu_1-\\hat\\mu_2=1$，$m=16$，$\\hat\\sigma_1^2+\\hat\\sigma_2^2=4$。$x=?$', answer: 2, explain: '$x=1\\times\\sqrt{16}/\\sqrt4=1\\times4/2=2$：4 是 $\\sqrt m$，2 是两边方差之和开方。' },
-      { type: 'mc', q: '两个算法的误差条明显重叠，说明：', options: ['算法 1 更好', '算法 2 更好', '没有明显差异', '实验有错'], answer: 2, explain: 'L15 p31。' },
+      { type: 'mc', q: '两个算法的误差条明显重叠，说明：', options: ['算法 1 更好', '算法 2 更好', '没有明显差异', '实验有错'], answer: 2, explain: T`error bar（误差条）是每个算法自己的区间 $\hat\mu_j\pm\frac{\hat\sigma_j}{\sqrt m}x_{1-\alpha/2,m-1}$，表示它的平均指标大致落在哪里。两个区间明显重叠，说明均值之差没有超出正常波动，**看不出谁更好**。不能因为某个均值低一点就选"算法 2 更好"：课件例子 $10.1\pm1.26$ 和 $9.9\pm1.11$ 均值差 0.2，区间大幅重叠。重叠也不代表实验有错，只是数据不足以分出高下。L15 p31。` },
     ],
   });
 
@@ -429,9 +429,9 @@
       ['学习者能比最好的专家好得多', '界里有 $m$：最坏情况下跟最好专家同一量级。'],
     ],
     quiz: [
-      { type: 'num', q: '64 个专家，至少一个从不出错。Majority vote 最多错几次？', answer: 6, explain: '$\\log_264$。' },
-      { type: 'num', q: 'Halving：$m=3$，$n=16$。上界 $\\frac{m+\\log_2n}{\\log_2(4/3)}$ 约等于多少？（用 $1/\\log_2(4/3)\\approx2.41$）', answer: 16.87, tol: 0.06, explain: '$7/\\log_2(4/3)\\approx7\\times2.41\\approx16.9$。' },
-      { type: 'mc', q: 'Majority vote 的证明用的 potential function 是：', options: ['总权重', '存活专家数 $|E|$', '学习者错误数', '最好专家的错误数'], answer: 1, explain: 'L16 p6。' },
+      { type: 'num', q: '64 个专家，至少一个从不出错。Majority vote 最多错几次？', answer: 6, explain: T`majority vote（多数投票）在有完美专家时的错误界是 $M\le\log_2n$，这里专家数 $n=64$。理由：学习者每错一次，说明存活专家里多数错了，至少一半被删掉；完美专家永远不被删，至少剩 1 个。64 每次减半到 1：$64\to32\to16\to8\to4\to2\to1$，共 6 次，即 $\log_264=6$（$2^6=64$）。所以**最多错 6 次**。` },
+      { type: 'num', q: 'Halving：$m=3$，$n=16$。上界 $\\frac{m+\\log_2n}{\\log_2(4/3)}$ 约等于多少？（用 $1/\\log_2(4/3)\\approx2.41$）', answer: 16.87, tol: 0.06, explain: T`把题目的数代进 halving（减半算法）的界 $\frac{m+\log_2n}{\log_2(4/3)}$：$m=3$ 是最好专家犯错的次数，$n=16$ 是专家个数，$\log_216=4$（因为 $2^4=16$）。分子 $3+4=7$。除以 $\log_2(4/3)$ 就是乘 $2.41$：$7\times2.41=16.87$，即学习者最多错约 16.9 次。易错点：**$\log_2n$ 是 4 而不是 16**，以及别漏了分子里的 $m$。` },
+      { type: 'mc', q: 'Majority vote 的证明用的 potential function 是：', options: ['总权重', '存活专家数 $|E|$', '学习者错误数', '最好专家的错误数'], answer: 1, explain: T`potential function（势函数）是证明里用的一个量：学习者每错一次它就按比例缩小，但它又有下界。majority vote 里这个量是**存活专家数 $|E|$**：每错一次至少减半，错 $M$ 次后 $|E|\le n/2^M$；完美专家永不被删，所以 $|E|\ge1$；两边夹起来得 $2^M\le n$，即 $M\le\log_2n$。"总权重"是 halving 的势函数——majority 里错的专家直接删除，根本没有权重。L16 p6。` },
       { type: 'show', q: '（英文）Why does majority vote make at most $\\log_2 n$ mistakes when one expert is perfect?', answer: T`Each time the learner errs, the majority of the surviving experts erred, so at least half of them are removed. After $M$ mistakes at most $n/2^M$ experts survive. The perfect expert is never removed, so at least one survives: $1\le n/2^M$, giving $M\le\log_2n$.` },
       { type: 'show', q: '（英文）Sketch why halving satisfies $M\\le\\frac{m+\\log_2n}{\\log_2(4/3)}$.', answer: T`Use the total weight $W$ as a potential. Initially $W=n$. When the learner errs, at least half of the weight was on wrong experts and is halved, so $W$ shrinks to at most $\frac34$ of its value: after $M$ mistakes $W\le n(3/4)^M$. The best expert errs $m$ times, so its weight is $(1/2)^m\le W$. Hence $(1/2)^m\le n(3/4)^M$; taking $\log_2$ gives $-m\le\log_2n+M\log_2(3/4)$, i.e. $M\le\frac{m+\log_2n}{\log_2(4/3)}\approx2.41(m+\log_2n)$.` },
     ],
@@ -538,8 +538,8 @@
       ['界里的 log 是以 2 为底', 'L16 p18 起用自然对数。'],
     ],
     quiz: [
-      { type: 'num', q: 'Weighted majority：$m=5$，$\\ln n=2$，$\\varepsilon=0.5$。上界？', answer: 23, explain: '$2(1+\\varepsilon)m=2\\times1.5\\times5=15$；$2\\ln n/\\varepsilon=2\\times2/0.5=8$；上界 $15+8=23$。' },
-      { type: 'num', q: 'Probabilistic experts：$\\ln n=1$，$\\varepsilon=0.25$，$L^*=8$。上界？', answer: 14, explain: '界 $L\\le\\frac{\\ln n}{\\varepsilon}+(1+\\varepsilon)L^*$：$\\ln n/\\varepsilon=1/0.25=4$；$(1+0.25)\\times8=10$；上界 $4+10=14$。' },
+      { type: 'num', q: 'Weighted majority：$m=5$，$\\ln n=2$，$\\varepsilon=0.5$。上界？', answer: 23, explain: T`把数代进 weighted majority（加权多数）的错误界 $M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}$。第一项用最好专家的错误数 $m=5$：$2\times(1+0.5)\times5=2\times1.5\times5=15$。第二项用专家个数，题目直接给了 $\ln n=2$：$2\times2/0.5=4/0.5=8$。上界 $15+8=23$，即学习者最多错 23 次。注意界里是自然对数 $\ln$，不要换成 $\log_2$。` },
+      { type: 'num', q: 'Probabilistic experts：$\\ln n=1$，$\\varepsilon=0.25$，$L^*=8$。上界？', answer: 14, explain: T`probabilistic experts（随机化专家）的期望总损失界是 $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$。题目给 $\ln n=1$、$\varepsilon=0.25$、最好专家的总损失 $L^*=8$。第一项 $1/0.25=4$；第二项 $(1+0.25)\times8=1.25\times8=10$；上界 $4+10=14$。和 weighted majority 比，$L^*$ 前的系数是 $1+\varepsilon$ 而不是 $2(1+\varepsilon)$，第一项也没有 2：随机选专家让对手无法预判你。` },
       { type: 'mc', q: 'L16 p19 的下界例子说明：', options: ['随机化没用', '确定性加权多数对 $m$ 的系数至少是 2', '专家越多越好', 'halving 是最优的'], answer: 1, explain: '对手让确定性学习者天天错：$M=T\\ge2m$。' },
       { type: 'show', q: '（英文）Why can no deterministic weighted-majority algorithm improve the factor 2 in front of $m$?', answer: T`Take two experts who always disagree. A deterministic learner's prediction is a fixed function of the history, so an adversary can always set the outcome to the opposite of it: the learner errs every round, $M=T$. In every round exactly one of the two experts is right, so their mistakes sum to $T$ and the better one makes $m\le T/2$. Hence $M\ge2m$ for every deterministic algorithm.` },
       { type: 'show', q: '（英文）Describe the probabilistic experts algorithm and its guarantee.', answer: T`Each expert has weight $w_i$ (initially 1). Each round, follow expert $i$ with probability $w_i/W$, where $W=\sum_iw_i$; after the losses $\ell_i\in[0,1]$ are revealed, update every expert by $w_i\leftarrow w_i(1-\varepsilon)^{\ell_i}$. Its expected total loss satisfies $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$, where $L^*$ is the best expert's loss: randomisation removes the adversary's ability to predict the learner and brings the factor in front of the best expert's loss down from 2 to $1+\varepsilon$.` },

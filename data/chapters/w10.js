@@ -155,10 +155,10 @@
       ['Naive Bayes 是判别式模型', '生成式（学 $P(\\bx,y)$）；logistic regression 才是判别式。'],
     ],
     quiz: [
-      { type: 'num', q: '先验 $\\mathrm{Beta}(1,3)$，抛 6 次 4 次正面。后验均值？', answer: 0.5, explain: '$\\mathrm{Beta}(5,5)$，$5/10$。' },
-      { type: 'num', q: '日出问题：连续升起 8 天，明天升起的概率？', answer: 0.9, explain: '$9/10$。' },
-      { type: 'mc', q: 'Multinomial 似然的共轭先验是：', options: ['Beta', 'Gamma', 'Dirichlet', 'Normal'], answer: 2, explain: 'L19 p17。' },
-      { type: 'mc', q: '"$f(\\theta)\\propto g(\\theta)$ 且 $g$ 是分布 ⇒ $f$ 归一化后就是 $g$"，这让我们可以：', options: ['不用先验', '扔掉常数、只看形状来认出后验', '跳过似然', '直接得到 MLE'], answer: 1, explain: 'L19 p14。' },
+      { type: 'num', q: '先验 $\\mathrm{Beta}(1,3)$，抛 6 次 4 次正面。后验均值？', answer: 0.5, explain: T`要算的是看过数据后正面概率 $q$ 的后验均值。题目给出先验 $\alpha=1,\ \beta=3$，抛 $n=6$ 次、正面 $k=4$ 次，所以反面 $n-k=6-4=2$ 次。**后验 = Beta(正面次数 + $\alpha$，反面次数 + $\beta$)**：$\mathrm{Beta}(4+1,\ 2+3)=\mathrm{Beta}(5,5)$，均值 $\frac{5}{5+5}=0.5$。MLE（最大似然估计）是 $4/6\approx0.667$，先验（均值 $\frac{1}{1+3}=0.25$）把估计往下拉到了 0.5。常见错误：第二个参数加成正面次数 $k$，而不是反面次数 $n-k$。` },
+      { type: 'num', q: '日出问题：连续升起 8 天，明天升起的概率？', answer: 0.9, explain: T`要算的是日出问题里"明天还升起"的概率，也就是后验均值。用均匀先验 $\mathrm{Beta}(1,1)$（$\alpha=\beta=1$）；8 天每天都升起，所以 $n=k=8$，没升起 $0$ 次。后验 $\mathrm{Beta}(8+1,\ 0+1)=\mathrm{Beta}(9,1)$，均值 $\frac{9}{9+1}=0.9$，正是公式 $\frac{k+1}{k+2}=\frac{9}{10}$。**答案不是 1**：先验那一次"假想的没升起"一直留在分母里；直接写 $8/8=1$ 是 MLE 的答案。` },
+      { type: 'mc', q: 'Multinomial 似然的共轭先验是：', options: ['Beta', 'Gamma', 'Dirichlet', 'Normal'], answer: 2, explain: T`Multinomial（多项分布）是 Binomial 的多类版本：每次结果落在 $K$ 类之一，参数是一组加起来为 1 的概率 $(q_1,\dots,q_K)$。它的 conjugate prior（共轭先验）是 Dirichlet，也就是 Beta 的多类版本：把每一类的计数加到对应参数上，后验仍是 Dirichlet。最容易混的是 Beta：它只描述一个 $q\in[0,1]$，配的是只有两类结果的 Binomial。Gamma 配 Poisson（计数），Normal 配 Normal（均值）。L19 p17。` },
+      { type: 'mc', q: '"$f(\\theta)\\propto g(\\theta)$ 且 $g$ 是分布 ⇒ $f$ 归一化后就是 $g$"，这让我们可以：', options: ['不用先验', '扔掉常数、只看形状来认出后验', '跳过似然', '直接得到 MLE'], answer: 1, explain: T`$f\propto g$ 的意思是 $f=C\cdot g$，$C$ 是和 $\theta$ 无关的常数；两边积分得 $\int f\,d\theta=C$（$g$ 是分布，积分为 1），所以 $f/\int f\,d\theta=g$。这就是 uniqueness up to normalisation（归一化唯一性）：算后验时可以扔掉所有和 $q$ 无关的常数（组合数、Gamma 函数、分母 $p(k)$），看到剩下的形状 $q^{k+\alpha-1}(1-q)^{n-k+\beta-1}$ 就认出它是 $\mathrm{Beta}(k+\alpha,\ n-k+\beta)$，不用真的去积分。它并不能省掉先验或似然——这个形状正是二者相乘得来的；它也和 MLE 无关。L19 p14。` },
     ],
   });
 
@@ -279,9 +279,9 @@
       ['Laplace 近似对多峰后验也很好', '一个 Normal 只有一个峰，多峰、偏斜、长尾时都差。'],
     ],
     quiz: [
-      { type: 'mc', q: 'Laplace 近似需要的两样东西：', options: ['后验均值和方差', '后验众数和众数处的二阶导数', '先验和似然的积分', '很多后验样本'], answer: 1, explain: 'L19 p23。' },
-      { type: 'mc', q: 'Variational 方法把推断变成：', options: ['抽样', '优化', '积分', '计数'], answer: 1, explain: 'L19 p22。' },
-      { type: 'num', q: '某一维后验的 log 密度在众数处的二阶导数是 $-25$。Laplace 近似的标准差？', answer: 0.2, explain: '方差 $1/25$，标准差 $1/5$。' },
+      { type: 'mc', q: 'Laplace 近似需要的两样东西：', options: ['后验均值和方差', '后验众数和众数处的二阶导数', '先验和似然的积分', '很多后验样本'], answer: 1, explain: T`Laplace approximation（拉普拉斯近似）用一个 Normal 盖住后验：中心放在后验的 mode（众数，即 MAP 估计、曲线最高点），宽度由 log 后验在众数处的二阶导数决定（一维时方差 $=-1/\text{二阶导}$，多维时 $(-H)^{-1}$）。众数只要做一次优化就能找到，不需要归一化常数，所以这个方法快。最容易选错的是"后验均值和方差"：要算它们就得先把后验归一化，而这正是算不出来的那一步；"很多后验样本"是 Monte Carlo 的做法。L19 p23。` },
+      { type: 'mc', q: 'Variational 方法把推断变成：', options: ['抽样', '优化', '积分', '计数'], answer: 1, explain: T`Variational method（变分方法）先选一个好算的分布族（如 Gaussian、独立 Bernoulli 的乘积），再在族里找和真实后验 $p$ "最接近"的那个 $q$。"找最接近的"就是调 $q$ 的参数让差距最小，所以是一个优化问题。最容易混的是"抽样"：那是 Monte Carlo（蒙特卡洛）方法，从后验抽样本、用样本平均近似期望。一句话记：Monte Carlo = 抽样，variational = 优化。L19 p22。` },
+      { type: 'num', q: '某一维后验的 log 密度在众数处的二阶导数是 $-25$。Laplace 近似的标准差？', answer: 0.2, explain: T`要算的是 Laplace 近似那个 Normal 的标准差。题目给的 $-25$ 是 log 后验在众数处的二阶导数（山顶有多弯）。一维时方差 $=-1/\text{二阶导}=-1/(-25)=1/25=0.04$，标准差 $=\sqrt{0.04}=0.2$。道理：方差为 $s^2$ 的 Normal，log 密度的二阶导恰好是 $-1/s^2$，令它等于 $-25$ 就得到 $s^2=1/25$。陷阱：答成方差 0.04，或漏掉负号得到负的方差。` },
       { type: 'show', q: '（英文）How do Monte Carlo and variational approximations differ?', answer: T`Monte Carlo methods draw samples from the (unnormalised) posterior and approximate expectations by sample averages — inference becomes sampling; they become exact as the number of samples grows but can be slow. Variational methods choose a tractable family (e.g. Gaussians or a product of independent factors) and optimise the member closest to the posterior — inference becomes optimisation; they are fast but limited by the chosen family.` },
     ],
   });
@@ -436,9 +436,9 @@
       ['MLE 时把所有行放一起算 $P(C)$', '$P(C\\mid A,B)$ 要按父节点配置分组，每组单独数。'],
     ],
     quiz: [
-      { type: 'num', q: '6 个二元变量的完整联合表有几行？', answer: 64, explain: '$2^6$。' },
-      { type: 'num', q: '二元节点有 4 个二元父节点，它的 CPT 有几个自由参数？', answer: 16, explain: '$2^4$ 列，每列 1 个自由参数。' },
-      { type: 'num', q: '硬币例子：$P(x_1=0,x_2=1,x_3=1)=?$', answer: 0.025, explain: '$0.5\\times0.5\\times0.1$。' },
+      { type: 'num', q: '6 个二元变量的完整联合表有几行？', answer: 64, explain: T`完整联合表给每一种取值组合一行。每个二元变量有 2 种取值，6 个变量的组合数是 $2\times2\times2\times2\times2\times2=2^6=64$，所以有 64 行（所有行加起来必须是 1，自由参数 $64-1=63$ 个）。变量每多一个，整张表就翻一倍——这正是 Bayesian network（贝叶斯网络）要把它拆成很多张小 CPT 的原因。` },
+      { type: 'num', q: '二元节点有 4 个二元父节点，它的 CPT 有几个自由参数？', answer: 16, explain: T`按课件格式，CPT（条件概率表）的每一列是父节点的一种取值组合，每一行是子节点的一个取值。4 个二元父节点有 $2^4=16$ 种组合，所以 16 列；子节点二元，所以 2 行，表中共 $2\times16=32$ 个数。每一列的两个数加起来必须是 1，知道一个就能算出另一个，所以每列只有 1 个自由参数：$16\times1=16$。陷阱：答 32 是数了表中所有的数（entries），不是自由参数。` },
+      { type: 'num', q: '硬币例子：$P(x_1=0,x_2=1,x_3=1)=?$', answer: 0.025, explain: T`按 BN 的因子分解 $P(x_1,x_2,x_3)=P(x_1)\,P(x_2)\,P(x_3\mid x_1,x_2)$，把三张表里对应的格子乘起来。两枚公平硬币：$P(x_1=0)=0.5$，$P(x_2=1)=0.5$。$x_1x_2=01$ 两枚不同，而 $x_3=1$ 是报告"相同"，即报告说错了，CPT 里那一格是 $0.1$。所以 $0.5\times0.5\times0.1=0.025$。陷阱：把 $x_3=1$ 当成"报告正确"而取 0.9。` },
       { type: 'mc', q: '$P(A)P(B\\mid A)P(C\\mid A,B)$ 对应的图：', options: ['$A\\to B\\to C$', '$A\\to B$，$A\\to C$，$B\\to C$', '$C\\to A$，$C\\to B$', '$A\\to C\\leftarrow B$'], answer: 1, explain: '每个因子竖线右边的变量都指向左边的变量。' },
     ],
   });
@@ -580,10 +580,10 @@
       ['连通 ⇒ 一定相关', '严格说是"图不保证独立"；考试写"does not hold"并给出路径即可。'],
     ],
     quiz: [
-      { type: 'mc', q: 'Alarm 网络中 $E\\perp B$（什么都不观测）成立吗？', options: ['成立', '不成立'], answer: 0, explain: '祖先图只有 $E,B$，没有边。' },
+      { type: 'mc', q: 'Alarm 网络中 $E\\perp B$（什么都不观测）成立吗？', options: ['成立', '不成立'], answer: 0, explain: T`按 D-separation（D 分离）的步骤：① ancestral graph（祖先图）：$X=E$、$Y=B$、条件集为空，$E$ 和 $B$ 都没有父节点，所以祖先图只有 $E,B$ 两个点；② moralize：它们的共同孩子 $A$ 不在祖先图里，不结婚；③④ 去方向，没有要删的点。$E$ 和 $B$ 之间没有任何边，不连通 ⇒ 成立。直觉：地震和盗窃各发生各的，**只有观测到共同结果 $A$（或它的后代 $L$）后才会变相关**。选"不成立"是把这题和 $E\perp B\mid A$ 弄混了。` },
       { type: 'mc', q: 'Alarm 网络中 $E\\perp B\\mid A$ 成立吗？', options: ['成立', '不成立'], answer: 1, explain: '$A$ 是共同孩子；moralize 后 $E$—$B$ 直接相连。' },
       { type: 'mc', q: 'Alarm 网络中 $R\\perp B$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: '祖先图 $\\{R,E,B\\}$，$E\\to R$，$B$ 孤立（$A$ 不在祖先图里，$E,B$ 不结婚）。' },
-      { type: 'mc', q: '链 $A\\to B\\to C\\to D$，$A\\perp D\\mid C$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: '删掉 $C$ 后链断开。' },
+      { type: 'mc', q: '链 $A\\to B\\to C\\to D$，$A\\perp D\\mid C$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: T`按 D-separation 的步骤：① 祖先图：$D$ 的祖先是 $C,B,A$，四个点全保留；② moralize：链上每个点最多一个父节点，没有共同孩子，不加边；③ 去方向得 $A$—$B$—$C$—$D$；④ 删掉条件节点 $C$，剩下 $A$—$B$ 和孤立的 $D$。$A$ 到 $D$ 没有路 ⇒ 成立。这是链结构：知道中间的 $C$ 就挡住了信息。条件节点不必紧挨着 $A$，只要它在 $A$ 到 $D$ 唯一的那条路上就够了。` },
     ],
   });
 
@@ -733,9 +733,9 @@
     ],
     quiz: [
       { type: 'num', q: '4 个节点两两全连（完全图）。有几个极大团？', answer: 1, explain: '整个 4 个节点就是一个团。' },
-      { type: 'num', q: '无向链 $A$—$B$—$C$—$D$ 有几个极大团？', answer: 3, explain: '$\\{A,B\\},\\{B,C\\},\\{C,D\\}$。' },
-      { type: 'mc', q: '无向链 $A$—$B$—$C$，$A\\perp C\\mid B$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: '删掉 $B$ 后不连通。' },
-      { type: 'mc', q: '哪种独立性 MRF 表达不了？', options: ['4-环的两条条件独立', 'v-structure 的"边缘独立但条件相关"', '链的条件独立', '完全独立'], answer: 1, explain: 'L20 p33。' },
+      { type: 'num', q: '无向链 $A$—$B$—$C$—$D$ 有几个极大团？', answer: 3, explain: T`clique（团）是两两之间都有边的一组点；maximal clique（极大团）是再加任何一个点就不再是团的团。链上只有三条边 $A$—$B$、$B$—$C$、$C$—$D$，没有三角形：例如 $\{A,B,C\}$ 缺 $A$—$C$ 这条边，不是团。所以每条边各是一个极大团：$\{A,B\},\{B,C\},\{C,D\}$，共 3 个。单个点（如 $\{B\}$）也是团，但能扩成 $\{A,B\}$，不算极大。` },
+      { type: 'mc', q: '无向链 $A$—$B$—$C$，$A\\perp C\\mid B$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: T`MRF（马尔可夫随机场）读独立性只用普通的图分离：删掉条件集里的点，看 $X$、$Y$ 还连不连通。这里删掉 $B$ 后，$A$ 到 $C$ 唯一的路 $A$—$B$—$C$ 断了，不连通 ⇒ $A\perp C\mid B$ 成立。无向图不用取祖先图、也不用 moralize，那些步骤只属于 BN 的 D-separation。` },
+      { type: 'mc', q: '哪种独立性 MRF 表达不了？', options: ['4-环的两条条件独立', 'v-structure 的"边缘独立但条件相关"', '链的条件独立', '完全独立'], answer: 1, explain: T`v-structure（汇合结构）$x_1\to x_3\leftarrow x_2$ 表达的是：$X_1\perp X_2$ 成立，但给定 $X_3$ 后不再独立。MRF 只能用"删掉条件集后是否连通"表达独立：$x_1$、$x_2$ 之间若没有路，给定 $x_3$ 后也照样分开；若有路，什么都不给时它们就连着，读不出 $X_1\perp X_2$。所以没有任何无向图能做到"不给时独立、给了反而相关"。最容易误选的"4-环的两条条件独立"正好相反：那是 MRF 能表达、BN 表达不了的。L20 p33。` },
     ],
   });
 

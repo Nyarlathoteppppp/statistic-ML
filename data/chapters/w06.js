@@ -136,9 +136,9 @@
       ['数参数时忘了 bias', '每个单元多一个 bias 参数。'],
     ],
     quiz: [
-      { type: 'num', q: '全连接网络 5 输入 → 3 隐藏 → 1 输出（都有 bias）。参数总数？', answer: 22, explain: '$(5+1)\\times3+(3+1)\\times1=18+4=22$。' },
-      { type: 'num', q: 'ReLU：$f(-3)=?$', answer: 0, explain: '$\\max(0,-3)$。' },
-      { type: 'mc', q: '下面哪个**不能**单靠一个 perceptron 实现？', options: ['AND', 'OR', 'NOT', 'XOR'], answer: 3, explain: 'XOR 线性不可分。' },
+      { type: 'num', q: '全连接网络 5 输入 → 3 隐藏 → 1 输出（都有 bias）。参数总数？', answer: 22, explain: T`Fully connected（全连接）层里，每个单元连着上一层的每个输入，外加 1 个 bias，所以每个单元有"输入数 + 1"个参数。隐藏层：3 个单元，每个连 5 个输入 + 1 个 bias，共 $(5+1)\times3=18$；输出层：1 个单元，连 3 个隐藏单元 + 1 个 bias，共 $(3+1)\times1=4$。合计 $18+4=22$。**漏算 bias 会得到 $5\times3+3\times1=18$。**` },
+      { type: 'num', q: 'ReLU：$f(-3)=?$', answer: 0, explain: T`ReLU（rectified linear unit，线性整流）是 $f(s)=\max(0,s)$：正数原样输出，负数一律变成 0。$-3<0$，所以 $f(-3)=\max(0,-3)=0$。别答成 3（那是取绝对值）或 $-3$（那是原样输出）。负半轴输出恒为 0、导数也为 0，所以这样的输入会让 ReLU 单元"关闭"。` },
+      { type: 'mc', q: '下面哪个**不能**单靠一个 perceptron 实现？', options: ['AND', 'OR', 'NOT', 'XOR'], answer: 3, explain: T`一个 perceptron 是线性分类器，只能用一条直线把两类分开。XOR 的正类是 $(0,1),(1,0)$、负类是 $(0,0),(1,1)$，同类点在对角上，**没有任何一条直线能把它们分开（线性不可分）**。AND（如 $x_1+x_2-1.5\ge0$）、OR（$x_1+x_2-0.5\ge0$）都能被一条直线分开；NOT 只有一个输入，$g(-x_1)$ 就够。XOR 需要两层：先算 OR 和 AND，再组合成"OR 且 非 AND"。` },
       { type: 'mc', q: 'L11 p22 说深网络相比单个很宽的隐藏层：', options: ['理论上更强', '经验上通常更准确', '没有梯度消失', '参数一定更少'], answer: 1, explain: '理论上一层就够，经验上深更好。' },
       { type: 'show', q: '（英文）Why do neural networks need non-linear activation functions?', answer: T`Without them every layer is a linear map, and a composition of linear maps is linear, so the whole network would be equivalent to a single linear model and could not represent non-linearly separable functions such as XOR. Non-linear activations make the composition non-linear, giving universal approximation capability.` },
       { type: 'show', q: '（英文）If one wide hidden layer is a universal approximator, why use deep networks?', answer: T`Universal approximation only says a network with one hidden layer of sufficient width exists; it may need very many units and says nothing about learning it. Deep networks represent compositional structure more efficiently (simple features combined into more complex ones layer by layer) and work better in practice, at the cost of harder optimisation such as vanishing gradients.` },
@@ -267,9 +267,9 @@
       ['$\\delta$ 总是 $z-y$', '只在平方损失 + 恒等输出时；其他组合要重新求 $\\partial L/\\partial s$（如 sigmoid + cross-entropy 恰好也是 $z-y$）。'],
     ],
     quiz: [
-      { type: 'num', q: '平方损失、恒等输出，$z=0.3$，$y=1$。$\\delta=?$', answer: -0.7, explain: '$z-y$。' },
-      { type: 'num', q: '接上，$u_2=0.5$。$\\partial L/\\partial w_2=?$', answer: -0.35, explain: '$\\delta u_2$。' },
-      { type: 'num', q: "接上，$w_2=2$，sigmoid 隐藏层 $u_2=0.5$。$\\varepsilon_2=?$", answer: -0.35, explain: "$-0.7\\times2\\times0.5\\times0.5=-0.35$。" },
+      { type: 'num', q: '平方损失、恒等输出，$z=0.3$，$y=1$。$\\delta=?$', answer: -0.7, explain: T`$\delta$ 是损失对输出得分 $s$ 的导数 $\partial L/\partial s$。平方损失 $L=\frac12(z-y)^2$ 对 $z$ 求导得 $z-y$；恒等输出 $z=s$ 时 $\partial z/\partial s=1$，所以 $\delta=z-y$。代入 $z=0.3$、$y=1$：$\delta=0.3-1=-0.7$。负号表示预测偏小，梯度下降会把输出往上推。**顺序是 $z-y$（预测减真值）**，写成 $y-z=0.7$ 符号就反了。` },
+      { type: 'num', q: '接上，$u_2=0.5$。$\\partial L/\\partial w_2=?$', answer: -0.35, explain: T`输出层权重的梯度 $\partial L/\partial w_2=\frac{\partial L}{\partial s}\cdot\frac{\partial s}{\partial w_2}$。第一项就是上一题的 $\delta=-0.7$；因为 $s=\sum_ju_jw_j$，$s$ 对 $w_2$ 的导数就是 $w_2$ 这条连线的输入 $u_2=0.5$。所以 $\partial L/\partial w_2=\delta u_2=-0.7\times0.5=-0.35$。梯度为负，梯度下降会把 $w_2$ 调大，让偏小的输出变大。` },
+      { type: 'num', q: "接上，$w_2=2$，sigmoid 隐藏层 $u_2=0.5$。$\\varepsilon_2=?$", answer: -0.35, explain: T`$\varepsilon_2=\partial L/\partial r_2$ 是隐藏单元 2 的误差项，公式 $\varepsilon_2=\delta\,w_2\,g'(r_2)$：输出误差 $\delta$，乘它通往输出的权重 $w_2$，再乘激活函数在 $r_2$ 处的斜率。sigmoid 的导数是 $g'(r_2)=u_2(1-u_2)=0.5\times(1-0.5)=0.25$。代入 $\delta=-0.7$、$w_2=2$：$\varepsilon_2=-0.7\times2\times0.25=-0.35$。**常见错误是把 $g'(r_2)$ 写成 $u_2=0.5$**（sigmoid 的导数不是它自己），那样会得到 $-0.7$。` },
       { type: 'mc', q: 'Backprop 高效的主要原因：', options: ['用了二阶导', '误差项在层间复用，一次反向遍历算出全部梯度', '只更新输出层', '不需要前向计算'], answer: 1, explain: 'L11 p30–p31。' },
     ],
   });
@@ -376,9 +376,9 @@
       ['Momentum 公式里减的是梯度', '减的是速度 $\\mathbf v$（包含了历史梯度）。'],
     ],
     quiz: [
-      { type: 'num', q: 'Momentum $\\alpha=0.5$，$\\eta=1$，$v=2$，当前梯度 1。新的 $v=?$', answer: 2, explain: '$0.5\\times2+1=2$。' },
-      { type: 'mc', q: 'Mini-batch SGD 的主要好处：', options: ['梯度精确', '在稳定性和计算量之间折中，可并行', '保证全局最优', '不需要学习率'], answer: 1, explain: 'L12 p9。' },
-      { type: 'mc', q: 'Adam 结合了：', options: ['SGD 和 Newton', 'momentum 和自适应学习率', 'dropout 和 weight decay', 'GD 和 early stopping'], answer: 1, explain: 'L12 p14。' },
+      { type: 'num', q: 'Momentum $\\alpha=0.5$，$\\eta=1$，$v=2$，当前梯度 1。新的 $v=?$', answer: 2, explain: T`Momentum（动量）更新速度 $v\leftarrow\alpha v+\eta\nabla L$：上一步的速度保留 $\alpha$ 的比例，再加上这一步的梯度。代入 $\alpha=0.5$、旧的 $v=2$、$\eta=1$、当前梯度 1：$0.5\times2+1\times1=1+1=2$。参数接着走 $\theta\leftarrow\theta-v$，这一步走 2，比普通梯度下降的 $\eta\times1=1$ 多，多出来的就是"惯性"。**旧速度要先乘 $\alpha$**，直接相加会得到 3。` },
+      { type: 'mc', q: 'Mini-batch SGD 的主要好处：', options: ['梯度精确', '在稳定性和计算量之间折中，可并行', '保证全局最优', '不需要学习率'], answer: 1, explain: T`课件对比三种做法：SGD 每次只用 1 个样本，更新快但梯度方差大、很抖；GD 每次用全部数据，稳定但慢、计算贵；mini-batch（小批量）每次用 $1<b<N$ 个样本（如 $b=100$），**在计算量和稳定性之间折中**，而且一批样本可以在 GPU 上并行算。误选"梯度精确"：只有用全部数据的 GD 才算出精确梯度，mini-batch 仍是估计。它也不保证全局最优，也照样需要学习率。L12 p9。` },
+      { type: 'mc', q: 'Adam 结合了：', options: ['SGD 和 Newton', 'momentum 和自适应学习率', 'dropout 和 weight decay', 'GD 和 early stopping'], answer: 1, explain: T`Adam 的 $\mathbf m$ 是梯度的滑动平均，作用和 momentum 的速度一样（记住方向、带惯性）；$\mathbf v$ 是梯度平方的滑动平均，用 $\eta/\sqrt{\hat{\mathbf v}+\epsilon}$ 给每个参数单独定步长，这就是 Adagrad 式的自适应学习率。**所以 Adam = momentum + 自适应学习率**，课件这一页的第一句就是这么说的。误选"SGD 和 Newton"：Adam 只用一阶梯度（和它的平方），不算 Newton 法需要的二阶导（Hessian）。L12 p14。` },
       { type: 'show', q: '（英文）Compare batch gradient descent, SGD and mini-batch SGD.', answer: T`Batch GD uses the gradient of the loss over the whole training set: each step is accurate and stable but expensive for large data. SGD uses the gradient of a single example: each update is very cheap but noisy (high variance), which can also help escape shallow local optima and saddle points. Mini-batch SGD averages the gradient over a small batch: it reduces the noise relative to SGD while keeping updates cheap, and it uses vectorised / parallel hardware efficiently, so it is the standard choice for training neural networks.` },
     ],
   });
@@ -472,8 +472,8 @@
       ['Weight decay 只惩罚输出层', 'L12 p19 对 $v_{ij}$ 和 $w_j$ 都惩罚。'],
     ],
     quiz: [
-      { type: 'num', q: 'Weight decay：$w=2$，数据梯度 0，$\\lambda=0.25$，$\\eta=0.1$。新的 $w=?$', answer: 1.9, explain: '总梯度 $2\\times0.25\\times2=1$，$2-0.1=1.9$。' },
-      { type: 'mc', q: '下面哪个是 implicit regularisation？', options: ['dropout', 'weight decay', 'early stopping', '$L_1$ 惩罚'], answer: 2, explain: 'L12 p18。' },
+      { type: 'num', q: 'Weight decay：$w=2$，数据梯度 0，$\\lambda=0.25$，$\\eta=0.1$。新的 $w=?$', answer: 1.9, explain: T`Weight decay（权重衰减）在损失上加 $\lambda w^2$，求导多出 $2\lambda w$，所以总梯度 = 数据梯度 + $2\lambda w$。代入：数据梯度 0，$2\lambda w=2\times0.25\times2=1$，总梯度 $0+1=1$。更新 $w\leftarrow w-\eta\times1=2-0.1\times1=1.9$；等价写法 $(1-2\eta\lambda)w=(1-0.05)\times2=1.9$。**即使数据梯度为 0，权重也会每步按比例缩小**，这就是"衰减"。漏了因子 2 会算成 1.95。` },
+      { type: 'mc', q: '下面哪个是 implicit regularisation？', options: ['dropout', 'weight decay', 'early stopping', '$L_1$ 惩罚'], answer: 2, explain: T`课件把 early stopping（早停）称为 implicit regularisation（隐式正则化）：它不改损失函数，只是在验证误差开始上升时停止训练。权重从 0 附近的随机小值出发，停得早就没机会长大；对 tanh 这类在 0 附近接近直线的激活，网络因此被拉向一个线性模型。**weight decay 和 $L_1$ 惩罚都是在损失上显式加惩罚项，属于显式正则化**；dropout 在 L12 p20 单独讲，靠训练时随机屏蔽单元起作用。L12 p18。` },
       { type: 'mc', q: 'Weight decay 在 Bayesian 视角下对应：', options: ['Laplace 先验', 'Gaussian 先验', '均匀先验', 'Beta 先验'], answer: 1, explain: '$L_2$ 惩罚 = Gaussian 先验（c17）。' },
     ],
   });
@@ -584,8 +584,8 @@
       ['PCA 不需要中心化', '必须先减均值（L12 p29）。'],
     ],
     quiz: [
-      { type: 'num', q: '协方差特征值 6、3、1。保留前两个主成分解释的方差比例？', answer: 0.9, explain: '$9/10$。' },
-      { type: 'mc', q: 'PCA 中 $\\mathbf p_1\'\\Sigma_x\\mathbf p_1$ 在最优点等于：', options: ['0', '1', '最大特征值', '迹'], answer: 2, explain: '$\\lambda_1$。' },
+      { type: 'num', q: '协方差特征值 6、3、1。保留前两个主成分解释的方差比例？', answer: 0.9, explain: T`PCA 中每个特征值就是数据沿对应主成分方向的方差，所有特征值之和就是总方差。总方差 $6+3+1=10$；前两个主成分取最大的两个特征值，方差 $6+3=9$；比例 $9/10=0.9$，即只保留两维就留下了 90% 的方差。**分母是全部特征值之和**；只写 $6/10$ 是只算了第一个主成分。` },
+      { type: 'mc', q: 'PCA 中 $\\mathbf p_1\'\\Sigma_x\\mathbf p_1$ 在最优点等于：', options: ['0', '1', '最大特征值', '迹'], answer: 2, explain: T`最优点由拉格朗日条件给出 $\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1$（$\mathbf p_1$ 是特征向量）。两边左乘 $\mathbf p_1'$：$\mathbf p_1'\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1'\mathbf p_1=\lambda_1\times1=\lambda_1$（用了约束 $\|\mathbf p_1\|=1$）。这个量是沿 $\mathbf p_1$ 的投影方差，要它最大，就取**最大**特征值。误选"1"是把约束 $\mathbf p_1'\mathbf p_1=1$ 当成了答案；"迹"是全部特征值之和，即所有方向的总方差。` },
       { type: 'mc', q: '下面哪个**不能**防止 autoencoder 直接复制输入？', options: ['窄的 bottleneck', '对输入加噪声', '让 $\\mathbf u$ 稀疏', '让 bottleneck 比输入更宽'], answer: 3, explain: 'L12 p25–p26。' },
     ],
   });

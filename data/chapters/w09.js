@@ -156,7 +156,7 @@
     quiz: [
       { type: 'num', q: '$\\mu=(0.1,0.4,0.9)$，$T=100$ 轮里各被拉 $(10,10,80)$ 次。期望 regret？', answer: 13, explain: '最好的臂均值 $\\mu^*=0.9$。臂 1 每拉一次比最优少 $0.9-0.1=0.8$，臂 2 少 $0.9-0.4=0.5$，臂 3 就是最优、差 0。期望 regret $=10\\times0.8+10\\times0.5+80\\times0=13$。' },
       { type: 'mc', q: 'Greedy、$Q_0=-\\infty$，第 1 轮拉了臂 2。之后：', options: ['每个臂各拉一次', '永远拉臂 2', '随机拉', '轮流拉'], answer: 1, explain: '臂 2 的有限平均值总大于 $-\\infty$（L17 p8）。' },
-      { type: 'num', q: 'ε-greedy，$\\varepsilon=0.3$，$k=3$。拉当前最好臂的概率？', answer: 0.8, explain: '$0.7+0.3/3$。' },
+      { type: 'num', q: 'ε-greedy，$\\varepsilon=0.3$，$k=3$。拉当前最好臂的概率？', answer: 0.8, explain: T`ε-greedy 有两条路拉到当前最好的臂。利用：概率 $1-\varepsilon=1-0.3=0.7$，直接拉它。探索：概率 $\varepsilon=0.3$ 在全部 $k=3$ 个臂里均匀随机挑，挑中它的概率是 $1/3$，贡献 $0.3\times\frac13=0.1$。两条路相加 $0.7+0.1=0.8$。**易漏的是第二条路**：探索时也可能恰好抽到最好的臂，只答 0.7 就错了。` },
       { type: 'show', q: '（英文）What is the main weakness of ε-greedy that UCB addresses?', answer: T`ε-greedy explores blindly: with probability ε it picks an arm uniformly at random, ignoring how promising or how uncertain each arm is, and when it exploits it ignores how reliable each average is. Optimistic initialisation only helps at the start. UCB directs exploration by adding a bonus that is large for arms pulled few times, so it tries arms that could still be good and stops trying clearly bad, well-estimated arms.` },
     ],
   });
@@ -295,10 +295,10 @@
       ['UCB 的 ε 和 ε-greedy 的 ε 是一回事', 'Hoeffding 里的 ε 是失败概率（取 $1/t^4$，置信水平是 $1-\\varepsilon$），和探索率无关。'],
     ],
     quiz: [
-      { type: 'num', q: '三个臂已拉 $(10,5,5)$ 次，下一轮 $t$ 是多少？', answer: 21, explain: '$20+1$。' },
-      { type: 'num', q: '$\\ln t\\approx2$，某臂 $N=16$，$\\hat\\mu=0.5$。UCB 值？', answer: 1, explain: '$0.5+\\sqrt{4/16}=0.5+0.5$。' },
-      { type: 'mc', q: '一个臂很久没被拉，它的 UCB bonus 会：', options: ['不变', '慢慢变大', '慢慢变小', '变成 0'], answer: 1, explain: '$N$ 不变而 $\\ln t$ 增大。' },
-      { type: 'mc', q: 'UCB bonus 的理论来源是：', options: ['中心极限定理', 'Hoeffding 不等式', 'Bayes 公式', 'VC 维'], answer: 1, explain: 'L17 p17，取 $\\varepsilon=1/t^4$。' },
+      { type: 'num', q: '三个臂已拉 $(10,5,5)$ 次，下一轮 $t$ 是多少？', answer: 21, explain: T`UCB 里的 $t$ 是全局的当前轮号，所有臂共用，等于已拉总次数加 1。三个臂的次数相加 $10+5+5=20$，说明已经过了 20 轮，下一轮是第 $20+1=21$ 轮，所以 $t=21$。常见错误：拿某个臂自己的次数（如 10）当 $t$，或**忘了加 1** 答成 20。` },
+      { type: 'num', q: '$\\ln t\\approx2$，某臂 $N=16$，$\\hat\\mu=0.5$。UCB 值？', answer: 1, explain: T`UCB 值 = 平均奖励 + exploration bonus（探索奖励）：$Q=\hat\mu+\sqrt{2\ln t/N}$。题目给 $\hat\mu=0.5$、$\ln t\approx2$、该臂被拉次数 $N=16$。bonus：$2\ln t=2\times2=4$，$4/16=0.25$，开方 $\sqrt{0.25}=0.5$。$Q=0.5+0.5=1$。两个陷阱：忘了根号里的 2（得 $\sqrt{2/16}\approx0.35$），或**忘了开方**（得 $0.5+0.25=0.75$）。` },
+      { type: 'mc', q: '一个臂很久没被拉，它的 UCB bonus 会：', options: ['不变', '慢慢变大', '慢慢变小', '变成 0'], answer: 1, explain: T`bonus 是 $\sqrt{2\ln t/N_{t-1}(i)}$。臂没被拉，它的次数 $N$ 停在原值；而轮号 $t$ 每轮加 1，$\ln t$ 慢慢增大，所以 bonus 慢慢变大，**这个臂迟早会被再试一次**，不会像 greedy 那样被永远放弃。"不变"是最诱人的错项：它只看到 $N$ 不变，忽略了所有臂共用的 $t$ 一直在涨。` },
+      { type: 'mc', q: 'UCB bonus 的理论来源是：', options: ['中心极限定理', 'Hoeffding 不等式', 'Bayes 公式', 'VC 维'], answer: 1, explain: T`Hoeffding's inequality（Hoeffding 不等式）说：$n$ 个取值在 $[0,1]$ 的 i.i.d. 奖励，以至少 $1-\varepsilon$ 的概率有 $\mu\le\overline R_n+\sqrt{\ln(1/\varepsilon)/(2n)}$，右边就是真实均值的置信上界。把 $n$ 换成该臂的次数 $N_{t-1}(i)$，并取失败概率 $\varepsilon=1/t^4$：$\ln(1/\varepsilon)=4\ln t$，**$\sqrt{4\ln t/(2N)}=\sqrt{2\ln t/N}$ 正是 UCB 的 bonus**。central limit theorem（中心极限定理）只在样本多时给近似，Hoeffding 对任意 $n$ 都成立，课件用的是后者。L17 p17。` },
     ],
   });
 
@@ -377,8 +377,8 @@
       ['有了上下文就不需要探索', '仍然需要；UCB 加在回归预测上。'],
     ],
     quiz: [
-      { type: 'mc', q: 'Contextual bandit 里奖励估计变成了：', options: ['分类问题', '回归问题', '聚类问题', '不需要估计'], answer: 1, explain: '$E[R_i(t)\\mid\\bX_i(t)]$（L17 p25）。' },
-      { type: 'mc', q: 'RL 比 contextual bandit 多了什么？', options: ['奖励', '上下文', '动作会影响下一个状态', '探索'], answer: 2, explain: 'L17 p26。' },
+      { type: 'mc', q: 'Contextual bandit 里奖励估计变成了：', options: ['分类问题', '回归问题', '聚类问题', '不需要估计'], answer: 1, explain: T`普通 bandit 对每个臂只估一个数：平均奖励 $E[R_i(t)]$。contextual bandit（上下文老虎机）每轮先看到上下文特征向量 $\bX_i(t)$，奖励随它变，要估的变成条件期望 $E[R_i(t)\mid\bX_i(t)]$：输入特征、输出一个实数（期望奖励），**这正是 regression（回归）**。不是分类：要预测的是期望奖励这个连续值，不是离散类别。选臂时仍取 UCB 最大的臂，只是 UCB 加在回归预测上。L17 p25。` },
+      { type: 'mc', q: 'RL 比 contextual bandit 多了什么？', options: ['奖励', '上下文', '动作会影响下一个状态', '探索'], answer: 2, explain: T`contextual bandit 已经有状态（上下文），但下一个状态是"自己来的"，和你选了什么动作无关。reinforcement learning（强化学习）里 **（状态, 动作）决定下一个状态**：比如下围棋，这一步落子决定了下一步面对的棋局，所以 RL 要把预测的奖励往未来展开（roll out）。"上下文"不对：contextual bandit 本来就有上下文；奖励和探索两者也都有。L17 p26。` },
     ],
   });
 
@@ -550,9 +550,9 @@
       ['Sequential 更新和一次性更新结果不同', '完全相同（今天的后验 = 明天的先验）。'],
     ],
     quiz: [
-      { type: 'num', q: '$y=wx+$噪声，$\\sigma^2=1$，$\\gamma^2=1$，数据 $x=(1,1)$，$y=(2,2)$。$w_N=?$', answer: 1.3333, tol: 0.002, explain: '$\\sum x^2=2$，$\\sum xy=4$，$4/(2+1)$。' },
-      { type: 'num', q: '接上，$V_N=?$', answer: 0.3333, tol: 0.002, explain: '$1/(2+1)$。' },
-      { type: 'num', q: '接上，$x_*=3$ 的预测方差？', answer: 4, explain: '$1+9\\times\\frac13$。' },
+      { type: 'num', q: '$y=wx+$噪声，$\\sigma^2=1$，$\\gamma^2=1$，数据 $x=(1,1)$，$y=(2,2)$。$w_N=?$', answer: 1.3333, tol: 0.002, explain: T`求 Bayesian 线性回归的后验均值 $w_N$。一维（一个权重、无截距）公式是 $w_N=\frac{\sum x_iy_i}{\sum x_i^2+\sigma^2/\gamma^2}$。从数据算：$\sum x_i^2=1^2+1^2=2$，$\sum x_iy_i=1\times2+1\times2=4$；题目给 $\sigma^2/\gamma^2=1/1=1$。$w_N=4/(2+1)=4/3\approx1.333$。只看数据的 MLE 是 $4/2=2$；**分母多出的 1 来自先验**，把估计往 0 拉，和 ridge 一样。` },
+      { type: 'num', q: '接上，$V_N=?$', answer: 0.3333, tol: 0.002, explain: T`$V_N$ 是后验方差，衡量对 $w$ 还有多不确定。一维公式 $V_N=\frac{\sigma^2}{\sum x_i^2+\sigma^2/\gamma^2}$，沿用上一题：$\sigma^2=1$，$\sum x_i^2=2$，$\sigma^2/\gamma^2=1$。$V_N=1/(2+1)=1/3\approx0.333$。它比先验方差 $\gamma^2=1$ 小：看过数据后对 $w$ 更确定了。易错点是忘了分子的 $\sigma^2$（本题 $\sigma^2=1$ 看不出差别，别的题会错）。` },
+      { type: 'num', q: '接上，$x_*=3$ 的预测方差？', answer: 4, explain: T`predictive variance（预测方差）$\sigma_N^2(x_*)=\sigma^2+x_*^2V_N$ 是两块相加：$\sigma^2=1$ 是数据本身的噪声，处处一样；$x_*^2V_N$ 是"对 $w$ 还不确定"带来的部分。代入测试点 $x_*=3$ 和上一题的 $V_N=1/3$：$x_*^2V_N=9\times\frac13=3$。预测方差 $=1+3=4$。**$x_*$ 离 0 越远，第二项越大**；只答 $\sigma^2=1$ 是 MLE/MAP 的固定方差，忘了把 $x_*$ 平方会得到 $1+3\times\frac13=2$。` },
       { type: 'mc', q: 'Bayesian 线性回归的后验均值 $\\bw_N$ 等于：', options: ['MLE', '$\\lambda=\\sigma^2/\\gamma^2$ 的 ridge 解', 'lasso 解', '0'], answer: 1, explain: 'Normal 后验的均值 = 众数 = MAP = ridge。' },
       { type: 'mc', q: '哪类测试点的预测方差通常最大？', options: ['训练数据最密的地方', '落在训练数据没约束住的权重方向上（典型：远离数据外推）', '处处相同', '原点'], answer: 1, explain: '$\\bx_*\'\\mathbf V_N\\bx_*$ 在数据没约束住的方向上大（L18 p25）。' },
       { type: 'show', q: '（英文）What is sequential Bayesian updating?', answer: T`Start from the prior; after observing a data point, compute the posterior; then use that posterior as the prior for the next data point, and repeat: $p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$. With conditionally independent observations this gives exactly the same posterior as processing all data at once, and the posterior becomes more peaked as data accumulate.` },

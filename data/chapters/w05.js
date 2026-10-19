@@ -153,9 +153,9 @@
       ['dual 总比 primal 快', '取决于 $n$ 和 $d$；样本多时 primal 可能更好（讲者）。'],
     ],
     quiz: [
-      { type: 'mc', q: 'KKT 中的 complementary slackness 是：', options: ['$\\lambda_i\\ge0$', '$g_i(\\bx^*)\\le0$', '$\\lambda_i^*g_i(\\bx^*)=0$', '$\\nabla\\mathcal L=0$'], answer: 2, explain: 'L09 p7。' },
+      { type: 'mc', q: 'KKT 中的 complementary slackness 是：', options: ['$\\lambda_i\\ge0$', '$g_i(\\bx^*)\\le0$', '$\\lambda_i^*g_i(\\bx^*)=0$', '$\\nabla\\mathcal L=0$'], answer: 2, explain: T`Complementary slackness（互补松弛）说**乘子和约束值的乘积为 0**：$\lambda_i^*g_i(\bx^*)=0$。所以两者至少有一个是 0：约束不紧（$g_i<0$）时乘子必须为 0；乘子大于 0 时约束必须是紧的（$g_i=0$）。放到 SVM 里：只有压在 margin 线上的支持向量才可能有 $\lambda_i>0$。其余选项是 KKT 的另外三条：$\lambda_i\ge0$ 是 dual feasibility（对偶可行），$g_i(\bx^*)\le0$ 是 primal feasibility（原可行），$\nabla\mathcal L=0$ 是 stationarity（驻点）。L09 p7。` },
       { type: 'num', q: '某 SVM dual 解 $\\lambda=(0,0.5,0,0.5)$，$y=(+1,+1,-1,-1)$，$\\bx_2=(2,1)$，$\\bx_4=(0,1)$。$w_1^*=?$', answer: 1, explain: '$\\bw=\\sum_i\\lambda_iy_i\\bx_i$，只有 $\\lambda_2,\\lambda_4$ 非零。第 2 点标签 $+1$：贡献 $0.5\\times(+1)\\times(2,1)=(1,0.5)$；第 4 点标签 $-1$：贡献 $0.5\\times(-1)\\times(0,1)=(0,-0.5)$。相加 $(1,0)$，所以 $w_1^*=1$。' },
-      { type: 'mc', q: 'Soft-margin SVM dual 的约束是：', options: ['$\\lambda_i\\ge0$', '$0\\le\\lambda_i\\le C$，$\\sum\\lambda_iy_i=0$', '$\\lambda_i\\le C$ 仅此', '$\\lambda_i=C$'], answer: 1, explain: 'L09 p12。' },
+      { type: 'mc', q: 'Soft-margin SVM dual 的约束是：', options: ['$\\lambda_i\\ge0$', '$0\\le\\lambda_i\\le C$，$\\sum\\lambda_iy_i=0$', '$\\lambda_i\\le C$ 仅此', '$\\lambda_i=C$'], answer: 1, explain: T`soft-margin SVM 的 dual 目标和 hard margin 完全一样，变的只有约束：$\lambda_i\ge0$ 多了一个上界，变成 **box constraints（盒约束）$0\le\lambda_i\le C$**；$\sum_i\lambda_iy_i=0$ 仍然保留，因为它来自对 $b$ 求导，soft margin 里 $b$ 还在。上界 $C$ 就是目标里罚 slack 的那个系数 $C$：一个点的乘子不能超过违规的"单价"。只写"$\lambda_i\ge0$"是 hard margin 的约束；"仅 $\lambda_i\le C$"漏了 $\lambda_i\ge0$ 和 $\sum\lambda_iy_i=0$。L09 p12。` },
       { type: 'show', q: '（英文）How are support vectors identified from the dual solution?', answer: T`They are the training points with $\lambda_i^*>0$. By complementary slackness $\lambda_i^*(1-y_i(\mathbf w^{*\prime}\mathbf x_i+b^*))=0$, so (hard margin) $\lambda_i^*>0$ forces $y_i(\mathbf w^{*\prime}\mathbf x_i+b^*)=1$: functional margin 1, i.e. the point lies on the margin at Euclidean distance $1/\|\mathbf w^*\|$. Points with $\lambda_i^*=0$ do not affect $\mathbf w^*=\sum_i\lambda_i^*y_i\mathbf x_i$. (Soft margin: support vectors with $\lambda_i=C$ may lie inside the margin or be misclassified, $\xi_i>0$.)` },
     ],
   });
@@ -277,8 +277,8 @@
       ['kernel SVM 要存 $\\bw$', '只存支持向量和 $\\lambda_i$；无限维时 $\\bw$ 算不出来也不需要。'],
     ],
     quiz: [
-      { type: 'num', q: '$\\bu=(1,0)$，$\\bv=(2,3)$，$K=(\\bu\'\\bv+1)^2$。$K=?$', answer: 9, explain: '$(2+1)^2$。' },
-      { type: 'num', q: 'RBF，$\\gamma=1$，$\\|\\bu-\\bv\\|^2=\\ln 4$（≈1.386）。$K=?$', answer: 0.25, explain: '$e^{-\\ln4}=1/4$。' },
+      { type: 'num', q: '$\\bu=(1,0)$，$\\bv=(2,3)$，$K=(\\bu\'\\bv+1)^2$。$K=?$', answer: 9, explain: T`多项式核 $(\bu'\bv+1)^2$ 的算法：先算点积，再加 1，最后平方。点积 $\bu'\bv=1\times2+0\times3=2$；加 1 得 $3$；平方得 $3^2=9$。这个 9 等于 6 维特征空间里 $\varphi(\bu)'\varphi(\bv)$ 的值，但不用写出 $\varphi$，这就是 kernel trick。**顺序别弄反**：先平方再加 1 会得到 $2^2+1=5$。` },
+      { type: 'num', q: 'RBF，$\\gamma=1$，$\\|\\bu-\\bv\\|^2=\\ln 4$（≈1.386）。$K=?$', answer: 0.25, explain: T`RBF kernel（径向基核）是 $K=\exp(-\gamma\|\bu-\bv\|^2)$。题目直接给了距离的平方 $\|\bu-\bv\|^2=\ln4$（不用再平方），$\gamma=1$，所以指数是 $-1\times\ln4=-\ln4$。用 $e^{\ln a}=a$：$e^{-\ln4}=\frac{1}{e^{\ln4}}=\frac14=0.25$。RBF 的值总在 $(0,1]$ 里：两点重合时为 1，越远越接近 0。**别漏掉指数里的负号**，漏了会得到 4，超出了 RBF 的取值范围。` },
       { type: 'mc', q: '为什么 SVM 能用 kernel？', options: ['因为 primal 是凸的', '因为 dual 的训练和预测只用到数据的点积', '因为 hinge loss', '因为支持向量少'], answer: 1, explain: 'L09 p19–p24。' },
       { type: 'mc', q: 'RBF kernel 对应的特征空间维度是：', options: ['2', '与输入相同', '$d+1$', '无限'], answer: 3, explain: 'L09 p34 的泰勒展开。' },
       { type: 'show', q: '（英文）Give the feature map for $K(\\mathbf u,\\mathbf v)=(\\mathbf u\'\\mathbf v)^2$ in 2D.', answer: T`$(\mathbf u'\mathbf v)^2=u_1^2v_1^2+2u_1u_2v_1v_2+u_2^2v_2^2=\varphi(\mathbf u)'\varphi(\mathbf v)$ with $\varphi(\mathbf x)=[x_1^2,\ \sqrt2\,x_1x_2,\ x_2^2]'$.` },
@@ -395,8 +395,8 @@
       ['任何相似度都能当 kernel', '必须隐含一个特征空间点积（L09 p36）。'],
     ],
     quiz: [
-      { type: 'mc', q: '下面哪个**不一定**是合法 kernel（$K_1,K_2$ 合法）？', options: ['$K_1+K_2$', '$K_1K_2$', '$5K_1$', '$K_1-K_2$'], answer: 3, explain: '差不在组合规则里。' },
-      { type: 'mc', q: '要证明 $K$ **不**合法，最少需要：', options: ['对所有点集检查', '一个让 Gram 矩阵不 PSD 的点集', '算出特征映射', '证明对称'], answer: 1, explain: '一个反例。' },
+      { type: 'mc', q: '下面哪个**不一定**是合法 kernel（$K_1,K_2$ 合法）？', options: ['$K_1+K_2$', '$K_1K_2$', '$5K_1$', '$K_1-K_2$'], answer: 3, explain: T`L09 p33 的组合规则只保证四种操作得到合法 kernel：$K_1+K_2$、$K_1K_2$、$cK_1$（$c>0$）、$f(\bu)K_1(\bu,\bv)f(\bv)$。**减法不在其中，而且确实会出错**：取 $K_1=\bu'\bv$、$K_2=2\bu'\bv$（都合法），则 $K_1-K_2=-\bu'\bv$，对角 $K(\bx,\bx)=-\|\bx\|^2<0$，而合法 kernel 的对角必须是 $\|\varphi(\bx)\|^2\ge0$。$5K_1$ 容易被怀疑，但 $5>0$，属于正数倍规则，合法；乘积 $K_1K_2$ 也在规则里。` },
+      { type: 'mc', q: '要证明 $K$ **不**合法，最少需要：', options: ['对所有点集检查', '一个让 Gram 矩阵不 PSD 的点集', '算出特征映射', '证明对称'], answer: 1, explain: T`Mercer 定理说：$K$ 合法 ⇔ 所有有限点集上的 Gram 矩阵都 PSD（半正定）。"对所有点集都成立"这种说法，**只要找到一个反例就被推翻**：给出一组点，使 Gram 矩阵 $M$ 有某个 $\mathbf c$ 让 $\mathbf c'M\mathbf c<0$（或对角出现负数），就证明 $K$ 不合法。例如 $K(x,z)=xz-1$，只取一个点 $x=0$：$K(0,0)=-1<0$。误选"对所有点集检查"：那是证明合法时才需要的。` },
       { type: 'num', q: '$K(x,z)=x^2z^2$，点 $1,-1$。Gram 矩阵的行列式？', answer: 0, explain: '$\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$，det = 0（PSD，合法：$\\varphi(x)=x^2$）。' },
       { type: 'show', q: '（英文）State the representer theorem informally and why it matters.', answer: T`For a learning problem minimising empirical risk plus a monotonically increasing penalty on the norm of the function (optimising over the RKHS associated with $K$, using its RKHS norm), the optimal solution can be written as $f^*(\mathbf x)=\sum_{i=1}^n\alpha_iK(\mathbf x,\mathbf x_i)$. Hence such methods (e.g. ridge regression, logistic regression, PCA) can be kernelised: they only need kernel evaluations between data points.` },
     ],
@@ -515,9 +515,9 @@
       ['用 0/1 标签代入 $\\eta y\\bx$', '规则要求 $y\\in\\{-1,+1\\}$；$y=0$ 会让负类永远不更新。'],
     ],
     quiz: [
-      { type: 'num', q: '$\\bw=(1,-1)$，$w_0=0$，样本 $(1,2)$，$y=+1$，$\\eta=0.5$。更新后 $w_2=?$', answer: 0, explain: '$s=-1$，分错；$w_2=-1+0.5\\times2=0$。' },
-      { type: 'num', q: '同上，更新后 $w_0=?$', answer: 0.5, explain: '$0+0.5\\times1$。' },
-      { type: 'mc', q: 'Perceptron 是：', options: ['非线性分类器', '线性分类器', '回归模型', '生成式模型'], answer: 1, explain: 'L10 p8。' },
+      { type: 'num', q: '$\\bw=(1,-1)$，$w_0=0$，样本 $(1,2)$，$y=+1$，$\\eta=0.5$。更新后 $w_2=?$', answer: 0, explain: T`Perceptron（感知机）先算得分（含 bias）：$s=w_0+w_1x_1+w_2x_2=0+1\times1+(-1)\times2=-1$。标签 $y=+1$，$sy=-1\le0$，分错，要更新 $\bw\leftarrow\bw+\eta y\bx$。第二个分量：$w_2\leftarrow w_2+\eta yx_2=-1+0.5\times(+1)\times2=-1+1=0$（同时 $w_1$ 变成 $1+0.5\times1=1.5$）。更新后这个点的得分变成 $0.5+1.5\times1+0\times2=2>0$，被分对了：更新就是把边界往分错的点那边推。` },
+      { type: 'num', q: '同上，更新后 $w_0=?$', answer: 0.5, explain: T`Bias 权重 $w_0$ 对应一个恒为 1 的输入 $x_0=1$，所以它和其他权重用同一条规则：$w_0\leftarrow w_0+\eta yx_0$。上一题已判定这个样本分错（$sy=-1\le0$），代入 $w_0=0$、$\eta=0.5$、$y=+1$：$w_0\leftarrow0+0.5\times(+1)\times1=0.5$。**分错时 bias 也要更新**，忘了它是这类手算题最常见的失分点。` },
+      { type: 'mc', q: 'Perceptron 是：', options: ['非线性分类器', '线性分类器', '回归模型', '生成式模型'], answer: 1, explain: T`perceptron 的得分 $s=\bw'\bx=\sum_{j=0}^mw_jx_j$ 是输入的线性函数，判类只看 $s\ge0$ 还是 $s<0$，所以决策边界 $\bw'\bx=0$ 是一个超平面（二维里就是一条直线），这就是线性分类器。容易误选"非线性分类器"，因为输出套了一个 sign/step 激活；**但激活只是对线性得分取符号，不会把边界弄弯**。它输出的是类别而不是实数，所以不是回归模型。L10 p8。` },
       { type: 'show', q: '（英文）Derive the perceptron update from the perceptron loss.', answer: T`The perceptron loss is $L_i(\mathbf w)=\max(0,-y_i\mathbf w'\mathbf x_i)$. Its gradient is $\mathbf 0$ if $y_i\mathbf w'\mathbf x_i>0$ and $-y_i\mathbf x_i$ if $y_i\mathbf w'\mathbf x_i<0$, so a stochastic gradient step gives $\mathbf w\leftarrow\mathbf w+\eta y_i\mathbf x_i$ on a mistake. The course also updates when $y_i\mathbf w'\mathbf x_i=0$, so that training can start from $\mathbf w=\mathbf 0$.` },
     ],
   });
@@ -622,9 +622,9 @@
       ['收敛界和数据量 $n$ 有关', '$R^2/\\gamma^2$ 只依赖半径和 margin。'],
     ],
     quiz: [
-      { type: 'num', q: '$R=3$，$\\gamma=1$，更新次数上界？', answer: 9, explain: '$R^2/\\gamma^2$。' },
-      { type: 'mc', q: '数据不可分时 perceptron：', options: ['收敛到最小错误的解', '不收敛', '收敛到 SVM 解', '收敛但慢'], answer: 1, explain: 'L10 p32。' },
-      { type: 'mc', q: 'Kernel perceptron 中 $\\alpha_i=0$ 表示：', options: ['样本 $i$ 从未被分错', '样本 $i$ 总被分错', '样本 $i$ 是支持向量', '学习率为 0'], answer: 0, explain: '只有分错才加。' },
+      { type: 'num', q: '$R=3$，$\\gamma=1$，更新次数上界？', answer: 9, explain: T`Perceptron 收敛定理（L10 p30–p31）：数据线性可分、margin 为 $\gamma$、所有点满足 $\|\bx_i\|\le R$ 时，从 $\bw=\mathbf 0$ 出发最多更新 $R^2/\gamma^2$ 次。代入 $R=3$、$\gamma=1$：$3^2/1^2=9/1=9$。数据越分散（$R$ 大）、margin 越小，需要的更新越多。**两个量都要平方**，算成 $R/\gamma=3$ 是错的。` },
+      { type: 'mc', q: '数据不可分时 perceptron：', options: ['收敛到最小错误的解', '不收敛', '收敛到 SVM 解', '收敛但慢'], answer: 1, explain: T`收敛定理的前提是数据线性可分（存在 margin $\gamma>0$）。不可分时，不管 $\bw$ 取什么，总有点被分错，于是每一轮都会触发更新，权重一直在变，永远停不下来。**课件明确说：不可分时训练"完全失败"，不会给出一个近似解**，所以"收敛到最小错误的解"是最诱人的错项。它也不会收敛到 SVM 的最大 margin 解：即使可分，perceptron 也只停在某一条能分开的线上。L10 p32。` },
+      { type: 'mc', q: 'Kernel perceptron 中 $\\alpha_i=0$ 表示：', options: ['样本 $i$ 从未被分错', '样本 $i$ 总被分错', '样本 $i$ 是支持向量', '学习率为 0'], answer: 0, explain: T`Kernel perceptron 从 $\boldsymbol\alpha=\mathbf 0$ 开始，**只有样本 $i$ 被分错（$s_iy_i\le0$）时才执行 $\alpha_i\leftarrow\alpha_i+\eta$**，分对时 $\alpha_i$ 不动。所以 $\alpha_i=0$ 说明样本 $i$ 从来没触发过更新，它在得分 $s=\sum_j\alpha_jy_jK(\bx_j,\bx)$ 里也不出现。误选"支持向量"正好反了：起作用的是 $\alpha_i>0$ 的样本（类似 SVM 里 $\lambda_i>0$ 的点），$\alpha_i=0$ 的样本对预测没有贡献。` },
     ],
   });
 
