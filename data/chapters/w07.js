@@ -16,6 +16,12 @@
       T`Output size $\lfloor(n+2p-k)/s\rfloor+1$; a fully connected layer has $n_{in}n_{out}$ weights (+ $n_{out}$ biases); pooling layers have no parameters.`,
       T`Fully connected nets on images ignore spatial structure, need huge numbers of parameters and must relearn a pattern at every location; convolution gives local connectivity, translation equivariance and far fewer parameters.`,
     ],
+    keyZh: [
+      T`卷积层：一个小 filter（滤波器）在输入上滑动，每个位置把对应元素相乘再求和，得到一个输出；所有位置用同一套 filter 权重，这叫权重共享（weight sharing）。`,
+      T`参数 = filter 个数 × 输入通道数 × 每个通道上的 $K\times K$，再加每个 filter 一个 bias，与图像大小无关。绝不按输出位置重复计数：真题里单通道、宽 3 的 1D filter 只有 3 个权重。`,
+      T`输出边长用上面的公式（padding 加 $2p$，别漏 +1）；全连接层权重 = 输入数 × 输出数，再加每个输出一个 bias；pooling 层没有参数。`,
+      T`把图像拉平喂全连接网络：丢了相邻关系、参数爆炸，同一图案换个位置还得重学。卷积只连局部、到处共享权重，参数少得多，而且平移等变（图案平移，特征图跟着平移）。`,
+    ],
     examQ: [
       { src: '2026 practice Q1d / 2025 practice Q5', q: T`How many parameters does the following convolutional neural network have (exclude the bias)? (Figure on the [T3](#/T03) page: 7 inputs → 1D convolutional layer of 5 units, each seeing 3 inputs → fully connected 4 → fully connected 5.)`,
         a: T`$3+5\cdot4+4\cdot5=43$. The convolutional layer uses one width-3 filter shared across all positions, so it has 3 weights (not $5\times3$); the fully connected layers have $5\times4=20$ and $4\times5=20$.`,
@@ -170,6 +176,12 @@
       T`Convolution is translation-equivariant; max pooling adds some, not guaranteed, translation invariance. Stacking $L$ stride-1 convolutions of width $k$ gives a receptive field of $1+L(k-1)$.`,
       T`ResNet residual blocks output $F(\bx)+\bx$; the identity path lets gradients pass, so very deep networks (152 layers) can be trained. Transfer learning: pretrain on a large dataset, then fine-tune.`,
     ],
+    keyZh: [
+      T`最大池化（max pooling）：每个 $m\times m$ 小块只留最大值。宽高变小，后面层的参数也随之变少；通道数不变；它自己没有参数。`,
+      T`max 不是处处可导，反向传播用次梯度（sub-gradient）：梯度只传给前向时取到最大值的那个输入，其余为 0；有并列最大值时只挑其中一个。`,
+      T`卷积是平移等变（图案平移，特征图跟着平移）；max pooling 再带来一定的平移不变性，但不保证（最大值跨出窗口时输出会变）。每叠一层宽 $k$ 的卷积，感受野（receptive field）宽度多 $k-1$。`,
+      T`ResNet 残差块：输出 = 学到的变换 + 输入本身，梯度能沿这条直通路传回前面的层，152 层也能训练。迁移学习（transfer learning）：先在大数据集上预训练，再在目标任务上微调（fine-tune）。`,
+    ],
     title: 'Pooling 与 CNN 架构', en: 'Max pooling, translation invariance, receptive fields, ResNet',
     summary: '**Max pooling（最大池化）** 把每个 $m\\times m$ 小块换成它的最大值：降低分辨率、减少后面的参数、带来一定的平移不变性；它没有参数，反向传播只把梯度传给那个最大值。CNN 的典型结构：卷积 → pooling → 卷积 → pooling → 全连接 → 输出。堆叠卷积层让 **receptive field（感受野）** 越来越大；**ResNet（残差网络）** 的残差连接让很深的网络能训练。',
     prereq: ['c34', 'c38'],
@@ -287,6 +299,12 @@
       T`Unrolled over time it is a deep network with one layer per time step (depth = sequence length) and shared weights; it is trained by backpropagation through time (BPTT).`,
       T`Repeated multiplication by $W$ causes vanishing or exploding gradients: for a linear RNN $\partial\mathbf h^{(T)}/\partial\mathbf h^{(1)}=W^{T-1}$, vanishing if the spectral radius $\rho(W)<1$, exploding if $\rho(W)>1$.`,
       T`An LSTM passes its state through an additive copy self-loop scaled by a sigmoid forget gate (plus input and output gates), keeping gradients over 100+ steps instead of about 5–10.`,
+    ],
+    keyZh: [
+      T`循环神经网络（RNN）逐个读入序列，每步用同一组参数，由上一步的隐藏状态和当前输入算出新的隐藏状态。三种用法：序列分类、序列标注、编码器–解码器。`,
+      T`把循环沿时间展开，每个时间步是一层，深度 = 序列长度，各层共享权重（2021 Q1：在什么意义上"深"）；训练用随时间反向传播（BPTT）。`,
+      T`反传时同一个 $W$ 被连乘很多次：线性 RNN 的梯度正好是 $W$ 的 $T-1$ 次方。谱半径（$W$ 特征值绝对值的最大者）小于 1 则梯度消失，大于 1 则爆炸。`,
+      T`LSTM：旧状态乘 sigmoid 遗忘门（forget gate）后直接加到新状态上，靠加法而不是反复乘 $W$ 往下传，另有输入门、输出门；能保持 100+ 步的梯度，普通 RNN 只有约 5–10 步。`,
     ],
     examQ: [
       { src: '2021 Q1', q: T`A recurrent neural network is a type of deep artificial neural network. In what respect is it deep?`,
@@ -425,6 +443,13 @@
       T`Self-attention: item $i$ is used as the query against the other items $j\ne i$ (the lecture's wording; standard Transformers also include $i$ itself) via their keys, and its new representation is the attention-weighted sum of their values.`,
       T`Transformer: self-attention instead of recurrence, plus residual connections and layer normalisation, feed-forward layers, multiple heads and positional encoding (attention ignores order); positions are computed in parallel during training.`,
       T`Training uses teacher forcing: the decoder input is the target shifted right, [START, $y_1,\dots,y_{T-1}$], and all next tokens $[y_1,\dots,y_T{=}\text{EOS}]$ are predicted in parallel; a causal mask sets scores of future positions to $-\infty$ (weight 0 after softmax) and a padding mask hides <pad> tokens. At inference there is no target: greedy decoding appends the argmax token one step at a time until EOS.`,
+    ],
+    keyZh: [
+      T`注意力（attention）三步：给每个位置打分 $e_j$；softmax 把分数变成非负、和为 1 的权重；把所有隐藏状态按权重加权平均，得到上下文向量（context vector）$\mathbf c$。`,
+      T`翻译（seq2seq）时，解码器每一步都用上一步的状态重新给编码器各位置打分，得到这一步专属的上下文 $\mathbf c_i$；不再把整句塞进一个固定向量，权重热图还能看出词对齐。`,
+      T`自注意力（self-attention）：第 $i$ 个元素用自己的 query 去和其他元素的 key 打分，再按权重加总它们的 value，作为自己的新表示。课件写 $j\ne i$，标准 Transformer 也包括它自己。`,
+      T`Transformer 用自注意力代替循环，再加残差 + 层归一化、逐位置的前馈网络、多头注意力，以及位置编码（attention 本身不知道词序）；训练时所有位置并行计算。`,
+      T`训练用教师强制（teacher forcing）：解码器输入是正确答案右移一位，所有位置并行预测下一个词；因果掩码把未来位置得分设为 $-\infty$（权重变 0），填充掩码挡住 <pad>。生成时没有答案，只能贪心解码：逐词取概率最大的接上，直到 EOS。`,
     ],
     title: 'Attention 与 Transformer', en: 'Attention, self-attention, the Transformer',
     summary: '**Attention（注意力）**：不只用最后一个隐藏状态，而是对所有隐藏状态做**加权平均**，权重 $\\alpha_j$ 是得分的 softmax——哪个位置相关就多看哪个。**Self-attention（自注意力）** 让序列里每个元素去关注其他元素；**Transformer** 用它代替 RNN，可以并行处理整个序列。',

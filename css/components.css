@@ -207,7 +207,7 @@ details.deep.storyfold > summary { color: #b07a2a; font-weight: 500; }
 
 /* printable outline (js/ui/outline.js): compact handout, English exam words, blank notes column */
 .outline .ol-bar { display: flex; gap: 12px; align-items: center; margin: 0 0 1rem; }
-.outline .ol-row { display: grid; grid-template-columns: 1fr 15%; gap: 8px; }
+.outline .ol-row { display: grid; grid-template-columns: 1fr 12%; gap: 8px; }
 .outline .ol-notes { border-left: 1px dashed var(--line-2); }
 .outline .ol-h1 { font-weight: 700; font-size: 1.15em; }
 .outline .ol-head p { margin: 2px 0; }
@@ -224,12 +224,14 @@ details.deep.storyfold > summary { color: #b07a2a; font-weight: 500; }
 .outline .ol-f { display: inline; margin-right: 10px; }
 .outline .ol-fxt { color: var(--muted); font-size: .9em; }
 .outline .ol-sep { color: var(--muted); }
+.outline .ol-kzh { color: #555; font-size: .92em; }
 .outline .ol-exq, .outline .ol-pit1 { margin: 1px 0; }
 .callout.examq { border-color: var(--line-2); }
+ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
 @media print {
   .noprint { display: none !important; }
-  @page { size: A4; margin: 8mm 8mm 9mm; }
-  .outline { font-size: 7.6pt; line-height: 1.28; color: #000; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  @page { size: A4; margin: 7mm 7mm 8mm; }
+  .outline { font-size: 7.6pt; line-height: 1.22; color: #000; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .outline .katex { font-size: 1.02em; }
   .outline .ol-notes { border-left-color: #bbb; }
   .outline .ol-label { color: #000; }

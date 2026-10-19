@@ -1,8 +1,9 @@
-/* Printable outline: { t:'outline' } builds a compact paper handout (target ≤ 15 A4 pages) from the site's own data.
- * Exam words are in English. Per week: the week's storyline (b.storyline). Per chapter: English title, English key
- * points (keyEn), every formula with an English label (b.fxEn maps the site's Chinese labels; folded not-examinable
- * parts skipped), past concept questions (examQ, English) and the top pitfall, beside a blank notes column.
- * Then the exam types' solving steps. Explanations stay on the site. Print with the browser (A4). */
+/* Printable outline: { t:'outline' } builds a compact paper handout (about 15 A4 pages) from the site's own data.
+ * Exam words are English, each followed by a short Chinese line in grey (keyZh, qzh/azh).
+ * Per week: the week's storyline (b.storyline). Per chapter: English title, English key points, every formula with an
+ * English label (b.fxEn / b.fxWhat map the site's Chinese headings; folded not-examinable parts skipped), past concept
+ * questions (examQ) and the top pitfall, beside a narrow notes column. Then the exam types' solving methods.
+ * Explanations stay on the site. Print with the browser (A4). */
 (function (root) {
   'use strict';
   const SML = root.SML;
@@ -45,7 +46,10 @@
       (b.blocks || []).forEach((x) => walk(x, sk));
     };
     walk(page.blocks, false);
-    return out;
+    // drop a formula that repeats another (same after normalising) or is just the start of a longer one
+    const norm = (t) => t.replace(/\\htmlClass\{[^}]*\}/g, '').replace(/\\(?:,|;|!|quad|qquad| )/g, '').replace(/[{}\s]/g, '');
+    const ns = out.map((x) => norm(x.tex));
+    return out.filter((x, i) => !ns.some((n, j) => j !== i && n.startsWith(ns[i]) && (n.length > ns[i].length || j < i)));
   }
 
   R.outline = function (b) {
@@ -94,7 +98,7 @@
           ' <span class="ol-meta">' + star + (types ? ' · ' + types : '') + ' · #/' + id + '</span>'));
         if (p.keyEn && p.keyEn.length) {
           const ul = el('ul', 'ol-key');
-          p.keyEn.forEach((k) => { const li = el('li'); li.innerHTML = inline(k); ul.appendChild(li); });
+          p.keyEn.forEach((k, i) => { const li = el('li'); li.innerHTML = inline(k) + (p.keyZh && p.keyZh[i] ? ' <span class="ol-kzh">' + inline(p.keyZh[i]) + '</span>' : ''); ul.appendChild(li); });
           left.appendChild(ul);
         }
         // group formulas by English name, so a name prints once
@@ -109,7 +113,8 @@
           f.innerHTML = label('Formulas') + [...groups].map(([name, ts]) => '<span class="ol-f"><span class="ol-fxt">' + inline(name) + ':</span> ' + ts.map((t) => tex(t, false)).join('<span class="ol-sep">;</span> ') + '</span>').join('');
           left.appendChild(f);
         }
-        (p.examQ || []).forEach((e) => left.appendChild(el('div', 'ol-exq', label('Past ' + inline(e.src || '')) + '<b>Q.</b> ' + inline(e.q) + ' <b>A.</b> ' + inline(e.a))));
+        const zh = (t) => (t ? ' <span class="ol-kzh">' + inline(t) + '</span>' : '');
+        (p.examQ || []).forEach((e) => left.appendChild(el('div', 'ol-exq', label('Past ' + inline(e.src || '')) + '<b>Q.</b> ' + inline(e.q) + zh(e.qzh) + ' <b>A.</b> ' + inline(e.a) + zh(e.azh))));
         const pit = sectionBlocks(p, 'pitfalls').find((x) => x && x.t === 'table');
         if (pit && pit.rows && pit.rows.length) left.appendChild(el('div', 'ol-pit1', label('易错') + '✗ ' + inline(pit.rows[0][0]) + ' → ✓ ' + inline(pit.rows[0][1])));
         const box = el('div', 'ol-ch');

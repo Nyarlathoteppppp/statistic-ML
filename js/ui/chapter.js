@@ -40,7 +40,7 @@
 
     if ((c.keyEn && c.keyEn.length) || (c.examQ && c.examQ.length)) {
       const kb = [];
-      if (c.keyEn && c.keyEn.length) kb.push({ t: 'ul', items: c.keyEn });
+      if (c.keyEn && c.keyEn.length) kb.push({ t: 'ul', items: c.keyEn, zh: c.keyZh });
       if (c.examQ && c.examQ.length) { kb.push({ t: 'h4', text: '原题（概念题）' }); c.examQ.forEach((e) => kb.push(T_ex(e))); }
       B.push({ t: 'deep', title: 'Key points in English（考试英文要点）' + (c.examQ && c.examQ.length ? ' + 原题' : ''), hint: '点开看', blocks: kb });
     }
@@ -62,7 +62,7 @@
 
     return {
       id: c.id, eyebrow: (c.week ? c.week + ' · ' : '') + (c.lec || ''), title: c.title, en: c.en,
-      lead: c.summary, blocks: B, keyEn: c.keyEn, examQ: c.examQ,
+      lead: c.summary, blocks: B, keyEn: c.keyEn, keyZh: c.keyZh, examQ: c.examQ,
     };
   };
 

@@ -16,6 +16,12 @@
       T`Universal approximation: with a suitable non-linear activation (e.g. sigmoid), one hidden layer of sufficient finite width can approximate any continuous function on a compact domain arbitrarily well; it guarantees existence, not how to learn it.`,
       T`Hidden layers are a learned non-linear basis $\mathbf u=\varphi(\bx)$ (representation learning); deeper networks build features hierarchically and work better in practice, but are harder to train (vanishing gradients).`,
     ],
+    keyZh: [
+      T`多层感知机（MLP）是一层套一层的函数复合：每个单元先加权求和，再套激活函数。没有非线性激活，叠多少层都还是线性模型，学不会 XOR。`,
+      T`五种激活函数：step 输出 0/1，sign 输出 $\pm1$，logistic（sigmoid）输出 $(0,1)$ 之间的数，tanh 输出 $(-1,1)$ 之间的数，ReLU 把负数变 0、正数原样输出。`,
+      T`万能逼近定理（universal approximation）：激活函数合适时，一个足够宽（但有限）的隐藏层就能把有界闭区域上的任意连续函数逼近到任意精度；它只保证这样的网络存在，不说怎么训练出来。`,
+      T`隐藏层 = 从数据学出来的非线性特征 $\varphi(\bx)$（表示学习，representation learning），输出层在它上面做线性模型。更深的网络逐层组合特征，实践中更好，但更难训练（梯度消失）。`,
+    ],
     examQ: [
       { src: '2021 Q4', q: T`Explain how artificial neural networks can be considered to be a form of non-linear basis function when learning a linear model.`,
         a: T`The hidden layers compute a non-linear transformation $\mathbf u=\varphi(\bx)$ of the input, and the output layer is a linear model on these features, $z=\bw'\varphi(\bx)$. Unlike a fixed basis expansion (polynomials, RBFs), the basis parameters are learned from data jointly with the linear weights.`,
@@ -168,6 +174,12 @@
       T`The forward pass stores $r_j,u_j,z$; one backward pass then propagates $\delta$ from the output, each layer reusing the error terms above (summed over the units it feeds).`,
       T`$g'(r)=u(1-u)$ for sigmoid, and $1$ if $r>0$ else $0$ for ReLU; all gradients use the old weights before any update.`,
     ],
+    keyZh: [
+      T`损失不直接依赖隐藏层权重 $v_{ij}$，要沿上面那条依赖链一步步影响到 $L$；反向传播（backpropagation）就是用链式法则把链上每一步的局部导数乘起来。`,
+      T`平方损失 + 恒等输出时的四个公式：输出误差 $\delta$ = 预测减真值；输出层梯度 = $\delta$ 乘这条边的输入 $u_j$；隐藏误差 $\varepsilon_j$ = $\delta$ 乘 $w_j$ 再乘激活斜率；隐藏层梯度 = $\varepsilon_j$ 乘 $x_i$。`,
+      T`先前向一遍并存下 $r_j,u_j,z$；再从输出往回走一遍传播 $\delta$，每层复用上一层算好的误差项（一个单元连向多个单元时，把各路径的贡献加起来），所以很高效。`,
+      T`激活函数的导数：sigmoid 为 $u(1-u)$（最大 0.25），ReLU 在 $r>0$ 时为 1、否则为 0。所有梯度都用更新前的旧权重算完，再统一更新。`,
+    ],
     examQ: [
       { src: '2021 Q13(b)', q: T`Given that the output loss of a feed-forward network, $L$, is not a direct function of hidden-layer weights, $w$, how is $\frac{\partial L}{\partial w}$ calculated in backpropagation? Include the formulation of $\frac{\partial L}{\partial w_j}$, where $j$ is the index of a single weight parameter.`,
         a: T`(Lecture notation: hidden weight $v_{ij}$, output weight $w_j$.) $L$ depends on $v_{ij}$ only via $v_{ij}\to r_j\to u_j\to s\to z\to L$, so the chain rule gives $\frac{\partial L}{\partial v_{ij}}=\frac{\partial L}{\partial z}\frac{\partial z}{\partial s}\frac{\partial s}{\partial u_j}\frac{\partial u_j}{\partial r_j}\frac{\partial r_j}{\partial v_{ij}}=\delta\,w_j\,g'(r_j)\,x_i$. After a forward pass, $\delta=\partial L/\partial s$ ($z-y$ for squared loss, identity output) is computed at the output and propagated backwards, reusing error terms layer by layer.`,
@@ -309,6 +321,12 @@
       T`Adagrad: $\theta_i\leftarrow\theta_i-\frac{\eta}{\sqrt{g_i+\epsilon}}(\nabla L)_i$, where $g_i$ sums the past squared gradients: per-parameter adaptive step sizes that only shrink.`,
       T`Adam = momentum (moving average $\mathbf m$ of gradients) + adaptive scaling (moving average $\mathbf v$ of squared gradients) + bias correction $\hat{\mathbf m}=\frac{\mathbf m}{1-\beta_1^t}$, $\hat{\mathbf v}=\frac{\mathbf v}{1-\beta_2^t}$.`,
     ],
+    keyZh: [
+      T`每步用多少数据算梯度：批量梯度下降（batch GD）用全部，稳定但贵；SGD 用 1 个，便宜但噪声大；小批量（mini-batch）用一小批，折中，还能在 GPU 上并行。`,
+      T`动量（momentum）：速度 $\mathbf v$ 累积过去的梯度，参数沿速度走；来回震荡的方向互相抵消，梯度接近 0 时还能凭惯性冲过平坦区、浅的局部最优和鞍点。`,
+      T`Adagrad：每个参数各自累加过去梯度的平方 $g_i$，步长按 $1/\sqrt{g_i}$ 缩小，过去梯度大的参数步子变小；$g_i$ 只增不减，所以步长只会越来越小。`,
+      T`Adam = 动量（梯度的滑动平均 $\mathbf m$，记方向）+ 自适应步长（梯度平方的滑动平均 $\mathbf v$，记大小）+ 偏差校正（两者从 0 开始，前几步偏小，除以 $1-\beta^t$ 补回来）。`,
+    ],
     examQ: [
       { src: '2021 Q7', q: T`Explain why the use of momentum in an optimiser can help avoid getting trapped at local optima or saddle points, with respect to the training of machine learning models with non-convex training objectives.`,
         a: T`Momentum keeps a velocity that accumulates past gradients, $\mathbf v^{(t)}=\alpha\mathbf v^{(t-1)}+\eta\nabla L$, $\boldsymbol\theta^{(t)}=\boldsymbol\theta^{(t-1)}-\mathbf v^{(t)}$. At a saddle point or shallow local optimum the gradient is near zero, but the accumulated velocity keeps the parameters moving, so they can pass through flat regions and small basins (escape is not guaranteed).`,
@@ -430,6 +448,12 @@
       T`Weight decay: minimise $L+\lambda\|\boldsymbol\theta\|^2$; the gradient gains $2\lambda w$, so $w\leftarrow(1-2\eta\lambda)w-\eta\frac{\partial L}{\partial w}$; the network version of ridge (Gaussian prior).`,
       T`Dropout: randomly drop units during training (new mask per example); at test time keep all units, scaling weights by the keep probability. It forces redundancy and acts like an ensemble.`,
     ],
+    keyZh: [
+      T`深度网络非常灵活，参数往往比样本还多（过参数化，over-parameterised），很容易把训练集背下来；三种主要正则化：早停、权重衰减、dropout。`,
+      T`早停（early stopping）：验证误差开始上升就停。它不改损失函数，属于隐式正则化：权重从接近 0 出发，停得早就没机会长大。`,
+      T`权重衰减（weight decay）：损失加上权重平方和，梯度多一项 $2\lambda w$，相当于每步先把权重乘一个略小于 1 的数再按梯度走。就是神经网络版的 ridge，对应 Gaussian 先验。`,
+      T`Dropout：训练时随机关掉一部分单元，每个样本换一个新 mask；测试时全部打开，权重乘保留概率。网络不能依赖个别单元，被迫学冗余表示，效果像许多子网络的集成。`,
+    ],
     title: '深度网络正则化', en: 'Regularising deep networks: early stopping, weight decay, dropout',
     summary: '神经网络参数极多、非常灵活，容易过拟合。三种对策：**early stopping（早停）**（验证误差开始上升就停）、**weight decay（权重衰减）**（加 $L_2$ 惩罚，梯度多一项 $2\\lambda w$）、**dropout**（训练时随机屏蔽一部分单元，测试时不屏蔽并调整权重）。',
     prereq: ['c16', 'c18', 'c34'],
@@ -530,6 +554,12 @@
       T`An undercomplete (narrow) bottleneck forces compression; an overcomplete one can just copy the input. Neither guarantees a useful code, so constraints such as denoising or sparsity are added.`,
       T`PCA: centre the data and solve $\max_{\mathbf p_1}\mathbf p_1'\Sigma_x\mathbf p_1$ s.t. $\mathbf p_1'\mathbf p_1=1$; the Lagrangian gives $\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1$, so take the top eigenvector (variance $\lambda_1$).`,
       T`A one-hidden-layer linear autoencoder with squared loss, trained to optimum on centred data, learns the same subspace as PCA ("almost PCA"), but its basis need not be orthonormal or ordered by variance.`,
+    ],
+    keyZh: [
+      T`自编码器（autoencoder）：目标就是输入本身，网络要经过一个窄的瓶颈（bottleneck）把输入重建出来，从而学到压缩表示；不需要标签，属于无监督学习。`,
+      T`欠完备（undercomplete，瓶颈比输入窄）被迫压缩；过完备（overcomplete，比输入宽）可以直接复制输入。两者都不保证学到有用的编码，所以还要加去噪、稀疏等约束。`,
+      T`PCA：先中心化，再找让投影方差最大的单位方向；用拉格朗日乘子解出它必须是协方差矩阵的特征向量，投影方差就等于特征值，所以取最大特征值对应的那个。`,
+      T`单隐藏层、线性激活、平方误差的自编码器，在中心化数据上训练到最优时，学到的子空间和 PCA 相同（"almost PCA"）；但它的基向量不一定正交，也不按方差排序。`,
     ],
     examQ: [
       { src: '2021 Q9', q: T`With respect to learning an autoencoder, explain a failure case that can arise from the use of complex non-linear encoder and decoder components.`,

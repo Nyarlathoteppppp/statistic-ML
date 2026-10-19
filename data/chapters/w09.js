@@ -16,6 +16,12 @@
       T`Greedy plays $\arg\max_iQ_{t-1}(i)$ (sample means) and never explores: $Q_0=-\infty$ locks onto the first arm pulled, $Q_0=+\infty$ only tries each arm once.`,
       T`ε-greedy: with probability $1-\varepsilon$ exploit, with probability $\varepsilon$ pick uniformly among all $k$ arms; its exploration is blind to how reliable each estimate is.`,
     ],
+    keyZh: [
+      T`多臂老虎机（multi-armed bandit）：$k$ 个臂（arm），平均奖励都未知；每轮只拉一个，也只看到它的奖励。experts 每轮能看到所有专家的损失，这是两者的根本区别。`,
+      T`累积遗憾（cumulative regret）= 每轮都拉最好臂的期望总奖励，减去我们实际的期望总奖励；也等于各臂"被拉次数 × 比最优少赚的 gap"之和。难点是探索（exploration）与利用（exploitation）的取舍。`,
+      T`贪心（greedy）总拉目前平均奖励最高的臂，从不探索。$Q_0=-\infty$ 会锁死在第一次拉的臂；$Q_0=+\infty$ 只让每个臂各试一次，之后纯利用。`,
+      T`ε-贪心（ε-greedy）：以概率 $1-\varepsilon$ 拉当前最好的臂，以概率 $\varepsilon$ 在全部 $k$ 个臂里均匀随机挑。缺点是探索很盲目，不看每个臂的估计有多可靠。`,
+    ],
     title: 'Bandits：regret、greedy、ε-greedy', en: 'Multi-armed bandits: cumulative regret, greedy and ε-greedy',
     summary: '**Multi-armed bandit（多臂老虎机）**：面前有 $k$ 台老虎机（**arm，臂**），每台的平均奖励未知。每一轮只能拉一台，**只看到这一台的奖励**。目标是让累计奖励尽量接近"一开始就知道哪台最好"的人——差距叫 **cumulative regret（累积遗憾）**。核心矛盾是 **exploration vs exploitation（探索 vs 利用）**：拉看起来最好的（利用），还是试试不太了解的（探索）？Greedy 只利用；ε-greedy 以概率 ε 随机探索。',
     prereq: ['c46'],
@@ -178,6 +184,12 @@
       T`Two exploration mechanisms: an optimistic initial value $Q_0$ (e.g. $+\infty$) for unpulled arms, and the exploration bonus; a larger $\rho$ in $\sqrt{\rho\ln t/N_{t-1}(i)}$ explores more.`,
       T`The bonus comes from Hoeffding's inequality with failure probability $\varepsilon=1/t^4$; UCB's regret grows only as $O(\log t)$.`,
     ],
+    keyZh: [
+      T`UCB 值 = 平均奖励 + 探索奖励（bonus），每轮拉值最大的臂。$t$ 是全局的当前轮号（已拉总次数 + 1），所有臂共用；分母的 $N$ 才是这个臂自己被拉的次数。`,
+      T`面对不确定性保持乐观（optimism in the face of uncertainty）：拉得少的臂 bonus 大，按"它最好可能有多好"去估；被冷落的臂 $N$ 不变而 $\ln t$ 一直涨，迟早会被再试一次。`,
+      T`两种探索机制：一是没拉过的臂取乐观的初始值 $Q_0$（如 $+\infty$），保证每个臂先试一次；二是 bonus。可调系数 $\rho$ 越大，越爱探索。`,
+      T`bonus 来自 Hoeffding 不等式：把失败概率取成 $\varepsilon=1/t^4$（不是 ε-greedy 的 ε）反解，正好是上面的 bonus。UCB 的 regret 只按 $O(\log t)$ 增长，平均每轮的 regret 趋于 0。`,
+    ],
     examQ: [
       { src: '2021 Q17', q: T`Describe two mechanisms used by the Upper Confidence Bound (UCB) multi-armed bandit to explore arms that so far have no demonstrated high rewards. (Given: $Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log(t)/N_{t-1}(i)}$; unobserved arms start with value $Q_0$.)`,
         a: T`(1) Initialisation: an arm never pulled takes the value $Q_0$; an optimistic $Q_0$ (e.g. $+\infty$) makes every arm be tried before exploitation begins. (2) The exploration bonus $\sqrt{\rho\log t/N_{t-1}(i)}$ is large for rarely pulled arms and grows with $\log t$ while an arm is neglected, so an uncertain arm can have the highest value despite a low mean; larger $\rho$ explores more.`,
@@ -334,6 +346,10 @@
       T`A contextual bandit observes a context vector $\mathbf X_i(t)$ each round, so estimating $E[R_i(t)\mid\mathbf X_i(t)]$ becomes a regression problem; UCB is applied to the regression prediction.`,
       T`Contextual bandit vs RL: in a contextual bandit the action does not affect the next state; in reinforcement learning the (state, action) pair determines the next state, so future rewards must be considered.`,
     ],
+    keyZh: [
+      T`上下文老虎机（contextual bandit）每轮先看到上下文特征向量，奖励随它变，要估的变成"给定上下文的期望奖励"，这是回归（regression）问题；选臂时把 UCB 加在回归预测上。`,
+      T`区别在动作会不会改变下一个状态：contextual bandit 里下一个状态"自己来"，和动作无关；强化学习（reinforcement learning）里（状态, 动作）决定下一个状态，所以要考虑未来的奖励。`,
+    ],
     title: 'Contextual bandits 与 RL', en: 'Contextual bandits and the link to reinforcement learning',
     summary: '现实里"哪个臂最好"往往取决于情况：给体育迷和给厨艺爱好者推荐的广告不一样。**Contextual bandit（上下文老虎机）** 每轮先看到一个**上下文（context）**特征向量，奖励的估计变成**回归问题** $E[R_i(t)\\mid\\bX_i(t)]$，再对回归预测用 UCB。再往前一步，如果选的动作还会**改变下一轮的状态**，就是 **reinforcement learning（强化学习）**。',
     prereq: ['c48', 'c10'],
@@ -420,6 +436,13 @@
       T`Predictive distribution $\mathrm{Normal}(\mathbf x_*'\mathbf w_N,\ \sigma^2+\mathbf x_*'\mathbf V_N\mathbf x_*)$: the noise $\sigma^2$ is constant; the second term is large where the data constrain $\mathbf w$ poorly (far from the data).`,
       T`Predict with MAP (mode only, fixed variance $\sigma^2$), Monte Carlo (average over posterior samples) or exact Bayes (integrate over $\mathbf w$); sequential updating gives the same posterior as one batch update.`,
       T`Bayesian model selection: choose the model family with the largest evidence $p(\mathbf y\mid\mathbf X)=\int p(\mathbf y\mid\mathbf X,\mathbf w)p(\mathbf w)\,d\mathbf w$; training RSS keeps falling with complexity, but the evidence penalises unnecessary flexibility (Occam's razor).`,
+    ],
+    keyZh: [
+      T`MLE / MAP 只给一个点估计（point estimate），不说它有多可靠。Fisher 信息（Fisher information）是负对数似然的弯曲程度：越弯，数据把 $\bw$ 钉得越牢，估计越稳。`,
+      T`Normal 先验 × Normal 似然 = Normal 后验，这叫共轭（conjugate），后验均值 $\bw_N$ 和协方差 $\mathbf V_N$ 有闭式解，考试只需会代入。$\bw_N$ 就是 ridge 的解（$\lambda=\sigma^2/\gamma^2$）。`,
+      T`预测分布（predictive distribution）的方差是两块相加：$\sigma^2$ 是数据噪声，处处一样；第二项是"权重还没定下来"带来的不确定，在数据没约束住的地方（典型是远离数据）大。`,
+      T`三种预测：MAP 只用后验众数，方差固定为 $\sigma^2$；Monte Carlo 从后验抽很多个 $\bw$，各自预测再平均；精确 Bayes 对所有 $\bw$ 积分。逐个数据点更新（sequential）和一次看完结果相同。`,
+      T`贝叶斯模型选择（Bayesian model selection）：选证据（evidence）最大的模型族。训练 RSS 随复杂度一路下降，evidence 却会给多余的灵活性扣分，这就是奥卡姆剃刀（Occam's razor）。`,
     ],
     examQ: [
       { src: '2021 Q5', q: T`Consider a setting with high uncertainty over model parameters. Describe what effect, if any, this will have for the maximum likelihood estimate.`,

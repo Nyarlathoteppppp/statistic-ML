@@ -185,6 +185,10 @@ function validateBlock(b, pageId, loc) {
     });
   }
   if (b.t === 'ul' || b.t === 'ol') (b.items || []).forEach((it, idx) => checkMarkdownString(it, pageId, `${loc}.items[${idx}]`));
+  if (b.t === 'ul' && b.zh) {
+    if (b.zh.length !== (b.items || []).length) addProblem(pageId, loc, `zh has ${b.zh.length} lines for ${(b.items || []).length} items`);
+    b.zh.forEach((it, idx) => checkMarkdownString(it, pageId, `${loc}.zh[${idx}]`));
+  }
   if (b.t === 'steps') (b.items || []).forEach((it, idx) => {
     if (typeof it === 'string') checkMarkdownString(it, pageId, `${loc}.items[${idx}]`);
     else if (Array.isArray(it)) validateBlocks(it, pageId, `${loc}.items[${idx}]`);

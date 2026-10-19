@@ -16,6 +16,12 @@
       T`Ridge: $\hat\bw=\argmin_\bw\|\by-\mathbf X\bw\|_2^2+\lambda\|\bw\|_2^2=(\mathbf X'\mathbf X+\lambda\mathbf I)^{-1}\mathbf X'\by$; adding $\lambda>0$ to every eigenvalue makes the matrix PD, hence always invertible.`,
       T`Regularisation adds information to fix ill-conditioning, prevent overfitting and encode prior knowledge; ridge shrinks weights towards 0 but gives dense, not sparse, solutions.`,
     ],
+    keyZh: [
+      T`特征共线或样本数少于参数数（$n<p$）时，$\mathbf X'\mathbf X$ 有特征值 0、不可逆：最小二乘问题不适定，解有无穷多个，权重也没法解释（说不清哪个特征更重要）。`,
+      T`不适定（ill-posed）：解不唯一（有特征值正好等于 0）；病态（ill-conditioned）：解唯一，但数据稍一变动解就变很多（有特征值接近 0）。`,
+      T`岭回归（ridge）：在 RSS 上加 $\lambda$ 倍的权重平方和；闭式解只比最小二乘多一个 $\lambda\mathbf I$，它让每个特征值都加上 $\lambda>0$，矩阵变成正定（PD），所以一定可逆。`,
+      T`正则化（regularisation）= 给学习问题加额外信息：修好病态计算、防止过拟合、加入先验知识；ridge 把权重往 0 压小，但得到稠密（dense）解，不会稀疏（sparse，即权重恰好为 0）。`,
+    ],
     title: '共线性与 Ridge', en: 'Irrelevant features, ill-posed problems, ridge regression',
     summary: '特征共线（multicollinearity，多重共线性）或样本太少时，$\\mathbf X\'\\mathbf X$ 不可逆，最小二乘有无穷多解、权重没法解释。**Ridge regression（岭回归）** 在 RSS 上加 $\\lambda\\|\\bw\\|_2^2$，等价于给 $\\mathbf X\'\\mathbf X$ 的每个特征值加 $\\lambda$，从而总可逆、解唯一。',
     prereq: ['c04', 'c11'],
@@ -163,6 +169,12 @@
       T`Regularisation is MAP: ridge = zero-mean Gaussian prior, lasso = Laplace prior; in general a penalty $\lambda R(\boldsymbol\theta)$ corresponds to the prior $p(\boldsymbol\theta)\propto\exp(-\lambda R(\boldsymbol\theta))$.`,
       T`1D lasso is soft thresholding: $w=\text{soft}(\bx'\by,\lambda/2)/\bx'\bx$, so $w=0$ whenever $|\bx'\by|\le\lambda/2$; ridge $w=\bx'\by/(\bx'\bx+\lambda)$ only shrinks.`,
     ],
+    keyZh: [
+      T`Lasso：在 RSS 上加 $\lambda$ 倍的权重绝对值之和；它往往把一些权重压成恰好 0（稀疏 sparse，等于自动做特征选择），一般没有闭式解。`,
+      T`为什么稀疏：$L_1$ 约束区域是菱形，尖角在坐标轴上，RSS 的椭圆等高线通常先碰到尖角（某个坐标为 0）；$L_2$ 的约束区域是圆，光滑、没有尖角。`,
+      T`正则化就是 MAP：ridge = 均值为 0 的高斯先验，lasso = 拉普拉斯先验（Laplace prior）；一般地，惩罚项 $\lambda R$ 对应先验 $\propto\exp(-\lambda R)$，即对数先验就是负的惩罚项。`,
+      T`一维 lasso 是软阈值（soft thresholding）：先把 $\bx'\by$ 往 0 减去 $\lambda/2$（减过头就停在 0），再除以 $\bx'\bx$，所以 $|\bx'\by|\le\lambda/2$ 时权重恰好为 0；ridge 只是分母加 $\lambda$，只会变小。`,
+    ],
     examQ: [
       { src: '2021 Q13(a)', q: T`Consider the training objective $L(\theta)=-\log P_\theta(\mathbf y\mid\mathbf X)+\lambda r(\theta)$, with $\lambda>0$ and $r(\theta)\ge0$. For the minimiser to be a MAP estimate, state the general form of the corresponding prior over $\theta$.`,
         a: T`$p(\theta)\propto\exp(-\lambda r(\theta))$. Then $-\log p(\theta\mid D)=L(\theta)+\text{const}$, so minimising $L$ maximises the posterior. E.g. $r(\theta)=\|\theta\|_2^2$ gives a zero-mean Gaussian prior (ridge), $r(\theta)=\|\theta\|_1$ a Laplace prior (lasso).`,
@@ -305,6 +317,11 @@
       T`Training error keeps falling as complexity grows while test error is typically U-shaped, so never select the degree or $\lambda$ by training error.`,
       T`Explicit model selection: train each candidate on $D_{\text{train}}$, pick the best on $D_{\text{validate}}$, then retrain it on all the data; with regularisation, choose $\lambda$ by validation or cross-validation.`,
     ],
+    keyZh: [
+      T`欠拟合（underfitting）：模型太简单，训练误差和测试误差都高；过拟合（overfitting）：模型把噪声也拟合了，训练误差低但测试误差高。`,
+      T`模型越复杂，训练误差一直下降，测试误差通常先降后升（U 形）；所以绝不能用训练误差来选多项式次数或 $\lambda$。`,
+      T`显式模型选择：每个候选模型在训练集上训练、在验证集上挑最好的，再用全部数据重新训练它；用正则化时，用验证集或交叉验证（cross-validation）选 $\lambda$。`,
+    ],
     examQ: [
       { src: '2021 Q6', q: T`Explain why using the training likelihood, $p(\mathbf y\mid\mathbf X,\theta)$, for model selection can be problematic when choosing between models from different families.`,
         a: T`More flexible families tend to reach a higher training likelihood, partly by fitting noise, so selecting by it tends to favour the most complex family and overfit; it says nothing about unseen data. Use held-out data / cross-validation, or the marginal likelihood, which penalises unnecessary complexity.`,
@@ -423,6 +440,12 @@
       T`Bias: how far the average prediction over training sets is from $\mathbb E[Y]$; variance: how much the prediction changes with the training set; $\mathrm{Var}[Y]$ is noise no model can remove.`,
       T`Simple models or strong regularisation: high bias, low variance (underfit); complex models: low bias, high variance (overfit); so test error is typically U-shaped in complexity.`,
       T`The derivation uses $\mathbb E[Z^2]=\mathrm{Var}[Z]+(\mathbb E[Z])^2$ and the independence of the test label from the training set.`,
+    ],
+    keyZh: [
+      T`测试点上的平方误差拆成三项：bias²（平均预测偏多少）+ variance（换训练集时预测晃多大）+ 不可约误差（irreducible error，标签噪声）；期望同时对训练集和标签噪声求平均。`,
+      T`偏差（bias）：所有可能训练集上的平均预测离真实期望 $\mathbb E[Y]$ 多远；方差（variance）：换一个训练集，预测变化多大；$\mathrm{Var}[Y]$ 是任何模型都消除不了的噪声。`,
+      T`简单模型或强正则化：高 bias、低 variance（欠拟合）；复杂模型：低 bias、高 variance（过拟合）；所以测试误差随复杂度通常呈 U 形。`,
+      T`推导只用两样东西：方差公式移项得到的 $\mathbb E[Z^2]=\mathrm{Var}[Z]+(\mathbb E[Z])^2$，以及新测试点的标签与训练集独立（交叉项才能拆成两个期望相乘）。`,
     ],
     examQ: [
       { src: '2021 Q8', q: T`With respect to the training of machine learning models, describe a situation where it would be desirable to use an estimator with high bias.`,
@@ -558,6 +581,11 @@
       T`Empirical risk $\hat R_D[f]=\frac1n\sum_{i=1}^nl(y_i,f(\bx_i))$ is computable on the training set; true risk $R[f]=\mathbb E\,l(Y,f(X))$ is the expected loss on unseen data and cannot be computed.`,
       T`ERM picks $\hat f_D=\argmin_{f\in\mathcal F}\hat R_D[f]$ from a model class $\mathcal F$; estimation chooses within a class, model selection chooses between classes.`,
       T`Underfitting: both risks high; overfitting: empirical risk low but true risk high. Since $\hat f_D$ depends on the random data, $R[\hat f_D]$ is random too.`,
+    ],
+    keyZh: [
+      T`经验风险（empirical risk）= 训练集上的平均损失，能算；真实风险（true risk）= 在没见过的新数据上的期望损失，数据分布未知，所以算不出。`,
+      T`ERM 从模型类（model class，事先定好的候选"菜单"）里挑经验风险最小的分类器；在一个类里挑叫估计（estimation），在几个类之间挑叫模型选择（model selection）。`,
+      T`欠拟合：两种风险都大；过拟合：经验风险小、真实风险大。ERM 选出的 $\hat f_D$ 取决于随机的训练数据，所以它的真实风险也是随机的。`,
     ],
     title: '经验风险、真实风险、ERM', en: 'Empirical risk, true risk, finite model classes',
     summary: '**Empirical risk（经验风险）** = 训练集上的平均损失，能算；**true risk（真实风险）** = 在真实分布上的期望损失，是我们真正关心的，但算不出。ERM 选经验风险最小的分类器。L06 的问题：两者差多少？先从**有限**的模型类开始。',
@@ -696,6 +724,12 @@
       T`The penalty grows only logarithmically in $|\mathcal F|$ and $1/\delta$ and shrinks as $1/\sqrt n$; the bound holds for every data distribution, so it can be loose.`,
       T`Proof idea: Hoeffding's inequality for each fixed $f$, plus a union bound over all $f\in\mathcal F$, because $\hat f_D$ depends on the data.`,
       T`SRM chooses the model class minimising empirical risk plus this penalty. The bound is vacuous for infinite classes (e.g. real-weight linear classifiers), which need the VC dimension.`,
+    ],
+    keyZh: [
+      T`条件：模型类有限且在看数据之前就固定、$n$ 个 i.i.d. 样本、损失在 $[0,1]$。结论：以至少 $1-\delta$ 的概率，真实风险 ≤ 训练集上的经验风险 + 根号里的复杂度惩罚。`,
+      T`惩罚随类的大小 $|\mathcal F|$ 和 $1/\delta$ 只按 log 增长，随样本量按 $1/\sqrt n$ 下降；它对任何数据分布都成立（最坏情况），所以可能很宽松。`,
+      T`证明思路：对每个固定的 $f$ 用 Hoeffding 不等式，再用联合界（union bound）让它对所有 $f$ 同时成立，因为 ERM 选出的 $\hat f_D$ 依赖数据，事先不知道是哪一个。`,
+      T`结构风险最小化（SRM）：选"经验风险 + 惩罚"最小的模型类。无限类（如实数权重的线性分类器）的 $\log|\mathcal F|=\infty$，界失效，要用 VC 维。`,
     ],
     title: '有限类泛化界、SRM', en: 'Generalisation bound for finite classes; structural risk minimisation',
     summary: '有限模型类、损失在 $[0,1]$ 时：以至少 $1-\\delta$ 的概率，$R[\\hat f_D]\\le\\hat R_D[\\hat f_D]+\\sqrt{\\frac{\\log|\\mathcal F|+\\log(1/\\delta)}{2n}}$。模型类越大惩罚越大，样本越多惩罚越小。**SRM** 就是选使右边最小的模型类。',

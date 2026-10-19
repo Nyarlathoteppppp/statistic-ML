@@ -76,7 +76,8 @@
     h3: (b) => { const h = el('h3', null, inline(b.text)); if (b.id) h.id = b.id; return h; },
     h4: (b) => el('h4', null, inline(b.text)),
     math: (b) => mathBlock(b.tex),
-    ul: (b) => el('ul', null, b.items.map((i) => '<li>' + inline(i) + '</li>').join('')),
+    // optional b.zh: a Chinese line under each item (same index), e.g. English key points with their meaning
+    ul: (b) => el('ul', b.zh ? 'bi' : null, b.items.map((i, k) => '<li>' + inline(i) + (b.zh && b.zh[k] ? '<div class="kzh">' + inline(b.zh[k]) + '</div>' : '') + '</li>').join('')),
     ol: (b) => el('ol', null, b.items.map((i) => '<li>' + inline(i) + '</li>').join('')),
     steps: (b, ctx) => {
       const ol = el('ol', 'steps');
