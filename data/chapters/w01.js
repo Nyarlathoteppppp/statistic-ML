@@ -10,6 +10,12 @@
    * ===================================================================== */
   add({
     id: 'c01', week: 'W1', lec: 'L01', pages: 'L01 p11–p18', star: 1,
+    keyEn: [
+      T`A probability space is $(\Omega,F,P)$: outcomes, events and a probability measure obeying three axioms: $P(f)\ge0$, countable additivity for disjoint events, $P(\Omega)=1$.`,
+      T`A random variable is a function $X(\omega)\in\mathbb R$ of the outcome; its distribution is a PMF $p(x)=P(X=x)$ (discrete) or a PDF (continuous: a density, which can exceed 1).`,
+      T`$E[X]=\sum_x x\,P(X=x)$ is linear: $E[aX+b]=aE[X]+b$ and $E[X+Y]=E[X]+E[Y]$ always hold, with no independence needed.`,
+      T`$\mathrm{Var}(X)=E[(X-E[X])^2]=E[X^2]-(E[X])^2$ and $\mathrm{Var}(aX+b)=a^2\mathrm{Var}(X)$; variances add only for uncorrelated (e.g. independent) variables.`,
+    ],
     title: '概率：随机变量、期望、方差', en: 'Probability, random variables, expectation, variance',
     summary: '整门课的语言。后面所有东西——likelihood、risk、bias/variance、bandit 的平均回报——都是"某个随机变量的期望"。这一章把这套语言讲清楚。',
     symbols: [
@@ -160,11 +166,17 @@
    * ===================================================================== */
   add({
     id: 'c02', week: 'W1', lec: 'L01', pages: 'L01 p19–p25', star: 2,
+    keyEn: [
+      T`Sum rule (marginalisation): $P(A)=\sum_b P(A,B=b)=\sum_b P(A\mid B=b)P(B=b)$; product rule: $P(A,B)=P(A\mid B)P(B)=P(B\mid A)P(A)$.`,
+      T`Conditioning: $P(A\mid B)=P(A,B)/P(B)$ for $P(B)>0$, i.e. keep the slice where $B$ holds and renormalise it.`,
+      T`Bayes' theorem: $P(A\mid B)=\frac{P(B\mid A)P(A)}{P(B)}$ (posterior = likelihood times prior over evidence), where $P(B)=\sum_aP(B\mid A=a)P(A=a)$ by the sum rule.`,
+      T`Independence: $P(X,Y)=P(X)P(Y)$; conditional independence $X\perp Y\mid Z$: $P(X,Y\mid Z)=P(X\mid Z)P(Y\mid Z)$. Neither implies the other.`,
+    ],
     title: '条件概率、独立、Bayes rule、边缘化', en: 'Conditioning, independence, Bayes\' theorem, marginalisation',
     summary: '四个操作：joint（联合）、conditional（条件）、marginal（边缘）、Bayes（反转条件）。Bayesian 统计、Bayesian network、D-separation 全部建立在这四个操作上。',
     prereq: ['c01'],
     symbols: [
-      [T`$P(A,B)$ = $P(A\cap B)$`, T`$A$ 和 $B$ 同时发生（$\cap$ = 交集，\"且\"）`],
+      [T`$P(A,B)$ = $P(A\cap B)$`, T`$A$ 和 $B$ 同时发生（$\cap$ = 交集，"且"）`],
       [T`$P(A\mid B)$`, T`已知 $B$ 时 $A$ 的概率（竖线读作 given）`],
       [T`$\neg D$`, T`非 $D$（没有病）`],
       [T`$X\perp Y$`, T`$X$ 与 $Y$ 独立`],
@@ -305,6 +317,12 @@
    * ===================================================================== */
   add({
     id: 'c03', week: 'W1', lec: 'L01', pages: 'L01 p26–p35', star: 2,
+    keyEn: [
+      T`Dot product: $\bu'\bv=\sum_iu_iv_i=\|\bu\|\,\|\bv\|\cos\theta$; zero means orthogonal, negative means the angle exceeds $90^\circ$.`,
+      T`A hyperplane is $\{\bx:\bw'\bx+b=0\}$; $\bw$ is its normal vector (perpendicular to it), and the sign of $\bw'\bx+b$ tells which side $\bx$ is on.`,
+      T`Distance from $\bx$ to the hyperplane: $|\bw'\bx+b|/\|\bw\|$. Dividing by $\|\bw\|$ removes the scale freedom: $(c\bw,cb)$ with $c>0$ is the same hyperplane.`,
+      T`Norms: $\|\mathbf a\|_2=\sqrt{\mathbf a'\mathbf a}$ (ridge penalises $\|\bw\|_2^2$) and $\|\mathbf a\|_1=\sum_i|a_i|$ (lasso penalises $\|\bw\|_1$).`,
+    ],
     title: '线代：向量、点积、超平面、范数', en: 'Vectors, dot product, hyperplanes, norms',
     summary: '线性模型、SVM、perceptron 的几何全在这一章：一个线性分类器就是一个 hyperplane $\\bw\'\\bx+b=0$，$\\bw$ 是它的法向量，$\\bw\'\\bx+b$ 的符号告诉你在哪一侧。',
     prereq: [],
@@ -446,6 +464,12 @@
    * ===================================================================== */
   add({
     id: 'c04', week: 'W1', lec: 'L01', pages: 'L01 p36–p43', star: 1,
+    keyEn: [
+      T`Vectors are linearly dependent if one is a linear combination of the others; linearly dependent columns of $\mathbf X$ mean a redundant feature.`,
+      T`Eigenvalue: $\mathbf A\bv=\lambda\bv$, $\bv\ne\mathbf 0$. A symmetric $\mathbf A$ is PSD if $\bv'\mathbf A\bv\ge0$ for all $\bv$ (all eigenvalues $\ge0$) and PD if $\bv'\mathbf A\bv>0$ for $\bv\ne\mathbf 0$ (all $>0$).`,
+      T`$\mathbf X'\mathbf X$ is always PSD since $\bv'\mathbf X'\mathbf X\bv=\|\mathbf X\bv\|^2\ge0$; it is PD (invertible) iff the columns of $\mathbf X$ are linearly independent.`,
+      T`Dependent columns ⇒ zero eigenvalue ⇒ $\mathbf X'\mathbf X$ is not invertible; adding $\lambda\mathbf I$ raises every eigenvalue by $\lambda$ (ridge). A valid kernel's Gram matrix must be PSD.`,
+    ],
     title: '矩阵、特征值、PSD', en: 'Linear independence, matrices, eigenvalues, positive semidefinite',
     summary: '三个后面会反复出现的结论：① 列线性相关 ⇒ 矩阵不可逆（线性回归闭式解失效 → 需要 ridge）；② $\\mathbf X\'\\mathbf X$ 永远 PSD；③ 合法 kernel 的 Gram 矩阵必须 PSD（kernel 的合法性条件，第 29–30 章才讲，这里先记住"PSD"这个词）。',
     prereq: ['c03'],
@@ -588,6 +612,12 @@
    * ===================================================================== */
   add({
     id: 'c05', week: 'W1', lec: 'L02', pages: 'L02 p3–p9', star: 2,
+    keyEn: [
+      T`Frequentist view: the parameter $\theta$ is a fixed unknown constant and the data are i.i.d. random, so an estimator $\hat\theta(X_1,\dots,X_n)$ is a random variable.`,
+      T`Bias $B_\theta(\hat\theta)=E_\theta[\hat\theta]-\theta$ (unbiased if 0); variance $\mathrm{Var}_\theta(\hat\theta)=E_\theta[(\hat\theta-E_\theta[\hat\theta])^2]$, its spread over repeated samples.`,
+      T`Consistent: $\hat\theta\to\theta$ in probability as $n\to\infty$; asymptotically efficient: its variance reaches the smallest possible value as $n\to\infty$.`,
+      T`Sample mean: $E[\bar X]=\theta$ and $\mathrm{Var}(\bar X)=\sigma^2/n$, so it is consistent. Unbiased and consistent do not imply each other ($X_1$ is unbiased but not consistent).`,
+    ],
     title: '估计量：bias、variance、consistency', en: 'Estimators: bias, variance, consistency, efficiency',
     summary: '频率学派的核心想法：参数 $\\theta$ 是一个固定但未知的常数；用数据算出的估计 $\\hat\\theta$ 才是随机的。好估计量 = 平均起来对（bias 小）+ 不乱跳（variance 小）。',
     prereq: ['c01'],
@@ -711,6 +741,12 @@
    * ===================================================================== */
   add({
     id: 'c06', week: 'W1', lec: 'L02', pages: 'L02 p10–p15', star: 3,
+    keyEn: [
+      T`MLE: $\hat\theta\in\argmax_{\theta\in\Theta}\prod_{i=1}^np_\theta(x_i)$, the parameter under which the observed i.i.d. data are most probable.`,
+      T`The likelihood is $p(x\mid\theta)$ viewed as a function of $\theta$ with the data fixed; it is not a probability distribution over $\theta$.`,
+      T`Recipe: write the likelihood, take the log (monotone so the argmax is unchanged; products become sums; avoids underflow), set $dL/d\theta=0$ and solve, or use gradient ascent (descent on the negative log-likelihood) if no closed form.`,
+      T`Bernoulli: $\hat\theta=k/n$ (a CPT entry's MLE is the conditional count ratio); Gaussian: $\hat\mu=\bar x$, $\hat\sigma^2=\frac1n\sum_i(x_i-\bar x)^2$, which is biased but consistent.`,
+    ],
     title: '最大似然 MLE', en: 'Maximum-likelihood estimation',
     summary: '"最好的参数 = 让观测数据最可能出现的参数。" 固定四步：写似然（相乘）→ 取 log（变相加）→ 求导 = 0 → 解出参数。线性回归（c11）、logistic（c15）、CPT 计数（c53）都是 MLE。',
     prereq: ['c01', 'c05'],
@@ -859,6 +895,11 @@
    * ===================================================================== */
   add({
     id: 'c07', week: 'W1', lec: 'L02', pages: 'L02 p16–p19', star: 2,
+    keyEn: [
+      T`A decision rule $\delta(\bx)\in\mathcal A$ is judged by a loss, e.g. square loss $(\hat y-y)^2$ or 0-1 loss $\mathbb I(\hat y\ne y)$; its risk is the expected loss $R_\theta(\delta)=E_{(X,Y)\sim\theta}[l(\delta(X),Y)]$.`,
+      T`Risk cannot be minimised directly because the data distribution is unknown; ERM instead minimises the empirical risk $\hat R(\delta)=\frac1n\sum_{i=1}^nl(\delta(X_i),Y_i)$ on the training data.`,
+      T`Under square loss, $E_\theta[(\theta-\hat\theta)^2]=B(\hat\theta)^2+\mathrm{Var}_\theta(\hat\theta)$ (the cross term has zero expectation), so a biased estimator can have a lower MSE.`,
+    ],
     title: '决策论、风险、ERM', en: 'Decision theory, risk, empirical risk minimisation',
     summary: '把"学习"统一成"选一个决策规则，让期望损失（risk）最小"。真实分布未知，所以用训练集上的平均损失代替——这就是 ERM，几乎所有 ML 训练目标的模板。',
     prereq: ['c05'],
@@ -867,7 +908,7 @@
       [T`$\mathcal A$`, T`所有可选决定的集合（action space）`],
       [T`$l(\hat y,y)$`, T`损失：预测 $\hat y$、真实 $y$ 时的代价`],
       [T`$R$, $\hat R$`, T`真实风险；经验（训练集）风险`],
-      [T`$E_{(X,Y)\sim\theta}$`, T`对\"从真实分布抽出的新数据 $(X,Y)$\"求期望`],
+      [T`$E_{(X,Y)\sim\theta}$`, T`对"从真实分布抽出的新数据 $(X,Y)$"求期望`],
       [T`$\mathbb I(\cdot)$`, T`示性函数：条件成立为 1，否则 0`],
     ],
     goals: [
@@ -884,7 +925,7 @@
         T`**[[Decision rule]]** $\delta(\bx)\in\mathcal A$：看到数据后做出的决定。可以是一个参数估计 $\hat\theta$，也可以是对新样本的预测 $\hat Y_{n+1}$。`,
         T`**Action space** $\mathcal A$：所有可选的决定。`,
         T`**[[Loss function]]** $l(\delta,X)$：这个决定有多糟。例如 **square loss** $l(\hat\theta,x)=(\hat\theta-x)^2$，**0-1 loss** $l(\hat y,y)=\mathbb I(\hat y\ne y)$（$\mathbb I$ 是 [[indicator function]]，预测错就记 1）。`,
-        T`**[[Risk]]**（L02 p18）：期望损失 $R_\theta(\delta)=E_{(X,Y)\sim\theta}\big[l(\delta(X),Y)\big]$。下标 $(X,Y)\sim\theta$ 的意思是：对\"从真实分布（参数 $\theta$）里抽出来的新数据\"求平均。`,
+        T`**[[Risk]]**（L02 p18）：期望损失 $R_\theta(\delta)=E_{(X,Y)\sim\theta}\big[l(\delta(X),Y)\big]$。下标 $(X,Y)\sim\theta$ 的意思是：对"从真实分布（参数 $\theta$）里抽出来的新数据"求平均。`,
       ] },
       T`目标：选 $\delta$ 使 risk 最小。**但不能直接做**——risk 是对真实分布 $\theta$ 求期望，而 $\theta$ 未知（L02 p18 "Can't directly! Why?"）。`,
       T`**Empirical Risk Minimisation (ERM)**：用训练数据的平均损失近似 risk：`,
@@ -987,6 +1028,18 @@
    * ===================================================================== */
   add({
     id: 'c08', week: 'W1', lec: 'L02', pages: 'L02 p20–p27', star: 3,
+    keyEn: [
+      T`Bayesian view: $\theta$ is a random variable expressing belief; posterior $p(\theta\mid D)=\frac{p(D\mid\theta)\,p(\theta)}{p(D)}\propto$ likelihood $\times$ prior.`,
+      T`Marginal likelihood（边缘似然）/ evidence: $p(D)=\int p(D\mid\theta)\,p(\theta)\,d\theta$, the probability of the data with the parameters integrated out under the prior; the normalising constant of Bayes' rule.`,
+      T`MAP: $\hat\theta=\argmax_\theta[\log p(D\mid\theta)+\log p(\theta)]$ (no evidence needed; the log prior acts as a regulariser). With a uniform prior, MAP $=$ MLE.`,
+      T`Beta–Bernoulli: prior $\mathrm{Beta}(a,b)$ and $k$ heads in $n$ give posterior $\mathrm{Beta}(a+k,\,b+n-k)$, MAP $\frac{k+a-1}{n+a+b-2}$ (when $a+k>1$ and $b+n-k>1$), posterior mean $\frac{k+a}{n+a+b}$.`,
+    ],
+    examQ: [
+      { src: '2026 practice Q1b / 2025 practice Q1b', q: T`In words or a mathematical expression, what is the marginal likelihood for a Bayesian probabilistic model?`,
+        a: T`The probability of the data with the model parameters integrated out under the prior, $p(x)=\int p(x\mid\theta)p(\theta)\,d\theta$ ($x$ the data, $\theta$ the parameters), i.e. the expected likelihood under the prior; it is the normalising constant of Bayes' rule.`,
+        qzh: T`用文字或数学表达式说明：对于贝叶斯概率模型（Bayesian probabilistic model），边缘似然（marginal likelihood）是什么？`,
+        azh: T`在先验（prior）下把模型参数积分掉之后数据的概率，$p(x)=\int p(x\mid\theta)p(\theta)\,d\theta$（$x$ 为数据，$\theta$ 为参数），即似然在先验下的期望（expected likelihood under the prior）；它是贝叶斯公式（Bayes' rule）的归一化常数（normalising constant）。` },
+    ],
     genesis: T`c06 的 MLE 只看数据：一枚硬币抛 3 次全是正面，MLE 给出正面概率 $\hat\theta=3/3=1$，等于说"以后永远是正面"。没人会信——你早就知道硬币大多接近公平，可 MLE 里没有地方放这份"早就知道"。Bayesian 的想法是：**把"对参数的看法"也写成一个概率分布（先验），看到数据后用 Bayes rule 更新成后验。** 数据少时，先验把估计往常识那边拉；数据多了，数据说了算。（Bayes rule 来自 Thomas Bayes 的遗作，1763 年由 Richard Price 整理发表。）`,
     title: 'Bayesian：先验、后验、边缘似然、MAP', en: 'Bayesian statistics: prior, posterior, marginal likelihood, MAP',
     summary: '把参数当随机变量：先验 × 似然 ∝ 后验。分母是 **marginal likelihood**（往年原题）。只要一个数时取后验均值或 MAP；均匀先验下 MAP = MLE。',
@@ -1099,7 +1152,7 @@
     ],
     intuition: [
       T`**后验 = 先验和数据的"加权妥协"。** 先验说"我觉得 $\theta$ 在这附近"，数据说"数据显示在那附近"。谁更确定（方差更小），后验就更靠近谁。数据越多，数据的权重越大，先验影响越小。`,
-      T`**分母只是归一化常数。** 它不依赖 $\theta$，所以求 MAP 时可以扔掉：后验 $\propto$ 似然 × 先验。但它本身也有意义——它衡量"这个模型（含先验）整体上对数据的解释力"，可以用来比较模型。比较模型时应该用 evidence，而不是训练集上的最大似然——evidence 会对不必要的复杂度\"扣分\"（L18、T13 2021 Q6）。`,
+      T`**分母只是归一化常数。** 它不依赖 $\theta$，所以求 MAP 时可以扔掉：后验 $\propto$ 似然 × 先验。但它本身也有意义——它衡量"这个模型（含先验）整体上对数据的解释力"，可以用来比较模型。比较模型时应该用 evidence，而不是训练集上的最大似然——evidence 会对不必要的复杂度"扣分"（L18、T13 2021 Q6）。`,
       { t: 'think', q: '如果先验方差非常非常大（几乎没有先验信息），Gaussian 例子里的后验均值会接近什么？', a: T`接近数据的均值 $\bar x$，也就是 MLE。公式里 $1/\sigma_0^2\to0$，先验的权重消失。下面的可视化可以把先验方差拉到 5 验证。` },
       { t: 'story', title: '两大学派之争', md: '20 世纪上半叶，Fisher 等人批评 inverse probability（逆概率：用 Bayes 定理给参数赋概率，常配平坦先验），认为先验太任意，频率学派因此长期占主导。共轭模型（如 Beta–Bernoulli）一直可以手算；要到约 1990 年代计算机能大规模采样（MCMC），复杂的 Bayesian 模型才广泛进入应用。今天 ML 两派方法都用——这门课也两派都讲。' },
     ],
@@ -1196,6 +1249,12 @@
    * ===================================================================== */
   add({
     id: 'c09', week: 'W1', lec: 'L02', pages: 'L02 p28–p31（+ L01 p13, L19 p3, p10）', star: 2,
+    keyEn: [
+      T`Parametric: a fixed, finite number of parameters regardless of data size (e.g. linear or logistic regression); non-parametric: the number of parameters grows with the data (e.g. kNN), more flexible but less efficient.`,
+      T`Generative: models the joint $P(\bx,y)=P(y)P(\bx\mid y)$ and classifies by Bayes' rule, $\hat y=\argmax_yP(y)P(\bx\mid y)$ (e.g. naive Bayes); it can generate new data.`,
+      T`Discriminative: models $P(y\mid\bx)$ or a decision function directly (e.g. logistic regression, SVM), with fewer assumptions about the distribution of $\bx$.`,
+      T`The two distinctions are orthogonal, and all four combinations exist in both frequentist and Bayesian statistics.`,
+    ],
     title: '参数/非参数、生成/判别', en: 'Parametric vs non-parametric; generative vs discriminative',
     summary: '给模型分类的两把尺子。参数个数固定还是随数据增长？建模 $P(X,Y)$ 还是只建模 $P(Y\\mid X)$？两把尺子互相独立，频率学派和 Bayesian 里都有四种组合。',
     prereq: ['c02'],
@@ -1262,7 +1321,7 @@
     math: [
       { t: 'h3', text: '生成式分类器怎么预测' },
       { t: 'math', tex: T`\hat y=\argmax_y P(\bx,y)=\argmax_y P(y)\,P(\bx\mid y),\qquad P(y\mid\bx)=\frac{P(y)P(\bx\mid y)}{\sum_{y'}P(y')P(\bx\mid y')}` },
-      T`对比判别式：直接给出 $P(y\mid\bx)$，例如 logistic regression $P(y=1\mid\bx)=\sigma(\bw'\bx)$，其中 $\sigma(z)=\frac{1}{1+e^{-z}}$ 是 [[sigmoid]] 函数，把超平面的\"带符号距离\" $\bw'\bx$ 压成 0 到 1 之间的概率（第 15 章详讲）。`,
+      T`对比判别式：直接给出 $P(y\mid\bx)$，例如 logistic regression $P(y=1\mid\bx)=\sigma(\bw'\bx)$，其中 $\sigma(z)=\frac{1}{1+e^{-z}}$ 是 [[sigmoid]] 函数，把超平面的"带符号距离" $\bw'\bx$ 压成 0 到 1 之间的概率（第 15 章详讲）。`,
     ],
     example: [
       { t: 'h3', text: '用生成式模型分类一封邮件' },

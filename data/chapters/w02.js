@@ -10,6 +10,18 @@
    * ===================================================================== */
   add({
     id: 'c10', week: 'W2', lec: 'L03', pages: 'L03 p4–p10', star: 3,
+    keyEn: [
+      T`Linear regression predicts a continuous response as $\hat y=\bx'\bw$; the dummy feature $x_0=1$ turns the intercept $w_0$ into an ordinary weight.`,
+      T`It minimises the residual sum of squares (RSS): $\hat\bw=\argmin_\bw\sum_{i=1}^n(y_i-\bx_i'\bw)^2=\argmin_\bw\|\by-\mathbf X\bw\|^2$.`,
+      T`Set the partial derivatives to zero; in 1D, $b=\frac{n\sum x_iy_i-\sum x_i\sum y_i}{n\sum x_i^2-(\sum x_i)^2}$ and $a=\bar y-b\bar x$.`,
+      T`Squared loss is differentiable, gives a closed-form solution and equals the MLE under Gaussian noise, but it is sensitive to outliers.`,
+    ],
+    examQ: [
+      { src: '2026 practice Q1a / 2025 practice Q1a', q: T`In words or a mathematical expression, what quantity is minimised by linear regression?`,
+        a: T`The residual sum of squares between the targets and the predictions, $\sum_{i=1}^n(y_i-\hat y_i)^2=\|\by-\mathbf X\bw\|^2$ (equivalently the mean squared error); under Gaussian noise this is maximum likelihood.`,
+        qzh: T`用文字或数学表达式说明：线性回归（linear regression）最小化的是什么量？`,
+        azh: T`目标值与预测值之间的残差平方和（residual sum of squares），$\sum_{i=1}^n(y_i-\hat y_i)^2=\|\by-\mathbf X\bw\|^2$（等价地，也可以说是均方误差 mean squared error）；在高斯噪声（Gaussian noise）假设下，这就是最大似然（maximum likelihood）。` },
+    ],
     genesis: T`要预测一个数（比如由温度预测湿度），最简单的猜法是一条直线。可数据点不会全落在一条线上，任何一条线都有误差，怎么挑"最好"的那条？得把一堆误差合成一个数来比：直接相加，正负会抵消；加绝对值不会抵消，但绝对值在 0 处有尖角，没法靠"求导等于 0"一步解出来。**加平方既不会抵消，又处处可导，最好的直线能用公式直接算出来**，这就是最小二乘。（Legendre 1805 年发表了最小二乘法；Gauss 1809 年把它和正态分布的误差联系起来，那是 c11 的内容。）`,
     title: '线性回归与最小二乘', en: 'Linear regression and least squares',
     summary: '用一条直线（高维是超平面）预测一个数。"最好的直线" = 让**残差平方和（RSS）**最小的那条。往年卷原题：*what quantity is minimised by linear regression?* 答案就是 RSS。',
@@ -149,6 +161,12 @@
    * ===================================================================== */
   add({
     id: 'c11', week: 'W2', lec: 'L03', pages: 'L03 p11–p19', star: 2,
+    keyEn: [
+      T`Model: $y=\bx'\bw+\varepsilon$ with i.i.d. $\varepsilon\sim\mathcal N(0,\sigma^2)$; the log-likelihood is $-\frac{1}{2\sigma^2}\sum_i(y_i-\bx_i'\bw)^2+C$, so maximising it $\iff$ least squares.`,
+      T`Normal equations: $\mathbf X'\mathbf X\bw=\mathbf X'\by$; if $\mathbf X'\mathbf X$ is invertible, $\hat\bw=(\mathbf X'\mathbf X)^{-1}\mathbf X'\by$.`,
+      T`Invertibility needs $\mathbf X$ to have full column rank (no collinear features, $n\ge m+1$); otherwise there are infinitely many least-squares solutions.`,
+      T`$\hat\sigma^2_{\text{MLE}}=\text{RSS}/n$. Adding a zero-mean Gaussian prior on $\bw$ and taking the MAP gives ridge regression.`,
+    ],
     title: '线性回归 = Gaussian MLE', en: 'Linear regression as maximum likelihood; normal equations',
     summary: '假设 $y=\\bx\'\\bw+\\varepsilon$，噪声 $\\varepsilon\\sim\\mathcal N(0,\\sigma^2)$。写出似然、取 log，会发现最大化似然 ⇔ 最小化 RSS。再用矩阵求导得到闭式解 $\\hat\\bw=(\\mathbf X\'\\mathbf X)^{-1}\\mathbf X\'\\by$。',
     prereq: ['c06', 'c10', 'c04'],
@@ -269,6 +287,12 @@
    * ===================================================================== */
   add({
     id: 'c12', week: 'W2', lec: 'L03', pages: 'L03 p20–p28', star: 3,
+    keyEn: [
+      T`Basis expansion: replace $\bx$ by fixed non-linear features $\varphi(\bx)$ and fit $\hat y=\varphi(\bx)'\bw$; the model is linear in the parameters (normal equations still apply) but non-linear in $\bx$.`,
+      T`Polynomial basis, e.g. $[1,x,x^2]$; RBF: $\varphi(\bx)=\psi(\|\bx-\mathbf z\|)$ depends only on the distance to a centre $\mathbf z$, e.g. $\exp(-\frac1\sigma\|\bx-\mathbf z\|^2)$.`,
+      T`XOR is not linearly separable in the original space; with $\varphi_j(\bx)=\|\bx-\mathbf z_j\|$, the score $\varphi_1+\varphi_4$ is $\sqrt2$ for class A and 2 for class B, so a threshold (e.g. 1.7) separates them.`,
+      T`Limitation: the basis must be chosen in advance, and one centre per training point gives $n$ features; neural networks learn $\varphi$, kernels avoid computing it.`,
+    ],
     title: 'Basis expansion、RBF、XOR', en: 'Basis expansion, radial basis functions, XOR',
     summary: '把输入 $\\bx$ 先变成新特征 $\\varphi(\\bx)$，再做线性模型。对参数仍是线性的（闭式解照样能用），但对 $\\bx$ 可以是曲线、曲面。经典例子：XOR 在原空间线性不可分，换成"到中心的距离"特征后可分（L03 p24，往年 T8）。',
     prereq: ['c10', 'c11'],
@@ -395,6 +419,12 @@
    * ===================================================================== */
   add({
     id: 'c13', week: 'W2', lec: 'L04', pages: 'L04 p3–p11', star: 2,
+    keyEn: [
+      T`Training is optimisation: we want the minimiser (argmin) $\hat{\boldsymbol\theta}\in\argmin_{\boldsymbol\theta}L(\text{data},\boldsymbol\theta)$, not the minimum value.`,
+      T`Gradient descent: $\boldsymbol\theta^{(i+1)}=\boldsymbol\theta^{(i)}-\eta\nabla L(\boldsymbol\theta^{(i)})$; a too-large $\eta$ oscillates or diverges, a too-small one converges slowly.`,
+      T`SGD updates with the gradient of one batch (cheap; noisy but right on average); one pass over the data is an epoch, and the data are shuffled each epoch.`,
+      T`Convex (Hessian PSD): every local minimum is a global minimum; strictly convex: the minimiser, if it exists, is unique.`,
+    ],
     title: '迭代优化：GD、SGD', en: 'Iterative optimisation: gradient descent, SGD, convexity',
     summary: '大多数 ML 目标没有闭式解，只能"一步一步往下走"：沿负梯度方向更新 $\\boldsymbol\\theta\\leftarrow\\boldsymbol\\theta-\\eta\\nabla L$。SGD 每步只用一小批数据。凸函数保证找到的局部最小就是全局最小。',
     prereq: ['c04', 'c06'],
@@ -528,6 +558,11 @@
    * ===================================================================== */
   add({
     id: 'c14', week: 'W2', lec: 'L04', pages: 'L04 p12–p18', star: 1,
+    keyEn: [
+      T`Newton–Raphson finds a zero of the derivative using curvature: $\theta_{t+1}=\theta_t-L'(\theta_t)/L''(\theta_t)$; multivariate: $\boldsymbol\theta_{t+1}=\boldsymbol\theta_t-(\nabla^2L)^{-1}\nabla L$.`,
+      T`It fits a local quadratic and jumps to its stationary point (the minimum when the Hessian is positive definite): no learning rate, far fewer iterations than GD, and one step for a quadratic objective.`,
+      T`Each step needs the $p\times p$ Hessian, $O(p^2)$ memory and $O(p^3)$ time to invert, so it is impractical with many parameters (e.g. neural networks); it can be unstable far from the optimum.`,
+    ],
     title: 'Newton–Raphson', en: 'Newton–Raphson (second-order optimisation)',
     summary: '二阶方法：不只看坡度，还看弯曲程度（Hessian）。更新 $\\boldsymbol\\theta\\leftarrow\\boldsymbol\\theta-(\\nabla^2L)^{-1}\\nabla L$。收敛步数少得多，但每步要求逆 $p\\times p$ 矩阵，代价 $O(p^3)$。',
     prereq: ['c13'],
@@ -636,6 +671,13 @@
    * ===================================================================== */
   add({
     id: 'c15', week: 'W2', lec: 'L04', pages: 'L04 p19–p32', star: 2,
+    keyEn: [
+      T`Model: $P(Y=1\mid\bx)=\sigma(\bx'\bw)=\frac{1}{1+\exp(-\bx'\bw)}$, i.e. $y\mid\bx\sim\text{Bernoulli}(\sigma(\bx'\bw))$; the score $\bx'\bw$ is the log-odds.`,
+      T`It is a linear classifier: $\sigma(s)=\frac12\iff s=0$, so the decision boundary $\bx'\bw=0$ is a hyperplane.`,
+      T`Training is Bernoulli MLE, equivalent to minimising cross-entropy; the log-likelihood gradient is $\nabla L=\sum_i(y_i-\sigma(\bx_i'\bw))\bx_i$. No closed form, but the negative log-likelihood is convex (a single global optimum), so use gradient methods or Newton.`,
+      T`Linear regression is poor for classification: squared loss penalises correctly classified points far from the threshold, so such points drag the fit and shift the boundary.`,
+      T`Multiclass (softmax) logistic regression: one weight vector per class, logits $s_k=\bx'\bw_k$, $P(y=k\mid\bx)=\frac{\exp(s_k)}{\sum_j\exp(s_j)}$; predict the class with the largest logit; train by minimising the cross-entropy $-\sum_ky_k\log p_k$ with one-hot $\by$ (= negative log-likelihood). Parameters $D\cdot m+m$ (MNIST: $784\times10+10=7850$).`,
+    ],
     title: 'Logistic regression', en: 'Logistic regression',
     summary: '二分类：$P(Y=1\\mid\\bx)=\\sigma(\\bx\'\\bw)=\\frac{1}{1+e^{-\\bx\'\\bw}}$。决策边界 $\\bx\'\\bw=0$ 是超平面（所以是线性分类器）。训练 = Bernoulli MLE = 最小化 cross-entropy；没有闭式解，但目标是凸的，用 GD/Newton。',
     prereq: ['c03', 'c06', 'c13'],
@@ -652,6 +694,7 @@
       '写出 logistic 模型，并证明决策边界是 $\\bx\'\\bw=0$',
       '写出 Bernoulli 对数似然和梯度 $\\sum_i(y_i-\\theta(\\bx_i))\\bx_i$，手算一步更新',
       '说明 MLE ⇔ 最小化 cross-entropy',
+      '推广到多类：softmax、one-hot cross-entropy、数参数（Worksheet 6）',
     ],
     types: ['T13'],
     what: [
@@ -689,6 +732,12 @@
       T`上面是频率学派（c06）的写法：最大化整批标签出现的概率。课件后半段换成决策论（c07）的写法：给**每个样本**一个损失，再求平均。这个损失恰好等于"负的对数似然"，名字叫 **cross-entropy（交叉熵）**——所以最小化 cross-entropy 和最大化对数似然是同一件事：`,
       { t: 'math', tex: T`H(g_{\text{ref}},g_{\text{est}})=-\sum_{a\in A}g_{\text{ref}}(a)\log g_{\text{est}}(a)` },
       T`对一个样本，真实分布 $g_{\text{ref}}(1)=y_i,\ g_{\text{ref}}(0)=1-y_i$，估计分布 $g_{\text{est}}(1)=\theta(\bx_i)$：$H=-[y_i\log\theta(\bx_i)+(1-y_i)\log(1-\theta(\bx_i))]=-\log p(y_i\mid\bx_i)$。所以**最小化 cross-entropy 之和 = 最大化对数似然**（又一次"两条路同一个答案"）。`,
+      { t: 'h3', text: '多分类：softmax regression（Worksheet 6）', id: 'softmax' },
+      T`上面只有两类。$m$ 类时（如手写数字 0–9，$m=10$），每一类配一个权重向量 $\bw_k$，算一个得分 $s_k=\bx'\bw_k$（叫 **logit**），再用 softmax 把 $m$ 个得分变成概率：`,
+      { t: 'math', tex: T`P(y=k\mid\bx)=\frac{\exp(\bx'\bw_k)}{\sum_{j=1}^m\exp(\bx'\bw_j)}` },
+      T`取 exp 让每一项为正，除以总和让它们加起来为 1。exp 是单调增的，所以**预测 = 得分最大的那一类**（argmax），不用真的算出概率。$m=2$ 时 $P(y=1\mid\bx)=\frac{e^{s_1}}{e^{s_1}+e^{s_2}}=\sigma(s_1-s_2)$，就是上面的二分类 logistic regression。`,
+      T`训练仍是 MLE。把标签写成 **one-hot** 向量 $\by$（正确的那一类为 1，其余为 0），一个样本的多类 cross-entropy 是 $-\sum_ky_k\log p_k=-\log p_{\text{正确类}}$，正好是负对数似然，所以最小化它就是最大化似然。`,
+      T`**数参数**：每类一个 $D$ 维权重向量加一个 bias，共 $D\cdot m+m$ 个。Worksheet 6 的 MNIST：$28\times28=784$ 个像素当特征，10 类：$784\times10+10=7850$。它也叫没有隐藏层的单层神经网络（c33），仍是线性分类器。`,
     ],
     fx: [
       {
@@ -715,6 +764,8 @@
       T`一个样本 $\bx=(1,2)$，$y=1$，$\bw=(0,0)$，$\eta=0.1$：$\theta=\sigma(0)=0.5$；梯度 $(1-0.5)(1,2)=(0.5,1)$；新 $\bw=(0.05,0.1)$。`,
       { t: 'h3', text: '例 3：cross-entropy' },
       T`$y=1$，预测 $p=0.8$：$H=-\ln0.8\approx0.223$。$y=1$ 但预测 $p=0.1$：$H=-\ln0.1\approx2.303$。错得越自信，惩罚越大。`,
+      { t: 'h3', text: '例 4：softmax（3 类）' },
+      T`logits $(2,1,0)$：$e^2\approx7.389$，$e^1\approx2.718$，$e^0=1$，和 $\approx11.107$ ⇒ 概率 $\approx(0.665,\ 0.245,\ 0.090)$，预测第 1 类（得分最大）。如果正确答案是第 2 类，one-hot $\by=(0,1,0)$，loss $=-\ln0.245\approx1.41$。（c41 attention 的权重也是这样算的。）`,
       { t: 'fade', title: '分步练习：logistic 的梯度更新', plan: [T`$\theta=\sigma(\bx'\bw)$`, T`梯度 $(y-\theta)\bx$`, T`$\bw\leftarrow\bw+\eta\cdot$梯度`], items: [
         { md: T`$\bx=(1,3)$，$y=0$，$\bw=(0,0)$，$\eta=0.1$。`, steps: [
           { md: T`$\theta=\sigma(0)=0.5$` },
@@ -759,6 +810,8 @@
       { type: 'num', q: '$\\sigma(s)=0.8$，求 $\\sigma(-s)$。', answer: 0.2, explain: T`Sigmoid 有对称性 $\sigma(-s)=1-\sigma(s)$。推导：$\sigma(-s)=\frac1{1+e^{s}}$，分子分母同乘 $e^{-s}$ 得 $\frac{e^{-s}}{e^{-s}+1}=1-\frac1{1+e^{-s}}=1-\sigma(s)$。题目给 $\sigma(s)=0.8$，所以 $\sigma(-s)=1-0.8=0.2$。含义：**得分取反，就是把 $P(Y=1)$ 和 $P(Y=0)$ 对调**。` },
       { type: 'num', q: '$\\bw=(1,-2)$（含 bias），$\\bx=(1,0.5)$。$P(Y=1\\mid\\bx)=?$', answer: 0.5, explain: T`先算线性得分 $s=\bx'\bw$，再代入 sigmoid。"含 bias"的意思是：$\bx$ 的第一个分量是 dummy feature $x_0=1$，$\bw$ 的第一个分量是截距 $w_0=1$。$s=1\times1+(-2)\times0.5=1-1=0$，所以 $P(Y=1\mid\bx)=\sigma(0)=0.5$，这个点正好在决策边界上。**陷阱是漏掉 bias 项**：只算 $-2\times0.5=-1$ 会得到 $\sigma(-1)\approx0.269$。`, qzh: T`已知 $\bw=(1,-2)$，其中含偏置项（bias）；$\bx=(1,0.5)$。求 $P(Y=1\mid\bx)$。` },
       { type: 'mc', q: 'Logistic regression 的训练目标等价于：', options: ['最小化 RSS', '最小化 cross-entropy（负对数似然）', '最大化 margin', '最小化 0-1 loss'], answer: 1, explain: 'L04 p29–p31。' },
+      { type: 'num', q: '3 类 softmax，logits $(\\ln6,\\ \\ln3,\\ 0)$。第 1 类的概率？', answer: 0.6, explain: T`softmax 先对每个 logit 取 exp，再除以总和。exp 和 ln 互为反函数：$\exp(\ln6)=6$，$\exp(\ln3)=3$，$\exp(0)=1$，和 $6+3+1=10$。第 1 类 $6/10=0.6$，另外两类 $0.3$、$0.1$，三者和为 1；预测第 1 类，因为它的 logit 最大。**陷阱：直接拿 logit 相除**，$\ln6/(\ln6+\ln3+0)$ 不是概率。` },
+      { type: 'num', q: '（Worksheet 6）MNIST 的 $28\\times28$ 灰度图拉平当特征，做 10 类 multiclass logistic regression（含 bias）。参数个数？', answer: 7850, explain: T`特征数 $D=28\times28=784$（每个像素一个）。每类一个 784 维权重向量：$784\times10=7840$；每类再加 1 个 bias，共 10 个。合计 $7840+10=7850$。worksheet 把权重排成 $784\times10$ 的矩阵 $W$ 加长度 10 的 $\mathbf b$，数出来一样。这个模型就是没有隐藏层的单层神经网络。` },
       { type: 'show', q: '用英文说明为什么 logistic regression 是线性分类器。', answer: T`It predicts class 1 when $P(y=1\mid\mathbf x)=\sigma(\mathbf x'\mathbf w)\ge\frac12$. Since $\sigma(s)=\frac12\iff s=0$, the decision boundary is $\mathbf x'\mathbf w=0$, a hyperplane with normal vector $\mathbf w$; the sigmoid only maps the linear score to a probability.` },
     ],
   });
@@ -775,7 +828,7 @@
       [T`Basis expansion $\varphi(\bx)'\bw$：对参数线性、对输入非线性；XOR 用距离特征后 A 得分 $\sqrt2$、B 得分 2。`, 'c12'],
       [T`GD：$\boldsymbol\theta\leftarrow\boldsymbol\theta-\eta\nabla L$；SGD 用 batch；凸 ⇒ 局部最小即全局，严格凸 ⇒ 最小点若存在则唯一。`, 'c13'],
       [T`Newton：$\boldsymbol\theta\leftarrow\boldsymbol\theta-(\nabla^2L)^{-1}\nabla L$；步数少但每步 $O(p^3)$。`, 'c14'],
-      [T`Logistic：$P(Y=1\mid\bx)=\sigma(\bx'\bw)$，边界 $\bx'\bw=0$；梯度 $\sum(y_i-\theta(\bx_i))\bx_i$；MLE = 最小化 cross-entropy；无闭式解但凸。`, 'c15'],
+      [T`Logistic：$P(Y=1\mid\bx)=\sigma(\bx'\bw)$，边界 $\bx'\bw=0$；梯度 $\sum(y_i-\theta(\bx_i))\bx_i$；MLE = 最小化 cross-entropy；无闭式解但凸；多类用 softmax $\frac{\exp(s_k)}{\sum_j\exp(s_j)}$ + one-hot cross-entropy，参数 $Dm+m$。`, 'c15'],
     ],
     map: [
       { t: 'table', head: ['模型', '概率假设', '损失（ERM 视角）', '怎么求解'], rows: [

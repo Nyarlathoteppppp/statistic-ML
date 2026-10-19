@@ -10,6 +10,12 @@
    * ===================================================================== */
   add({
     id: 'c42', week: 'W8', lec: 'L15', pages: 'L15 p3–p14', star: 2,
+    keyEn: [
+      T`From the confusion matrix: precision $=TP/(TP+FP)$, recall (sensitivity) $=TP/(TP+FN)$, specificity $=TN/(TN+FP)$, $F_1=\frac{2PR}{P+R}$; for regression use MSE, RMSE or MAE.`,
+      T`Because the class distributions overlap, moving the threshold trades precision against recall (sensitivity against specificity), so report them in pairs; accuracy is misleading for imbalanced classes.`,
+      T`ROC curve: one (specificity, sensitivity) point per threshold; AUC（曲线下面积）summarises it: 0.5 = random guessing, 1 = perfect classifier.`,
+      T`50% error is the chance-level baseline for balanced binary classes, not a lower bound; when errors have different costs use a cost-sensitive loss $\frac1n\sum_iCost(g(x_i),y_i)$.`,
+    ],
     title: '评估指标', en: 'Performance metrics: confusion matrix, precision/recall, ROC/AUC, costs',
     summary: '模型好不好，要看在**没见过的数据**上的表现，而且要选对指标。回归用 MSE / RMSE / MAE；分类用混淆矩阵（TP、FP、FN、TN）派生出的 accuracy、precision、recall（= sensitivity）、specificity、F1。precision 和 recall 此消彼长；扫阈值得到 **ROC 曲线**，用 **AUC** 概括。不同错误代价不同时用 cost-sensitive loss。',
     prereq: ['c07', 'c20'],
@@ -126,6 +132,12 @@
    * ===================================================================== */
   add({
     id: 'c43', week: 'W8', lec: 'L15', pages: 'L15 p15–p24', star: 2,
+    keyEn: [
+      T`Training set fits parameters, validation set selects hyperparameters, test set is used once to report performance; never tune on the test set.`,
+      T`$k$-fold CV: train on $k-1$ folds, test on the held-out fold, rotate; report $\hat\mu=\frac1k\sum_iM_i$ and $\hat\sigma^2=\frac1k\sum_i(M_i-\hat\mu)^2$; $k=n$ is leave-one-out.`,
+      T`0.632 bootstrap: draw $n$ examples with replacement for training, test on the unsampled ones; an example is drawn at least once with probability $1-(1-1/n)^n\to1-1/e\approx0.632$.`,
+      T`Nested CV: the inner loop selects hyperparameters, the outer loop reports performance. Feature selection must use only each fold's training part, otherwise the CV estimate is optimistically biased.`,
+    ],
     title: '验证集、k-fold、bootstrap、nested CV', en: 'Train/validation/test, k-fold cross-validation, 0.632 bootstrap, nested CV',
     summary: '训练误差会骗人（过拟合）。分出 **validation set（验证集）** 选超参数、**test set（测试集）** 报最终结果。数据少时用 **k-fold cross-validation（k 折交叉验证）**：轮流留一折做测试；或 **0.632 bootstrap**：有放回抽 $n$ 个训练、剩下的测试（每个样本被抽中的概率约 0.632）。选超参数 + 报告性能要用 **nested CV**。特征选择必须在 CV **内部**只用训练部分做。',
     prereq: ['c18', 'c42'],
@@ -217,6 +229,7 @@
     ],
     pitfalls: [
       ['用测试集选超参数', '选超参数用验证集（或内层 CV）；测试集只用来报告。'],
+      ['先在全部数据上画图、看关系，选好模型后才划分 train/test', '这也是偷看，叫 data snooping（数据窥探，Worksheet 3 的 "Have we made any mistakes?"）：测试样本已经影响了模型选择，测试误差偏乐观。先划分，画图、选模型都只看训练集。'],
       ['在全部数据上做特征选择再 CV', '会"偷看"验证数据（L15 p22）。'],
       ['Bootstrap 是无放回抽样', '有放回，所以有重复、有样本没被抽到。'],
       ['k-fold 的方差除以 $k-1$', 'L15 的公式除以 $k$。'],
@@ -234,6 +247,12 @@
    * ===================================================================== */
   add({
     id: 'c44', week: 'W8', lec: 'L15', pages: 'L15 p25–p35', star: 1,
+    keyEn: [
+      T`A difference in mean error may be luck: report the mean and variance over repeated splits ($k$-fold or bootstrap) and test whether the difference is significant.`,
+      T`Two-sample $t$ test: $x=\frac{(\hat\mu_1-\hat\mu_2)\sqrt m}{\sqrt{\hat\sigma_1^2+\hat\sigma_2^2}}$; one-sided $H_1:\mu_1>\mu_2$; reject $\mu_1=\mu_2$ only if $x>x_{1-\alpha,\nu}$ (critical value is given).`,
+      T`Error bars $\hat\mu_j\pm\frac{\hat\sigma_j}{\sqrt m}x_{1-\alpha/2,m-1}$ are a separate two-sided display; heavily overlapping bars suggest no clear difference.`,
+      T`Each sample must be an independent unit of interest（研究单位）: repeated measurements of one patient or object, or duplicated data, inflate $m$ and fake significance.`,
+    ],
     title: '比较算法：t 检验、error bars', en: 'Comparing algorithms: variability, t-test, error bars, units of interest',
     summary: '两个算法的平均错误率不同，可能只是运气。要同时看**均值和方差**：用 **two-sample t test（双样本 t 检验）** 判断差异是否显著，或画 **error bars（误差条）** 看是否重叠。另外，每个样本必须是一个独立的"研究单位"，不能把同一个人 / 物体的多次记录当成多个样本。',
     prereq: ['c43'],
@@ -326,6 +345,12 @@
    * ===================================================================== */
   add({
     id: 'c45', week: 'W8', lec: 'L16', pages: 'L16 p1–p14', star: 2,
+    keyEn: [
+      T`Online learning with expert advice: each round see $n$ experts' predictions, predict, then see the outcome; outcomes may be adversarial (no i.i.d. assumption); compare our mistakes $M$ with the best expert's $m$.`,
+      T`Majority vote (an infallible expert exists): predict the majority of the surviving experts and delete every expert that errs; $M\le\log_2n$.`,
+      T`Halving (no perfect expert): weighted majority vote, halve the weight of each wrong expert instead of deleting it; $M\le\frac{m+\log_2n}{\log_2(4/3)}\approx2.41(m+\log_2n)$.`,
+      T`Potential-function（势函数）proof: each learner mistake cuts the total weight by a constant factor, $W\le n(3/4)^M$, while the best expert keeps $W\ge(1/2)^m$; take logs.`,
+    ],
     title: 'Experts：majority、halving', en: 'Learning with expert advice: majority vote and halving',
     summary: '**Online learning（在线学习）**：每天听 $n$ 个专家的预测，自己做预测，再看真实结果；目标是总错误少。结果可以是**对抗性的**（不假设 i.i.d.）。有完美专家时用 **majority vote**：错一次删掉所有错的专家，$M\\le\\log_2n$。没有完美专家时用 **halving**：错的专家权重减半而不删除，$M\\le2.4(m+\\log_2n)$。',
     prereq: ['c31'],
@@ -442,6 +467,12 @@
    * ===================================================================== */
   add({
     id: 'c46', week: 'W8', lec: 'L16', pages: 'L16 p15–p27', star: 1,
+    keyEn: [
+      T`Weighted majority: multiply each wrong expert's weight by $(1-\varepsilon)$; $M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}$ for $\varepsilon\in(0,0.5]$. Smaller $\varepsilon$ brings the factor on $m$ towards 2 but enlarges the $\ln n$ term.`,
+      T`No deterministic algorithm beats the factor 2: with two always-disagreeing experts an adversary makes the learner wrong every round ($M=T$), while the better expert has $m\le T/2$.`,
+      T`Probabilistic experts: follow expert $i$ with probability $w_i/W$ and update $w_i\leftarrow(1-\varepsilon)^{\ell_i}w_i$ for losses in $[0,1]$; expected loss $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$ for $\varepsilon\in(0,0.5]$.`,
+      T`Regret $=L-L^*$: the learner's total loss minus the best expert's (in hindsight). Worksheet 9: $n=3$, $\varepsilon=0.1$, $L=4$, $L^*=2$ ⇒ regret $2$; the bound gives $\frac{\ln3}{0.1}+1.1\times2\approx13.2$, larger than the trivial bound $10$ (10 rounds, losses in $[0,1]$), so it is vacuous there.`,
+    ],
     title: 'Weighted majority、probabilistic experts', en: 'Weighted majority (1−ε) and probabilistic experts',
     summary: '把 halving 的"减半"推广成"乘 $1-\\varepsilon$"：$M\\le2(1+\\varepsilon)m+\\frac{2\\ln n}{\\varepsilon}$，对 $m$ 的系数接近 2（确定性算法不可能更好）。再随机化：按权重概率选一个专家跟，损失在 $[0,1]$，期望总损失 $L\\le\\frac{\\ln n}{\\varepsilon}+(1+\\varepsilon)L^*$——系数接近 1。',
     prereq: ['c45'],
@@ -449,6 +480,7 @@
       [T`$\varepsilon$`, T`降权幅度，$\varepsilon\in(0,0.5]$`],
       [T`$\ell_i^{(t)}\in[0,1]$`, T`专家 $i$ 在第 $t$ 轮的损失`],
       [T`$L^*$`, T`最好专家的总损失`],
+      [T`$L-L^*$`, T`regret（遗憾）：学习者总损失比事后最好的专家多多少`],
       [T`$L_t$, $L=\sum_tL_t$`, T`学习者第 $t$ 轮的期望损失、总期望损失`],
       [T`$\ln$`, T`自然对数（本章的 log 都是 $\log_e$；c45 的 majority / halving 用 $\log_2$）`],
       [T`$w_i,\ W=\sum_iw_i$`, T`专家 $i$ 的权重、所有专家的总权重`],
@@ -477,6 +509,7 @@
       T`随机化之后，损失也不必再是"错了记 1"，可以是 0 到 1 之间的小数（比如预测概率差多少）。学习者按权重比例**随机**挑一个专家跟，对手就无法提前算准你会跟谁。更新也改成覆盖**所有**专家：损失越大，乘的 $(1-\varepsilon)^{\ell_i}$ 越小（损失 0 的不降权）。这样期望总损失对最好专家的系数能从 2 降到 $1+\varepsilon$：`,
       T`**Probabilistic experts**（L16 p22）：损失 $\ell_i^{(t)}\in[0,1]$；以概率 $w_i/W$ 随机选专家 $i$ 跟着预测；**每个**专家都更新 $w_i\leftarrow(1-\varepsilon)^{\ell_i^{(t)}}w_i$。`,
       { t: 'math', tex: T`L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*\qquad(\text{L16 p23})` },
+      T`**Regret（遗憾）** $=L-L^*$：学习者的总损失比事后看来最好的那个专家多出多少（Worksheet 9 用这个词；c47 bandits 的 cumulative regret 是同一个想法，只是换成奖励）。上面的界移项就是 regret 的界：$L-L^*\le\frac{\ln n}{\varepsilon}+\varepsilon L^*$。`,
       T`和 bandits 的联系（L16 p27）：如果每轮只能看到**自己选的那个专家**的损失，就是下一周的 multi-armed bandit（c47）。`,
     ],
     why: [
@@ -506,6 +539,14 @@
       },
     ],
     example: [
+      { t: 'h3', text: 'Worksheet 9 手算题（全解）' },
+      T`题目：probabilistic experts，3 个专家，$\varepsilon=0.1$。10 轮后算法的累计损失是 4，事后最好的专家累计损失是 2。题目给了 $\ln0.1\approx-2.3$、$\ln2\approx0.7$、$\ln3\approx1.1$、$\ln4\approx1.4$，这里只用到 $\ln3$。`,
+      { t: 'steps', items: [
+        T`**(a) 证明思路**：用总权重 $W$ 当势函数。上界：用 $(1-\varepsilon)^\ell\le1-\varepsilon\ell$ 得每轮 $W(t+1)\le(1-\varepsilon L_t)W(t)$，所以 $W\le n\prod_t(1-\varepsilon L_t)$。下界：最好专家的权重 $(1-\varepsilon)^{L^*}\le W$。两边取 $\ln$，用 $\ln(1-x)\le-x$ 和 $-\ln(1-\varepsilon)\le\varepsilon+\varepsilon^2$ 化简，得 $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$（见"数学定义"）。`,
+        T`**(b) Regret** $=L-L^*=4-2=2$。`,
+        T`**(c) 定理给的上界**：$\frac{\ln3}{0.1}+(1+0.1)\times2\approx\frac{1.1}{0.1}+2.2=11+2.2=13.2$（用精确的 $\ln3$ 是 13.19）。实际损失 4 在界内。`,
+        T`**(d) 平凡上界**：每轮损失最多 1，10 轮最多 $10\times1=10$。定理给的 13.2 比 10 还大，所以在 $T=10$ 时这个界没有提供任何信息（vacuous）。原因是 $\frac{\ln n}{\varepsilon}=11$ 这一项不随轮数增长，轮数少时它一项就超过了 $T$。轮数多时界才有用：例如 100 轮、$L^*=20$，界 $=11+1.1\times20=33$，远小于 100。`,
+      ] },
       { t: 'fade', title: '分步练习：代入界', plan: ['确定 $m$（或 $L^*$）、$n$、$\\varepsilon$', '代入公式', '比较 / 解释'], items: [
         { md: T`Weighted majority：$m=10$，$\ln n=4$，$\varepsilon=0.5$。`, steps: [
           { md: '已给出' }, { md: '$2(1.5)(10)+2(4)/0.5=30+16=46$' }, { md: '学习者最多错 46 次' },
@@ -569,7 +610,7 @@
       [T`Train/val/test 分工；k-fold（均值、方差除以 $k$）、LOOCV；0.632 bootstrap；nested CV；特征选择在 CV 内部。`, 'c43'],
       [T`$t$ 检验 $x=\frac{(\hat\mu_1-\hat\mu_2)\sqrt m}{\sqrt{\hat\sigma_1^2+\hat\sigma_2^2}}$ 与临界值比；单侧检验；error bars 是另一种（双侧）展示，明显重叠 ⇒ 看不出差异；样本要是独立研究单位。`, 'c44'],
       [T`Online 设定（对抗性结果）；majority：删错的，$M\le\log_2n$；halving：错的减半，$M\le\frac{m+\log_2n}{\log_2(4/3)}\approx2.41(m+\log_2n)$。`, 'c45'],
-      [T`Weighted majority $\times(1-\varepsilon)$：$M\le2(1+\varepsilon)m+2\ln n/\varepsilon$（2 不可改进）；probabilistic：$L\le\ln n/\varepsilon+(1+\varepsilon)L^*$。`, 'c46'],
+      [T`Weighted majority $\times(1-\varepsilon)$：$M\le2(1+\varepsilon)m+2\ln n/\varepsilon$（2 不可改进）；probabilistic：$L\le\ln n/\varepsilon+(1+\varepsilon)L^*$；regret $=L-L^*$，轮数少时界可能大于平凡上界 $T$（vacuous）。`, 'c46'],
     ],
     map: [
       { t: 'table', head: ['', 'Batch（W1–W7）', 'Online（本周 L16）'], rows: [

@@ -10,6 +10,12 @@
    * ===================================================================== */
   add({
     id: 'c47', week: 'W9', lec: 'L17', pages: 'L17 p2–p15', star: 2,
+    keyEn: [
+      T`Multi-armed bandit: $k$ arms with unknown mean rewards $\mu_i$; each round pull one arm and observe only its reward (unlike experts, where every expert's loss is seen).`,
+      T`Cumulative regret $=\mu^*T-\sum_{t=1}^TE[R_{i_t}(t)]=\sum_iE[N_T(i)](\mu^*-\mu_i)$ with $\mu^*=\max_i\mu_i$; exploration vs exploitation is the trade-off.`,
+      T`Greedy plays $\arg\max_iQ_{t-1}(i)$ (sample means) and never explores: $Q_0=-\infty$ locks onto the first arm pulled, $Q_0=+\infty$ only tries each arm once.`,
+      T`ε-greedy: with probability $1-\varepsilon$ exploit, with probability $\varepsilon$ pick uniformly among all $k$ arms; its exploration is blind to how reliable each estimate is.`,
+    ],
     title: 'Bandits：regret、greedy、ε-greedy', en: 'Multi-armed bandits: cumulative regret, greedy and ε-greedy',
     summary: '**Multi-armed bandit（多臂老虎机）**：面前有 $k$ 台老虎机（**arm，臂**），每台的平均奖励未知。每一轮只能拉一台，**只看到这一台的奖励**。目标是让累计奖励尽量接近"一开始就知道哪台最好"的人——差距叫 **cumulative regret（累积遗憾）**。核心矛盾是 **exploration vs exploitation（探索 vs 利用）**：拉看起来最好的（利用），还是试试不太了解的（探索）？Greedy 只利用；ε-greedy 以概率 ε 随机探索。',
     prereq: ['c46'],
@@ -166,6 +172,18 @@
    * ===================================================================== */
   add({
     id: 'c48', week: 'W9', lec: 'L17', pages: 'L17 p16–p23', star: 3,
+    keyEn: [
+      T`UCB: $Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\frac{2\ln t}{N_{t-1}(i)}}$, where $t=\sum_iN_{t-1}(i)+1$ is the current round, shared by all arms; pull the arm with the largest $Q$.`,
+      T`Optimism in the face of uncertainty（面对不确定性保持乐观）: rarely pulled arms get a large bonus, and a neglected arm's bonus grows with $\ln t$, so it is eventually tried again.`,
+      T`Two exploration mechanisms: an optimistic initial value $Q_0$ (e.g. $+\infty$) for unpulled arms, and the exploration bonus; a larger $\rho$ in $\sqrt{\rho\ln t/N_{t-1}(i)}$ explores more.`,
+      T`The bonus comes from Hoeffding's inequality with failure probability $\varepsilon=1/t^4$; UCB's regret grows only as $O(\log t)$.`,
+    ],
+    examQ: [
+      { src: '2021 Q17', q: T`Describe two mechanisms used by the Upper Confidence Bound (UCB) multi-armed bandit to explore arms that so far have no demonstrated high rewards. (Given: $Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log(t)/N_{t-1}(i)}$; unobserved arms start with value $Q_0$.)`,
+        a: T`(1) Initialisation: an arm never pulled takes the value $Q_0$; an optimistic $Q_0$ (e.g. $+\infty$) makes every arm be tried before exploitation begins. (2) The exploration bonus $\sqrt{\rho\log t/N_{t-1}(i)}$ is large for rarely pulled arms and grows with $\log t$ while an arm is neglected, so an uncertain arm can have the highest value despite a low mean; larger $\rho$ explores more.`,
+        qzh: T`描述置信上界（Upper Confidence Bound, UCB）多臂老虎机（multi-armed bandit）用来探索那些至今还没有表现出高奖励的臂（arms）的两种机制。（已给出：$Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log(t)/N_{t-1}(i)}$；没有被观测过的臂初始值为 $Q_0$。）`,
+        azh: T`(1) 初始化（initialisation）：从未拉过的臂取值 $Q_0$；乐观的（optimistic）$Q_0$（例如 $+\infty$）使每个臂在开始利用（exploitation）之前都会被尝试。(2) 探索奖励（exploration bonus）$\sqrt{\rho\log t/N_{t-1}(i)}$ 对很少被拉的臂很大，而且在一个臂被冷落期间随 $\log t$ 增长，所以一个不确定的臂即使均值低，也可能拥有最高的值；$\rho$ 越大，探索越多。` },
+    ],
     title: 'UCB', en: 'Upper confidence bound (UCB): optimism in the face of uncertainty',
     summary: '**UCB（upper confidence bound，置信上界）**：给每个臂的平均奖励加一个**探索奖励（exploration bonus）** $\\sqrt{2\\ln t/N_{t-1}(i)}$，拉值最大的。拉得少的臂 bonus 大，所以会被"乐观地"高估、得到尝试——**optimism in the face of uncertainty（面对不确定时保持乐观）**。bonus 来自 Hoeffding 不等式。**往年必考计算题（T2）**：给每个臂的次数和奖励，算 UCB 值、选下一个臂。',
     prereq: ['c47', 'c21'],
@@ -185,6 +203,7 @@
       '解释 bonus 为什么随 $N$ 减小、随 $t$ 增大；解释 optimism in the face of uncertainty',
       '说出 UCB 的两种探索机制：$Q_0$ 和 bonus（2021 Q17）',
       '说出 bonus 来自 Hoeffding（$\\varepsilon=1/t^4$），以及 regret 是 $O(\\log t)$（L17 p17、p22）',
+      '说出 offline evaluation 怎么用随机日志评估一个 bandit（Workshop 10）',
     ],
     types: ['T02'],
     what: [
@@ -202,7 +221,7 @@
       { t: 'math', tex: T`Q_{t-1}(i)=\begin{cases}\hat\mu_{t-1}(i)+\sqrt{\dfrac{2\ln t}{N_{t-1}(i)}},&N_{t-1}(i)>0\\[1em]Q_0,&N_{t-1}(i)=0\end{cases}\qquad i_t\in\argmax_iQ_{t-1}(i)` },
       T`拉 $Q$ 最大的臂（平局随机）。$\hat\mu_{t-1}(i)$ 是该臂的平均奖励 $=\dfrac{\text{该臂累计奖励}}{N_{t-1}(i)}$。`,
       T`**两部分**：$\hat\mu$ 负责**利用**（平均高的臂值高）；$\sqrt{2\ln t/N}$ 负责**探索**（拉得少的臂值高）。两者加在一起，一个公式同时照顾了两件事——不像 ε-greedy 要靠抛硬币切换。`,
-      T`例（2026 practice Q2）：三个臂拉了 $(64,16,4)$ 次、奖励总和 $(40,10,2)$，下一轮 $t=85$，$2\ln t\approx9$。平均 $(40/64,\ 10/16,\ 2/4)=(0.625,\ 0.625,\ 0.5)$。bonus 是 $\sqrt{2\ln t/N}$——要开方：$\sqrt{9/64}=3/8$，$\sqrt{9/16}=3/4$，$\sqrt{9/4}=3/2$。UCB 值 $0.625+0.375=1$、$0.625+0.75=1.375$、$0.5+1.5=2$ ⇒ 拉臂 3：它平均最低，但只拉过 4 次、最不确定。具体步骤见下面"数学定义"和 [T2](#/T02)。`,
+      T`例（2026 practice Q2，也是 Workshop 10 的手算题，官方答案相同）：三个臂拉了 $(64,16,4)$ 次、奖励总和 $(40,10,2)$，下一轮 $t=85$，$2\ln t\approx9$。平均 $(40/64,\ 10/16,\ 2/4)=(0.625,\ 0.625,\ 0.5)$。bonus 是 $\sqrt{2\ln t/N}$——要开方：$\sqrt{9/64}=3/8$，$\sqrt{9/16}=3/4$，$\sqrt{9/4}=3/2$。UCB 值 $0.625+0.375=1$、$0.625+0.75=1.375$、$0.5+1.5=2$ ⇒ 拉臂 3：它平均最低，但只拉过 4 次、最不确定。具体步骤见下面"数学定义"和 [T2](#/T02)。`,
       { t: 'video', id: 'ucb' },
       { t: 'h3', text: '④ 效果：和 ε-greedy 比（L17 p19–p21）' },
       { t: 'slide', src: 'L17/p21', caption: '平均累计奖励：UCB（红）很快超过两条 ε-greedy 曲线并一直领先。' },
@@ -212,6 +231,9 @@
       T`**可调版本**（L17 p22）：把 2 换成 $\rho>0$：$\hat\mu+\sqrt{\rho\ln t/N}$。$\rho$ 越大越爱探索。2021 Q17 给的就是这个形式。`,
       T`回到 c47 的目标：cumulative regret 要尽量小。固定 $\varepsilon$ 的 ε-greedy 每轮都拿固定比例去盲探，regret 随轮数**线性**增长；UCB 的保证好得多：`,
       T`**Regret**（L17 p22）：UCB 的 regret 增长是 $O(\log t)$，平均每轮的 regret $\to0$；在乘一个常数的意义下是最优的。UCB 是 AlphaGo 用的 Monte Carlo tree search（蒙特卡洛树搜索）的基础。`,
+      { t: 'h3', text: '⑥ 不上线也能比较：offline evaluation（Workshop 10）' },
+      T`④ 里比较 UCB 和 ε-greedy 的曲线是模拟出来的。真实场景（Workshop 10：新闻网站选哪篇文章，被点击奖励为 1，否则为 0）里，把两个 bandit 都上线比较很贵：算法一开始什么都不知道，前期必然给读者推很多没人点的文章。`,
+      T`**Offline / off-policy evaluation（离线评估）** 只用一份历史日志：每一轮的文章是均匀随机选的，并记下点没点。评估一个 bandit 时按顺序回放日志：让它选一个臂；和日志里的臂相同，就把日志里的奖励给它、更新它、计入成绩；不同就跳过这一条，因为没人知道它选的那篇会不会被点。日志是均匀随机的，所以留下来的那些轮，和这个算法真的上线时遇到的情况一样。代价是丢掉大部分日志：10 个臂时平均只有约 1/10 能对上（Workshop 10 用 1 万条日志，只评估了 800 个对上的轮）。成绩看每轮平均奖励，也就是点击率（CTR，click-through rate）。`,
     ],
     why: [
       T`**T2 是往年必考计算题**：2026 practice Q2（6 分）原题就是"三个臂、给次数和奖励、算 UCB 值、选臂"；2021 Q17（8 分）问 UCB 的两种探索机制。计算只要一个公式，失分点集中在"$t$ 取多少"和"不用计算器开根号"。完整题型见 [T2](#/T02)。`,
@@ -299,6 +321,7 @@
       { type: 'num', q: '$\\ln t\\approx2$，某臂 $N=16$，$\\hat\\mu=0.5$。UCB 值？', answer: 1, explain: T`UCB 值 = 平均奖励 + exploration bonus（探索奖励）：$Q=\hat\mu+\sqrt{2\ln t/N}$。题目给 $\hat\mu=0.5$、$\ln t\approx2$、该臂被拉次数 $N=16$。bonus：$2\ln t=2\times2=4$，$4/16=0.25$，开方 $\sqrt{0.25}=0.5$。$Q=0.5+0.5=1$。两个陷阱：忘了根号里的 2（得 $\sqrt{2/16}\approx0.35$），或**忘了开方**（得 $0.5+0.25=0.75$）。` },
       { type: 'mc', q: '一个臂很久没被拉，它的 UCB bonus 会：', options: ['不变', '慢慢变大', '慢慢变小', '变成 0'], answer: 1, explain: T`bonus 是 $\sqrt{2\ln t/N_{t-1}(i)}$。臂没被拉，它的次数 $N$ 停在原值；而轮号 $t$ 每轮加 1，$\ln t$ 慢慢增大，所以 bonus 慢慢变大，**这个臂迟早会被再试一次**，不会像 greedy 那样被永远放弃。"不变"是最诱人的错项：它只看到 $N$ 不变，忽略了所有臂共用的 $t$ 一直在涨。` },
       { type: 'mc', q: 'UCB bonus 的理论来源是：', options: ['中心极限定理', 'Hoeffding 不等式', 'Bayes 公式', 'VC 维'], answer: 1, explain: T`Hoeffding's inequality（Hoeffding 不等式）说：$n$ 个取值在 $[0,1]$ 的 i.i.d. 奖励，以至少 $1-\varepsilon$ 的概率有 $\mu\le\overline R_n+\sqrt{\ln(1/\varepsilon)/(2n)}$，右边就是真实均值的置信上界。把 $n$ 换成该臂的次数 $N_{t-1}(i)$，并取失败概率 $\varepsilon=1/t^4$：$\ln(1/\varepsilon)=4\ln t$，**$\sqrt{4\ln t/(2N)}=\sqrt{2\ln t/N}$ 正是 UCB 的 bonus**。central limit theorem（中心极限定理）只在样本多时给近似，Hoeffding 对任意 $n$ 都成立，课件用的是后者。L17 p17。` },
+      { type: 'mc', q: 'Offline evaluation 回放均匀随机的日志。某一轮 bandit 选的臂和日志里的臂不同，应该：', options: ['把日志里的奖励记给它', '跳过这一条：不更新、不计分', '记奖励 0 并更新', '按日志里的臂更新它'], answer: 1, explain: T`日志只记下了被随机选中的那个臂的奖励；bandit 选了别的臂，它会不会被点击没人知道，所以这一条既不能计分，也不能用来更新，只能跳过。只保留对上的轮：因为日志是均匀随机选的臂，这些轮和算法真的上线时遇到的情况一样，评估是公平的。"记奖励 0"会把"没观测到"当成"没被点击"，系统性地压低成绩；"把日志的奖励记给它"或"按日志的臂更新"等于把别的臂的结果算到它头上。Workshop 10。` },
     ],
   });
 
@@ -307,6 +330,10 @@
    * ===================================================================== */
   add({
     id: 'c49', week: 'W9', lec: 'L17', pages: 'L17 p24–p27', star: 1,
+    keyEn: [
+      T`A contextual bandit observes a context vector $\mathbf X_i(t)$ each round, so estimating $E[R_i(t)\mid\mathbf X_i(t)]$ becomes a regression problem; UCB is applied to the regression prediction.`,
+      T`Contextual bandit vs RL: in a contextual bandit the action does not affect the next state; in reinforcement learning the (state, action) pair determines the next state, so future rewards must be considered.`,
+    ],
     title: 'Contextual bandits 与 RL', en: 'Contextual bandits and the link to reinforcement learning',
     summary: '现实里"哪个臂最好"往往取决于情况：给体育迷和给厨艺爱好者推荐的广告不一样。**Contextual bandit（上下文老虎机）** 每轮先看到一个**上下文（context）**特征向量，奖励的估计变成**回归问题** $E[R_i(t)\\mid\\bX_i(t)]$，再对回归预测用 UCB。再往前一步，如果选的动作还会**改变下一轮的状态**，就是 **reinforcement learning（强化学习）**。',
     prereq: ['c48', 'c10'],
@@ -387,6 +414,27 @@
    * ===================================================================== */
   add({
     id: 'c50', week: 'W9', lec: 'L18', pages: 'L18 p2–p27', star: 3,
+    keyEn: [
+      T`MLE/MAP give a point estimate that ignores parameter uncertainty; Fisher information $\mathcal I=\frac1{\sigma^2}\mathbf X'\mathbf X$ (curvature of the negative log-likelihood) shows how firmly the data pin down $\mathbf w$.`,
+      T`Normal prior $\mathrm{Normal}(\mathbf 0,\gamma^2\mathbf I_D)$ × Normal likelihood is conjugate: posterior $\mathrm{Normal}(\mathbf w_N,\mathbf V_N)$ with $\mathbf V_N=\sigma^2(\mathbf X'\mathbf X+\frac{\sigma^2}{\gamma^2}\mathbf I_D)^{-1}$, $\mathbf w_N=\frac1{\sigma^2}\mathbf V_N\mathbf X'\mathbf y$ (the ridge solution).`,
+      T`Predictive distribution $\mathrm{Normal}(\mathbf x_*'\mathbf w_N,\ \sigma^2+\mathbf x_*'\mathbf V_N\mathbf x_*)$: the noise $\sigma^2$ is constant; the second term is large where the data constrain $\mathbf w$ poorly (far from the data).`,
+      T`Predict with MAP (mode only, fixed variance $\sigma^2$), Monte Carlo (average over posterior samples) or exact Bayes (integrate over $\mathbf w$); sequential updating gives the same posterior as one batch update.`,
+      T`Bayesian model selection: choose the model family with the largest evidence $p(\mathbf y\mid\mathbf X)=\int p(\mathbf y\mid\mathbf X,\mathbf w)p(\mathbf w)\,d\mathbf w$; training RSS keeps falling with complexity, but the evidence penalises unnecessary flexibility (Occam's razor).`,
+    ],
+    examQ: [
+      { src: '2021 Q5', q: T`Consider a setting with high uncertainty over model parameters. Describe what effect, if any, this will have for the maximum likelihood estimate.`,
+        a: T`The MLE is a point estimate, so it ignores the uncertainty: it still returns a single value, but that value is unreliable (high variance, sensitive to the particular sample, prone to overfitting) and predictions made with it are over-confident. A Bayesian approach keeps the posterior and averages predictions over it.`,
+        qzh: T`考虑模型参数（model parameters）不确定性很高的情形。描述这会对最大似然估计（maximum likelihood estimate）产生什么影响（如果有的话）。`,
+        azh: T`MLE 是点估计（point estimate），所以它忽略了不确定性：它照样返回一个值，但这个值不可靠（方差大、对具体样本敏感、容易过拟合 overfitting），用它做出的预测会过度自信（over-confident）。贝叶斯方法（Bayesian approach）则保留后验（posterior），并在后验上对预测取平均。` },
+      { src: '2021 Q10', q: T`Conjugacy between the likelihood and prior is very important when using Bayesian models. However conjugacy is not critical when using the maximum a posteriori (MAP) estimator. Explain why this is the case.`,
+        a: T`Conjugacy makes the full posterior (its normalising constant, the evidence, and predictive integrals) available in closed form. MAP only needs the mode, $\hat\theta=\arg\max_\theta[\log p(D\mid\theta)+\log p(\theta)]$; the evidence does not depend on $\theta$, so MAP is just an optimisation problem, solvable numerically for any prior.`,
+        qzh: T`使用贝叶斯模型（Bayesian models）时，似然（likelihood）与先验（prior）之间的共轭性（conjugacy）非常重要。但使用最大后验（maximum a posteriori, MAP）估计量时，共轭性并不关键。解释为什么会这样。`,
+        azh: T`共轭性使完整的后验（posterior，包括它的归一化常数即证据 evidence，以及预测积分 predictive integrals）有闭式解（closed form）。MAP 只需要众数（mode），$\hat\theta=\arg\max_\theta[\log p(D\mid\theta)+\log p(\theta)]$；证据不依赖于 $\theta$，所以 MAP 只是一个优化问题（optimisation problem），对任何先验都可以用数值方法求解。` },
+      { src: '2021 Q11', q: T`For Bayesian linear regression (as presented in class), explain how the posterior variance can vary for different test points. (Given: predictive distribution $y_*\sim\mathrm{Normal}(\mathbf x_*'\mathbf w_N,\ \sigma^2+\mathbf x_*'\mathbf V_N\mathbf x_*)$.)`,
+        a: T`The noise term $\sigma^2$ is constant, but $\mathbf x_*'\mathbf V_N\mathbf x_*$ depends on the test point: it is large when $\mathbf x_*$ lies in directions the training data constrain poorly (large posterior covariance), typically far from the data, and small near well-covered regions. So the model is more uncertain where it has seen little data.`,
+        qzh: T`对于（课上讲的）贝叶斯线性回归（Bayesian linear regression），解释后验方差（posterior variance）如何随不同的测试点（test points）而变化。（已给出预测分布 predictive distribution：$y_*\sim\mathrm{Normal}(\mathbf x_*'\mathbf w_N,\ \sigma^2+\mathbf x_*'\mathbf V_N\mathbf x_*)$。）`,
+        azh: T`噪声项（noise term）$\sigma^2$ 是常数，但 $\mathbf x_*'\mathbf V_N\mathbf x_*$ 取决于测试点：当 $\mathbf x_*$ 落在训练数据约束不足的方向上（后验协方差 posterior covariance 大）时，这一项很大，通常是在远离数据的地方；在数据覆盖充分的区域附近则很小。所以模型在见过的数据少的地方更不确定。` },
+    ],
     title: '不确定性与 Bayesian 线性回归', en: 'Uncertainty, Bayesian linear regression and the predictive distribution',
     summary: 'MLE / MAP 只给**一个**权重 $\\hat\\bw$（点估计），不告诉你它有多可靠。**Bayesian linear regression（贝叶斯线性回归）** 保留整个**后验分布** $p(\\bw\\mid\\mathbf X,\\by)$：Normal 先验 × Normal 似然 = Normal 后验（**共轭**），均值 $\\bw_N$、协方差 $\\mathbf V_N$ 有闭式解。预测时对所有可能的 $\\bw$ 取平均，得到**预测分布**，方差 $\\sigma^2+\\bx_*\'\\mathbf V_N\\bx_*$——离训练数据越远越不确定。往年简答常考（2021 Q5、Q10、Q11）。',
     prereq: ['c08', 'c10', 'c16'],
@@ -410,6 +458,7 @@
       '解释共轭、为什么 MAP 不需要共轭（2021 Q10）',
       '描述 sequential updating，以及 MAP / 近似 Bayes / 精确 Bayes 三种预测方式（L18 p20–p22）',
       '写出预测分布，解释预测方差为什么随测试点变化（L18 p24–p25；2021 Q11）',
+      '用 evidence 比较模型族，说出它为什么不会偏向最复杂的模型（Workshop 11）',
     ],
     types: ['T09', 'T13'],
     notExam: '未知 $\\sigma^2$ 时的 InverseGamma 先验 / Student-t 预测（L18 p26）只需知道有这回事；两个 Normal 相乘的配方推导（p18 "Advanced"）不要求。',
@@ -453,6 +502,17 @@
       { t: 'math', tex: T`\sigma_N^2(\bx_*)=\sigma^2+\bx_*'\mathbf V_N\bx_*` },
       T`**读这两行：** 预测的**均值**就是用后验均值 $\bw_N$ 代进去 $\bx_*'\bw_N$；预测的**方差**是两块相加——$\sigma^2$ 是数据本身的噪声（处处一样），$\bx_*'\mathbf V_N\bx_*$ 是"权重还没确定"带来的额外不确定，随 $\bx_*$ 变化。一维时就是 $\sigma^2+x_*^2V_N$：$x_*$ 离 0 越远，带子越宽。下图右下就是这个效果。`,
       { t: 'slide', src: 'L18/p25', caption: '左：MLE / MAP 的误差带处处一样宽；右下：Bayesian 的预测带在数据附近窄、在没有数据的地方宽。' },
+      T`图里的带子是均值上下各 2 个预测标准差：$\bx_*'\bw_N\pm2\sigma_N(\bx_*)$。正态分布落在 ±2 个标准差内的概率约 95%（精确是 95.4%；±1.96 才是正好 95%），所以这条带子就是 $y_*$ 的 95% **credible interval（可信区间）**；它和频率学派 confidence interval（置信区间）的区别见 c51。Workshop 11 用抽样核对过：从后验抽 $\bw$、再加噪声得到的预测曲线，约 95% 落在这条带子里，所以近似 Bayes 和精确 Bayes 的图一致。`,
+      { t: 'h3', text: '⑧ 次数选几？用 evidence 选模型（Workshop 11）' },
+      T`到这里模型族都是事先定好的。Workshop 11 只有 8 个点（真实函数是二次的），却用 9 次多项式基（c12）：后验和预测带都能算，但次数该选几？训练误差帮不上忙：次数越高模型越灵活，训练 RSS（残差平方和）一路下降。**Bayesian model selection（贝叶斯模型选择）**：对每个候选模型族算 evidence $p(\by\mid\mathbf X)=\int p(\by\mid\mathbf X,\bw)\,p(\bw)\,d\bw$（就是 ④ 里后验的分母），选最大的。它问的是：还没看数据时，这个模型族（连同它的先验）认为"出现这批数据"有多可能。`,
+      { t: 'table', cls: 'compact', head: ['多项式次数', '训练 RSS', 'log evidence'], rows: [
+        ['1', '0.614', '−29.40'],
+        ['2', '0.083', '**−5.75**（最大）'],
+        ['3', '0.079', '−6.64'],
+        ['9', '0.071', '−7.21'],
+      ] },
+      T`（Workshop 11 的输出，$\sigma=0.1$，$\gamma=10$；4–10 次时 RSS 和 evidence 都继续缓慢下降。）**RSS 一路下降，evidence 却在 2 次最高**，正好是生成数据的真实次数。3 次和 9 次的 RSS 几乎一样（0.079 和 0.071），evidence 仍偏向 3 次。原因：evidence 是把似然按先验对所有 $\bw$ 平均。灵活的模型能生成很多种数据集，先验概率被分散开，分给眼前这一批的就少；够用的简单模型得分反而高，这就是 Occam's razor（奥卡姆剃刀）。1 次太简单，拟合差，evidence 最低。所以 evidence 只用训练数据就能比较模型族，不需要留验证集（2021 Q6 的另一种答法，见 [T13](#/T13)）。`,
+      T`两点提醒。① 预测带只衡量"在这个模型族里"对权重的不确定，前提是 L18 p26 的假设"数据真的来自这个模型"；模型族选错时，带子可能又窄又偏，所以选模型本身也重要。② 这里 $\sigma^2$、$\gamma^2$ 都当已知。Workshop 11 的 bonus 给它们的倒数（精度）各配一个 Gamma 先验（等价于对方差用 L18 p26 的 Inverse Gamma 先验）；sklearn 的 BayesianRidge 从数据里估计它们，所以 $\sigma$ 设错时更稳健。`,
     ],
     why: [
       T`往年简答题：2021 Q5（参数不确定性高时 MLE 会怎样）、Q10（为什么 MAP 不需要共轭）、Q11（预测方差为什么随测试点变化）——三道都是这一章。下一周（W10）的 Bayesian 分类、Beta–Binomial 共轭也是同样的套路。`,
@@ -548,6 +608,7 @@
       ['$\\bx_*\'\\bw_N$ 是预测方差', '那是预测**均值**。'],
       ['数据无穷多时预测方差趋于 0', '最多降到 $\\sigma^2$：噪声消不掉（而且前提是数据真的约束住了测试点涉及的权重方向；比如所有训练输入都是 $x=0$，再多数据也学不到斜率）。'],
       ['Sequential 更新和一次性更新结果不同', '完全相同（今天的后验 = 明天的先验）。'],
+      ['训练 RSS 最小的多项式次数最好', '次数越高越灵活，训练 RSS 一路下降；Bayesian 用 evidence 选（Workshop 11 选中 2 次），或用验证集。'],
     ],
     quiz: [
       { type: 'num', q: '$y=wx+$噪声，$\\sigma^2=1$，$\\gamma^2=1$，数据 $x=(1,1)$，$y=(2,2)$。$w_N=?$', answer: 1.3333, tol: 0.002, explain: T`求 Bayesian 线性回归的后验均值 $w_N$。一维（一个权重、无截距）公式是 $w_N=\frac{\sum x_iy_i}{\sum x_i^2+\sigma^2/\gamma^2}$。从数据算：$\sum x_i^2=1^2+1^2=2$，$\sum x_iy_i=1\times2+1\times2=4$；题目给 $\sigma^2/\gamma^2=1/1=1$。$w_N=4/(2+1)=4/3\approx1.333$。只看数据的 MLE 是 $4/2=2$；**分母多出的 1 来自先验**，把估计往 0 拉，和 ridge 一样。` },
@@ -555,6 +616,7 @@
       { type: 'num', q: '接上，$x_*=3$ 的预测方差？', answer: 4, explain: T`predictive variance（预测方差）$\sigma_N^2(x_*)=\sigma^2+x_*^2V_N$ 是两块相加：$\sigma^2=1$ 是数据本身的噪声，处处一样；$x_*^2V_N$ 是"对 $w$ 还不确定"带来的部分。代入测试点 $x_*=3$ 和上一题的 $V_N=1/3$：$x_*^2V_N=9\times\frac13=3$。预测方差 $=1+3=4$。**$x_*$ 离 0 越远，第二项越大**；只答 $\sigma^2=1$ 是 MLE/MAP 的固定方差，忘了把 $x_*$ 平方会得到 $1+3\times\frac13=2$。` },
       { type: 'mc', q: 'Bayesian 线性回归的后验均值 $\\bw_N$ 等于：', options: ['MLE', '$\\lambda=\\sigma^2/\\gamma^2$ 的 ridge 解', 'lasso 解', '0'], answer: 1, explain: 'Normal 后验的均值 = 众数 = MAP = ridge。' },
       { type: 'mc', q: '哪类测试点的预测方差通常最大？', options: ['训练数据最密的地方', '落在训练数据没约束住的权重方向上（典型：远离数据外推）', '处处相同', '原点'], answer: 1, explain: '$\\bx_*\'\\mathbf V_N\\bx_*$ 在数据没约束住的方向上大（L18 p25）。' },
+      { type: 'mc', q: 'Workshop 11：多项式次数从 1 升到 10，训练 RSS 一直下降，log evidence 在 2 次最大（$-5.75$），9 次是 $-7.21$。Bayesian model selection 选几次？', options: ['10 次：RSS 最小', '2 次：evidence 最大', '9 次：worksheet 一开始用的就是它', '1 次：最简单的模型'], answer: 1, explain: T`Bayesian model selection（贝叶斯模型选择）选 evidence $p(\by\mid\mathbf X)$ 最大的模型族，这里是 2 次（$-5.75>-6.64>-7.21$），正好是生成数据的真实次数。训练 RSS 不能用来选：次数越高模型越灵活，RSS 一路下降，按它选永远选最高次，也就是过拟合。evidence 是把似然按先验对所有 $\bw$ 平均：灵活的模型把先验概率分散在很多种可能的数据集上，分给这一批的少，所以多余的复杂度被扣分（Occam's razor）。1 次太简单、拟合差，evidence 最低（$-29.40$）。` },
       { type: 'show', q: '（英文）What is sequential Bayesian updating?', answer: T`Start from the prior; after observing a data point, compute the posterior; then use that posterior as the prior for the next data point, and repeat: $p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$. With conditionally independent observations this gives exactly the same posterior as processing all data at once, and the posterior becomes more peaked as data accumulate.`, qzh: '什么是序贯贝叶斯更新（sequential Bayesian updating）？', azh: T`从先验（prior）出发；观测到一个数据点后，计算后验（posterior）；再把这个后验作为下一个数据点的先验，如此重复：$p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$。当观测条件独立时，这样得到的后验与一次性处理全部数据完全相同；并且随着数据积累，后验会变得越来越尖（peaked）。` },
     ],
   });
@@ -569,7 +631,7 @@
       [T`Bandit：只看到所拉臂的奖励；regret $=\mu^*T-\sum_tE[R_{i_t}(t)]=\sum_iE[N(i)](\mu^*-\mu_i)$；greedy 按平均选，$Q_0=-\infty$ 锁死、$+\infty$ 各试一次；ε-greedy 盲目探索。`, 'c47'],
       [T`UCB：$Q=\hat\mu+\sqrt{2\ln t/N}$（可调版把 2 换成 $\rho$：$\hat\mu+\sqrt{\rho\ln t/N}$），$t=$ 已拉总次数 $+1$；bonus 来自 Hoeffding（$\varepsilon=1/t^4$）；regret $O(\log t)$；两种探索：$Q_0$ 和 bonus。`, 'c48'],
       [T`Contextual bandit：有上下文，奖励估计变回归 $E[R_i\mid\bX_i]$，UCB 加在回归预测上；RL：动作还会改变下一个状态。`, 'c49'],
-      [T`Bayesian 线性回归：Normal–Normal 共轭；$\mathbf V_N=\sigma^2(\mathbf X'\mathbf X+\frac{\sigma^2}{\gamma^2}\mathbf I)^{-1}$，$\bw_N=\frac1{\sigma^2}\mathbf V_N\mathbf X'\by$（= ridge 解）；预测 $\mathrm{Normal}(\bx_*'\bw_N,\ \sigma^2+\bx_*'\mathbf V_N\bx_*)$；sequential 更新与一次性相同。`, 'c50'],
+      [T`Bayesian 线性回归：Normal–Normal 共轭；$\mathbf V_N=\sigma^2(\mathbf X'\mathbf X+\frac{\sigma^2}{\gamma^2}\mathbf I)^{-1}$，$\bw_N=\frac1{\sigma^2}\mathbf V_N\mathbf X'\by$（= ridge 解）；预测 $\mathrm{Normal}(\bx_*'\bw_N,\ \sigma^2+\bx_*'\mathbf V_N\bx_*)$；sequential 更新与一次性相同；用 evidence 选模型族（Workshop 11）。`, 'c50'],
     ],
     map: [
       { t: 'table', head: ['问题', '只要一个值', '要表达不确定性'], rows: [
@@ -590,6 +652,7 @@
       { q: 'Bayesian 线性回归的后验？', a: T`$\mathrm{Normal}(\bw_N,\mathbf V_N)$，$\mathbf V_N=\sigma^2(\mathbf X'\mathbf X+\frac{\sigma^2}{\gamma^2}\mathbf I_D)^{-1}$，$\bw_N=\frac1{\sigma^2}\mathbf V_N\mathbf X'\by$。`, ch: 'c50' },
       { q: '预测分布和预测方差？', a: T`$\mathrm{Normal}(\bx_*'\bw_N,\ \sigma^2+\bx_*'\mathbf V_N\bx_*)$；第二项随测试点变化，远离数据时大。`, ch: 'c50' },
       { q: '为什么 MAP 不需要共轭？（2021 Q10）', a: 'MAP 只求众数，evidence 和参数无关会抵消，只需优化 log 似然 + log 先验；共轭是为了闭式的完整后验。', ch: 'c50' },
+      { q: '怎么用 evidence 选模型？为什么不用训练 RSS？', a: T`每个模型族算 evidence $p(\by\mid\mathbf X)=\int p(\by\mid\mathbf X,\bw)p(\bw)\,d\bw$，选最大的。训练 RSS 随复杂度一路下降，只会选最复杂的；evidence 对多余的复杂度扣分（Occam's razor）。Workshop 11：RSS 一路降，evidence 在 2 次最高。`, ch: 'c50' },
       { q: 'Fisher information（线性回归）？', a: T`$\mathcal I=\frac1{\sigma^2}\mathbf X'\mathbf X$：负对数似然的曲率，越大点估计越稳。`, ch: 'c50', qzh: '线性回归的 Fisher 信息（Fisher information）是什么？' },
     ],
     formulas: [

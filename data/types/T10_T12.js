@@ -120,6 +120,25 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
         {
           t: 'exam', md: T`Perceptron update: for each training example, compute $s=\mathbf w'\mathbf x$ (with $x_0=1$); if $y\,s\le0$ the example is misclassified and we set $\mathbf w\leftarrow\mathbf w+\eta\,y\,\mathbf x$, otherwise $\mathbf w$ is unchanged. This is stochastic gradient descent on the perceptron loss $\max(0,-y\,\mathbf w'\mathbf x)$, whose gradient is $-y\mathbf x$ for misclassified points and $\mathbf 0$ otherwise.`,
         },
+        { t: 'h3', text: 'Worksheet 5 Ex3 全解' },
+        T`题目：$\mathbf X$ 的四行 $(1,1,1),(1,1,2),(1,0,0),(1,-1,0)$（第一列是 bias 输入 $x_0=1$），$\mathbf y=(1,1,-1,-1)$，$\eta=0.1$，$\bw$ 从 $\mathbf 0$ 开始，按顺序过样本。题目要求用 **pseudocode 规则**：先预测 $\hat y$（$s\ge0$ 判 $+1$，否则 $-1$），$\hat y\ne y$ 才做 $\bw\leftarrow\bw+\eta y\bx$。`,
+        {
+          t: 'table', cls: 'compact', head: ['Epoch', '样本', '$s=\\bw\'\\bx$', '$\\hat y$ / $y$', '更新后 $\\bw$'], rows: [
+            ['1', '$(1,1,1)$', '0', '+1 / +1', '不变 $(0,0,0)$'],
+            ['1', '$(1,1,2)$', '0', '+1 / +1', '不变'],
+            ['1', '$(1,0,0)$', '0', '+1 / −1 ✗', '$(0,0,0)-0.1(1,0,0)=(-0.1,0,0)$'],
+            ['1', '$(1,-1,0)$', '−0.1', '−1 / −1', '不变'],
+            ['2', '$(1,1,1)$', '−0.1', '−1 / +1 ✗', '$(-0.1,0,0)+0.1(1,1,1)=(0,0.1,0.1)$'],
+            ['2', '$(1,1,2)$', '0.3', '+1 / +1', '不变'],
+            ['2', '$(1,0,0)$', '0', '+1 / −1 ✗', '$(0,0.1,0.1)-0.1(1,0,0)=(-0.1,0.1,0.1)$'],
+            ['2', '$(1,-1,0)$', '−0.2', '−1 / −1', '不变'],
+            ['3', '四个样本', '0.1, 0.2, −0.1, −0.2', '全对', '停'],
+          ],
+        },
+        T`答案：$\bw=(-0.1,0.1,0.1)$，共 3 次更新，第 3 个 epoch 没有更新，停止。决策规则：$-0.1+0.1x_1+0.1x_2\ge0$，即 $x_1+x_2\ge1$ 判 $+1$。`,
+        {
+          t: 'note', title: '两种规则：考试写哪个', md: T`**区别只在 $s=0$。** 本页上面的规则（L10）是 $y\cdot s\le0$ 就更新；pseudocode 在 $s=0$、$y=+1$ 时判对、不更新。同一道题用 $y\cdot s\le0$ 规则：更新发生在 E1 的 $(1,1,1)$、E1 的 $(1,0,0)$、E2 的 $(1,0,0)$，中间的 $\bw$ 不同，最后也是 $(-0.1,0.1,0.1)$。如果把 $s=0$ 判成 $-1$，结果会变成 $(0,0.1,0.1)$。考试时，题目指定了规则就照题目；没指定就用课件的 $y\cdot s\le0$，并在第一行写明约定，例如 "predict $+1$ if $s\ge0$; update when $y\,s\le0$"。`,
+        },
       ],
     },
     {
@@ -130,12 +149,13 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
       chips: [{ text: 'L16', href: '#/L16', cls: 'src' }, { text: 'L06 p17', href: '#/L06', cls: 'src' }, { text: 'L07 p31', href: '#/L07', cls: 'src' }],
       lead: '往年卷没直接考计算，但简答可能问"这个界说明了什么"。会代数、会解释每一项就够了。',
       blocks: [
-        '符号：前三行的 $n$ 是**专家个数**，$M$ 是学习者犯错次数，$m$ 是最好专家的犯错次数。后两行的 $n$ 是**样本个数**（不是专家个数）；$R$ 是真实风险（期望测试误差），$\\hat R$ 是训练误差，$|\\mathcal F|$ 是模型类里有几个模型，界以至少 $1-\\delta$ 的概率成立。',
+        '符号：前四行的 $n$ 是**专家个数**，$M$ 是学习者犯错次数，$m$ 是最好专家的犯错次数；第 4 行改用损失（每轮在 $[0,1]$ 内）：$L$ 是学习者的期望总损失，$L^*$ 是最好专家的总损失，$L-L^*$ 叫 regret（遗憾）。后两行的 $n$ 是样本个数（不是专家个数）；$R$ 是真实风险（期望测试误差），$\\hat R$ 是训练误差，$|\\mathcal F|$ 是模型类里有几个模型，界以至少 $1-\\delta$ 的概率成立。',
         {
           t: 'table', head: ['界', '公式', '每一项说明什么'], rows: [
             ['Majority（完美专家）', '$M\\le\\log_2 n$', '每错一次，存活专家至少减半'],
             ['Halving', '$M\\le\\frac{m+\\log_2n}{\\log_2(4/3)}$（系数 $1/\\log_2(4/3)\\approx1/0.415\\approx2.41$）', '最好专家错 $m$ 次；专家数只以 $\\log$ 影响'],
             ['Weighted majority', '$M\\le2(1+\\varepsilon)m+2\\ln n/\\varepsilon$（注意这里是自然对数 $\\ln$，上面两行是 $\\log_2$）', '$\\varepsilon$ 小：$m$ 系数接近 2，但 $\\ln n$ 项变大'],
+            ['Probabilistic experts', '$L\\le\\frac{\\ln n}{\\varepsilon}+(1+\\varepsilon)L^*$（自然对数）', '对最好专家的系数降到 $1+\\varepsilon$；$\\frac{\\ln n}{\\varepsilon}$ 不随轮数变，轮数少时界可能比平凡上界（轮数 × 1）还大，例见 [c46](#/c46)'],
             ['有限类泛化', '$R\\le\\hat R+\\sqrt{(\\log|\\mathcal F|+\\log(1/\\delta))/(2n)}$', '模型类大 → 惩罚大；$n$ 大 → 惩罚小'],
             ['VC 泛化', '$R\\le\\hat R+\\sqrt{8\\,\\frac{\\VC\\log(2n+1)+\\log(4/\\delta)}{n}}$', '用 VC 维代替 $\\log|\\mathcal F|$'],
           ],

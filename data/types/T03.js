@@ -78,7 +78,24 @@ Total (excluding biases): $3+20+20=$ **43**.`,
         ],
       },
 
-      { t: 'h2', text: '5. 随机练习', id: 'practice' },
+      { t: 'h2', text: '5. Worksheet 8 全解：CNN 与 logistic regression', id: 'ws8' },
+      'Worksheet 8 原题：在 CIFAR-10（$32\\times32$ 彩色图，10 类）上分别数 logistic regression 和下面这个 CNN 的参数（含 bias）。卷积 stride 1、无 padding；max pooling 是 $2\\times2$、stride 2，没有参数。worksheet 把尺寸写成"通道 × 高 × 宽"（如 $3\\times32\\times32$），本页按"高 × 宽 × 通道"写，数字一样。',
+      {
+        t: 'table', head: ['层', '输出', '参数（含 bias）', '不含 bias'], rows: [
+          ['输入', '$32\\times32\\times3$', '0', '0'],
+          ['Conv I：8 个 $5\\times5$', '$28\\times28\\times8$（$32-5+1=28$）', '$8\\times(5\\cdot5\\cdot3)+8=608$', '600'],
+          ['Max pooling', '$14\\times14\\times8$', '0', '0'],
+          ['Conv II：16 个 $5\\times5$', '$10\\times10\\times16$（$14-5+1=10$）', '$16\\times(5\\cdot5\\cdot8)+16=3216$', '3200'],
+          ['Max pooling', '$5\\times5\\times16$，拉平成 $400$', '0', '0'],
+          ['Dense I：$400\\to256$', '256', '$400\\times256+256=102656$', '102400'],
+          ['Dense II：$256\\to10$', '10', '$256\\times10+10=2570$', '2560'],
+          ['CNN 合计', '', '**109050**', '108760'],
+          ['Logistic regression：拉平 $3072\\to10$', '10', '$3072\\times10+10=30730$', '30720'],
+        ],
+      },
+      'Logistic regression 把 $32\\times32\\times3=3072$ 个像素拉平，每类一个权重向量（多类 softmax，见 [c15](#/c15)）。CNN 的参数约是它的 3.5 倍，但 94% 在 Dense I；两个卷积层合起来只有 $608+3216=3824$ 个，这就是权重共享。题目没说 bias 时写含 bias 的数，并注明不含 bias 的值。',
+
+      { t: 'h2', text: '6. 随机练习', id: 'practice' },
       { t: 'practice', gen: 'cnn', title: 'CNN 参数随机题' },
       {
         t: 'quiz', items: [
@@ -90,6 +107,10 @@ Total (excluding biases): $3+20+20=$ **43**.`,
           {
             q: '输入 $28\\times28\\times3$，卷积层 16 个 $3\\times3$ filter，stride 1，padding 1。不含 bias 的参数个数？', type: 'num', answer: 432,
             explain: '$C_{out}C_{in}K^2=16\\times3\\times3^2=16\\times3\\times9=432$。输出 $\\lfloor(28+2\\times1-3)/1\\rfloor+1=27+1=28$（$+2$ 是两边各补 $P=1$ 圈 0），即 $28\\times28\\times16$（输出大小不影响参数数）。',
+          },
+          {
+            q: '（Worksheet 8）把 $32\\times32\\times3$ 的图拉平，做 10 类 logistic regression（含 bias）。参数个数？', type: 'num', answer: 30730,
+            explain: '拉平后每张图是 $32\\times32\\times3=3072$ 个数。10 类各有一个 3072 维权重向量：$3072\\times10=30720$；每类再加 1 个 bias，共 10 个。合计 $30720+10=30730$。它比上面的 CNN（109050）少，但不看像素之间的空间关系，worksheet 里测试准确率不到 40%，CNN 约 65%。',
           },
           {
             q: '一个 $2\\times2$ max pooling 层有多少个可学习参数？', type: 'num', answer: 0,

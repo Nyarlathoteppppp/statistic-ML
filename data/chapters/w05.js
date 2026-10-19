@@ -10,6 +10,18 @@
    * ===================================================================== */
   add({
     id: 'c28', week: 'W5', lec: 'L09', pages: 'L09 p1–p14', star: 2,
+    keyEn: [
+      T`Lagrangian $\mathcal L=f(\bx)+\sum_i\lambda_ig_i(\bx)+\sum_j\nu_jh_j(\bx)$ with $\lambda_i\ge0$; primal $=\min\max\mathcal L$, dual $=\max\min\mathcal L$. The SVM is a convex QP with strong duality.`,
+      T`KKT conditions: primal feasibility ($g_i\le0$, $h_j=0$), dual feasibility ($\lambda_i\ge0$), complementary slackness ($\lambda_ig_i(\bx^*)=0$), stationarity ($\nabla_\bx\mathcal L=\mathbf 0$).`,
+      T`SVM dual: $\max_{\boldsymbol\lambda}\sum_i\lambda_i-\frac12\sum_{i,j}\lambda_i\lambda_jy_iy_j\bx_i'\bx_j$ s.t. $\lambda_i\ge0$ (soft margin: $0\le\lambda_i\le C$) and $\sum_i\lambda_iy_i=0$.`,
+      T`Stationarity gives $\bw^*=\sum_i\lambda_iy_i\bx_i$; only support vectors have $\lambda_i>0$. Data enter only via dot products (allowing kernels); the dual's cost grows with $n$, the primal's with $d$.`,
+    ],
+    examQ: [
+      { src: '2021 Q3', q: T`For a support vector machine with a quadratic kernel, in what situation, if any, would it be better to use the primal program instead of the dual program for training?`,
+        a: T`When the number of training examples $n$ is much larger than the dimension of the explicit quadratic feature space ($O(m^2)$ for $m$ input features). The dual scales with $n$ (an $n\times n$ kernel matrix) and the primal with the feature dimension, so expanding the features and solving the primal is cheaper.`,
+        qzh: T`对于使用二次核（quadratic kernel）的支持向量机（support vector machine），在什么情况下（如果存在的话）用原问题（primal program）训练比用对偶问题（dual program）更好？`,
+        azh: T`当训练样本数 $n$ 远大于显式二次特征空间（explicit quadratic feature space）的维数（$m$ 个输入特征时为 $O(m^2)$）时。对偶问题的代价随 $n$ 增长（要处理一个 $n\times n$ 的核矩阵 kernel matrix），原问题的代价随特征维数增长，所以显式展开特征、再求解原问题更便宜。` },
+    ],
     title: 'Lagrangian、KKT、SVM dual', en: 'Lagrangian duality, KKT conditions, the SVM dual',
     summary: '带约束的优化不能直接用梯度下降。**Lagrange multipliers（拉格朗日乘子）** 把约束变成罚项，得到 **dual problem（对偶问题）**。SVM 的 dual 有两个关键性质：解是 $\\bw^*=\\sum_i\\lambda_iy_i\\bx_i$（只有支持向量的 $\\lambda_i>0$），而且数据**只以点积 $\\bx_i\'\\bx_j$ 的形式出现**——这为 kernel trick 铺好了路。',
     prereq: ['c26', 'c27'],
@@ -165,6 +177,12 @@
    * ===================================================================== */
   add({
     id: 'c29', week: 'W5', lec: 'L09', pages: 'L09 p15–p26, p32, p34', star: 3,
+    keyEn: [
+      T`A kernel is a function $K(\bu,\bv)=\varphi(\bu)'\varphi(\bv)$: a dot product in some feature space, computed without forming $\varphi$.`,
+      T`Kernel trick: the SVM dual and prediction use data only via dot products, so replacing $\bx_i'\bx_j$ by $K(\bx_i,\bx_j)$ trains a linear SVM in feature space exactly: $s=b^*+\sum_i\lambda_i^*y_iK(\bx_i,\bx)$.`,
+      T`In 2D, $(\bu'\bv)^2=\varphi(\bu)'\varphi(\bv)$ with $\varphi(\bx)=[x_1^2,\ \sqrt2\,x_1x_2,\ x_2^2]$ (the $\sqrt2$ splits the cross term); polynomial kernel: $(\bu'\bv+c)^d$ with $c\ge0$ and integer $d\ge0$.`,
+      T`RBF (Gaussian) kernel $\exp(-\gamma\|\bu-\bv\|^2)$ has an infinite-dimensional feature space; a larger $\gamma$ gives a narrower, more local kernel.`,
+    ],
     title: 'Kernel trick、多项式核、RBF', en: 'The kernel trick, polynomial and RBF kernels',
     summary: '**Kernel（核函数）** $K(\\bu,\\bv)=\\varphi(\\bu)\'\\varphi(\\bv)$：特征空间里的点积，但不用算 $\\varphi$ 就能直接得到。dual SVM 只用点积，所以把 $\\bx_i\'\\bx_j$ 换成 $K(\\bx_i,\\bx_j)$ 就等于在高维（甚至无限维）空间训练线性 SVM——这就是 **kernel trick**。',
     prereq: ['c12', 'c28'],
@@ -290,6 +308,12 @@
    * ===================================================================== */
   add({
     id: 'c30', week: 'W5', lec: 'L09', pages: 'L09 p27–p38', star: 3,
+    keyEn: [
+      T`A valid kernel equals $\varphi(\bu)'\varphi(\bv)$ for some feature map. Proof by construction, e.g. for $k_1+k_2$ concatenate: $\varphi_3([\mathbf a;\mathbf b])=[\varphi_1(\mathbf a);\varphi_2(\mathbf b)]$, whose dot product is $k_1+k_2$ (2021 Q15).`,
+      T`If $K_1,K_2$ are kernels, so are $K_1+K_2$, $K_1K_2$, $cK_1$ ($c>0$) and $f(\bu)K_1(\bu,\bv)f(\bv)$; a difference $K_1-K_2$ need not be.`,
+      T`Mercer: $K$ is valid iff the Gram matrix $M_{ij}=K(\bx_i,\bx_j)$ is PSD for every finite point set; one counterexample (e.g. $K(\bx,\bx)<0$) proves a function is not a kernel.`,
+      T`Representer theorem: the minimiser of empirical risk plus an increasing penalty $g(\|f\|)$ has the form $f^*(\bx)=\sum_i\alpha_iK(\bx,\bx_i)$, so ridge, logistic regression, PCA, etc. can be kernelised.`,
+    ],
     title: '合法 kernel、Mercer、representer', en: 'Valid kernels, Mercer\'s theorem, representer theorem',
     summary: '不是任何"相似度"都能当 kernel——必须对应某个特征空间的点积。两种证明方法：① **构造**特征映射 / 用组合规则（和、积、正数倍、$f(\\bu)Kf(\\bv)$）；② **Mercer**：任意有限点集的 Gram 矩阵都 PSD。往年 2021 Q15 就是"证明 $k_1+k_2$ 合法"。',
     prereq: ['c04', 'c29'],
@@ -407,6 +431,12 @@
    * ===================================================================== */
   add({
     id: 'c31', week: 'W5', lec: 'L10', pages: 'L10 p2–p29, p33–p40', star: 2,
+    keyEn: [
+      T`The perceptron is a linear classifier: $s=\bw'\bx$ with bias weight $w_0$ ($x_0=1$), predict class A if $s\ge0$; its decision boundary $\bw'\bx=0$ is a hyperplane.`,
+      T`Perceptron loss $L_i(\bw)=\max(0,-s_iy_i)$: 0 if correctly classified, $|s_i|$ otherwise; on a mistake its gradient is $-y_i\bx_i$.`,
+      T`SGD update with $y_i\in\{-1,+1\}$: if $s_iy_i\le0$ then $\bw\leftarrow\bw+\eta y_i\bx_i$ (bias included: $w_0\leftarrow w_0+\eta y_i$); otherwise no change.`,
+      T`Unlike the hinge loss $\max(0,1-sy)$ it demands no margin, so it finds some separating boundary, not the maximum-margin one.`,
+    ],
     title: 'Perceptron 模型与更新', en: 'The perceptron: model, loss, training rule',
     summary: '**Perceptron（感知机）** 是最早的神经元模型，也是一个线性分类器：$s=\\bw\'\\bx$（含 bias），$s\\ge0$ 判 A。训练用 SGD（stochastic gradient descent，随机梯度下降，第 13 章：每次用一个样本的梯度更新）最小化 perceptron loss $\\max(0,-sy)$，得到极简的更新规则：**分错（$sy\\le0$）就 $\\bw\\leftarrow\\bw+\\eta y\\bx$，分对不动。**',
     prereq: ['c03', 'c13'],
@@ -446,7 +476,7 @@
     ],
     intuition: [
       T`**更新 = 把边界往分错的点那边推。** 正类点被分到负侧（$s<0$，$y=+1$）：加上 $\eta\bx$，让 $\bw$ 更像这个点，下次它的得分 $\bw'\bx$ 变大（增加 $\eta\|\bx\|^2$）。负类点被分错：减去 $\eta\bx$。`,
-      T`**为什么用 $\le0$ 而不是 $<0$？** 初始 $\bw=\mathbf 0$ 时所有点 $s=0$，用严格 $<0$ 永远不会更新（L10 p19、p22 的 "why?"）。`,
+      T`**为什么用 $\le0$ 而不是 $<0$？** 初始 $\bw=\mathbf 0$ 时所有点 $s=0$，用严格 $<0$ 永远不会更新（L10 p19、p22 的 "why?"）。Worksheet 5 的 pseudocode 写法不同：先预测 $\hat y$（$s\ge0$ 判 $+1$），$\hat y\ne y$ 才更新。两者只在 $s=0$、$y=+1$ 时不同：pseudocode 判对、不更新，$sy\le0$ 规则要更新。完整例子见 [T11](#/T11)。`,
       { t: 'think', q: 'Perceptron loss 和 SVM 的 hinge loss $\\max(0,1-sy)$ 差在哪？这对结果有什么影响？', a: 'perceptron loss 是 $\\max(0,-sy)$：只要分对（$sy>0$）就满足，哪怕紧贴边界。hinge 要求 $sy\\ge1$（有 margin）。所以 perceptron 只找到**某一条**能分开的线（无穷多条中的一条，L10 p32），SVM 找 margin 最大的那条。' },
       { t: 'story', title: 'Rosenblatt 的感知机', md: 'Frank Rosenblatt 1957–1958 年在康奈尔提出 perceptron，还造了一台专用硬件 Mark I Perceptron 来识别图片。当时的报纸对它寄予厚望；1969 年 Minsky 和 Papert 指出单层感知机连 XOR 都学不会（第 12 章），热潮随之退去。' },
     ],
@@ -533,6 +563,11 @@
    * ===================================================================== */
   add({
     id: 'c32', week: 'W5', lec: 'L10', pages: 'L10 p30–p32, p42–p47', star: 1,
+    keyEn: [
+      T`Convergence theorem: if the data are linearly separable with margin $\gamma>0$ and $\|\bx_i\|\le R$, the perceptron (from $\bw=\mathbf 0$, $\eta=1$) makes at most $R^2/\gamma^2$ updates.`,
+      T`On non-separable data it never converges and gives no approximate solution; on separable data it stops at some separating boundary, not the maximum-margin one.`,
+      T`Kernel perceptron: $\bw=\sum_j\alpha_jy_j\bx_j$, so the score is $s_i=\sum_j\alpha_jy_jK(\bx_j,\bx_i)$; on a mistake ($s_iy_i\le0$) update $\alpha_i\leftarrow\alpha_i+\eta$.`,
+    ],
     title: '收敛定理、kernel perceptron', en: 'Perceptron convergence and the kernel perceptron',
     summary: '数据线性可分时，perceptron 在有限步内收敛（更新次数 $\\le R^2/\\gamma^2$）；不可分时不收敛。因为 $\\bw$ 总是训练点的线性组合，预测只依赖点积——换成 kernel 就得到 **kernel perceptron**：每个样本记一个计数 $\\alpha_i$，分错就 $\\alpha_i\\mathrel{+}=\\eta$。',
     prereq: ['c29', 'c31'],

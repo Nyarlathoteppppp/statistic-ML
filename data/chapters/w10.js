@@ -17,6 +17,13 @@
    * ===================================================================== */
   add({
     id: 'c51', week: 'W10', lec: 'L19', pages: 'L19 p2–p18', star: 2,
+    keyEn: [
+      T`Generative models learn $P(\mathbf x,y)$, i.e. how the data are generated (e.g. naive Bayes); discriminative models learn $P(y\mid\mathbf x)$ or the classifier directly (e.g. logistic regression).`,
+      T`Beta–Binomial: prior $\mathrm{Beta}(\alpha,\beta)$ and $k$ successes in $n$ trials give the posterior $\mathrm{Beta}(k+\alpha,\ n-k+\beta)$, mean $\frac{k+\alpha}{n+\alpha+\beta}$: add the counts to the parameters.`,
+      T`A conjugate prior（共轭先验）keeps the posterior in the prior's family, so the update and the evidence are closed-form (Normal–Normal, Beta–Binomial, Dirichlet–Multinomial).`,
+      T`Sunrise problem: with a uniform prior, after $k$ consecutive sunrises $P(\text{rise tomorrow})=\frac{k+1}{k+2}$, never exactly 1.`,
+      T`A $100(1-\alpha)\%$ equal-tailed credible interval leaves posterior mass $\alpha/2$ in each tail, so the parameter lies in it with posterior probability $1-\alpha$; a frequentist confidence interval is random and covers the fixed true value in $100(1-\alpha)\%$ of repeated samples.`,
+    ],
     title: '生成模型、Beta–Binomial、共轭', en: 'Generative models, Beta–Binomial conjugacy, the sunrise problem',
     summary: '**Generative model（生成模型）** 学 $P(\\bx,y)$，模仿"数据是怎么生成的"：先抛一枚有偏硬币决定类别 $y$，再按类别生成特征 $\\bx$。离散数据上 Bayesian 方法的核心例子是 **Beta–Binomial 共轭**：先验 $\\mathrm{Beta}(\\alpha,\\beta)$，看到 $n$ 次里 $k$ 次正面，后验就是 $\\mathrm{Beta}(k+\\alpha,\\ n-k+\\beta)$——**把计数加到参数上**。Laplace 的日出问题：太阳连续升起 $k$ 天，明天升起的概率是 $\\frac{k+1}{k+2}$，不是 1。',
     prereq: ['c08', 'c09'],
@@ -36,6 +43,7 @@
       '写出 Binomial 似然、Beta 先验，推出后验 $\\mathrm{Beta}(k+\\alpha,n-k+\\beta)$（L19 p11–p13）',
       '用"正比于一个已知分布 ⇒ 就是它"的技巧识别后验（L19 p14）',
       '算日出问题 $\\frac{k+1}{k+2}$，说出常见共轭对（L19 p15–p17）',
+      '说出等尾 credible interval 的定义，以及它和 confidence interval 在解释上的区别（Workshop 2）',
     ],
     types: ['T09', 'T13'],
     what: [
@@ -90,6 +98,7 @@
         ['后验均值', '$\\frac{k+\\alpha}{n+\\alpha+\\beta}$', '$9/14\\approx0.643$'],
       ] },
       T`MAP 那一格：后验是 $\mathrm{Beta}(9,5)$，密度正比于 $q^{8}(1-q)^{4}$（指数比参数少 1）。$q^a(1-q)^b$ 的最高点在 $q=\frac{a}{a+b}$（取对数求导：$\frac{a}{q}-\frac{b}{1-q}=0$，即 $a(1-q)=bq$）；这里 $a=8$、$b=4$，最高点在 $\frac{8}{8+4}=\frac{9-1}{9+5-2}=\frac{8}{12}$。代入计数就是 $\frac{7+2-1}{10+2+2-2}=\frac8{12}\approx0.667$。后验参数仍是 $k+\alpha=9$；"减 1"只出现在找峰值时。要求 $k+\alpha>1$ 且 $n-k+\beta>1$，是为了峰在 0 和 1 之间；不满足时峰不在 0 和 1 之间（贴在边界上，或像 $\mathrm{Beta}(1,1)$ 那样处处一样高），不能直接套这个分数。`,
+      T`**报一个范围：credible interval（可信区间）**（Workshop 2 bonus）。上面三个估计都只是一个数。想报一个范围，就在后验上切两刀：等尾（equal-tailed）的 $100(1-\alpha)\%$ 可信区间 $[l,u]$，让 $l$ 左边和 $u$ 右边各留 $\alpha/2$ 的后验质量，中间正好 $1-\alpha$（这里的 $\alpha$ 是 0.05 这样的小概率，不是 Beta 的参数 $\alpha$）。例：后验 $\mathrm{Beta}(9,5)$ 的 95% 区间约 $[0.39,\ 0.86]$，两侧各 2.5%（端点要用软件求分位数，考试不会让你手算）。它的意思是：给定先验和这批数据，$q$ 落在区间里的概率是 95%；$q$ 是随机的，区间是固定的。频率学派的 confidence interval（置信区间）正好反过来：$q$ 是一个固定的未知数，随机的是区间（每份数据算出一个）；"95%"指重复抽很多份数据时，约 95% 的区间会盖住真值，对手里这一个区间不能说"$q$ 有 95% 的概率在里面"。Workshop 2 特别提醒两者不要混。`,
       { t: 'h3', text: '常见共轭对（L19 p17）' },
       { t: 'table', cls: 'compact', head: ['用途', '似然', '共轭先验'], rows: [
         ['回归', 'Normal', 'Normal（均值；c50）'],
@@ -159,6 +168,7 @@
       { type: 'num', q: '日出问题：连续升起 8 天，明天升起的概率？', answer: 0.9, explain: T`要算的是日出问题里"明天还升起"的概率，也就是后验均值。用均匀先验 $\mathrm{Beta}(1,1)$（$\alpha=\beta=1$）；8 天每天都升起，所以 $n=k=8$，没升起 $0$ 次。后验 $\mathrm{Beta}(8+1,\ 0+1)=\mathrm{Beta}(9,1)$，均值 $\frac{9}{9+1}=0.9$，正是公式 $\frac{k+1}{k+2}=\frac{9}{10}$。**答案不是 1**：先验那一次"假想的没升起"一直留在分母里；直接写 $8/8=1$ 是 MLE 的答案。` },
       { type: 'mc', q: 'Multinomial 似然的共轭先验是：', options: ['Beta', 'Gamma', 'Dirichlet', 'Normal'], answer: 2, explain: T`Multinomial（多项分布）是 Binomial 的多类版本：每次结果落在 $K$ 类之一，参数是一组加起来为 1 的概率 $(q_1,\dots,q_K)$。它的 conjugate prior（共轭先验）是 Dirichlet，也就是 Beta 的多类版本：把每一类的计数加到对应参数上，后验仍是 Dirichlet。最容易混的是 Beta：它只描述一个 $q\in[0,1]$，配的是只有两类结果的 Binomial。Gamma 配 Poisson（计数），Normal 配 Normal（均值）。L19 p17。` },
       { type: 'mc', q: '"$f(\\theta)\\propto g(\\theta)$ 且 $g$ 是分布 ⇒ $f$ 归一化后就是 $g$"，这让我们可以：', options: ['不用先验', '扔掉常数、只看形状来认出后验', '跳过似然', '直接得到 MLE'], answer: 1, explain: T`$f\propto g$ 的意思是 $f=C\cdot g$，$C$ 是和 $\theta$ 无关的常数；两边积分得 $\int f\,d\theta=C$（$g$ 是分布，积分为 1），所以 $f/\int f\,d\theta=g$。这就是 uniqueness up to normalisation（归一化唯一性）：算后验时可以扔掉所有和 $q$ 无关的常数（组合数、Gamma 函数、分母 $p(k)$），看到剩下的形状 $q^{k+\alpha-1}(1-q)^{n-k+\beta-1}$ 就认出它是 $\mathrm{Beta}(k+\alpha,\ n-k+\beta)$，不用真的去积分。它并不能省掉先验或似然——这个形状正是二者相乘得来的；它也和 MLE 无关。L19 p14。` },
+      { type: 'mc', q: '后验 $\\mathrm{Beta}(9,5)$ 的 95% 等尾 credible interval 约为 $[0.39,\\ 0.86]$。哪个说法正确？', options: ['给定先验和数据，$q$ 落在 $[0.39,0.86]$ 里的后验概率是 0.95', '重复抽很多份数据，约 95% 这样算出的区间会盖住真实的 $q$', '区间左右两侧各有 5% 的后验质量', '区间以 MLE $0.7$ 为中心'], answer: 0, explain: T`credible interval（可信区间）是在后验上切出来的：$q$ 被当成随机变量，区间固定，所以可以直接说"给定先验和数据，$q$ 在区间里的概率是 0.95"。第二项是频率学派 confidence interval（置信区间）的解释：那里 $q$ 固定、区间随数据而变，95% 指重复抽样时盖住真值的比例。第三项算错了：等尾区间两侧各留 $\alpha/2=0.05/2=0.025$，即各 2.5%，加起来才是 5%。第四项：等尾区间只管两侧尾巴的质量，不以任何点估计为中心；$\mathrm{Beta}(9,5)$ 是偏的，区间端点更精确是 $0.386$ 和 $0.861$，中点 $(0.386+0.861)/2\approx0.62$，既不是 MLE $7/10=0.7$，也不是后验均值 $9/14\approx0.643$。Workshop 2 bonus。` },
     ],
   });
 
@@ -167,6 +177,11 @@
    * ===================================================================== */
   add({
     id: 'c52', week: 'W10', lec: 'L19', pages: 'L19 p19–p24', star: 1,
+    keyEn: [
+      T`The logistic likelihood $q=\sigma(\mathbf x'\mathbf w)$ has no known conjugate prior, so the posterior and its normalising constant have no closed form and must be approximated.`,
+      T`Approximations: Monte Carlo (sample from the posterior), variational (optimise a simple distribution to be close to the posterior), or the Laplace approximation.`,
+      T`Laplace approximation: $p(\mathbf w\mid\text{data})\approx\mathrm{Normal}(\mathbf w_{\text{MAP}},(-H)^{-1})$, a Normal at the posterior mode; fast, but poor for multi-modal, skewed or heavy-tailed posteriors.`,
+    ],
     title: 'Bayesian logistic 与近似', en: 'Bayesian logistic regression, non-conjugacy and the Laplace approximation',
     summary: 'Logistic regression 也有参数不确定性，但它的似然 $q=\\sigma(\\bx\'\\bw)$ 是 sigmoid，**没有已知的共轭先验**：后验没有闭式解，归一化常数算不出来。只能**近似**：Monte Carlo（抽样）、variational（变分：找一个最接近的简单分布）、或 **Laplace approximation（拉普拉斯近似）**——在后验的众数处放一个 Normal，用众数处的二阶导数定宽度。',
     prereq: ['c15', 'c50', 'c51'],
@@ -291,6 +306,38 @@
    * ===================================================================== */
   add({
     id: 'c53', week: 'W10', lec: 'L20', pages: 'L20 p3–p14, p26–p27', star: 3,
+    keyEn: [
+      T`A Bayesian network is a DAG plus one CPT per node; the joint factorises as $P(x_1,\dots,x_n)=\prod_iP(x_i\mid x_{pa_i})$, each node conditioned only on its parents.`,
+      T`CPT format: rows = values of the child, columns = parent configurations, each column sums to 1; a binary node with $p$ binary parents has $2^{p+1}$ entries and $2^p$ free parameters.`,
+      T`A full joint table over $n$ binary variables has $2^n$ rows ($2^n-1$ free parameters); the factorisation replaces it with small local tables.`,
+      T`MLE with complete data: the likelihood splits per CPT, so each entry is a relative frequency $\hat P(x\mid u)=\#(X=x,\,pa=u)/\#(pa=u)$; a known deterministic rule gives a 0/1 CPT.`,
+    ],
+    examQ: [
+      { src: '2025 practice Q1(d)(e)', q: T`Four Boolean random variables $X,Y,Z,V$. (d) With no independence assumed, how many rows are in the probability table of their joint distribution? (e) If $X,Y,Z$ are independent of each other and $V$ depends on $X,Y$, how many rows do we need?`,
+        a: T`(d) $2^4=16$ rows (15 free parameters, since they sum to 1). (e) The joint factorises as $P(X)P(Y)P(Z)P(V\mid X,Y)$, so we store $2+2+2+2^3=14$ rows (only $1+1+1+4=7$ free parameters).`,
+        qzh: T`四个布尔随机变量（Boolean random variables）$X,Y,Z,V$。(d) 不假设任何独立性时，它们的联合分布（joint distribution）的概率表有多少行？(e) 如果 $X,Y,Z$ 相互独立，而 $V$ 依赖于 $X,Y$，需要多少行？`,
+        azh: T`(d) $2^4=16$ 行（因为总和为 1，自由参数 free parameters 有 15 个）。(e) 联合分布分解（factorises）为 $P(X)P(Y)P(Z)P(V\mid X,Y)$，所以要存 $2+2+2+2^3=14$ 行（自由参数只有 $1+1+1+4=7$ 个）。` },
+      { src: '2025 practice Q4(b)', q: T`For the directed PGM $A\to C\leftarrow B$ (Boolean variables), suppose we observe $n$ sets of values of $A,B,C$ (complete observations). What does the maximum-likelihood principle say to do?`,
+        a: T`Choose the CPT entries that maximise the likelihood of the data, $\prod_iP(a_i)P(b_i)P(c_i\mid a_i,b_i)$, subject to each distribution summing to 1. With complete data this decouples per table, giving relative frequencies, e.g. $\hat P(C=c\mid A=a,B=b)=\#(a,b,c)/\#(a,b)$.`,
+        qzh: T`对于有向概率图模型（directed PGM）$A\to C\leftarrow B$（布尔变量 Boolean variables），假设我们观测到 $n$ 组 $A,B,C$ 的取值（完全观测 complete observations）。最大似然原则（maximum-likelihood principle）告诉我们该怎么做？`,
+        azh: T`选择使数据似然（likelihood）$\prod_iP(a_i)P(b_i)P(c_i\mid a_i,b_i)$ 最大的条件概率表（CPT）取值，约束是每个分布之和为 1。在完全数据下，这个问题按表拆开（decouples per table），解就是相对频率（relative frequencies），例如 $\hat P(C=c\mid A=a,B=b)=\#(a,b,c)/\#(a,b)$。` },
+      { src: '2026 practice Q6(c) = 2025 practice Q6(c)', q: T`Bushfire alert model with sensors $S_1,S_2,S_3,C_1,C_2$ and alert $A$ (evacuate if any $S_i$ is on, but stay put if $C_1$ or $C_2$ is on). Suppose you are told the sensors are always accurate. What could you say about your CPTs?`,
+        a: T`It says nothing about how often the sensors are on, so the sensor tables are unaffected. But we can trust the sensors, so the CPT of $A$ becomes deterministic (all 0/1): $A=(S_1\lor S_2\lor S_3)\land\lnot(C_1\lor C_2)$.`,
+        qzh: T`山火警报模型（bushfire alert model）：传感器为 $S_1,S_2,S_3,C_1,C_2$，警报为 $A$（任一 $S_i$ 亮起就疏散，但 $C_1$ 或 $C_2$ 亮起时原地不动）。假设有人告诉你这些传感器总是准确的。关于你的条件概率表（CPTs），你能说些什么？`,
+        azh: T`这条信息没有说明传感器多久亮一次，所以传感器自己的表不受影响。但我们可以信任传感器，所以 $A$ 的 CPT 变成确定性的（deterministic，全是 0/1）：$A=(S_1\lor S_2\lor S_3)\land\lnot(C_1\lor C_2)$。` },
+      { src: '2025 practice Q6(d)', q: T`(Bushfire model) How would you change your model if the sensor $S_1$ is not perfectly accurate?`,
+        a: T`Add a latent variable $F_1$ (true fire at the location of $S_1$) with edge $F_1\to S_1$, and replace $S_1\to A$ by $F_1\to A$. New CPTs $P(F_1)$ and $P(S_1\mid F_1)$, which is not 0/1 and models false positives and false negatives.`,
+        qzh: T`（山火模型 bushfire model）如果传感器 $S_1$ 并非完全准确，你会怎样修改模型？`,
+        azh: T`加一个隐变量（latent variable）$F_1$（$S_1$ 所在位置是否真的有火），加边 $F_1\to S_1$，并把 $S_1\to A$ 换成 $F_1\to A$。新的 CPT 为 $P(F_1)$ 和 $P(S_1\mid F_1)$；后者不是 0/1，用来刻画误报（false positives）和漏报（false negatives）。` },
+      { src: '2025 practice Q6(e)', q: T`(Bushfire model) Given this final model, with all CPTs trained, how would you use it to drive the alarm to evacuate?`,
+        a: T`Observe the five sensor readings and compute $P(A=1\mid s_1,s_2,s_3,c_1,c_2)=\sum_fP(A=1\mid f,s_2,s_3,c_1,c_2)\,P(f\mid s_1)$ by marginalising the latent $F_1$; raise the alarm if it exceeds a threshold (e.g. 0.5, or one set by the costs of errors).`,
+        qzh: T`（山火模型 bushfire model）给定这个最终模型，并且所有 CPT 都已训练好，你会如何用它来驱动疏散警报（alarm to evacuate）？`,
+        azh: T`观测五个传感器的读数，通过对隐变量（latent variable）$F_1$ 求和边缘化（marginalising）来计算 $P(A=1\mid s_1,s_2,s_3,c_1,c_2)=\sum_fP(A=1\mid f,s_2,s_3,c_1,c_2)\,P(f\mid s_1)$；如果它超过某个阈值（threshold）就拉响警报（例如 0.5，或根据各类错误的代价设定的阈值）。` },
+      { src: '2021 Q14(c)', q: T`Instead of implementing $P(D\mid A,B)$ as a large conditional probability table, we use a logistic regression model with three parameters (one for each conditioning variable and a bias). Besides reducing the number of parameters, state another important consequence of this change.`,
+        a: T`Logistic regression $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ forces the log-odds to be linear in $A$ and $B$, so the model loses expressiveness: interactions such as an XOR-like dependence cannot be represented (higher bias). In exchange, parameters are shared across parent configurations, so estimates are more stable and unseen configurations still get sensible probabilities.`,
+        qzh: T`我们不把 $P(D\mid A,B)$ 实现为一张大的条件概率表（conditional probability table），而是用一个有三个参数（每个条件变量一个，再加一个偏置 bias）的逻辑回归（logistic regression）模型。除了减少参数个数之外，写出这个改动的另一个重要后果。`,
+        azh: T`逻辑回归 $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ 强制对数几率（log-odds）是 $A$ 和 $B$ 的线性函数，所以模型失去了表达能力（expressiveness）：像 XOR 那样的交互作用（interactions）无法表示（偏差 bias 更高）。作为交换，参数在不同的父节点取值组合（parent configurations）之间共享，所以估计更稳定，没见过的取值组合也能得到合理的概率。` },
+    ],
     title: 'Bayesian network、因子分解、CPT', en: 'Bayesian networks: DAGs, factorisation, CPTs, parameter counting and MLE',
     summary: '**Bayesian network（贝叶斯网络）** = 一张 **DAG（有向无环图）** + 每个节点一张 **CPT（条件概率表）**。联合分布等于每个节点"给定父节点"的条件概率之积：$P(x_1,\\dots,x_n)=\\prod_iP(x_i\\mid x_{pa_i})$。这让一张 $2^n$ 行的大表拆成很多小表。往年 Section C 的大题（山火警报、2025 Q4、2025 Q1d–e）都考：**画图、写因子分解、数 CPT 大小、用数数做 MLE**。',
     prereq: ['c02', 'c06'],
@@ -448,6 +495,18 @@
    * ===================================================================== */
   add({
     id: 'c54', week: 'W10', lec: 'L20', pages: 'L20 p12–p25', star: 3,
+    keyEn: [
+      T`$A\perp B\mid C$ means $P(A,B\mid C)=P(A\mid C)P(B\mid C)$: once $C$ is known, $B$ gives no further information about $A$; it neither implies nor is implied by $A\perp B$.`,
+      T`To test $X\perp Y\mid S$: take the ancestral graph of $X\cup Y\cup S$, moralise (marry parents of a common child), drop directions, delete $S$; if $X,Y$ are disconnected, the independence holds.`,
+      T`Chain and fork: the ends are independent given the middle node. Collider: two independent parents can become dependent once their common child (or a descendant) is observed (explaining away).`,
+      T`If a path still connects $X$ and $Y$, the graph does not imply the independence: write "does not hold" and name the path.`,
+    ],
+    examQ: [
+      { src: '2025 practice Q1(c)', q: T`In words, what does $\Pr(A,B\mid C)=\Pr(A\mid C)\Pr(B\mid C)$ say about the dependence of $A,B,C$?`,
+        a: T`$A$ and $B$ are conditionally independent given $C$: once $C$ is known, learning $B$ gives no further information about $A$ (and vice versa). It does not imply that $A$ and $B$ are marginally independent.`,
+        qzh: T`用文字说明：$\Pr(A,B\mid C)=\Pr(A\mid C)\Pr(B\mid C)$ 关于 $A,B,C$ 之间的依赖关系（dependence）说明了什么？`,
+        azh: T`给定 $C$ 时，$A$ 和 $B$ 条件独立（conditionally independent）：一旦已知 $C$，再得知 $B$ 不会提供关于 $A$ 的任何进一步信息（反之亦然）。这并不意味着 $A$ 和 $B$ 边缘独立（marginally independent）。` },
+    ],
     title: 'D-separation', en: 'Reading conditional independence from a Bayesian network: D-separation',
     summary: '给一张 BN，问"$X\\perp Y\\mid S$ 成立吗"——不用 CPT 的数字，只看图。课件的方法（**往年 8 分必考，T5**）：**① 取祖先图 → ② moralize（给共同孩子的父母连边）→ ③ 去掉方向 → ④ 删掉 $S$ 里的节点 → ⑤ 看 $X$、$Y$ 还连不连通**：不连通就独立，连通就不能保证独立。最反直觉的一点：两个独立的原因，在**观测到它们的共同结果之后**会变得相关。',
     prereq: ['c53', 'c02'],
@@ -592,6 +651,11 @@
    * ===================================================================== */
   add({
     id: 'c55', week: 'W10', lec: 'L20', pages: 'L20 p28–p41', star: 2,
+    keyEn: [
+      T`An MRF is an undirected graphical model: $X\perp Y\mid S$ holds if deleting $S$ disconnects $X$ from $Y$ (plain graph separation, no ancestral graph or moralising).`,
+      T`Hammersley–Clifford: $P(\mathbf x)=\frac1Z\prod_c\psi_c(\mathbf x_c)$ over the cliques, with positive potentials $\psi_c$ (scores, not probabilities); the partition function（配分函数）$Z=\sum_{\mathbf x}\prod_c\psi_c(\mathbf x_c)$ normalises.`,
+      T`BN to MRF: moralise, drop directions, put each CPT into the potential of a clique containing its variables ($Z=1$); some independences, e.g. of two parents of an unobserved child, are lost.`,
+    ],
     title: 'MRF、clique、BN→MRF', en: 'Markov random fields: cliques, potentials, partition function, converting BNs',
     summary: '**MRF（Markov random field，马尔可夫随机场）** 是**无向**图模型：边没有方向，独立性就是普通的图分离——删掉 $S$ 后 $X$、$Y$ 不连通 ⇒ $X\\perp Y\\mid S$。分布写成**团（clique）**上的正值 **potential（势函数）** 之积，再除以 **partition function（配分函数）** $Z$ 归一化（Hammersley–Clifford）。BN 可以转成 MRF：**moralize + 去方向**，每个 CPT 放进一个包含它的团里。下一周（W11）的推断算法都在 MRF 上做。',
     prereq: ['c53', 'c54'],

@@ -1,13 +1,14 @@
-/* Printable outline: { t:'outline' } builds a paper handout from the site's own data, so it always matches the site.
- * Per week: the week's storyline (review page "概念之间怎么连起来") and one block per chapter with
- * its one-line summary, the week's key point for it, formula cards, top mistakes, and a ruled column for notes.
- * Ends with the exam-type pages' solving steps. Print with the browser (A4); the toolbar is hidden on paper. */
+/* Printable outline: { t:'outline' } builds a compact paper handout (target ≤ 15 A4 pages) from the site's own data.
+ * Exam words are in English. Per week: the week's storyline (b.storyline). Per chapter: English title, English key
+ * points (keyEn), every formula with an English label (b.fxEn maps the site's Chinese labels; folded not-examinable
+ * parts skipped), past concept questions (examQ, English) and the top pitfall, beside a blank notes column.
+ * Then the exam types' solving steps. Explanations stay on the site. Print with the browser (A4). */
 (function (root) {
   'use strict';
   const SML = root.SML;
   const R = SML.render.blocks;
 
-  const textBlocks = (blocks) => (blocks || []).filter((b) => typeof b === 'string');
+  const noRef = (s) => String(s || '').replace(/（(?:L|WK|Worksheet)[^）]*）/g, '').trim();
 
   // blocks between the h2 with this id and the next h2
   function sectionBlocks(page, id) {
@@ -20,89 +21,99 @@
     return out;
   }
 
-  R.outline = function (b, ctx) {
+  // every formula of a page in reading order: fx cards first, then math blocks, skipping folded not-examinable parts.
+  // A formula under the generic "1 · 它是什么" heading gets the key 'cNN:k' (its k-th one) so it can be named per chapter.
+  function formulas(page) {
+    const out = [], seen = new Set();
+    let what = 0;
+    const add = (label, t) => {
+      const k = t.replace(/\\htmlClass\{[^}]*\}/g, '').replace(/\s+/g, '');
+      if (seen.has(k)) return;
+      seen.add(k);
+      const l = noRef(label);
+      out.push({ label: /^1 · /.test(l) ? page.id + ':' + (++what) : l, tex: t });
+    };
+    (page.blocks || []).forEach((b) => { if (b && b.t === 'fx') add(b.title || '', b.tex); });
+    let sec = '', h = '';
+    const walk = (b, skip) => {
+      if (!b || typeof b !== 'object') return;
+      if (Array.isArray(b)) { b.forEach((x) => walk(x, skip)); return; }
+      if (b.t === 'h2') { sec = b.id || ''; h = b.text || ''; return; }
+      if (b.t === 'h3') { h = b.text || ''; return; }
+      const sk = skip || b.t === 'fold' || b.t === 'ext' || (b.t === 'deep' && /notexam|storyfold/.test(b.cls || ''));
+      if (!sk && sec !== 'quiz' && b.t === 'math') add(h, b.tex);
+      (b.blocks || []).forEach((x) => walk(x, sk));
+    };
+    walk(page.blocks, false);
+    return out;
+  }
+
+  R.outline = function (b) {
     const { el } = SML.render;
     const { md, inline, tex } = SML.md;
     const pages = SML.content.all();
     const meta = SML.catalog.meta;
+    const fxEn = b.fxEn || {};
+    const fxWhat = b.fxWhat || {};
     const wrap = el('div', 'outline');
 
     const bar = el('div', 'ol-bar noprint');
     const btn = el('button', 'btn primary', '打印 / 存成 PDF'); btn.type = 'button';
     btn.addEventListener('click', () => root.print());
-    bar.append(btn, el('span', 'muted small', '纸张选 A4、纵向；打印设置里勾上"背景图形"，右边的笔记横线才会印出来。'));
+    bar.append(btn, el('span', 'muted small', '纸张选 A4、纵向、缩放 100%。公式和考点都已印好；右边空白一栏只写你自己的补充。'));
     wrap.appendChild(bar);
 
-    const notes = (lines) => { const n = el('div', 'ol-notes'); n.style.minHeight = (lines * 1.6) + 'em'; return n; };
-    const row = (left, lines) => { const r = el('div', 'ol-row'); r.append(left, notes(lines)); return r; };
+    const row = (left) => { const r = el('div', 'ol-row'); r.append(left, el('div', 'ol-notes')); return r; };
+    const label = (text) => '<span class="ol-label">' + text + '</span>';
 
-    // ---- cover: how to use + map of weeks, chapters and exam types ----
-    const cover = el('section', 'ol-cover');
-    const intro = el('div');
-    intro.innerHTML = md('**怎么用**：左边是网站上的脉络和要点，右边留白写你自己的补充。每章标题后面的 `#/c23` 就是网站上那一章的地址（在网址末尾输入即可跳过去）。学完一章，在标题下面的方框里打勾。') +
-      md('**考试**：11 月 6 日（周五）16:30，Royal Exhibition Building West；阅读 15 分钟 + 作答 120 分钟；闭卷、不用计算器，复杂公式会给；讲过的都考（lectures、workshops、quizzes）。');
-    cover.appendChild(row(intro, 6));
+    // ---- head: exam facts and how to use ----
+    const head = el('div', 'ol-head');
+    head.innerHTML = '<div class="ol-h1">COMP90051 Statistical Machine Learning · Exam outline</div>' +
+      md('**Exam** Fri 6 Nov 16:30, Royal Exhibition Building West · 15 min reading + 120 min writing · closed book, no calculator, complex formulas are given. ' +
+        '每章标题后的 `#/c23` 是网站地址，解释和练习都在网站上；这里只印要背、要写的东西，英文照抄即可。');
+    wrap.appendChild(row(head));
+
+    // ---- one section per week: storyline, then chapters ----
     const course = SML.catalog.zones.find((z) => z.id === 'course');
-    const map = el('table', 'ol-map compact');
-    map.innerHTML = '<thead><tr><th>周</th><th>章节（网站编号）</th></tr></thead>';
-    const tb = el('tbody');
-    course.units.forEach((u) => {
-      const tr = el('tr');
-      const chs = u.items.filter((id) => /^c\d+/.test(id)).map((id) => (meta[id].tag || id) + ' ' + meta[id].title + (meta[id].star === 3 ? ' ★' : ''));
-      tr.innerHTML = '<td>' + inline(u.title) + '</td><td>' + chs.map((c) => inline(c)).join('；') + '</td>';
-      tb.appendChild(tr);
-    });
-    map.appendChild(tb);
-    cover.appendChild(map);
-    wrap.appendChild(cover);
-
-    // ---- one section per week ----
-    course.units.forEach((u) => {
+    const story = b.storyline || [];
+    course.units.forEach((u, wi) => {
       const sec = el('section', 'ol-week');
-      sec.appendChild(el('h2', 'ol-wtitle', inline(u.title)));
-      const rid = u.items.find((id) => /^r\d+/.test(id));
-      const rv = rid && pages[rid];
-      const kp = rv ? ((rv.blocks || []).find((x) => x && x.t === 'kp') || { items: [] }).items : [];
-      if (rv) {
-        const story = el('div', 'ol-story');
-        story.appendChild(el('div', 'ol-label', '本周脉络'));
-        if (rv.lead) story.appendChild(el('div', null, md(rv.lead)));
-        textBlocks(sectionBlocks(rv, 'map')).slice(0, 3).forEach((t) => story.appendChild(el('div', null, md(t))));
-        sec.appendChild(row(story, 5));
-      }
+      const st = story[wi];
+      const top = el('div');
+      top.appendChild(el('div', 'ol-wtitle', inline(st ? st[0] : u.title)));
+      if (st) top.appendChild(el('div', 'ol-story', inline(st[1])));
+      sec.appendChild(row(top));
       u.items.filter((id) => /^c\d+/.test(id)).forEach((id) => {
         const p = pages[id];
         if (!p) return;
-        const head = (p.blocks || []).find((x) => x && x.t === 'chapterHead') || {};
-        const box = el('div', 'ol-ch');
+        const ch = (p.blocks || []).find((x) => x && x.t === 'chapterHead') || {};
         const left = el('div');
-        const types = (head.types || []).map((t) => '练 ' + (meta[t] ? meta[t].tag : t)).join(' · ');
-        left.appendChild(el('div', 'ol-ctitle', '<b>第 ' + (meta[id].tag || id) + ' 章 · ' + inline(p.title) + '</b>' +
-          ' <span class="ol-meta">' + (head.star ? head.star.text : '') + ' · 网站 #/' + id + (types ? ' · ' + types : '') + '</span>'));
-        left.appendChild(el('div', 'ol-check', '□ 读完　□ 小测全对　□ 题型练过　□ 复习过'));
-        const gen = (p.blocks || []).find((x) => x && x.t === 'callout' && x.cls === 'genesis');
-        if (gen) left.appendChild(el('div', 'ol-item', '<span class="ol-label">为什么有它</span>' + md(gen.md)));
-        if (p.lead) left.appendChild(el('div', 'ol-item', '<span class="ol-label">一句话</span>' + md(p.lead)));
-        kp.filter((k) => k[1] === id).forEach((k) => left.appendChild(el('div', 'ol-item', '<span class="ol-label">要点</span>' + md(k[0]))));
-        const fx = (p.blocks || []).filter((x) => x && x.t === 'fx');
-        if (fx.length) {
-          const f = el('div', 'ol-item');
-          f.appendChild(el('span', 'ol-label', '公式'));
-          fx.forEach((x) => {
-            const one = el('div', 'ol-fx');
-            one.innerHTML = '<span class="ol-fxt">' + inline(x.title || '') + '</span>' + tex(x.tex, true);
-            f.appendChild(one);
-          });
+        const star = meta[id].star ? '★'.repeat(meta[id].star) : '';
+        const types = (ch.types || []).map((t) => (meta[t] ? meta[t].tag : t)).join(' ');
+        left.appendChild(el('div', 'ol-ctitle', '<b>' + (meta[id].tag || id) + ' ' + inline(p.en || p.title) + '</b> <span class="ol-zht">' + inline(p.title) + '</span>' +
+          ' <span class="ol-meta">' + star + (types ? ' · ' + types : '') + ' · #/' + id + '</span>'));
+        if (p.keyEn && p.keyEn.length) {
+          const ul = el('ul', 'ol-key');
+          p.keyEn.forEach((k) => { const li = el('li'); li.innerHTML = inline(k); ul.appendChild(li); });
+          left.appendChild(ul);
+        }
+        // group formulas by English name, so a name prints once
+        const groups = new Map();
+        formulas(p).forEach((x) => {
+          const name = fxWhat[x.label] || fxEn[x.label] || x.label;
+          if (!groups.has(name)) groups.set(name, []);
+          groups.get(name).push(x.tex);
+        });
+        if (groups.size) {
+          const f = el('div', 'ol-fxs');
+          f.innerHTML = label('Formulas') + [...groups].map(([name, ts]) => '<span class="ol-f"><span class="ol-fxt">' + inline(name) + ':</span> ' + ts.map((t) => tex(t, false)).join('<span class="ol-sep">;</span> ') + '</span>').join('');
           left.appendChild(f);
         }
+        (p.examQ || []).forEach((e) => left.appendChild(el('div', 'ol-exq', label('Past ' + inline(e.src || '')) + '<b>Q.</b> ' + inline(e.q) + ' <b>A.</b> ' + inline(e.a))));
         const pit = sectionBlocks(p, 'pitfalls').find((x) => x && x.t === 'table');
-        if (pit && pit.rows && pit.rows.length) {
-          const ul = el('ul', 'ol-pit');
-          pit.rows.slice(0, 3).forEach((r) => { const li = el('li'); li.innerHTML = '✗ ' + inline(r[0]) + ' → ✓ ' + inline(r[1]); ul.appendChild(li); });
-          const it = el('div', 'ol-item'); it.appendChild(el('span', 'ol-label', '易错')); it.appendChild(ul);
-          left.appendChild(it);
-        }
-        box.appendChild(row(left, 8));
+        if (pit && pit.rows && pit.rows.length) left.appendChild(el('div', 'ol-pit1', label('易错') + '✗ ' + inline(pit.rows[0][0]) + ' → ✓ ' + inline(pit.rows[0][1])));
+        const box = el('div', 'ol-ch');
+        box.appendChild(row(left));
         sec.appendChild(box);
       });
       wrap.appendChild(sec);
@@ -112,21 +123,36 @@
     const types = SML.catalog.zones.find((z) => z.id === 'types');
     if (types) {
       const sec = el('section', 'ol-week');
-      sec.appendChild(el('h2', 'ol-wtitle', '题型：解题步骤'));
-      types.items.forEach((id) => {
+      const top = el('div');
+      top.appendChild(el('div', 'ol-wtitle', 'Exam question types · 题型解题步骤'));
+      top.appendChild(el('div', 'ol-story', '往年原题已印在各章 "Past" 里；T13 简答题库在网站 #/T13。'));
+      sec.appendChild(row(top));
+      types.items.filter((id) => id !== 'T13').forEach((id) => {
         const p = pages[id];
         if (!p) return;
         const left = el('div');
-        left.appendChild(el('div', 'ol-ctitle', '<b>' + (meta[id].tag || id) + ' · ' + inline(p.title) + '</b> <span class="ol-meta">网站 #/' + id + '</span>'));
-        if (p.lead) left.appendChild(el('div', 'ol-item', md(p.lead)));
-        const steps = (p.blocks || []).find((x) => x && x.t === 'steps');
+        left.appendChild(el('div', 'ol-ctitle', '<b>' + (meta[id].tag || id) + ' ' + inline(meta[id].en || p.title) + '</b> <span class="ol-zht">' + inline(p.title) + '</span> <span class="ol-meta">#/' + id + '</span>'));
+        // the method: the first steps block outside a worked example; otherwise the page's first table
+        let h2 = '', steps = null, table = null;
+        (p.blocks || []).forEach((x) => {
+          if (!x) return;
+          if (x.t === 'h2') { h2 = x.text || ''; return; }
+          if (x.t === 'steps' && !steps && !/例子|例题|全解/.test(h2)) steps = x;
+          if (x.t === 'table' && !table) table = x;
+        });
         if (steps) {
           const ol = el('ol', 'ol-steps');
-          steps.items.forEach((s) => { const li = el('li'); li.innerHTML = typeof s === 'string' ? inline(s) : ''; ol.appendChild(li); });
+          steps.items.forEach((x) => { const li = el('li'); li.innerHTML = typeof x === 'string' ? inline(x) : ''; ol.appendChild(li); });
           left.appendChild(ol);
+        } else if (table && table.rows) {
+          const ul = el('ul', 'ol-key');
+          table.rows.forEach((r) => { const li = el('li'); li.innerHTML = r.map((c) => inline(String(c))).join(' · '); ul.appendChild(li); });
+          left.appendChild(ul);
         }
+        const fs = formulas(p);
+        if (fs.length) left.appendChild(el('div', 'ol-fxs', label('Formulas') + fs.map((x) => '<span class="ol-f">' + tex(x.tex, false) + '</span>').join('')));
         const box = el('div', 'ol-ch');
-        box.appendChild(row(left, 6));
+        box.appendChild(row(left));
         sec.appendChild(box);
       });
       wrap.appendChild(sec);

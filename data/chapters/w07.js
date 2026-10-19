@@ -10,6 +10,18 @@
    * ===================================================================== */
   add({
     id: 'c38', week: 'W7', lec: 'L13', pages: 'L13 p2–p18', star: 3,
+    keyEn: [
+      T`A convolutional layer slides a small filter over the input, taking an elementwise product and sum at each position; the same filter weights are used at every position (weight sharing).`,
+      T`Parameters: $C_{out}\times C_{in}\times K^2$ weights plus $C_{out}$ biases, independent of the input size; never multiply by the number of output positions (one single-channel 1D width-3 filter has 3 weights).`,
+      T`Output size $\lfloor(n+2p-k)/s\rfloor+1$; a fully connected layer has $n_{in}n_{out}$ weights (+ $n_{out}$ biases); pooling layers have no parameters.`,
+      T`Fully connected nets on images ignore spatial structure, need huge numbers of parameters and must relearn a pattern at every location; convolution gives local connectivity, translation equivariance and far fewer parameters.`,
+    ],
+    examQ: [
+      { src: '2026 practice Q1d / 2025 practice Q5', q: T`How many parameters does the following convolutional neural network have (exclude the bias)? (Figure on the [T3](#/T03) page: 7 inputs → 1D convolutional layer of 5 units, each seeing 3 inputs → fully connected 4 → fully connected 5.)`,
+        a: T`$3+5\cdot4+4\cdot5=43$. The convolutional layer uses one width-3 filter shared across all positions, so it has 3 weights (not $5\times3$); the fully connected layers have $5\times4=20$ and $4\times5=20$.`,
+        qzh: T`下面这个卷积神经网络（convolutional neural network）有多少个参数（不计偏置 bias）？（图见 [T3](#/T03) 页：7 个输入 → 一维卷积层 1D convolutional layer，5 个单元，每个单元看 3 个输入 → 全连接层 fully connected，4 个单元 → 全连接层，5 个单元。）`,
+        azh: T`$3+5\cdot4+4\cdot5=43$。卷积层（convolutional layer）只用一个宽度为 3 的滤波器（filter），在所有位置共享，所以只有 3 个权重（不是 $5\times3$）；两个全连接层（fully connected layers）分别有 $5\times4=20$ 和 $4\times5=20$ 个权重。` },
+    ],
     title: '卷积、filter、参数计数', en: 'Convolution, filters, feature maps, counting CNN parameters',
     summary: '把图像拉平喂给全连接网络，既丢了空间结构、参数又爆炸。**CNN（卷积神经网络）** 用一个小的 **filter（滤波器 / 卷积核）** 在输入上滑动，每个位置做"逐元素相乘再求和"，**同一个 filter 在所有位置共享参数**。参数计数（T3）是往年必考计算题：卷积层**不按输出位置重复计数**——标准 2D 卷积的权重数为 $C_{out}C_{in}K^2$（含 bias 再加 $C_{out}$）；真题那种一维、单通道、单 filter 的卷积层只有 3 个权重。',
     prereq: ['c33'],
@@ -91,6 +103,9 @@
         T`左下（第 2–4 行、第 1–3 列）：$(0+2+1)-(3+0+1)=-1$；右下（第 2–4 行、第 2–4 列）：$(1+1+0)-(1+0+2)=-1$。`,
         T`$B=\begin{bmatrix}0&2\\-1&-1\end{bmatrix}$。`,
       ] },
+      { t: 'h3', text: 'Workshop 8 slide 的例子（附勘误）' },
+      T`$A=\begin{bmatrix}2&3&5&0\\1&5&7&-9\\-5&2&1&1\\2&0&-2&4\end{bmatrix}$，$2\times2$ kernel $W=\begin{bmatrix}1&0\\0&-1\end{bmatrix}$，stride 1，bias 0 ⇒ 输出边长 $4-2+1=3$。这个 kernel 只留窗口的左上格、减去右下格：$B_{ij}=A_{ij}-A_{i+1,j+1}$。左上：$2\times1+3\times0+1\times0+5\times(-1)=-3$；中心：$5\times1+7\times0+2\times0+1\times(-1)=4$。全部 9 格：$B=\begin{bmatrix}-3&-4&14\\-1&4&6\\-5&4&-3\end{bmatrix}$。`,
+      { t: 'errata', title: 'Workshop 8 slide 笔误', md: T`slide p5 把输出的中心格印成 5。按上面的算式是 $5-1=4$，考试写 4。` },
       { t: 'fade', title: '分步练习：输出尺寸与参数', plan: [T`输出尺寸 $\lfloor(n+2p-k)/s\rfloor+1$`, T`每个 filter 参数 $=K^2C_{in}$（+1 bias）`, T`乘以 filter 个数 $C_{out}$`], items: [
         { md: T`输入 $32\times32\times1$，6 个 $5\times5$ filter，$s=1$，$p=0$，含 bias。`, steps: [
           { md: '$28\\times28\\times6$' }, { md: '$25+1=26$' }, { md: '$6\\times26=156$' },
@@ -139,6 +154,7 @@
       { type: 'num', q: '输入 $16\\times16\\times8$，32 个 $3\\times3$ filter，不含 bias。权重数？', answer: 2304, explain: T`求卷积层的权重个数，公式 $C_{out}\times C_{in}\times K^2$。filter 个数 $C_{out}=32$；输入的第三维 8 是通道数 $C_{in}$，每个 filter 在 8 个通道上各有一套 $3\times3$ 权重，所以一个 filter 有 $8\times9=72$ 个数；32 个 filter 共 $32\times72=2304$ 个。输入的宽高 $16\times16$ 不进公式：**weight sharing（权重共享）让参数个数与图像大小无关**。陷阱：忘乘通道数 8，会得到 $32\times9=288$。` },
       { type: 'num', q: '输入宽 7，filter 宽 3，stride 2，padding 1。输出宽？', answer: 4, explain: T`用输出尺寸公式 $\lfloor(n+2p-k)/s\rfloor+1$。代入：输入宽 $n=7$；padding $p=1$ 表示两边各补 1 格 0，所以加的是 $2p=2$；filter 宽 $k=3$；stride $s=2$。$(7+2-3)/2=6/2=3$，向下取整仍是 3，再加 1 得 4。核对：补零后长度 9，filter 左端可停在第 1、3、5、7 格，正好 4 个位置。易错点：只加 $p$ 不加 $2p$，或**忘了最后的 +1**。` },
       { type: 'num', q: '（真题）7 输入 → 1D 卷积（宽 3）→ 5 → 全连接 4 → 全连接 5，不含 bias。参数总数？', answer: 43, explain: '卷积层只有一个宽 3 的 filter，所有位置共享：权重 3 个（不是 $5\\times3$）。全连接 5→4：$5\\times4=20$；全连接 4→5：$4\\times5=20$。合计 $3+20+20=43$。' },
+      { type: 'num', q: '（Worksheet 8 卷积 autoencoder 的第一层）输入 $32\\times32\\times3$，8 个 $4\\times4$ filter，stride 2，padding 1。输出宽？', answer: 16, explain: T`用输出尺寸公式 $\lfloor(n+2p-k)/s\rfloor+1$：$n=32$，$2p=2$，$k=4$，$s=2$。$(32+2-4)/2=30/2=15$，再加 1 得 16，输出 $16\times16\times8$。stride 2 让边长减半，所以这种卷积可以**代替 pooling 做下采样**。encoder 连做三层（filter 数 8、16、32）：$32\to16\to8\to4$，编码是 $4\times4\times32=512$ 个数（c37）。` },
       { type: 'mc', q: 'L13 p17 中 6 个 $5\\times5$ filter 作用于 $32\\times32\\times1$ 输入（s=1, p=0），输出是：', options: ['$32\\times32\\times6$', '$28\\times28\\times6$', '$28\\times28\\times1$', '$27\\times27\\times6$'], answer: 1, explain: '$32-5+1=28$，6 个 filter → 6 通道。' },
     ],
   });
@@ -148,6 +164,12 @@
    * ===================================================================== */
   add({
     id: 'c39', week: 'W7', lec: 'L13', pages: 'L13 p20–p30', star: 2,
+    keyEn: [
+      T`Max pooling replaces each $m\times m$ patch with its maximum: it lowers the resolution (and later layers' parameters), keeps the number of channels and has no parameters.`,
+      T`Backpropagation through max pooling uses a sub-gradient: the gradient goes only to the input that attained the maximum (one chosen input if tied).`,
+      T`Convolution is translation-equivariant; max pooling adds some, not guaranteed, translation invariance. Stacking $L$ stride-1 convolutions of width $k$ gives a receptive field of $1+L(k-1)$.`,
+      T`ResNet residual blocks output $F(\bx)+\bx$; the identity path lets gradients pass, so very deep networks (152 layers) can be trained. Transfer learning: pretrain on a large dataset, then fine-tune.`,
+    ],
     title: 'Pooling 与 CNN 架构', en: 'Max pooling, translation invariance, receptive fields, ResNet',
     summary: '**Max pooling（最大池化）** 把每个 $m\\times m$ 小块换成它的最大值：降低分辨率、减少后面的参数、带来一定的平移不变性；它没有参数，反向传播只把梯度传给那个最大值。CNN 的典型结构：卷积 → pooling → 卷积 → pooling → 全连接 → 输出。堆叠卷积层让 **receptive field（感受野）** 越来越大；**ResNet（残差网络）** 的残差连接让很深的网络能训练。',
     prereq: ['c34', 'c38'],
@@ -212,6 +234,7 @@
       { t: 'h3', text: 'Pooling 手算' },
       T`$4\times4$ 输入 $\begin{bmatrix}1&3&2&0\\4&2&1&5\\0&1&3&2\\2&6&1&1\end{bmatrix}$，$2\times2$ 窗口、stride 2：`,
       { t: 'table', cls: 'compact', head: ['窗口', 'max', 'average'], rows: [['左上 $\\{1,3,4,2\\}$', '4', '2.5'], ['右上 $\\{2,0,1,5\\}$', '5', '2'], ['左下 $\\{0,1,2,6\\}$', '6', '2.25'], ['右下 $\\{3,2,1,1\\}$', '3', '1.75']] },
+      T`Workshop 8 slide p6 的例子：$\begin{bmatrix}3&2&0&0\\0&7&1&3\\5&2&3&0\\0&9&2&3\end{bmatrix}$，$2\times2$、stride 2 ⇒ max $\begin{bmatrix}7&3\\9&3\end{bmatrix}$，average $\begin{bmatrix}3&1\\4&2\end{bmatrix}$（slide 只画出第一格 7 和 3）。slide 的说法：max 保留最强的特征，average 起平滑作用，选哪个要看数据和网络。`,
       { t: 'fade', title: '分步练习：pooling 与感受野', plan: ['划分窗口（stride = 窗口大小）', '每个窗口取 max（或平均）', '记录最大值位置（反向传播用）', T`感受野 $1+L(k-1)$`], items: [
         { md: '上面的 4×4 例子。', steps: [
           { md: '4 个 2×2 窗口', sg: 1 }, { md: T`$\begin{bmatrix}4&5\\6&3\end{bmatrix}$`, sg: 2 }, { md: '如左上的 4 在第 2 行第 1 列；反向时只有它收到梯度', sg: 3 },
@@ -259,6 +282,18 @@
    * ===================================================================== */
   add({
     id: 'c40', week: 'W7', lec: 'L14', pages: 'L14 p2–p15', star: 2,
+    keyEn: [
+      T`An RNN reads a sequence step by step with the same parameters at every step, $\mathbf h^{(t)}=\tanh(\mathbf b+W\mathbf h^{(t-1)}+U\bx^{(t)})$; uses: sequence classification, sequence tagging, encoder–decoder.`,
+      T`Unrolled over time it is a deep network with one layer per time step (depth = sequence length) and shared weights; it is trained by backpropagation through time (BPTT).`,
+      T`Repeated multiplication by $W$ causes vanishing or exploding gradients: for a linear RNN $\partial\mathbf h^{(T)}/\partial\mathbf h^{(1)}=W^{T-1}$, vanishing if the spectral radius $\rho(W)<1$, exploding if $\rho(W)>1$.`,
+      T`An LSTM passes its state through an additive copy self-loop scaled by a sigmoid forget gate (plus input and output gates), keeping gradients over 100+ steps instead of about 5–10.`,
+    ],
+    examQ: [
+      { src: '2021 Q1', q: T`A recurrent neural network is a type of deep artificial neural network. In what respect is it deep?`,
+        a: T`It is deep in time: unrolled over the input sequence, the hidden state passes through one transformation per time step, so the unrolled network's depth equals the sequence length, with the same weights shared across all steps. Gradients must be backpropagated through all steps (BPTT), causing vanishing/exploding gradients.`,
+        qzh: T`循环神经网络（recurrent neural network）是一种深度人工神经网络（deep artificial neural network）。它在什么意义上是“深”的？`,
+        azh: T`它在时间上是深的（deep in time）：沿输入序列展开（unrolled）后，隐藏状态（hidden state）每个时间步都要经过一次变换，所以展开后网络的深度等于序列长度，并且所有时间步共享同一组权重。梯度必须反向传播穿过所有时间步（随时间反向传播 BPTT），由此导致梯度消失/爆炸（vanishing/exploding gradients）。` },
+    ],
     title: 'RNN、BPTT、LSTM', en: 'Recurrent neural networks, backpropagation through time, LSTM',
     summary: '序列（句子、音频、股价）长度不固定。**RNN（循环神经网络）** 从左到右逐个读入，每步用**同一组参数**更新隐藏状态 $\\mathbf h^{(t)}=\\tanh(\\mathbf b+W\\mathbf h^{(t-1)}+U\\bx^{(t)})$。展开后是一个深度 = 序列长度的网络（2021 Q1："RNN 在什么意义上是深的？"）。训练用 **BPTT**；长序列会梯度消失 / 爆炸，**LSTM** 用门控的"复制"路径缓解。',
     prereq: ['c34', 'c36'],
@@ -384,6 +419,13 @@
    * ===================================================================== */
   add({
     id: 'c41', week: 'W7', lec: 'L14', pages: 'L14 p16–p22', star: 2,
+    keyEn: [
+      T`Attention: scores $e_j$, softmax weights $\alpha_j=\frac{\exp(e_j)}{\sum_{j'}\exp(e_{j'})}$, context $\mathbf c=\sum_j\alpha_j\mathbf h^{(j)}$: a weighted average of all hidden states.`,
+      T`In seq2seq each decoder step $i$ has its own context $\mathbf c_i$ with scores $e_{ij}=f(\mathbf s^{(i-1)},\mathbf h^{(j)})$; this removes the single fixed-size context bottleneck and gives interpretable alignments.`,
+      T`Self-attention: item $i$ is used as the query against the other items $j\ne i$ (the lecture's wording; standard Transformers also include $i$ itself) via their keys, and its new representation is the attention-weighted sum of their values.`,
+      T`Transformer: self-attention instead of recurrence, plus residual connections and layer normalisation, feed-forward layers, multiple heads and positional encoding (attention ignores order); positions are computed in parallel during training.`,
+      T`Training uses teacher forcing: the decoder input is the target shifted right, [START, $y_1,\dots,y_{T-1}$], and all next tokens $[y_1,\dots,y_T{=}\text{EOS}]$ are predicted in parallel; a causal mask sets scores of future positions to $-\infty$ (weight 0 after softmax) and a padding mask hides <pad> tokens. At inference there is no target: greedy decoding appends the argmax token one step at a time until EOS.`,
+    ],
     title: 'Attention 与 Transformer', en: 'Attention, self-attention, the Transformer',
     summary: '**Attention（注意力）**：不只用最后一个隐藏状态，而是对所有隐藏状态做**加权平均**，权重 $\\alpha_j$ 是得分的 softmax——哪个位置相关就多看哪个。**Self-attention（自注意力）** 让序列里每个元素去关注其他元素；**Transformer** 用它代替 RNN，可以并行处理整个序列。',
     prereq: ['c40'],
@@ -403,6 +445,7 @@
       '写出 attention 的三步：得分 $e_j$ → softmax 权重 $\\alpha_j$ → 加权和 $\\mathbf c$（L14 p17），手算',
       '解释 seq2seq 中的 repeated attention：每个解码步有自己的上下文 $\\mathbf c_i$（L14 p18）',
       '解释 self-attention 和 Transformer 的组成、为什么能并行',
+      '区分训练（teacher forcing + causal mask，所有位置并行）和生成（greedy decoding，逐词）（Worksheet 9）',
     ],
     types: ['T13'],
     notExam: 'L14 p19 的图像描述、p21 的 Transformer 细节结构图只需看懂思想；缩放点积 $\\mathbf q\\cdot\\mathbf k/\\sqrt d$ 等公式课件没给出，不要求。',
@@ -436,6 +479,16 @@
         T`**并行**：编码器、以及训练时（目标序列已知）的解码器，可以同时算所有位置；但生成（推理）时解码器仍要一个 token 一个 token 地产生，并用 **causal mask（因果掩码）** 挡住还没生成的位置。`,
       ] },
       T`**为什么 Transformer 能并行？** RNN 第 $t$ 步必须等第 $t-1$ 步算完。Self-attention 中每个位置的新表示只依赖上一层的所有位置，可以同时算——GPU 友好。任意两个位置之间只隔一次 attention，远距离信息不必沿着很长的时间链传递，避开了 vanilla RNN 的主要困难（但这不保证梯度永不消失）。`,
+      { t: 'h3', text: '⑥ 训练 vs 生成：teacher forcing、mask、greedy decoding（Worksheet 9）' },
+      T`上面说"训练时解码器可以并行"，靠的是 **teacher forcing（教师强制）**：训练时目标句已知，解码器每个位置的输入直接用正确答案右移一位，而不用模型自己（可能错的）预测。输入 $=[\text{START},y_1,\dots,y_{T-1}]$，目标 $=[y_1,\dots,y_T]$，$y_T$ 是句末符 EOS。Worksheet 9 的例子：德语 "Wie geht es dir" 译成 "How are you"，解码器输入 "<start> How are you"，目标 "How are you </s>"；每个位置预测下一个词，各算一个 cross-entropy，一次全部算完。`,
+      T`位置 $t$ 不能偷看后面的正确答案，所以 self-attention 加 **causal mask（因果掩码）**：得分矩阵对角线以上（未来的位置）加 $-\infty$，softmax 后 $\exp(-\infty)=0$，权重为 0。例：第 2 个位置的得分 $(1,2,0)$ 被改成 $(1,2,-\infty)$，权重 $\approx(0.269,0.731,0)$。一个 batch 里句子长短不一，短句补 <pad> 凑齐长度；padding mask（填充掩码）用同样的办法把 <pad> 位置挡掉。`,
+      T`生成（推理）时没有正确答案，只能 **greedy decoding（贪心解码）**：从 <start> 开始，每步取概率最大的词（argmax），接到输入末尾再预测下一个，直到生成 </s> 或到最大长度。所以生成必须逐个词进行。`,
+      { t: 'table', cls: 'compact', head: ['', '训练', '生成（推理）'], rows: [
+        ['解码器输入', '正确答案右移一位（teacher forcing）', '自己前面生成的词'],
+        ['计算方式', '所有位置一次算完', '一个词一个词'],
+        ['每个位置输出', '下一个词的分布，算 cross-entropy', '取 argmax 接到末尾（greedy）'],
+        ['causal mask', '要：挡住后面的正确答案', '也用（后面的词本来就还没生成）'],
+      ] },
     ],
     why: [
       T`Attention 是 2017 年以后几乎所有大模型（BERT、GPT 等）的核心。考试多为概念题：attention 解决了什么问题（单一上下文瓶颈）、self-attention 是什么、Transformer 为什么比 RNN 快。`,
@@ -501,6 +554,7 @@
     quiz: [
       { type: 'num', q: '得分 $e=(\\ln4,\\ \\ln1)$，$\\alpha_1=?$', answer: 0.8, explain: T`$\alpha_1$ 是位置 1 的 attention weight（注意力权重），等于得分的 softmax：$\alpha_1=\exp(e_1)/\big(\exp(e_1)+\exp(e_2)\big)$。题目给 $e_1=\ln4$、$e_2=\ln1$；exp 和 ln 互为反函数，所以 $\exp(\ln4)=4$，$\exp(\ln1)=1$。$\alpha_1=4/(4+1)=0.8$，相应 $\alpha_2=1/5=0.2$，两者和为 1。陷阱：**先取 exp 再归一化**，直接拿得分相除会得到 $\ln4/(\ln4+0)=1$。` },
       { type: 'num', q: '接上，$h^{(1)}=10$，$h^{(2)}=5$，$c=?$', answer: 9, explain: T`context vector（上下文向量）$c$ 是隐藏状态按注意力权重的加权平均：$c=\alpha_1h^{(1)}+\alpha_2h^{(2)}$。权重沿用上一题 $\alpha_1=0.8$、$\alpha_2=1-0.8=0.2$，隐藏状态由题目给出 $h^{(1)}=10$、$h^{(2)}=5$。$c=0.8\times10+0.2\times5=8+1=9$。结果更靠近 10，因为位置 1 的权重大：attention 让模型多看得分高的位置。` },
+      { type: 'mc', q: '（Worksheet 9）把 "Wie geht es dir" 译成 "How are you"。训练时用 teacher forcing，解码器的输入是：', options: ['"<start> How are you"', '"How are you </s>"', '模型上一步自己生成的词', '德语原句 "Wie geht es dir"'], answer: 0, explain: T`teacher forcing（教师强制）把**正确答案右移一位**当解码器输入：开头放 <start>，去掉最后的 </s>，即 $[\text{START},y_1,\dots,y_{T-1}]$。"How are you </s>" 是**目标**：每个位置要预测的下一个词。"模型上一步自己生成的词"是生成（推理）时 greedy decoding 的做法，训练时不这样做，所以训练能所有位置一次算完。德语原句是编码器的输入，解码器通过 cross-attention 看它。` },
       { type: 'mc', q: 'Transformer 比 RNN 训练快的主要原因：', options: ['参数更少', '序列中各位置可以并行计算', '不需要反向传播', '没有激活函数'], answer: 1, explain: T`RNN 第 $t$ 步要等第 $t-1$ 步的隐藏状态算完，只能一步一步顺序算。Transformer 用 self-attention（自注意力）代替循环：每个位置的新表示只依赖上一层的所有位置，**同一层里所有位置可以同时算**，正好适合 GPU。"参数更少"不对：快是因为能并行，和参数多少无关（大模型的参数往往更多）；它照样用反向传播训练，也有激活函数。L14 p16 就把 Transformer 定义为用 attention、高度可并行地处理序列的方法。` },
     ],
   });
@@ -515,7 +569,7 @@
       [T`卷积 = filter 滑动、逐元素相乘求和；权重共享；输出 $\lfloor(n+2p-k)/s\rfloor+1$；参数 $C_{out}C_{in}K^2(+C_{out})$。`, 'c38'],
       [T`Max pooling：取窗口最大值、无参数、sub-gradient 只传给最大值；卷积平移等变 + pooling ⇒ 一定程度的平移不变性；堆叠 ⇒ 感受野 $1+L(k-1)$；ResNet（残差网络）残差连接。`, 'c39'],
       [T`RNN：$\mathbf h^{(t)}=\tanh(\mathbf b+W\mathbf h^{(t-1)}+U\bx^{(t)})$，参数跨时间共享；展开深度 = 序列长度；BPTT；线性 RNN 的 $W^{T-1}$：$\rho(W)<1$ 消失、$>1$ 爆炸；LSTM 遗忘门复制路径。`, 'c40'],
-      [T`Attention：$\alpha_j=\mathrm{softmax}(e_j)$，$\mathbf c=\sum\alpha_j\mathbf h^{(j)}$；seq2seq 每步一个 $\mathbf c_i$；self-attention + 并行 = Transformer。`, 'c41'],
+      [T`Attention：$\alpha_j=\mathrm{softmax}(e_j)$，$\mathbf c=\sum\alpha_j\mathbf h^{(j)}$；seq2seq 每步一个 $\mathbf c_i$；self-attention + 并行 = Transformer；训练用 teacher forcing + causal mask（$-\infty$），生成用 greedy 逐词。`, 'c41'],
     ],
     map: [
       { t: 'table', head: ['数据', '结构', '共享参数的方式', '主要问题 / 对策'], rows: [
@@ -555,6 +609,7 @@
     ],
     quiz: [
       { type: 'num', q: '输入 $32\\times32\\times3$，8 个 $5\\times5$ filter，含 bias。参数？', answer: 608, explain: '每个 filter 在 3 个输入通道上各有 $5\\times5$ 个数：$5\\times5\\times3=75$，再加 1 个 bias 是 76；8 个 filter：$8\\times76=608$。' },
+      { type: 'num', q: '（Worksheet 8 原题）CNN：输入 $32\\times32\\times3$ → 8 个 $5\\times5$ 卷积 → $2\\times2$ max pooling（stride 2）→ 16 个 $5\\times5$ 卷积 → $2\\times2$ max pooling → 拉平 → 全连接 256 → 全连接 10。卷积 stride 1、无 padding，全部含 bias。参数总数？', answer: 109050, explain: T`先算尺寸：$32-5+1=28$，pooling 后 14；$14-5+1=10$，pooling 后 5；拉平 $5\times5\times16=400$。再逐层数参数：卷积 1：$8\times(5\times5\times3)+8=600+8=608$；卷积 2：$16\times(5\times5\times8)+16=3200+16=3216$；两个 pooling 都是 0；全连接 1：$400\times256+256=102400+256=102656$；全连接 2：$256\times10+10=2570$。合计 $608+3216+102656+2570=109050$（不含 bias 是 108760）。**94% 的参数在第一个全连接层**，两个卷积层合起来只有 3824 个。完整表格和 logistic regression 对比见 [T3](#/T03)。` },
       { type: 'num', q: '输入宽 32，filter 5，stride 1，padding 2。输出宽？', answer: 32, explain: '公式 $(W+2p-F)/s+1$：$2p=2\\times2=4$（两边各补 2 圈），$(32+4-5)/1+1=31+1=32$——输出和输入一样宽（"same" padding）。' },
       { type: 'num', q: '$28\\times28\\times6$ 经 $2\\times2$ stride 2 max pooling，再接 10 个输出的全连接层（含 bias）。全连接层参数？', answer: 11770, explain: '先 pooling：$28/2=14$，通道不变 ⇒ $14\\times14\\times6=1176$ 个数（拉平成向量）。再全连接：每个输出连 1176 个输入 + 1 个 bias ⇒ $10\\times(1176+1)=11770$。' },
       { type: 'num', q: 'RNN $H=10$，$D=5$，$K=3$（含 bias）。参数？', answer: 193, explain: '$U$（输入→隐藏）$H\\times D=10\\times5=50$；$W$（隐藏→隐藏）$H\\times H=100$；隐藏 bias $H=10$；$V$（隐藏→输出）$K\\times H=3\\times10=30$；输出 bias $K=3$。合计 $50+100+10+30+3=193$，和序列长度无关。' },

@@ -148,6 +148,8 @@
     { en: 'Binomial', alias: ['binomial distribution', 'binomial likelihood'], zh: '二项分布', plain: T`独立抛 $n$ 次、每次成功概率 $q$，成功 $k$ 次的概率 $\binom nk q^k(1-q)^{n-k}$。`, ch: 'c51' },
     { en: 'Multinomial', alias: ['multinomial distribution'], zh: '多项分布', plain: T`二项分布推广到多个类别：$n$ 次试验里每类各出现多少次。共轭先验是 Dirichlet。`, ch: 'c51' },
     { en: 'Poisson', alias: ['Poisson distribution'], zh: '泊松分布', plain: T`计数（一段时间内事件发生几次）的分布。共轭先验是 Gamma。`, ch: 'c51' },
+    { en: 'Credible interval', alias: ['Bayesian credible interval', 'equal-tailed interval'], zh: '可信区间', plain: T`Bayesian 的区间：后验分布中间的一段，参数落在里面的**后验概率**是 95%。等尾（equal-tailed）取法：两边各留 $\alpha/2$ 的后验概率。`, ch: 'c51' },
+    { en: 'Confidence interval', alias: ['frequentist confidence interval'], zh: '置信区间', plain: T`Frequentist 的区间：参数是固定的，区间随数据而变。95% 的意思是"重复抽样很多次，约 95% 的这样算出来的区间盖住真值"，**不是**"参数有 95% 概率在区间里"。`, ch: 'c51' },
     { en: 'Gamma function', zh: 'Gamma 函数', plain: T`阶乘的推广：$\Gamma(m)=(m-1)!$。在 Beta 分布里只出现在归一化常数中。`, ch: 'c51' },
     { en: 'Rule of succession', alias: ['sunrise problem'], zh: '继承法则（日出问题）', plain: T`均匀先验下，连续 $k$ 次成功后下一次成功的概率是 $\frac{k+1}{k+2}$（Laplace）。`, ch: 'c51' },
     { en: 'Variational methods', alias: ['variational', 'variational inference'], zh: '变分方法', plain: T`在一个好算的分布族里找最接近真实后验的分布，把推断变成优化问题。`, ch: 'c52' },

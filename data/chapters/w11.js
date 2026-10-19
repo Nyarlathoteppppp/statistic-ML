@@ -27,6 +27,11 @@
    * ===================================================================== */
   add({
     id: 'c56', week: 'W11', lec: 'L21', pages: 'L21 p3–p23', star: 2,
+    keyEn: [
+      T`Inference: given evidence, compute the (posterior) marginal of the query variables; summing out all other variables directly costs exponentially many terms.`,
+      T`Variable elimination on a tree: push each sum inside the product and eliminate from the leaves towards the query; each intermediate result is a message $m_{i\to j}(x_j)$, a function of $x_j$.`,
+      T`Message $m_{i\to j}(x_j)=\sum_{x_i}\psi_{ij}(x_i,x_j)\prod_{k\in N(i)\setminus j}m_{k\to i}(x_i)$; marginal $P(x_i)\propto\prod_{k\in N(i)}m_{k\to i}(x_i)$, normalised at the end (no need for $Z$).`,
+    ],
     genesis: T`推断要回答"听到警报后，盗窃的概率是多少"这类问题。最直接的做法是对所有没被问到的变量求和：$n$ 个二元变量要加的项数是 $2^n$ 量级，5 个变量 32 项还能手算，30 个就是十亿项。可联合分布本来就是很多小因子的乘积（c53、c55），每个因子只涉及两三个变量。**把求和号往里推：只出现在一个因子里的变量，先在那个因子里就地加掉**，剩下的是一张小表（一条"消息"），交给邻居接着算。在树上从叶子开始一个一个这样消下去，计算量只随变量个数线性增长。`,
     title: '树上消元与消息传递', en: 'Variable elimination and message passing on trees',
     summary: '**Inference（推断）= 用已经建好的模型回答问题**：知道一部分变量的值（观测 / evidence）后，问其他变量取各个值的概率。例：听到警报响了，发生盗窃的概率是多少？在图模型里，这就是求查询变量的**（后验）边缘分布**。直接对其余所有变量求和，项数随变量个数指数增长。本章按课件 L21 的顺序讲：先说清推断要算什么（p3–p5）和为什么先在**树**上做（p6），再在课件的 5 节点树上**从叶子往查询节点一个一个地求和**（variable elimination，p10–p22）。每一步的中间结果叫 **message（消息）** $m_{i\\to j}(x_j)$，最后归纳成两条规则（p22–p23）。',
@@ -227,6 +232,12 @@
    * ===================================================================== */
   add({
     id: 'c57', week: 'W11', lec: 'L21', pages: 'L21 p24–p37', star: 2,
+    keyEn: [
+      T`Evidence: multiply each factor containing an observed variable by $\delta(x_i,\hat x_i)$ (modified factor $\tilde\psi$), eliminate as usual, then normalise to get the posterior marginal.`,
+      T`Belief propagation on a tree: pick any root, collect messages from the leaves to the root, then distribute from the root back to the leaves; $2(n-1)$ messages give every node's marginal.`,
+      T`Marginal of neighbours: $P(x_2,x_4)\propto m_{1\to2}(x_2)\,m_{3\to2}(x_2)\,\psi_{24}(x_2,x_4)\,m_{5\to4}(x_4)$, the other incoming messages times the potential between them.`,
+      T`Graphs with cycles: junction tree (exact) or loopy belief propagation (approximate, since messages travel round loops and evidence is counted more than once).`,
+    ],
     title: 'Evidence 与 belief propagation', en: 'Incorporating evidence and two-phase belief propagation',
     summary: '有观测时，把**含观测变量的因子乘上指示函数** $\\delta(x_i,\\hat x_i)$（得到 modified factor $\\tilde\\psi$），然后照常消元。想要**所有**节点的边缘？不必对每个节点各做一次消元：**belief propagation（信念传播）** 选一个 root，**① 从叶子收消息到 root（collect），② 再从 root 发回叶子（distribute）**——每条边两个方向各一条消息，之后每个节点的边缘 $\\propto$ 收到的所有消息之积（再除以总和归一化）；相邻两点的联合边缘 $\\propto$ 外来消息 × 两点之间的 potential。',
     prereq: ['c56'],
@@ -386,6 +397,12 @@
    * ===================================================================== */
   add({
     id: 'c58', week: 'W11', lec: 'L22', pages: 'L22 p4–p26', star: 3,
+    keyEn: [
+      T`Cliques by elimination (moralise a BN first): for each variable in the given order, connect its current neighbours (fill-in edges), record the clique "variable + neighbours", then delete the variable.`,
+      T`Keep only the maximal cliques; weight clique-graph edges by the number of shared variables and take a maximum-weight spanning tree; intersections of adjacent cliques are the separators（分隔集）.`,
+      T`Running intersection property: a variable shared by two cliques appears in every clique on the path between them, so belief propagation on the cliques gives consistent, exact marginals.`,
+      T`Clique messages depend only on the separator: $m_{i\to j}(s_{ij})=\sum_{c_i\setminus s_{ij}}\psi_i(c_i)\prod_{k\in N(i)\setminus j}m_{k\to i}(s_{ki})$.`,
+    ],
     title: '消元找团、junction tree', en: 'Finding cliques by elimination and building the junction tree',
     summary: '图有环时，把变量聚成团，让**团**组成一棵树——**junction tree（联结树）**，再在团上跑 belief propagation。怎么找团（**T6 往年 8 分**）：按消元顺序一个个删变量；删之前**把它的邻居两两连上**（需要时加 fill-in 边），记下"它 + 它的邻居"这个团；最后**只保留极大团**。团之间按共享变量个数加权，取**最大权重生成树**，相邻团的交集叫 **separator（分隔集）**。',
     prereq: ['c55', 'c57'],
@@ -540,6 +557,11 @@
    * ===================================================================== */
   add({
     id: 'c59', week: 'W11', lec: 'L22', pages: 'L22 p26–p33', star: 2,
+    keyEn: [
+      T`The cost of exact inference is exponential in the largest clique size $k$ ($2^k$ table entries for binary variables), and the cliques are determined by the elimination order (triangulation).`,
+      T`Eliminating a highly connected variable early joins all its neighbours into one large clique; eliminating peripheral variables first keeps the cliques small.`,
+      T`Finding the optimal order is computationally hard; the greedy (myopic) heuristic eliminates, at each step, the variable that creates the smallest clique, with no optimality guarantee.`,
+    ],
     title: '消元顺序', en: 'Elimination order, clique size and inference cost',
     summary: '推断的计算量取决于**团的大小**：$k$ 个二元变量的团，potential 有 $2^k$ 个数要算。而团的大小由**消元顺序**决定（也叫 triangulation）。同一张图，先消外围的变量，团都很小；先消中心变量，第一个团就包含所有节点。**找最优顺序是计算上困难的**（L22 p27），实践中用**贪心（myopic）启发式**：每一步消掉"会产生最小团"的那个变量。',
     prereq: ['c58'],

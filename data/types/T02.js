@@ -10,7 +10,7 @@
     en: 'Upper Confidence Bound (UCB) for multi-armed bandits',
     chips: [
       { text: 'L17 p6–p22', href: '#/L17', cls: 'src' },
-      { text: '2026 practice Q2', cls: 'hot' }, { text: '2021 exam Q17', cls: 'hot' },
+      { text: '2026 practice Q2', cls: 'hot' }, { text: '2021 exam Q17', cls: 'hot' }, { text: 'Worksheet 10 同题', cls: 'src' },
     ],
     lead: '一个公式，三个数代进去。难点只有两个：**$t$ 等于多少**，以及**不用计算器怎么开根号**（题目会给 $\\ln$ 的近似值，数字也会设计成能开方）。',
     blocks: [
@@ -81,7 +81,7 @@ $Q(1)=\tfrac{40}{64}+\sqrt{9/64}=0.625+0.375=1.0$；$Q(2)=\tfrac{10}{16}+\sqrt{9
             ],
           },
           '结论：拉 **arm 3**。arm 1 和 arm 2 的均值一样（0.625），但 arm 2 拉得少，所以 bonus 更大；arm 3 均值最低，但只拉了 4 次，不确定性最大，UCB 认为它"可能很好"，值得探索。',
-          { t: 'note', md: '题目给的 $\\ln 4,\\ln 16,\\ln 64$ 是干扰项：有人会错用"每个臂自己的次数"代替 $t$。所有臂用同一个 $t=85$。' },
+          { t: 'note', md: '题目给的 $\\ln 4,\\ln 16,\\ln 64$ 是干扰项：有人会错用"每个臂自己的次数"代替 $t$。所有臂用同一个 $t=85$。Workshop 10 的手算题就是这一道（写明 $\\rho=2$），官方答案同样是 $t=85$、$Q=(1,\\ 11/8,\\ 2)$、拉 arm 3；它还多给了 $\\ln 5,\\ln 17,\\ln 65$，是给"每个臂的次数 + 1"这种错用准备的干扰项。' },
         ],
       },
       {

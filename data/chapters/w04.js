@@ -10,6 +10,12 @@
    * ===================================================================== */
   add({
     id: 'c22', week: 'W4', lec: 'L07', pages: 'L07 p1–p21', star: 2,
+    keyEn: [
+      T`A dichotomy is the label vector $(f(x_1),\dots,f(x_n))\in\{-1,+1\}^n$ a classifier gives to $n$ points; the growth function $S_\mathcal F(n)=\sup_{|\mathcal X|=n}|\mathcal F(\mathcal X)|\le2^n$ is the maximum number of distinct dichotomies.`,
+      T`An infinite class such as decision stumps (any real threshold $\beta$, two directions) still gives finitely many dichotomies: $S(n)=2(n+1)-2=2n$.`,
+      T`Best stump: sort the points, try every midpoint between neighbouring points (plus the two ends) in both directions, and count the training errors.`,
+      T`Growth-function bound (replacing $\log|\mathcal F|$): $R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{8\,\frac{\log S_\mathcal F(2n)+\log(4/\delta)}{n}}$; it never shrinks if $S_\mathcal F(n)=2^n$, so growth must be polynomial.`,
+    ],
     title: 'Dichotomy、growth function、stumps', en: 'Decision stumps, dichotomies, growth function',
     summary: '无限的模型类（如阈值可取任意实数的 **decision stump（决策树桩）**）在 $n$ 个具体的点上只能产生有限多种标签组合。这些组合叫 **dichotomy（二分）**，最多能产生多少种叫 **growth function（增长函数）** $S_\\mathcal F(n)$。它取代 $|\\mathcal F|$ 成为新的复杂度度量。',
     prereq: ['c21'],
@@ -134,6 +140,13 @@
    * ===================================================================== */
   add({
     id: 'c23', week: 'W4', lec: 'L07', pages: 'L07 p22–p29', star: 3,
+    keyEn: [
+      T`A set of $n$ points is shattered by $\mathcal F$ if all $2^n$ labellings are realised; $\mathrm{VC}(\mathcal F)$ is the size of the largest set that $\mathcal F$ can shatter (some set, not every set).`,
+      T`From a dichotomy table: upper bound $\mathrm{VC}\le\lfloor\log_2(\#\text{distinct rows})\rfloor$; then restrict to $k$ columns, remove duplicate rows, and check that all $2^k$ patterns appear.`,
+      T`At least $2^k$ rows is necessary, not sufficient: always exhibit $k$ columns showing all $2^k$ patterns and state that shattered set (2026/2025 practice Q3: 8 rows, but VC $=2$).`,
+      T`Decision stumps: VC $=2$; lines in $\mathbb R^2$: VC $=3$ (no 4 points can be shattered, e.g. the XOR labelling fails); linear classifiers in $\mathbb R^d$: VC $=d+1$.`,
+      T`Axis-aligned rectangles in $\mathbb R^2$: VC $=4$. Four points in a diamond are shattered (the bounding box of the positive points contains no negative point); for any 5 points, labelling the leftmost, rightmost, top and bottom points $+$ and another point $-$ is impossible, because any rectangle containing the extremes contains the bounding box of all 5 points.`,
+    ],
     genesis: T`c22 把"无穷多个分类器"换成了"在 $n$ 个点上最多分得出几种标签"，即 growth function $S_\mathcal F(n)$。可它是一整串数（$n=1,2,3,\dots$ 各一个），每个都要单独去算。观察这串数会发现：$n$ 小的时候 $S_\mathcal F(n)=2^n$，什么标签都分得出；一旦在某个 $n$ 上做不到 $2^n$，之后更大的 $n$ 也再做不到（$n+1$ 个点要被打散，其中任意 $n$ 个点得先被打散）。**这个分界点就是 VC 维：用一个数概括模型类有多灵活。** c24 的 Sauer–Shelah 引理再用这一个数给整串 growth function 一个上界。`,
     title: 'Shattering 与 VC 维', en: 'Shattering and the VC dimension',
     summary: '**Shatter（打散）**：一组点的所有 $2^n$ 种标签都能被某个分类器实现。**VC dimension（VC 维）** = 能被 shatter 的最大点集的大小。往年每年都考：给一张 dichotomy 表，求 VC 维并写出一个被 shatter 的点集（T1）。',
@@ -147,7 +160,7 @@
     goals: [
       '定义 shattering 和 VC 维，说清"存在一组点"而不是"所有点"',
       '从 dichotomy 表求 VC 维：上界 → 去列去重 → 找最大 shattered 子集（L07 p29 方法）',
-      '说出 stumps 的 VC = 2、$\\mathbb R^2$ 线性分类器 VC = 3、$\\mathbb R^d$ 线性分类器 VC = $d+1$',
+      '说出 stumps 的 VC = 2、$\\mathbb R^2$ 线性分类器 VC = 3、$\\mathbb R^d$ 线性分类器 VC = $d+1$；证明轴对齐矩形 VC = 4（Worksheet 5）',
       '解释为什么 4 个点不能被直线 shatter（XOR）',
     ],
     types: ['T01'],
@@ -167,6 +180,19 @@
         T`**$\mathbb R^d$ 中的线性分类器**：VC = $d+1$（L07 p33）。`,
       ] },
       { t: 'video', id: 'vc-shatter' },
+      { t: 'h3', text: '③ 再练一个：轴对齐矩形，VC = 4（Worksheet 5 Ex2）' },
+      T`**矩形分类器**：$f_{abcd}(\bx)=+1$ 当且仅当 $a\le x_1\le b$ 且 $c\le x_2\le d$，即点落在一个边与坐标轴平行的矩形里，否则 $-1$。结论 VC = 4。证明和上面"直线 VC = 3"一样分两步。`,
+      T`**VC ≥ 4（存在 4 个点）**：把 4 个点摆成菱形：最左、最右、最上、最下各一个。任给一种标注，取所有 $+$ 点的 bounding box（外接框：包住这些点的最小轴对齐矩形），稍微放大一点。每个点都在自己的方向上"突出"，所以这个框碰不到任何 $-$ 点；全是 $-$ 时把矩形放到远处。16 种标注都做得到。不是任意 4 点都行：正方形的 4 个角就不行，对角两点标 $+$ 时，框住它们的矩形就是整个正方形。`,
+      T`**VC < 5（任何 5 个点都不行）**：在 5 个点里取最左、最右、最上、最下的点（最多 4 个）标 $+$，剩下的点里任取一个标 $-$。包含这几个极值点的矩形一定包含它们的外接框，而这个框就是全部 5 个点的外接框，所以也包含那个 $-$ 点。这种标注做不到，任何 5 个点都不能被 shatter。英文答案见 [T13](#/T13/predicted)。`,
+      { t: 'html', html: '<div class="graph-row">' +
+        '<figure class="graph-fig"><svg class="graph" viewBox="0 0 200 200" role="img" aria-label="菱形四点，一个矩形框住左、上两个正类点">' +
+        '<rect class="edge fill" x="27" y="27" width="86" height="86" rx="3"/>' +
+        [[40, 100, '+'], [100, 40, '+'], [160, 100, '−'], [100, 160, '−']].map(([x, y, l]) => '<g class="node' + (l === '+' ? ' hl' : '') + '"><circle cx="' + x + '" cy="' + y + '" r="13"/><text x="' + x + '" y="' + y + '">' + l + '</text></g>').join('') +
+        '</svg><figcaption>菱形 4 点：任一种标注，框住 + 点的矩形都碰不到 − 点（图为其中一种）。</figcaption></figure>' +
+        '<figure class="graph-fig"><svg class="graph" viewBox="0 0 200 200" role="img" aria-label="五个点，框住四个极值点的矩形也框住了中间的负类点">' +
+        '<rect class="edge fill" x="17" y="17" width="166" height="166" rx="3"/>' +
+        [[30, 100, '+'], [170, 100, '+'], [100, 30, '+'], [100, 170, '+'], [112, 112, '−']].map(([x, y, l]) => '<g class="node' + (l === '+' ? ' hl' : ' q') + '"><circle cx="' + x + '" cy="' + y + '" r="13"/><text x="' + x + '" y="' + y + '">' + l + '</text></g>').join('') +
+        '</svg><figcaption>任 5 点：最左、最右、最上、最下标 +，剩下的标 −。框住 4 个 + 的矩形必然也框住 −。</figcaption></figure></div>' },
     ],
     why: [
       T`**T1 是往年最稳定的考点**：2026 Q3、2025 Q3、2021 Q16 都是"给一张 dichotomy 表，求 VC 维并写出一个 shattered set"，8–12 分，方法完全机械。本章把方法讲透，[T1 页](#/T01) 有全部真题解答和交互求解器。`,
@@ -246,6 +272,7 @@
         ['Decision stumps（一维）', '2', '$2n=2^n$ 最大解'],
         ['$\\mathbb R^2$ 中直线', '3', '三角形 3 点可 shatter；$S(4)=14<16$ ⇒ 任何 4 点都不行（凸四边形缺对角同色的 XOR；若一点在另三点围成的三角形内，缺的是"内点与外三点异号"）'],
         ['$\\mathbb R^d$ 中线性分类器', '$d+1$', 'L07 p33'],
+        ['$\\mathbb R^2$ 中轴对齐矩形', '4', '菱形 4 点可 shatter；任 5 点：4 个极值点标 +、其余一点标 − 做不到（Worksheet 5）'],
         ['有限类 $\\mathcal F$', '$\\le\\log_2|\\mathcal F|$', '每个分类器只给一行'],
       ] },
       { t: 'exam', md: T`**VC dimension (answer template):** The VC dimension is the size of the largest set of points that $\mathcal F$ can shatter, i.e. label in all $2^n$ possible ways. Here the table has $N$ distinct rows, so $\mathrm{VC}\le\lfloor\log_2N\rfloor$. Restricting to $\{x_a,x_b,x_c\}$ and removing duplicate rows gives all $2^3=8$ patterns $\{000,\dots,111\}$, so this set is shattered; no set of 4 points can be shattered (fewer than 16 rows). Hence $\mathrm{VC}(\mathcal F)=3$. (Template for the L07 p29 table: always conclude with the largest $k$ for which some $k$ columns actually show all $2^k$ patterns. Having at least $2^k$ rows is not enough — the 8-row table in 2026P Q3 / 2025P Q3 has no 3 columns with all 8 patterns, so there VC $=2$.)` },
@@ -282,6 +309,12 @@
    * ===================================================================== */
   add({
     id: 'c24', week: 'W4', lec: 'L07', pages: 'L07 p30–p34', star: 2,
+    keyEn: [
+      T`Sauer–Shelah lemma: if $\mathrm{VC}(\mathcal F)=d<\infty$ then $S_\mathcal F(n)\le\sum_{i=0}^{d}\binom ni\le(n+1)^d$, so the growth function is polynomial rather than $2^n$.`,
+      T`VC bound: with probability at least $1-\delta$ (i.i.d. data, 0-1 loss, ERM), $R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{8\,\frac{\mathrm{VC}(\mathcal F)\log(2n+1)+\log(4/\delta)}{n}}$.`,
+      T`The penalty is $O\big(\sqrt{\mathrm{VC}\log n/n}\big)\to0$, so a finite VC dimension implies generalisation (equivalently, PAC learnability); the bound holds for any distribution but is loose.`,
+      T`Structural risk minimisation (SRM): among model classes, choose the one minimising empirical risk plus the VC penalty.`,
+    ],
     title: 'VC 泛化界', en: 'Sauer–Shelah lemma and the VC generalisation bound',
     summary: '**Sauer–Shelah lemma（引理）**：VC 维有限时 growth function 只是多项式增长，$S_\\mathcal F(n)\\le\\sum_{i=0}^{\\mathrm{VC}}\\binom ni$。代入 growth-function 界得到 **VC 泛化界**：惩罚 $\\approx\\sqrt{\\mathrm{VC}\\log n/n}$，随 $n$ 下降——无限类也能泛化。',
     prereq: ['c22', 'c23'],
@@ -383,6 +416,12 @@
    * ===================================================================== */
   add({
     id: 'c25', week: 'W4', lec: 'L08', pages: 'L08 p1–p18', star: 3,
+    keyEn: [
+      T`Many separators have zero training error; the SVM picks the one maximising the margin, the distance from the boundary to the closest training point, which is more robust to sampling effects.`,
+      T`Distance of $\bx_i$ to the hyperplane $\bw'\bx+b=0$ is $\frac{|\bw'\bx_i+b|}{\|\bw\|}$; with $y_i\in\{-1,+1\}$ it is $\frac{y_i(\bw'\bx_i+b)}{\|\bw\|}$, positive for correctly classified points.`,
+      T`SVM objective: $\max_{\bw,b}\min_i\frac{y_i(\bw'\bx_i+b)}{\|\bw\|}$; the support vectors are the closest points. The margin is one-sided: the gap between the two margin lines is twice it.`,
+      T`Functional margin $y_i(\bw'\bx_i+b)$ scales with $(\bw,b)$; the geometric margin divides it by $\|\bw\|$: a scale-invariant signed distance, equal to the true distance for correctly classified points.`,
+    ],
     title: '最大 margin 与点到超平面距离', en: 'Maximum-margin idea and point-to-hyperplane distance',
     summary: '能完美分开数据的直线有无穷多条，训练误差都是 0。**SVM** 选离两类点都最远的那条：最大化 **margin（间隔）**——边界到最近点的距离。点到超平面的带符号距离 $\\frac{y_i(\\bw\'\\bx_i+b)}{\\|\\bw\\|}$ 是本章核心公式。',
     prereq: ['c03', 'c15'],
@@ -499,6 +538,22 @@
    * ===================================================================== */
   add({
     id: 'c26', week: 'W4', lec: 'L08', pages: 'L08 p19–p27', star: 3,
+    keyEn: [
+      T`Scaling $(\bw,b)$ by any $\alpha>0$ leaves the boundary unchanged, so fix the canonical scale $\min_iy_i(\bw'\bx_i+b)=1$; the margin is then $1/\|\bw\|$.`,
+      T`Hard-margin SVM primal: $\min_{\bw,b}\frac12\|\bw\|^2$ s.t. $y_i(\bw'\bx_i+b)\ge1$ for all $i$ (maximising $1/\|\bw\|$ $\Leftrightarrow$ minimising $\frac12\|\bw\|^2$).`,
+      T`Support vectors satisfy $y_i(\bw'\bx_i+b)=1$: functional margin 1, but Euclidean distance $1/\|\bw\|$. The solution depends only on them.`,
+      T`As regularised ERM: $\frac12\|\bw\|^2$ is the regulariser and the constraints act as a 0-or-$\infty$ loss; if the data are not linearly separable there is no solution.`,
+    ],
+    examQ: [
+      { src: '2021 Q2', q: T`For the hard-margin support vector machine, data points that are support vectors have a margin of 1 from the decision boundary. Explain how this can be the case even when support vectors are further than 1 unit away from the decision boundary in Euclidean space.`,
+        a: T`The 1 is the functional margin $y_i(\bw'\bx_i+b)=1$: since rescaling $(\bw,b)$ does not change the boundary, the scale is fixed so that the closest points have functional margin 1 (canonical form). Their Euclidean distance is $1/\|\bw\|$, which can exceed 1.`,
+        qzh: T`对于硬间隔支持向量机（hard-margin support vector machine），作为支持向量（support vectors）的数据点到决策边界（decision boundary）的间隔（margin）为 1。请解释：即使支持向量在欧氏空间（Euclidean space）中离决策边界超过 1 个单位，这为什么仍然成立。`,
+        azh: T`这里的 1 是函数间隔（functional margin）$y_i(\bw'\bx_i+b)=1$：因为对 $(\bw,b)$ 整体缩放不会改变边界，所以把尺度固定成让最近的点函数间隔恰好为 1（规范形式 canonical form）。这些点的欧氏距离是 $1/\|\bw\|$，它可以大于 1。` },
+      { src: '2026 practice Q1c', q: T`Consider the data shown with the hard-margin linear SVM decision boundary between the two classes (figure on the [T4](#/T04) page). Which points (by index 1–6) would be the support vectors of the SVM?`,
+        a: T`Points 1, 2 and 4, as they all lie on the margin: they are the closest points to the boundary on each side, with $y_i(\bw'\bx_i+b)=1$.`,
+        qzh: T`考虑图中的数据，以及两类之间的硬间隔线性 SVM（hard-margin linear SVM）决策边界（decision boundary），图见 [T4](#/T04) 页。哪些点（按编号 1–6）会是这个 SVM 的支持向量（support vectors）？`,
+        azh: T`点 1、2 和 4，因为它们都落在间隔（margin）上：它们是两侧离边界最近的点，满足 $y_i(\bw'\bx_i+b)=1$。` },
+    ],
     title: 'Hard-margin SVM', en: 'Hard-margin SVM: canonical scaling and the primal problem',
     summary: '$(\\bw,b)$ 乘任意正数不改变边界，所以固定"最近点的 functional margin = 1"（**canonical scaling**）。于是 margin $=1/\\|\\bw\\|$，最大化 margin ⇔ 最小化 $\\frac12\\|\\bw\\|^2$，约束 $y_i(\\bw\'\\bx_i+b)\\ge1$。等号成立的点是 support vectors。',
     prereq: ['c25'],
@@ -608,6 +663,12 @@
    * ===================================================================== */
   add({
     id: 'c27', week: 'W4', lec: 'L08', pages: 'L08 p28–p35', star: 2,
+    keyEn: [
+      T`Soft-margin SVM: $\min_{\bw,b,\boldsymbol\xi}\frac12\|\bw\|^2+C\sum_i\xi_i$ s.t. $y_i(\bw'\bx_i+b)\ge1-\xi_i$, $\xi_i\ge0$; slack variables let points violate the margin at a linear cost.`,
+      T`Equivalent form: hinge loss $\sum_i\max\big(0,1-y_i(\bw'\bx_i+b)\big)$ plus $\lambda\|\bw\|^2$, with $C\propto1/\lambda$; at the optimum each $\xi_i$ equals its hinge loss.`,
+      T`$\xi_i=0$: on or outside the margin; $0<\xi_i<1$: correct but inside the margin; $\xi_i=1$: on the boundary; $\xi_i>1$: misclassified.`,
+      T`Large $C$: violations are expensive, so the margin is narrow, close to hard margin if the data are separable (risk of overfitting); small $C$: wider margin, more violations, stronger regularisation.`,
+    ],
     title: 'Soft margin、hinge loss、slack', en: 'Soft-margin SVM, hinge loss, slack variables',
     summary: '真实数据很少完全可分。**Soft-margin SVM** 允许点进入 margin 甚至分错，但按违反程度罚：把 ∞ 损失换成 **hinge loss（合页损失 / 铰链损失）** $\\max(0,1-y_i(\\bw\'\\bx_i+b))$，等价地引入 **slack variables（松弛变量）** $\\xi_i$。$C$ 控制"宽 margin"和"少违规"的权衡。',
     prereq: ['c26'],
@@ -727,7 +788,7 @@
     summary: '本周一半是**往年必考计算题 T1（VC 维）**，一半是 **SVM 的几何与优化**（T4 看图找支持向量、2021 Q2 functional margin）。VC 题按"上界 → 选列去重 → 凑齐 $2^k$ → 写 shattered set"四步走，几乎不会错。',
     keypoints: [
       [T`无限类在 $n$ 个点上只有有限个 dichotomy；growth function $S(n)\le2^n$；stumps $S(n)=2n$；找 stump 试相邻中点、两个方向。`, 'c22'],
-      [T`VC 维 = 能被 shatter 的最大点集（"存在"一组即可）；stumps 2，$\mathbb R^2$ 直线 3，$\mathbb R^d$ 线性 $d+1$；从表求 VC：上界 $\lfloor\log_2\text{行数}\rfloor$ → 去列去重 → 凑齐 $2^k$。`, 'c23'],
+      [T`VC 维 = 能被 shatter 的最大点集（"存在"一组即可）；stumps 2，$\mathbb R^2$ 直线 3，$\mathbb R^d$ 线性 $d+1$，轴对齐矩形 4；从表求 VC：上界 $\lfloor\log_2\text{行数}\rfloor$ → 去列去重 → 凑齐 $2^k$。`, 'c23'],
       [T`Sauer–Shelah：$S(n)\le\sum_{i\le\mathrm{VC}}\binom ni$；VC 界 $\sqrt{8\frac{\mathrm{VC}\log(2n+1)+\log(4/\delta)}{n}}$；有限 VC ⇔ PAC 可学。`, 'c24'],
       [T`Margin = 边界到最近点的距离；带标签距离 $\frac{y_i(\bw'\bx_i+b)}{\|\bw\|}$；SVM 最大化最小距离。`, 'c25'],
       [T`Canonical scaling：最近点 functional margin = 1 ⇒ margin $=1/\|\bw\|$ ⇒ $\min\frac12\|\bw\|^2$ s.t. $y_i(\bw'\bx_i+b)\ge1$；等号点 = 支持向量。`, 'c26'],

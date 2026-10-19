@@ -3,6 +3,8 @@
  *   SML.chapter({
  *     id, week, lec, pages, star: 3|2|1, notExam: md, title, en, summary,
  *     genesis: md,                                      // 为什么会有它：没有它时卡在哪（发生法，放在第 1 节前）
+ *     keyEn: [md],                                      // English key points (exam wording); collapsed box on the page, printed in the outline
+ *     examQ: [{ src, q, a }],                           // real past-exam concept questions for this chapter (English q + model answer)
  *     goals: [md], prereq: [chapterId], types: [T-page ids], symbols: [[md symbol, md meaning]],
  *     what, why, intuition, math: md | [blocks],      // sections 1–4
  *     fx: [fxBlock],                                    // 5 公式逐项解释
@@ -21,6 +23,7 @@
     1: { cls: 'low', text: '★ 了解', note: '会用到，很少单独考' },
   };
   const asBlocks = (x) => (x == null ? [] : Array.isArray(x) ? x : [x]);
+  const T_ex = (e) => ({ t: 'callout', cls: 'examq', title: e.src || '原题', md: '**Q.** ' + e.q + (e.qzh ? '\n\n题意：' + e.qzh : '') + '\n\n**A.** ' + e.a + (e.azh ? '\n\n中文意思：' + e.azh : '') });
 
   SML.chapter = function (c) {
     const SECTIONS = [
@@ -35,6 +38,12 @@
     const star = STAR[c.star] || STAR[2];
     B.push({ t: 'chapterHead', star: star, notExam: c.notExam, goals: c.goals || [], prereq: c.prereq || [], types: c.types || [], pages: c.pages, symbols: c.symbols || [], sections: present.map(([k, label], i) => ({ id: k, n: i + 1, label: label })) });
 
+    if ((c.keyEn && c.keyEn.length) || (c.examQ && c.examQ.length)) {
+      const kb = [];
+      if (c.keyEn && c.keyEn.length) kb.push({ t: 'ul', items: c.keyEn });
+      if (c.examQ && c.examQ.length) { kb.push({ t: 'h4', text: '原题（概念题）' }); c.examQ.forEach((e) => kb.push(T_ex(e))); }
+      B.push({ t: 'deep', title: 'Key points in English（考试英文要点）' + (c.examQ && c.examQ.length ? ' + 原题' : ''), hint: '点开看', blocks: kb });
+    }
     if (c.genesis) B.push({ t: 'callout', cls: 'genesis', title: '为什么会有它', md: c.genesis });
 
     present.forEach(([k, label], i) => {
@@ -53,7 +62,7 @@
 
     return {
       id: c.id, eyebrow: (c.week ? c.week + ' · ' : '') + (c.lec || ''), title: c.title, en: c.en,
-      lead: c.summary, blocks: B,
+      lead: c.summary, blocks: B, keyEn: c.keyEn, examQ: c.examQ,
     };
   };
 
