@@ -21,6 +21,7 @@
         md: '1. 第一句直接回答问题（定义 / 是或否 / 结论）。\n2. 第二句给原因或机制，用课件术语。\n3. 能写公式就写一个（定义题尤其要写）。\n\n不要写背景介绍，阅卷只看关键词和机制。',
       },
       { t: 'h2', text: '1. 往年真题（全部）', id: 'past' },
+      { t: 'good', title: '官方答案：一行就够（2026 practice 解答）', md: 'Q1(a)（2 分）官方接受任意一种：*The residual sum of errors*；*The mean-squared error*；$\\sum_{i=1}^n(y_i-\\hat y_i)^2$（或它乘一个常数）。\n\nQ1(b)（2 分）官方接受任意一种：*The joint likelihood of the data and prior, after marginalising out the model parameters*；$p(x)=\\int p(x\\mid\\theta)p(\\theta)d\\theta$（写明 $x$ 是数据、$\\theta$ 是参数）；*The expected likelihood of the data, under the prior*。\n\n**2 分的定义题，写对一个说法或公式就够**，不用把下面的长答案全写上。' },
       { t: 'h3', text: '定义题（2025、2026 都考了）' },
       past('2026 Q1a / 2025 Q1a', '2–5', 'L03 p6, p15–p17',
         'In words or a mathematical expression, what quantity is minimised by linear regression?',

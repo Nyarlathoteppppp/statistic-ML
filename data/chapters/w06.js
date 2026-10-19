@@ -584,6 +584,18 @@
       ['PCA 不需要中心化', '必须先减均值（L12 p29）。'],
     ],
     quiz: [
+      {
+        type: 'mc', q: '（平时小测原题）Which of the following statements about autoencoders and PCA is **true**?',
+        qzh: '下面关于 autoencoder 和 PCA 的说法，哪一个是对的？',
+        options: [
+          'PCA and autoencoders always produce the same low-dimensional representation, even when the autoencoder uses nonlinear activations.',
+          'An autoencoder with a single hidden layer and linear activation functions is closely related to PCA.',
+          'PCA and a linear autoencoder are equivalent because both always recover the same orthonormal basis.',
+          'Autoencoders always outperform PCA because they can model nonlinear structure.',
+        ],
+        answer: 1,
+        explain: T`B 对：单隐藏层、线性激活、用平方误差训练的 autoencoder，学到的低维子空间就是 PCA 的主成分子空间（本章"Autoencoder 与 PCA"）。A 错：一旦用了非线性激活，学到的就不再是 PCA 那个线性子空间。C 错：线性 autoencoder 和 PCA 得到同一个**子空间**，但它的基向量不一定互相正交，也不一定就是那几个主成分，所以"同一组正交基"说过头了。D 错："总是更好"不成立：数据少或结构接近线性时，非线性 autoencoder 反而容易过拟合。`,
+      },
       { type: 'num', q: '协方差特征值 6、3、1。保留前两个主成分解释的方差比例？', answer: 0.9, explain: T`PCA 中每个特征值就是数据沿对应主成分方向的方差，所有特征值之和就是总方差。总方差 $6+3+1=10$；前两个主成分取最大的两个特征值，方差 $6+3=9$；比例 $9/10=0.9$，即只保留两维就留下了 90% 的方差。**分母是全部特征值之和**；只写 $6/10$ 是只算了第一个主成分。` },
       { type: 'mc', q: 'PCA 中 $\\mathbf p_1\'\\Sigma_x\\mathbf p_1$ 在最优点等于：', options: ['0', '1', '最大特征值', '迹'], answer: 2, explain: T`最优点由拉格朗日条件给出 $\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1$（$\mathbf p_1$ 是特征向量）。两边左乘 $\mathbf p_1'$：$\mathbf p_1'\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1'\mathbf p_1=\lambda_1\times1=\lambda_1$（用了约束 $\|\mathbf p_1\|=1$）。这个量是沿 $\mathbf p_1$ 的投影方差，要它最大，就取**最大**特征值。误选"1"是把约束 $\mathbf p_1'\mathbf p_1=1$ 当成了答案；"迹"是全部特征值之和，即所有方向的总方差。` },
       { type: 'mc', q: '下面哪个**不能**防止 autoencoder 直接复制输入？', options: ['窄的 bottleneck', '对输入加噪声', '让 $\\mathbf u$ 稀疏', '让 bottleneck 比输入更宽'], answer: 3, explain: 'L12 p25–p26。' },

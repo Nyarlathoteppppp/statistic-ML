@@ -515,6 +515,12 @@
       ['用 0/1 标签代入 $\\eta y\\bx$', '规则要求 $y\\in\\{-1,+1\\}$；$y=0$ 会让负类永远不更新。'],
     ],
     quiz: [
+      {
+        type: 'num', q: T`（平时小测原题）Imagine you are training a Perceptron as described in lectures: for $s=w_0+w_1x_1+w_2x_2$, the classifier predicts positive if $s\ge0$ and negative if $s<0$. You use the Perceptron loss $L(s,y)=\max\{0,-sy\}$ and the standard update rule with learning rate $\eta=1$. If the current weights are $(w_0,w_1,w_2)=(1,-2,2)$, what will the new weight $w_2$ be after processing the training example $(x_1,x_2)=(2,-1)$, $y=-1$?`,
+        qzh: T`按课件训练感知机：$s=w_0+w_1x_1+w_2x_2$，$s\ge0$ 判正类、$s<0$ 判负类；损失 $L(s,y)=\max\{0,-sy\}$，学习率 $\eta=1$。当前权重 $(w_0,w_1,w_2)=(1,-2,2)$，处理样本 $(x_1,x_2)=(2,-1)$、$y=-1$ 之后，新的 $w_2$ 是多少？`,
+        answer: 2,
+        explain: T`先算得分：$s=1+(-2)\times2+2\times(-1)=1-4-2=-5$。$s<0$ 判负类，真实 $y=-1$，分对了。等价地看损失：$y\,s=(-1)(-5)=5>0$，$L=\max\{0,-5\}=0$，梯度为 0，所以**不更新**，$w_2$ 仍是 2。常见错误是不管分没分对都套 $\mathbf w\leftarrow\mathbf w+\eta y\mathbf x$，会得到 $w_2=2+1\times(-1)\times(-1)=3$。`,
+      },
       { type: 'num', q: '$\\bw=(1,-1)$，$w_0=0$，样本 $(1,2)$，$y=+1$，$\\eta=0.5$。更新后 $w_2=?$', answer: 0, explain: T`Perceptron（感知机）先算得分（含 bias）：$s=w_0+w_1x_1+w_2x_2=0+1\times1+(-1)\times2=-1$。标签 $y=+1$，$sy=-1\le0$，分错，要更新 $\bw\leftarrow\bw+\eta y\bx$。第二个分量：$w_2\leftarrow w_2+\eta yx_2=-1+0.5\times(+1)\times2=-1+1=0$（同时 $w_1$ 变成 $1+0.5\times1=1.5$）。更新后这个点的得分变成 $0.5+1.5\times1+0\times2=2>0$，被分对了：更新就是把边界往分错的点那边推。` },
       { type: 'num', q: '同上，更新后 $w_0=?$', answer: 0.5, explain: T`Bias 权重 $w_0$ 对应一个恒为 1 的输入 $x_0=1$，所以它和其他权重用同一条规则：$w_0\leftarrow w_0+\eta yx_0$。上一题已判定这个样本分错（$sy=-1\le0$），代入 $w_0=0$、$\eta=0.5$、$y=+1$：$w_0\leftarrow0+0.5\times(+1)\times1=0.5$。**分错时 bias 也要更新**，忘了它是这类手算题最常见的失分点。` },
       { type: 'mc', q: 'Perceptron 是：', options: ['非线性分类器', '线性分类器', '回归模型', '生成式模型'], answer: 1, explain: T`perceptron 的得分 $s=\bw'\bx=\sum_{j=0}^mw_jx_j$ 是输入的线性函数，判类只看 $s\ge0$ 还是 $s<0$，所以决策边界 $\bw'\bx=0$ 是一个超平面（二维里就是一条直线），这就是线性分类器。容易误选"非线性分类器"，因为输出套了一个 sign/step 激活；**但激活只是对线性得分取符号，不会把边界弄弯**。它输出的是类别而不是实数，所以不是回归模型。L10 p8。` },

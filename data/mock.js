@@ -35,6 +35,7 @@
     lead: '**注意：这些题的完整解答在各题型页里已经出现过**，做这份卷只能检查你记住了没有。要测真实水平，先做 [新题模考](#/mock2)。\n\n原卷 50 分、50 分钟（真题 120 分、120 分钟，节奏相同：**1 分钟 1 分**）。不看网站、不用计算器，在纸上写完整英文答案，时间到再逐题对答案、按评分要点给自己打分。',
     blocks: [
       { t: 'viz', id: 'mock-timer', opts: { minutes: 50 } },
+      { t: 'good', title: '官方答案已对照（practice_exam_sol.pdf）', md: '老师发布的官方答案覆盖 Q1、Q2、Q3、Q6；Q4（D-separation）和 Q5（junction tree）官方写的是"在 tutorial 里讲"，没有书面答案，站上的解答是按课件方法自己做的。**有官方答案的题，站上的解答结论全部一致**：Q1(a) 残差平方和；Q1(b) $p(x)=\\int p(x\\mid\\theta)p(\\theta)d\\theta$；Q1(c) 点 1、2、4；Q1(d) $3+5\\cdot4+4\\cdot5=43$；Q2 拉臂 3（$Q=1,\\ 11/8,\\ 2$）；Q3 VC $=2$；Q6 六张 CPT、$A$ 的表 32 行。官方的写法差异见 [T13](#/T13) 和 [T7](#/T07)。' },
       { t: 'h2', text: 'Section A: Short Answer Questions [10 marks]', id: 'a' },
       Q('Q1(a)', 2, 'In words or a mathematical expression, what quantity is minimised by *linear regression*?', null, ['#/T13/past', 'T13'],
         '用文字或数学表达式回答：*线性回归（linear regression）* 最小化的是什么量？'),
