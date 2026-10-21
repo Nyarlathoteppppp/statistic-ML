@@ -22,8 +22,8 @@
       ['moment matching', '最优时两者相等；只对图里有的边成立', 'p8–p9'],
       ['tree MLE', '$\\hat P_{ij}=\\hat n_{ij}/T$、$\\hat P_i=\\hat n_i/T$ 代入树的分解式', 'p11–p12'],
       ['empirical entropy $\\hat H$ / mutual information $\\hat I$', '用频率算的熵、互信息；熵之和对所有树相同', 'p14'],
-      ['maximum weighted spanning tree', '从空树开始，每次加权重最大且不成环的边', 'p15–p19'],
-      ['BIC score for an edge', '$T\\hat I(X_i;X_j)-\\frac{r_ir_j-r_i-r_j+1}{2}\\log T$；只用正分的边，结果可能是 forest', 'p20'],
+      ['maximum weighted spanning tree', '从空树开始，每次加权重最大且不成环的边（讲者点名：Kruskal 算法，保证得到最大权生成树）', 'p15–p19'],
+      ['BIC score for an edge', '$T\\hat I(X_i;X_j)-\\frac{r_ir_j-r_i-r_j+1}{2}\\log T$；只用正分的边，结果可能是 forest；log 是自然对数（讲者）', 'p20'],
     ],
     formulas: [
       { t: 'math', tex: T`l(D;\theta)=\sum_{(i,j)\in E}\sum_{x_i,x_j}\hat n(x_i,x_j)\,\theta_{ij}(x_i,x_j)-T\log Z(\theta)` },
