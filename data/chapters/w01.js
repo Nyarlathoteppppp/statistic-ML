@@ -945,6 +945,18 @@
       { type: 'mc', q: 'MLE 中取对数的主要原因**不包括**：', options: ['连乘变连加，便于求导', '避免数值下溢', 'log 单调，最优点不变', 'log 让似然变成概率分布'], answer: 3, explain: '取 log 后也不是 $\\theta$ 的分布。' },
       { type: 'num', q: '某 BN 中，"Rain = T"出现 40 次，其中"WetGrass = T"有 30 次。$P(\\text{Wet}=T\\mid\\text{Rain}=T)$ 的 MLE？', answer: 0.75, explain: 'CPT 的 MLE = 条件计数比例 $30/40$，即 Bernoulli MLE 在"Rain = T"的子集上。详见 T7。' },
       { type: 'show', q: '推导 $p_\\theta(x)=\\theta e^{-\\theta x}$ 的 MLE（写出关键步骤，英文）。', answer: T`Log-likelihood $L(\theta)=\sum_i(\log\theta-\theta x_i)=n\log\theta-\theta\sum_ix_i$. Setting $dL/d\theta=n/\theta-\sum_ix_i=0$ gives $\hat\theta=n/\sum_ix_i=1/\bar x$. The second derivative $-n/\theta^2<0$ confirms a maximum.` },
+      {
+        type: 'mc', q: T`（平时小测原题）Suppose $f(w)>0$ for all $w$, and we define $g(w)=\log f(w)$. Why do $f(w)$ and $g(w)$ have the same minimiser?`,
+        qzh: T`设对所有 $w$ 都有 $f(w)>0$，令 $g(w)=\log f(w)$。为什么 $f(w)$ 和 $g(w)$ 的最小值点相同？`,
+        options: [
+          T`The logarithm is a concave function.`,
+          T`The logarithm is a strictly increasing (monotonic) function`,
+          T`The logarithm of a product is the sum of the logarithms`,
+          T`The logarithm preserves the derivatives of f(w).`,
+        ],
+        answer: 1,
+        explain: T`关键是单调性（monotonic）：log 严格递增，$f(w_1)<f(w_2)\iff\log f(w_1)<\log f(w_2)$，所以让 $f$ 最小的点也让 $\log f$ 最小，最大值点同理。这就是 MLE 里能"先取 log 再求最大"的原因。最容易选错的是第 3 项：乘积变求和是我们挑 log 的原因（好算），但不是最小值点不变的原因，Canvas 官方解释也特意强调了这一点。凹（concave）和这个性质无关；log 也不保持导数（$g'=f'/f$）。`,
+      },
     ],
   });
 
@@ -1320,6 +1332,18 @@
       { type: 'num', q: '例 1 的设定，但观测到的是**反面**（$x=0$）。evidence $P(x=0)$？', answer: 0.5, explain: T`Evidence（证据，即 marginal likelihood 边缘似然）是：对每个可能的 $\theta$，算"先验 × 这个 $\theta$ 下出现该数据的概率"，再全部加起来。例 1 中 $\theta\in\{0.3,0.5,0.7\}$，先验各 $1/3$；**出现反面的概率是 $1-\theta$**，分别是 $0.7$、$0.5$、$0.3$。$P(x=0)=\frac13\times0.7+\frac13\times0.5+\frac13\times0.3=\frac13\times1.5=0.5$。这里三个 $\theta$ 关于 0.5 对称，所以反面的 evidence 和例 1 里正面的 evidence 一样，都是 0.5。` },
       { type: 'mc', q: '下面关于 MAP 的说法哪个正确？', options: ['MAP 最大化 $p(D\\mid\\theta)$', 'MAP 需要计算 evidence', '均匀先验时 MAP = MLE', 'MAP 输出后验分布'], answer: 2, explain: 'L02 p26。MAP 不需要 evidence（与 $\\theta$ 无关）。' },
       { type: 'show', q: '（往年原题 2026 Q1b）In words or a mathematical expression, what is the marginal likelihood for a Bayesian probabilistic model?', answer: T`The marginal likelihood (evidence) is the probability of the observed data under the model with the parameters integrated out according to the prior: $p(D)=\int p(D\mid\theta)\,p(\theta)\,d\theta$ (a sum for discrete $\theta$). It is the normalising constant (denominator) in Bayes' rule for the posterior.`, qzh: '用文字或数学表达式说明：对于一个贝叶斯概率模型（Bayesian probabilistic model），边缘似然（marginal likelihood）是什么？', azh: T`边缘似然（marginal likelihood），又称证据（evidence），是在该模型下观测数据出现的概率，其中参数已按先验（prior）积分掉：$p(D)=\int p(D\mid\theta)\,p(\theta)\,d\theta$（$\theta$ 离散时为求和）。它是用 Bayes 公式（Bayes' rule）求后验时的归一化常数（normalising constant），即分母。` },
+      {
+        type: 'mc', q: T`（平时小测原题）Which statement best describes the relationship between Maximum Likelihood Estimation (MLE) and Maximum A Posteriori (MAP) estimation?`,
+        qzh: T`下面哪句话最准确地描述了极大似然估计（MLE）和最大后验估计（MAP）的关系？`,
+        options: [
+          T`MAP and MLE differ only when the likelihood function is non-convex.`,
+          T`MLE can be viewed as MAP with a Gaussian prior centred at zero.`,
+          T`MAP incorporates a prior over parameters, whereas MLE does not; under a uniform prior, they give the same estimate.`,
+          T`MAP produces a more accurate parameter estimate than MLE because it uses the Bayes rule to find the solution.`,
+        ],
+        answer: 2,
+        explain: T`MAP 最大化"似然 × 先验"：$\hat\theta_{\text{MAP}}=\argmax_\theta[\log p(D\mid\theta)+\log p(\theta)]$；MLE 只最大化 $\log p(D\mid\theta)$。先验是均匀分布（uniform prior）时，$\log p(\theta)$ 是常数，不改变 argmax，所以两者给出同一个估计。最容易选错的是第 2 项：零均值高斯先验对应的是 ridge（多了 L2 惩罚），不是 MLE；MLE 对应的是均匀先验。第 1 项：两者的区别来自先验，和似然是否凸无关。第 4 项：MAP 不一定更准，先验选得不好反而更差。`,
+      },
     ],
   });
 

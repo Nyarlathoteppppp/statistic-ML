@@ -170,6 +170,13 @@
       { type: 'mc', q: 'Greedy、$Q_0=-\\infty$，第 1 轮拉了臂 2。之后：', options: ['每个臂各拉一次', '永远拉臂 2', '随机拉', '轮流拉'], answer: 1, explain: '臂 2 的有限平均值总大于 $-\\infty$（L17 p8）。' },
       { type: 'num', q: 'ε-greedy，$\\varepsilon=0.3$，$k=3$。拉当前最好臂的概率？', answer: 0.8, explain: T`ε-greedy 有两条路拉到当前最好的臂。利用：概率 $1-\varepsilon=1-0.3=0.7$，直接拉它。探索：概率 $\varepsilon=0.3$ 在全部 $k=3$ 个臂里均匀随机挑，挑中它的概率是 $1/3$，贡献 $0.3\times\frac13=0.1$。两条路相加 $0.7+0.1=0.8$。**易漏的是第二条路**：探索时也可能恰好抽到最好的臂，只答 0.7 就错了。` },
       { type: 'show', q: '（英文）What is the main weakness of ε-greedy that UCB addresses?', answer: T`ε-greedy explores blindly: with probability ε it picks an arm uniformly at random, ignoring how promising or how uncertain each arm is, and when it exploits it ignores how reliable each average is. Optimistic initialisation only helps at the start. UCB directs exploration by adding a bonus that is large for arms pulled few times, so it tries arms that could still be good and stops trying clearly bad, well-estimated arms.`, qzh: 'UCB 解决了 ε-greedy 的什么主要缺点？', azh: 'ε-greedy 的探索是盲目的：它以概率 ε 均匀随机地选一个臂（arm），不考虑每个臂有多大希望、有多不确定；而在利用（exploit）时，它也不考虑每个平均值有多可靠。乐观初始化（optimistic initialisation）只在开始时有帮助。UCB 通过加一个探索奖励（bonus）来引导探索，这个奖励对拉得少的臂很大，所以它会去尝试仍可能很好的臂，并停止尝试那些明显很差、估计已经很准的臂。' },
+      {
+        type: 'mc', q: T`（平时小测原题）Consider the greedy multi-armed bandit, with initialised $Q_0=-\infty$, running in a setting with bounded rewards on all $k=5$ arms. What's the most number of times an arm $i$ with worst (minimum) expected reward $\mu_i$ could be pulled out of $T=100$ rounds?`,
+        qzh: T`greedy 多臂老虎机，初始值 $Q_0=-\infty$，$k=5$ 个臂的奖励都有界。期望奖励最差（$\mu_i$ 最小）的臂 $i$，在 $T=100$ 轮里最多可能被拉几次？`,
+        options: [T`1 round`, T`no rounds`, T`100 rounds`, T`96 rounds`],
+        answer: 2,
+        explain: T`第 1 轮所有臂的 $Q$ 都是 $-\infty$，并列，greedy 可能正好选中最差的臂 $i$。拉完之后 $Q(i)$ 变成它拿到的奖励（奖励有界，是个有限数），其他 4 个臂还是 $-\infty$。greedy 每轮选 $Q$ 最大的臂，有限数永远大于 $-\infty$，所以之后每轮都继续拉臂 $i$，其他臂一次都不会被试：100 轮全是它。这正是 $Q_0=-\infty$ 的问题：完全不探索。$Q_0=+\infty$ 时才会让每个臂先各试一次。96 是把"其他 4 个臂各试一次"当成了必然发生。`,
+      },
     ],
   });
 

@@ -714,6 +714,20 @@
       { type: 'num', q: '$L(\\theta)=2\\theta^2-8\\theta$，$\\theta_0=10$，Newton 一步后 $\\theta=?$', answer: 2, explain: '$L\'=4\\theta-8=32$，$L\'\'=4$，$10-8=2$，就是最优点（二次函数一步到位）。' },
       { type: 'mc', q: '参数 $p=10^6$ 的神经网络为什么不用 Newton？', options: ['Hessian 不存在', '存储 $p^2$、求逆 $O(p^3)$ 太贵', 'Newton 只适用于一维', 'Newton 需要学习率'], answer: 1, explain: 'L04 p16–p18。' },
       { type: 'num', q: '$L\'(\\theta_t)=3$，$L\'\'(\\theta_t)=6$，$\\theta_t=1$。$\\theta_{t+1}=?$', answer: 0.5, explain: T`一维 Newton–Raphson 的一步是 $\theta_{t+1}=\theta_t-L'(\theta_t)/L''(\theta_t)$：用一阶导除以二阶导来决定走多远，不需要学习率。题目给 $\theta_t=1$、$L'(\theta_t)=3$、$L''(\theta_t)=6$。$\theta_{t+1}=1-3/6=1-0.5=0.5$。和 GD 对比：GD 减去 $\eta L'$，Newton 用曲率 $L''$ 代替了 $1/\eta$，**弯得越厉害（$L''$ 越大），步子越小**。`, qzh: T`已知 $L'(\theta_t)=3$，$L''(\theta_t)=6$，$\theta_t=1$，求 $\theta_{t+1}$。` },
+      {
+        type: 'mc', q: T`（平时小测原题）Consider a simple linear regression problem with 1 instance and 1 feature, i.e. $x$ and $y$ are real-valued constants, and we minimise $L(w)=\frac12(y-xw)^2$ over the real variable $w$. How many steps does Newton–Raphson take to converge to a global minimum, starting from an arbitrary initial point $w_1$? Assume $x\neq0$.`,
+        qzh: T`只有 1 个样本、1 个特征的线性回归：$x$、$y$ 是实数常数，最小化 $L(w)=\frac12(y-xw)^2$。从任意初始点 $w_1$ 出发，Newton–Raphson 要几步收敛到全局最小？设 $x\neq0$。`,
+        options: [
+          T`It's not possible to tell, it depends on $x$ and $y$`,
+          T`It's not possible to tell, it depends on $w_1$`,
+          T`It takes zero steps after initialisation.`,
+          T`It takes one step after initialisation.`,
+          T`It takes two steps after initialisation.`,
+          T`It takes infinite steps after initialisation.`,
+        ],
+        answer: 3,
+        explain: T`求导：$L'(w)=-x(y-xw)=x^2w-xy$，$L''(w)=x^2>0$。Newton 一步：$w_2=w_1-\frac{L'(w_1)}{L''(w_1)}=w_1-\frac{x^2w_1-xy}{x^2}=\frac yx$。最小值点就是 $L'(w)=0$ 的解 $w^*=y/x$，所以无论 $w_1$ 是多少，**一步就到**。原因：$L$ 本身是二次函数，Newton 用二次函数去近似 $L$，这个近似是精确的。"零步"只在恰好 $w_1=y/x$ 时成立，而题目说的是任意初始点。`,
+      },
     ],
   });
 
