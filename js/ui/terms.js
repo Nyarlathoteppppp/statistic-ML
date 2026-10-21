@@ -60,10 +60,11 @@
     const keys = Object.keys(byKey).sort((a, b) => b.length - a.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
     re = keys.length ? new RegExp('(^|[^A-Za-z\\-])(' + keys.join('|') + ')(?![A-Za-z])', 'i') : null;
   }
-  const NO = 'KATEX,CODE,BUTTON,A,H1,H2,H3,H4,TEXTAREA,INPUT,SELECT,OPTION,SCRIPT,STYLE,SVG,SUMMARY';
+  // exact tag names (a substring test on a joined string used to skip P, B, I, … because they occur inside OPTION, BUTTON, INPUT)
+  const NO = new Set('KATEX,CODE,BUTTON,A,H1,H2,H3,H4,TEXTAREA,INPUT,SELECT,OPTION,SCRIPT,STYLE,SVG,SUMMARY'.split(','));
   function skipEl(el) {
     for (let e = el; e; e = e.parentElement) {
-      if (NO.indexOf(e.tagName) >= 0 || (e.classList && (e.classList.contains('katex') || e.classList.contains('exam-phrase') || e.classList.contains('term-pop') || e.classList.contains('solver') || e.classList.contains('chips') || e.classList.contains('ch-nav') || e.classList.contains('page-foot') || e.classList.contains('en-title')))) return true;
+      if (NO.has(e.tagName) || (e.classList && (e.classList.contains('katex') || e.classList.contains('exam-phrase') || e.classList.contains('term-pop') || e.classList.contains('solver') || e.classList.contains('chips') || e.classList.contains('ch-nav') || e.classList.contains('page-foot') || e.classList.contains('en-title')))) return true;
       if (e.tagName === 'ARTICLE' || e.id === 'main') break;
     }
     return false;
