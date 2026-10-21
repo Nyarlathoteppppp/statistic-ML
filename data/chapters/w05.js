@@ -9,7 +9,7 @@
    * c28 · Lagrangian、KKT、SVM dual（L09 p1–p14）
    * ===================================================================== */
   add({
-    id: 'c28', week: 'W5', lec: 'L09', pages: 'L09 p1–p14', star: 2,
+    id: 'c28', week: 'W5', lec: 'L09', pages: 'L09 p1–p14', star: 3,
     keyEn: [
       T`Lagrangian $\mathcal L=f(\bx)+\sum_i\lambda_ig_i(\bx)+\sum_j\nu_jh_j(\bx)$ with $\lambda_i\ge0$; primal $=\min\max\mathcal L$, dual $=\max\min\mathcal L$. The SVM is a convex QP with strong duality.`,
       T`KKT conditions: primal feasibility ($g_i\le0$, $h_j=0$), dual feasibility ($\lambda_i\ge0$), complementary slackness ($\lambda_ig_i(\bx^*)=0$), stationarity ($\nabla_\bx\mathcal L=\mathbf 0$).`,

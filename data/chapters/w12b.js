@@ -25,7 +25,7 @@
    * c63 · MRF 参数学习：moment matching（L24 p3–p12）
    * ===================================================================== */
   add({
-    id: 'c63', week: 'W12', lec: 'L24', pages: 'L24 p3–p12', star: 2,
+    id: 'c63', week: 'W12', lec: 'L24', pages: 'L24 p3–p12', star: 1,
     keyEn: [
       T`Learning the parameters (or the structure) of an MRF requires inference even with complete observations, because the distribution is globally normalised: $Z(\theta)$ depends on every parameter.`,
       T`With the graph fixed, $l(D;\theta)=\sum_{(i,j)\in E}\sum_{x_i,x_j}\hat n(x_i,x_j)\,\theta_{ij}(x_i,x_j)-T\log Z(\theta)$; the pairwise counts $\hat n(x_i,x_j)$ are sufficient statistics, and $l$ is concave, so it has no local optima that are not global.`,
@@ -269,7 +269,7 @@
    * ===================================================================== */
   const MW_ALL = 'x1-x2=1.5 x2-x4=0.9 x3-x4=1 x1-x3=3 x1-x4=0.7 x2-x3=2';
   add({
-    id: 'c64', week: 'W12', lec: 'L24', pages: 'L24 p13–p23', star: 2,
+    id: 'c64', week: 'W12', lec: 'L24', pages: 'L24 p13–p23', star: 1,
     keyEn: [
       T`For a tree with its ML parameters, $l(D;\hat\theta)=T\big[-\sum_{i=1}^n\hat H(X_i)+\sum_{(i,j)\in E}\hat I(X_i;X_j)\big]$; the sum of entropies is the same for all trees, so the best-scoring tree includes edges with high (empirical) mutual information.`,
       T`Maximum weighted spanning tree: start with an empty tree and iteratively add the candidate edge with the maximum weight if it does not create a cycle, until $n-1$ edges have been added.`,

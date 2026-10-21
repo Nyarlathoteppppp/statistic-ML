@@ -16,7 +16,7 @@
    * c51 · 生成模型、Beta–Binomial、共轭（L19 p2–p18）
    * ===================================================================== */
   add({
-    id: 'c51', week: 'W10', lec: 'L19', pages: 'L19 p2–p18', star: 2,
+    id: 'c51', week: 'W10', lec: 'L19', pages: 'L19 p2–p18', star: 3,
     keyEn: [
       T`Generative models learn $P(\mathbf x,y)$, i.e. how the data are generated (e.g. naive Bayes); discriminative models learn $P(y\mid\mathbf x)$ or the classifier directly (e.g. logistic regression).`,
       T`Beta–Binomial: prior $\mathrm{Beta}(\alpha,\beta)$ and $k$ successes in $n$ trials give the posterior $\mathrm{Beta}(k+\alpha,\ n-k+\beta)$, mean $\frac{k+\alpha}{n+\alpha+\beta}$: add the counts to the parameters.`,
@@ -681,7 +681,7 @@
    * c55 · MRF、clique、BN→MRF（L20 p28–p41）
    * ===================================================================== */
   add({
-    id: 'c55', week: 'W10', lec: 'L20', pages: 'L20 p28–p41', star: 2,
+    id: 'c55', week: 'W10', lec: 'L20', pages: 'L20 p28–p41', star: 3,
     keyEn: [
       T`An MRF is an undirected graphical model: $X\perp Y\mid S$ holds if deleting $S$ disconnects $X$ from $Y$ (plain graph separation, no ancestral graph or moralising).`,
       T`Hammersley–Clifford: $P(\mathbf x)=\frac1Z\prod_c\psi_c(\mathbf x_c)$ over the cliques, with positive potentials $\psi_c$ (scores, not probabilities); the partition function（配分函数）$Z=\sum_{\mathbf x}\prod_c\psi_c(\mathbf x_c)$ normalises.`,

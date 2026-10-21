@@ -597,7 +597,7 @@
    * c14 · Newton–Raphson（L04 p12–p18）
    * ===================================================================== */
   add({
-    id: 'c14', week: 'W2', lec: 'L04', pages: 'L04 p12–p18', star: 1,
+    id: 'c14', week: 'W2', lec: 'L04', pages: 'L04 p12–p18', star: 2,
     keyEn: [
       T`Newton–Raphson finds a zero of the derivative using curvature: $\theta_{t+1}=\theta_t-L'(\theta_t)/L''(\theta_t)$; multivariate: $\boldsymbol\theta_{t+1}=\boldsymbol\theta_t-(\nabla^2L)^{-1}\nabla L$.`,
       T`It fits a local quadratic and jumps to its stationary point (the minimum when the Hessian is positive definite): no learning rate, far fewer iterations than GD, and one step for a quadratic objective.`,

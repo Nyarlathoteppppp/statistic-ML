@@ -649,7 +649,7 @@ $$\begin{aligned}m_{V\to S}(S)=\sum_{V}\psi_{VS}(V,S)\,&m_{R\to V}(V)\,m_{T\to V
    * c59 · 消元顺序（L22 p26–p33）
    * ===================================================================== */
   add({
-    id: 'c59', week: 'W11', lec: 'L22', pages: 'L22 p26–p33', star: 2,
+    id: 'c59', week: 'W11', lec: 'L22', pages: 'L22 p26–p33', star: 3,
     keyEn: [
       T`The cost of exact inference is exponential in the largest clique size $k$ ($2^k$ table entries for binary variables), and the cliques are determined by the elimination order (triangulation).`,
       T`Eliminating a highly connected variable early joins all its neighbours into one large clique; eliminating peripheral variables first keeps the cliques small.`,

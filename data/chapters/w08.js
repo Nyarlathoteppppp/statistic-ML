@@ -9,7 +9,7 @@
    * c42 · 评估指标（L15 p3–p14）
    * ===================================================================== */
   add({
-    id: 'c42', week: 'W8', lec: 'L15', pages: 'L15 p3–p14', star: 2,
+    id: 'c42', week: 'W8', lec: 'L15', pages: 'L15 p3–p14', star: 1,
     keyEn: [
       T`From the confusion matrix: precision $=TP/(TP+FP)$, recall (sensitivity) $=TP/(TP+FN)$, specificity $=TN/(TN+FP)$, $F_1=\frac{2PR}{P+R}$; for regression use MSE, RMSE or MAE.`,
       T`Because the class distributions overlap, moving the threshold trades precision against recall (sensitivity against specificity), so report them in pairs; accuracy is misleading for imbalanced classes.`,
@@ -362,7 +362,7 @@
    * c45 · Experts：majority、halving（L16 p1–p14）
    * ===================================================================== */
   add({
-    id: 'c45', week: 'W8', lec: 'L16', pages: 'L16 p1–p14', star: 2,
+    id: 'c45', week: 'W8', lec: 'L16', pages: 'L16 p1–p14', star: 1,
     keyEn: [
       T`Online learning with expert advice: each round see $n$ experts' predictions, predict, then see the outcome; outcomes may be adversarial (no i.i.d. assumption); compare our mistakes $M$ with the best expert's $m$.`,
       T`Majority vote (an infallible expert exists): predict the majority of the surviving experts and delete every expert that errs; $M\le\log_2n$.`,

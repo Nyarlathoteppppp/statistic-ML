@@ -9,7 +9,7 @@
    * c22 · Dichotomy、growth function、decision stumps（L07 p1–p21）
    * ===================================================================== */
   add({
-    id: 'c22', week: 'W4', lec: 'L07', pages: 'L07 p1–p21', star: 2,
+    id: 'c22', week: 'W4', lec: 'L07', pages: 'L07 p1–p21', star: 3,
     keyEn: [
       T`A dichotomy is the label vector $(f(x_1),\dots,f(x_n))\in\{-1,+1\}^n$ a classifier gives to $n$ points; the growth function $S_\mathcal F(n)=\sup_{|\mathcal X|=n}|\mathcal F(\mathcal X)|\le2^n$ is the maximum number of distinct dichotomies.`,
       T`An infinite class such as decision stumps (any real threshold $\beta$, two directions) still gives finitely many dichotomies: $S(n)=2(n+1)-2=2n$.`,

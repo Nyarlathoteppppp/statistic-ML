@@ -348,7 +348,7 @@
    * c49 · Contextual bandits 与 RL（L17 p24–p27）
    * ===================================================================== */
   add({
-    id: 'c49', week: 'W9', lec: 'L17', pages: 'L17 p24–p27', star: 1,
+    id: 'c49', week: 'W9', lec: 'L17', pages: 'L17 p24–p27', star: 2,
     keyEn: [
       T`A contextual bandit observes a context vector $\mathbf X_i(t)$ each round, so estimating $E[R_i(t)\mid\mathbf X_i(t)]$ becomes a regression problem; UCB is applied to the regression prediction.`,
       T`Contextual bandit vs RL: in a contextual bandit the action does not affect the next state; in reinforcement learning the (state, action) pair determines the next state, so future rewards must be considered.`,

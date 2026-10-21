@@ -38,7 +38,7 @@
    * c60 · BN 等价（L23 p3–p7）
    * ===================================================================== */
   add({
-    id: 'c60', week: 'W12', lec: 'L23', pages: 'L23 p3–p7', star: 2,
+    id: 'c60', week: 'W12', lec: 'L23', pages: 'L23 p3–p7', star: 1,
     keyEn: [
       T`Two graphs are equivalent if they encode the same set of independence assumptions about the variables.`,
       T`Formally, two DAGs are equivalent if and only if they have the same set of edges when directions are ignored (the same skeleton) and the same immoral v-structures.`,
@@ -503,7 +503,7 @@
    * c62 · Bayesian score 与结构搜索（L23 p23–p34）
    * ===================================================================== */
   add({
-    id: 'c62', week: 'W12', lec: 'L23', pages: 'L23 p23–p34', star: 2,
+    id: 'c62', week: 'W12', lec: 'L23', pages: 'L23 p23–p34', star: 1,
     notExam: '闭式 Bayesian score 的推导（L23 p28；讲者："you also don\'t need to know how to derive it"），以及"三条准则只允许 Dirichlet"的证明（课件没给）。要会的是：认出公式、说出每个符号、代入计数。',
     keyEn: [
       T`Bayesian score: $\mathrm{score}(1|2,3;D)=\log\int P(\theta)\big[\prod_{t=1}^TP(x_{t1}\mid x_{t2},x_{t3};\theta)\big]d\theta$. Integrating over all parameter values, weighted by the prior, gives better complexity control than plugging in a single $\hat\theta$.`,
