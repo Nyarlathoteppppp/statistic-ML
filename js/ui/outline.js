@@ -74,7 +74,8 @@
     const head = el('div', 'ol-head');
     head.innerHTML = '<div class="ol-h1">COMP90051 Statistical Machine Learning · Exam outline</div>' +
       md('**Exam** Fri 6 Nov 16:30, Royal Exhibition Building West · 15 min reading + 120 min writing · closed book, no calculator, complex formulas are given. ' +
-        '每章标题后的 `#/c23` 是网站地址，解释和练习都在网站上；这里只印要背、要写的东西，英文照抄即可。');
+        '每章标题后的 `#/c23` 是网站地址，解释和练习都在网站上；这里只印要背、要写的东西，英文照抄即可。') +
+      md('**必会 8 类**（2026 practice 全卷，往年也几乎每份都有；网站 `#/must`）：① VC 表 Q3 · ② UCB Q2 · ③ CNN 参数 Q1(d) · ④ SVM 找 support vector Q1(c) · ⑤ D-separation Q4 · ⑥ 消元找团 Q5 · ⑦ PGM 建模/CPT/MLE Q6 · ⑧ 简答 Q1(a)(b)。步骤见书末 T1–T7。');
     wrap.appendChild(row(head));
 
     // ---- one section per week: storyline, then chapters ----

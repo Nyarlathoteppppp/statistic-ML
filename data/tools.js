@@ -131,6 +131,27 @@
     return box;
   };
 
+  /* Selected chapter examQ by [chapterId, src prefix] (the 必会 page): question shown, answer folded, link to the chapter. */
+  SML.render.blocks.examqPick = function (b) {
+    const { el } = SML.render;
+    const { md, inline } = SML.md;
+    const box = el('div', 'examq-index');
+    (b.picks || []).forEach(([id, src]) => {
+      const p = SML.content.get(id);
+      const e = p && (p.examQ || []).find((x) => String(x.src || '').indexOf(src) === 0);
+      if (!e) { box.appendChild(el('div', 'callout errata', '找不到原题：' + SML.md.esc(id + ' ' + src))); return; }
+      const m = SML.app.metaOf(id);
+      const card = el('div', 'callout examq');
+      card.innerHTML = '<div class="ctitle"><span>' + SML.md.esc(e.src) + ' · <a href="#/' + id + '">' + inline((m.tag ? m.tag + ' ' : '') + (m.title || p.title)) + '</a></span></div>' +
+        md('**Q.** ' + e.q) + (e.qzh ? md('题意：' + e.qzh) : '');
+      const d = el('details');
+      d.innerHTML = '<summary>看答案</summary>' + md('**A.** ' + e.a) + (e.azh ? md('中文意思：' + e.azh) : '');
+      card.appendChild(d);
+      box.appendChild(card);
+    });
+    return box;
+  };
+
   SML.content.add([
     { id: 'mistakes', title: '错题本', lead: '小测答错的题。点页面名回去重做。', blocks: [{ t: 'mistakes' }] },
     { id: 'phrases', title: '英文答题句式库', lead: '全站所有"卷面写法"（紫色框）汇总在这里，按页面分组。考前通读一遍，重点背关键词。', blocks: [{ t: 'phraseIndex' }] },

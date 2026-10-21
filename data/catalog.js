@@ -126,6 +126,7 @@
     r11: { tag: 'R11', title: 'W11 复习：图模型推断', review: true },
     r12: { tag: 'R12', title: 'W12 复习：学习图模型', review: true },
 
+    must: { title: '必会送分题（一定要会）' },
     formulas: { title: '闭卷必背公式', countable: false },
     phrases: { title: '英文答题句式库', countable: false },
     glossary: { title: '术语表', countable: false },
@@ -137,7 +138,7 @@
   root.SML.catalog = {
     meta: meta,
     zones: [
-      { id: 'guide', title: '考试导航', items: ['home', 'daily', 'route', 'outline'] },
+      { id: 'guide', title: '考试导航', items: ['home', 'must', 'daily', 'route', 'outline'] },
       {
         id: 'course', title: '课程（按周学习）', units: [
           { title: 'W1 · 概率、统计学派', items: ['c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'c07', 'c08', 'c09', 'r01'] },
