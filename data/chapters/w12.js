@@ -239,7 +239,7 @@
    * c61 · 完整数据学 BN：参数 MLE 与似然分数（L23 p8–p22）
    * ===================================================================== */
   add({
-    id: 'c61', week: 'W12', lec: 'L23', pages: 'L23 p8–p22', star: 2,
+    id: 'c61', week: 'W12', lec: 'L23', pages: 'L23 p8–p22', star: 3,
     keyEn: [
       T`Learning a Bayesian network from complete data is two-fold: parameter estimation for a given graph $G$, and structure learning, which scores each candidate $G$ (model selection) and searches for the highest-scoring acyclic graph (structure search).`,
       T`With complete data the log-likelihood splits into one term per CPT, $l(1|2,3;\theta)=\sum_{k=1}^{r_1}\sum_{j=1}^{q_1}\hat n_{1jk}\log\theta_{1jk}$, so the MLE is a relative frequency: $\hat\theta_{1jk}=\hat n_{1jk}/\sum_{l}\hat n_{1jl}$.`,

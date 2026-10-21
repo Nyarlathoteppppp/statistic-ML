@@ -25,8 +25,9 @@
     return out;
   }
 
-  // compare formulas by their content: no \htmlClass wrappers, spacing commands, braces or whitespace
-  const norm = (t) => String(t || '').replace(/\\htmlClass\{[^}]*\}/g, '').replace(/\\(?:,|;|!|quad|qquad| )/g, '').replace(/[{}\s$]/g, '');
+  // compare formulas by their content: no \htmlClass wrappers, spacing or bracket-size commands, braces or whitespace
+  const norm = (t) => String(t || '').replace(/\\htmlClass\{[^}]*\}/g, '').replace(/\\(?:,|;|!|quad|qquad| )/g, '')
+    .replace(/\\(?:[bB]igg?|left|right)(?![a-zA-Z])/g, '').replace(/\\[td]frac/g, '\\frac').replace(/[{}\s$]/g, '');
 
   // every formula of a page in reading order: fx cards first, then math blocks, skipping folded not-examinable parts.
   // A formula under a generic section heading ("1 · 它是什么", "4 · 数学定义") gets the key 'cNN:k' (its k-th one) so it can be named per chapter.
@@ -52,9 +53,9 @@
       (b.blocks || []).forEach((x) => walk(x, sk));
     };
     walk(page.blocks, false);
-    // drop a formula that repeats another (same after normalising) or is just the start of a longer one
+    // drop a formula that repeats another (same after normalising) or is contained in a longer one
     const ns = out.map((x) => norm(x.tex));
-    return out.filter((x, i) => !ns.some((n, j) => j !== i && n.startsWith(ns[i]) && (n.length > ns[i].length || j < i)));
+    return out.filter((x, i) => !ns.some((n, j) => j !== i && n.indexOf(ns[i]) >= 0 && (n.length > ns[i].length || j < i)));
   }
 
   // src labels of every past block on a page (nested ones too), in page order, without duplicates

@@ -210,7 +210,7 @@
     { en: 'Parameter independence', zh: '参数独立', plain: T`Bayesian score 先验的准则 1：CPT 不同列（不同父节点配置）的参数在先验上互相独立，所以先验是每列一个 Dirichlet 相乘。`, ch: 'c62' },
     { en: 'Parameter modularity', zh: '参数模块化', plain: T`准则 2：同一张条件表（同一节点、同一父节点集合）在不同的候选图里用同一个先验。`, ch: 'c62' },
     { en: 'Likelihood equivalence', zh: '似然等价', plain: T`准则 3：等价的图分数必须相同（数据本来就分不出它们）。为此超参数要取成某个联合分布的边缘乘 $\alpha$。`, ch: 'c62' },
-    { en: 'Structure search', alias: ['structure searching'], zh: '结构搜索', plain: T`在所有候选 DAG 里找分最高的那张。分数可分解，但"整张图无环"是全局约束，一般 BN 是 NP-hard，只能局部 / 随机搜索；只找树时用最大权生成树精确求解。`, ch: 'c62' },
+    { en: 'Structure search', alias: ['structure searching'], zh: '结构搜索', plain: T`在所有候选 DAG 里找分最高的那张。分数可分解，但"整张图无环"是全局约束，一般 BN 是 NP-hard，实际用局部 / 随机搜索，变量少或限制父节点个数时才用代价很大的精确搜索；只找树时用最大权生成树精确求解。`, ch: 'c62' },
     { en: 'Global normalisation', alias: ['globally normalised', 'globally normalized', 'global normalization'], zh: '全局归一化', plain: T`MRF 只在最后整体除以 $Z(\theta)$，没有各自归一的小表；改任一参数 $Z$ 就变，所有概率跟着变，所以数据完整时学参数也要做推断。`, ch: 'c63' },
     { en: 'Sufficient statistics', alias: ['sufficient statistic'], zh: '充分统计量', plain: T`似然只通过它们依赖数据的汇总量，知道它们就不需要原始数据。MRF 里是每条边上各取值组合的计数 $\hat n(x_i,x_j)$。`, ch: 'c63' },
     { en: 'Moment matching', zh: '矩匹配', plain: T`MRF 最大似然的最优条件：每条边上数据计数 = 模型预测计数，$\hat n(x_k,x_l)=T\,P(x_k,x_l;\theta)$。只对图里有的边成立；算预测计数要做推断。`, ch: 'c63' },
@@ -218,7 +218,7 @@
     { en: 'Entropy', alias: ['empirical entropy'], zh: '熵', plain: T`$\hat H(X)=-\sum_x\hat P(x)\log\hat P(x)$：变量有多难猜。总取同一个值时为 0，取值越均匀越大（二元最大 $\ln2$）。`, ch: 'c64' },
     { en: 'Chow–Liu tree', alias: ['Chow-Liu tree', 'Chow–Liu algorithm', 'Chow-Liu algorithm', 'Chow–Liu', 'Chow-Liu'], zh: 'Chow–Liu 树', plain: T`以互信息为边权的最大权生成树，是对数似然最高的树形模型（Chow 和 Liu，1968）。课件没用这个名字，算法就是 c64 那一套。`, ch: 'c64' },
     { en: 'Forest', alias: ['forests'], zh: '森林', plain: T`没有环、但不一定连通的图（几棵树放在一起）。树的 BIC 结构学习只用正分的边，结果可能是森林。`, ch: 'c64' },
-    { en: 'Gamma distribution', alias: ['Gamma prior'], zh: 'Gamma 分布', plain: T`$\lambda>0$ 上的分布，密度 $\propto\lambda^{\alpha-1}e^{-\lambda\beta}$（归一化常数考试会给）。它是 Poisson 似然的共轭先验。`, ch: 'c51' },
+    { en: 'Gamma distribution', alias: ['Gamma prior'], zh: 'Gamma 分布', plain: T`$\lambda>0$ 上的分布，密度 $\propto\lambda^{\alpha-1}e^{-\lambda\beta}$（归一化常数考试会给）。它是 Poisson 似然的共轭先验（课件 L19 p17 只列出这对，密度和更新见 T09 的 2016 Q10）。`, ch: 'c51' },
     { en: 'Poisson–Gamma', alias: ['Poisson-Gamma', 'Poisson–Gamma conjugacy'], zh: '泊松–伽马共轭对', plain: T`计数数据的共轭对：Poisson($\lambda$) 似然 + $\mathrm{Gamma}(\alpha,\beta)$ 先验，看到 $x_1,\dots,x_n$ 后后验是 $\mathrm{Gamma}(\alpha+\sum_ix_i,\ \beta+n)$——$\alpha$ 加计数之和，$\beta$ 加观测个数。`, ch: 'c51' },
     { en: 'Sub-gradient', alias: ['subgradient', 'sub-gradients', 'subgradients'], zh: '次梯度', plain: T`在不可导的拐点处代替梯度用的"斜率"。max pooling 里：前向时取到最大值的那个输入得 1、其余得 0，梯度只传给它。`, ch: 'c39' },
   ]);

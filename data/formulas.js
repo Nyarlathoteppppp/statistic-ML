@@ -41,7 +41,7 @@
           row('CPT 的 MLE（数数）', T`\hat\theta_{ijk}=\dfrac{\hat n_{ijk}}{\sum_{l=1}^{r_i}\hat n_{ijl}}=\dfrac{\#(x_i=k,\ pa_i=j)}{\#(pa_i=j)}`, 'L23 p18, T07'),
           row('Bayesian 线性回归后验', T`V_N=\sigma^2\Big(\bX'\bX+\tfrac{\sigma^2}{\gamma^2}I\Big)^{-1},\ \ \bw_N=\tfrac1{\sigma^2}V_N\bX'\by`, 'L18 p18'),
           row('预测分布', T`y_*\sim\mathcal N\big(\bx_*'\bw_N,\ \sigma^2+\bx_*'V_N\bx_*\big)`, 'L18 p24'),
-          row('Poisson–Gamma 后验', T`\mathrm{Gamma}\big(\alpha+\sum_{i=1}^n x_i,\ \beta+n\big)\ \ (\text{一个观测 }x\text{：}\mathrm{Gamma}(\alpha+x,\ \beta+1))`, 'L19 p17, T09（2016 Q10）'),
+          row('Poisson–Gamma 后验', T`\mathrm{Gamma}\big(\alpha+\sum_{i=1}^n x_i,\ \beta+n\big)\ \ (\text{一个观测 }x\text{：}\mathrm{Gamma}(\alpha+x,\ \beta+1))`, 'T09（2016 S2 Q10）；L19 p17 只列出这对共轭'),
           row('MRF 配分函数 / 边缘', T`Z=\sum_{\mathbf x}\prod_c\psi_c(\mathbf x_c);\ \ P(\text{问到的变量})=\tfrac1Z\sum_{\text{其余变量}}\prod_c\psi_c(\mathbf x_c)`, 'L20 p37, T06'),
         ],
       },

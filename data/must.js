@@ -22,7 +22,7 @@
         T`卷面写：VC 值、shattered 集、列出 $2^k$ 种组合、一句话说明更大的为什么不行。`,
       ],
       go: [['步骤', '#/T01/steps'], ['真题全解', '#/T01/past'], ['函数族 VC', '#/T01/family'], ['随机练习', '#/T01/practice']] },
-    { n: '②', title: 'UCB：算 Q 值、选臂', short: 'UCB', q: 'Q2 · 6 分', freq: '2021、2022、2026', page: 'T02',
+    { n: '②', title: 'UCB：算 Q 值、选臂', short: 'UCB', q: 'Q2 · 6 分', freq: '2021、2022、2026 有 bandit 题', page: 'T02',
       look: T`给每个臂被拉的次数和奖励总和，问 UCB 下一轮选哪个臂。`,
       steps: [
         T`$t=\sum_iN_{t-1}(i)+1$（总次数加 1）。`,
@@ -37,12 +37,12 @@
       steps: [
         T`从下往上，数出每层的单元数。`,
         T`卷积层的 filter 边长 $K$：看**一个**输出单元连了几条输入边。2026 卷每个卷积单元有 3 条入边，所以 $K=3$；再用 $7-3+1=5$ 验证卷积层正好 5 个单元。不要把卷积层的单元数 5 当成 $K$。`,
-        T`卷积层**权重共享**：参数 $=C_{out}\times C_{in}\times K^2$（加 bias 再加 $C_{out}$），和输出有多少个位置无关。`,
+        T`卷积层**权重共享**：1D（2026 卷那种，每个单元 $k$ 条入边）参数 $=k$；2D（$C_{out}$ 个 $K\times K$ filter）参数 $=C_{out}\times C_{in}\times K^2$。加 bias 再加 filter 个数；和输出有多少个位置无关。`,
         T`全连接层：两层单元数相乘（加 bias 再加输出单元数）。pooling 没有参数。`,
         T`尺寸：$\lfloor(n+2p-k)/s\rfloor+1$。看清题目要不要算 bias，再把各层加起来（2026 卷：$3+20+20=43$）。`,
       ],
       go: [['读图步骤', '#/T03/steps'], ['尺寸与感受野', '#/T03/size-rf'], ['随机练习', '#/T03/practice']] },
-    { n: '④', title: 'SVM：看图找 support vector', card: 'SVM 找 support vector', short: 'SVM 找 SV', q: 'Q1(c) · 3 分', freq: '6/7', page: 'T04',
+    { n: '④', title: 'SVM：看图找 support vector', card: 'SVM 找 support vector', short: 'SVM 找 SV', q: 'Q1(c) · 3 分', freq: '6/7 有 SVM 题', page: 'T04',
       look: T`给一张图，上面有两类点和 hard-margin SVM 的边界，问哪些点是 support vector。`,
       steps: [
         T`确认边界（题目给了就直接用）。`,
@@ -58,7 +58,7 @@
         T`列出所有有向边。`,
         T`画祖先图：只留 $X$、$Y$、$S$ 和它们的**全部祖先**。`,
         T`Moralize：有共同孩子的父节点两两连边，再去掉所有箭头。`,
-        T`删掉 $S$ 里的节点和它们的边。`,
+        T`删掉 $S$ 里的节点和它们的边（$S$ 指竖线右边的条件集；2026 卷里恰好有个节点也叫 $S$，它是被判断的对象，不能删）。`,
         T`$X$、$Y$ 不再连通就**成立**；还连通就**不成立**，并写出那条路径。`,
       ],
       note: T`**每一步都写在卷面上**，能拿步骤分。最常见的错：先删 $S$ 再 moralize，会把答案做反。`,

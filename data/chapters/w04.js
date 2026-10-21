@@ -707,7 +707,7 @@
    * c27 · Soft margin、hinge、slack（L08 p28–p35）
    * ===================================================================== */
   add({
-    id: 'c27', week: 'W4', lec: 'L08', pages: 'L08 p28–p35', star: 2,
+    id: 'c27', week: 'W4', lec: 'L08', pages: 'L08 p28–p35', star: 3,
     keyEn: [
       T`Soft-margin SVM: $\min_{\bw,b,\boldsymbol\xi}\frac12\|\bw\|^2+C\sum_i\xi_i$ s.t. $y_i(\bw'\bx_i+b)\ge1-\xi_i$, $\xi_i\ge0$; slack variables let points violate the margin at a linear cost.`,
       T`Equivalent form: hinge loss $\sum_i\max\big(0,1-y_i(\bw'\bx_i+b)\big)$ plus $\lambda\|\bw\|^2$, with $C\propto1/\lambda$; at the optimum each $\xi_i$ equals its hinge loss.`,
