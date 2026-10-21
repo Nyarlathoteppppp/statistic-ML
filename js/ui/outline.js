@@ -1,5 +1,5 @@
 /* Printable outline: { t:'outline' } builds a compact paper handout (about 15 A4 pages) from the site's own data.
- * Exam words are English, each followed by a short Chinese line in grey (keyZh, qzh/azh).
+ * Exam words are English, each followed by a short Chinese line in grey (keyZh; for past/quiz questions the question's qzh).
  * Per week: the week's storyline (b.storyline). Per chapter: English title, English key points, every formula with an
  * English label (b.fxEn / b.fxWhat map the site's Chinese headings; folded not-examinable parts skipped), past concept
  * questions (examQ) and the top pitfall, beside a narrow notes column. Then the exam types' solving methods.
@@ -114,12 +114,13 @@
           left.appendChild(f);
         }
         const zh = (t) => (t ? ' <span class="ol-kzh">' + inline(t) + '</span>' : '');
-        (p.examQ || []).forEach((e) => left.appendChild(el('div', 'ol-exq', label('Past ' + inline(e.src || '')) + '<b>Q.</b> ' + inline(e.q) + zh(e.qzh) + ' <b>A.</b> ' + inline(e.a) + zh(e.azh))));
+        // past and quiz questions: English Q/A plus the Chinese meaning of the question; the answer's Chinese stays on the site (page budget)
+        (p.examQ || []).forEach((e) => left.appendChild(el('div', 'ol-exq', label('Past ' + inline(e.src || '')) + '<b>Q.</b> ' + inline(e.q) + zh(e.qzh) + ' <b>A.</b> ' + inline(e.a))));
         // Canvas quiz questions of this chapter (tagged （平时小测原题）): question + answer, like the past questions
         sectionBlocks(p, 'quiz').filter((x) => x && x.t === 'quiz').forEach((qb) => (qb.items || []).forEach((it) => {
           if (!/平时小测原题/.test(it.q || '')) return;
           const ans = it.type === 'mc' ? (it.options || [])[it.answer] : (it.answerText || (it.answer != null ? String(it.answer) : ''));
-          left.appendChild(el('div', 'ol-exq', label('Quiz') + '<b>Q.</b> ' + inline(String(it.q).replace(/（平时小测原题）\s*/, '')) + zh(it.qzh) + ' <b>A.</b> ' + inline(ans || '') + zh(it.azh)));
+          left.appendChild(el('div', 'ol-exq', label('Quiz') + '<b>Q.</b> ' + inline(String(it.q).replace(/（平时小测原题）\s*/, '')) + zh(it.qzh) + ' <b>A.</b> ' + inline(ans || '')));
         }));
         const pit = sectionBlocks(p, 'pitfalls').find((x) => x && x.t === 'table');
         if (pit && pit.rows && pit.rows.length) left.appendChild(el('div', 'ol-pit1', label('易错') + '✗ ' + inline(pit.rows[0][0]) + ' → ✓ ' + inline(pit.rows[0][1])));

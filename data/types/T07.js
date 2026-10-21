@@ -11,6 +11,7 @@
     chips: [
       { text: 'L20 p8–p14, p27', href: '#/L20', cls: 'src' }, { text: 'L02 MLE', href: '#/L02', cls: 'src' },
       { text: '2026 practice Q6', cls: 'hot' }, { text: '2025 practice Q1d–e, Q4, Q6', cls: 'hot' }, { text: '2021 exam Q14', cls: 'src' },
+      { text: '2017 exam Q11 · 2016 exam Q12', href: '#/T07/more', cls: 'src' },
     ],
     lead: '这一类题分值最高，套路也最固定：**画图 → 写因子分解 → 数 CPT → 填 0/1 或数数估计 → 解释怎么用模型做决定**。山火题（Dandenongs / Bayesville）在 2025 和 2026 都出现了，务必背熟。',
     blocks: [
@@ -165,7 +166,118 @@
         ],
       },
 
-      { t: 'h2', text: '6. 随机练习', id: 'practice' },
+      { t: 'h2', text: '6. 更多往年设计题：2017 流感、2016 求职', id: 'more' },
+      T`两道老卷 Section D 的设计题，套路和山火题一样：逐句把题意翻成箭头（原因 → 结果）→ 写因子分解 → 数 CPT → 会出错的东西用"真实值 → 观测值"加一层 → 用推断回答问题。plate 记号今年没教，$N$ 个同类变量就画几个节点，再写"…"。`,
+      {
+        t: 'past', src: '2017 S2 exam Q11', marks: '2 + 1 + 1 + 1', topic: 'L20 p8–p14, p27 · L23 完整数据 MLE',
+        q: T`Influenza is a common disease, commonly known as the flu. It manifests with symptoms including muscle pain, coughing, fever and sneezing. A doctor will make a judgement about whether or not a patient has the flu, on the grounds of an individual's symptoms. The doctor may also make use of a clinical diagnostic test. These tests provide more reliable information than using symptoms alone, but are not perfect, in that they can return false positive or false negative results. (a) Draw a directed probabilistic graphical model (PGM) to best model the above scenario, based on the following random variables: $F$, whether the individual has the flu; $S_i$, the presence of symptom type $i$, $i=1\dots I$; and $T$ the result of the test. All random variables are binary valued. You may choose to include other random variables, as needed. [2 marks] (b) Now incorporate $D$, the doctor's diagnosis. How might the PGM differ if the doctor is known to be perfectly accurate, or inaccurate, when making their diagnosis based on the evidence? You may choose to include other random variables, as needed. [1 mark] (c) In making a diagnosis, the PGM can be used to compute a distribution over $F$. State the desired distribution, based on an individual attending the doctor with specific symptoms. [1 mark] (d) The parameters of the PGM are in the form of conditional probability tables. Explain how these parameters can be learned from data, and what kind of data would be required. [1 mark]`,
+        qzh: T`流感（influenza，俗称 flu）是常见病，症状包括肌肉痛、咳嗽、发烧和打喷嚏。医生根据病人的症状判断他是否得了流感，也可能借助临床诊断检测。检测比只看症状更可靠，但并不完美：可能出现假阳性（false positive）或假阴性（false negative）。(a) 用以下随机变量画一个有向概率图模型（directed PGM），尽量好地描述这个情境：$F$ 是否得流感；$S_i$ 第 $i$ 种症状是否出现，$i=1\dots I$；$T$ 检测结果。所有变量都是二元的，需要的话可以加其他变量。[2 分] (b) 现在加入医生的诊断 $D$。如果已知医生根据证据做诊断时完全准确，或者不准确，PGM 会有什么不同？需要的话可以加其他变量。[1 分] (c) 做诊断时可以用 PGM 算出 $F$ 的一个分布。对一个带着特定症状来看病的人，写出要算的分布。[1 分] (d) PGM 的参数是条件概率表（CPT）。说明怎样从数据学到这些参数，需要什么样的数据。[1 分]`,
+        azh: T`(a) 节点 $F$、$S_1,\dots,S_I$、$T$，边为对每个 $i$ 的 $F\to S_i$ 以及 $F\to T$：$P(F)\prod_i P(S_i\mid F)\,P(T\mid F)$。流感导致症状和检测结果；检测不完美，由非确定性的 CPT $P(T\mid F)$ 表示，其中 $P(T=1\mid F=0)$ 和 $P(T=0\mid F=1)$ 分别是假阳性率和假阴性率。
+(b) 医生只能看到证据，所以医生不准确时，加入 $D$，父节点为 $S_1,\dots,S_I,T$，CPT $P(D\mid S_1,\dots,S_I,T)$ 的条目严格介于 0 和 1 之间。如果医生完全准确，$D$ 总等于 $F$：加 $F\to D$，CPT 是确定性的（$P(D=f\mid F=f)=1$），$D$ 只是 $F$ 的副本。
+(c) 后验 $P(F\mid S_1=s_1,\dots,S_I=s_I)$（如果做了检测，也以 $T=t$ 为条件），即 $P(F=1\mid s_{1:I})\propto P(F=1)\prod_i P(s_i\mid F=1)$，再对 $F\in\{0,1\}$ 归一化。
+(d) 收集以往病人的完整记录（症状、检测结果、诊断以及确诊的流感状态）。完整数据下，最大似然按表分解，每个 CPT 条目就是相对频率，例如 $\hat P(S_i=1\mid F=1)=\#\{S_i=1,F=1\}/\#\{F=1\}$、$\hat P(T=1\mid F=0)=\#\{T=1,F=0\}/\#\{F=0\}$。`,
+        sol: [
+          { t: 'h4', text: '(a) 画图：原因 → 结果' },
+          T`流感 $F$ 是原因，症状 $S_1,\dots,S_I$ 和检测结果 $T$ 都是它的结果，所以箭头都从 $F$ 出发：每个 $i$ 一条 $F\to S_i$，再加 $F\to T$。因子分解：`,
+          { t: 'math', tex: T`P(F,S_1,\dots,S_I,T)=P(F)\prod_{i=1}^{I}P(S_i\mid F)\;P(T\mid F)` },
+          T`"检测会出错"体现在 CPT 上：$P(T\mid F)$ 是一张不全是 0/1 的 $2\times2$ 表，$P(T{=}1\mid F{=}0)$ 是假阳性率（false positive rate），$P(T{=}0\mid F{=}1)$ 是假阴性率（false negative rate）。这个形状还表示"知道是不是流感以后，各症状和检测结果互相独立"，和山火题一样是"一个原因、多个结果"。`,
+          { t: 'graph', nodes: { F: [210, 30], S1: [60, 140], S2: [160, 140], S3: [260, 140], T: [370, 140] }, labels: { S1: 'S₁', S2: 'S₂', S3: 'S₃' }, edges: 'F>S1 F>S2 F>S3 F>T', w: 340, caption: '$I=3$ 时的画法：$I$ 种症状就画 $I$ 个 $S$ 节点。' },
+          { t: 'warn', md: T`方向别画反：$S_i\to F$ 的意思是"症状导致流感"。题目给的变量要全部用上，$T$ 也要和 $F$ 相连。` },
+          { t: 'h4', text: '(b) 加上医生的诊断 D' },
+          T`关键：医生看不到真实的 $F$，只看到证据（症状和检测结果）。`,
+          {
+            t: 'ul', items: [
+              T`**医生不完全准确**：$D$ 的父节点是证据 $S_1,\dots,S_I,T$，CPT $P(D\mid S_1,\dots,S_I,T)$ 的条目在 0 和 1 之间（同样的证据，医生有时判对、有时判错）。这张表有 $2^{I+1}$ 种父节点组合。`,
+              T`**医生完全准确**：$D$ 永远等于真实的 $F$。最简单的画法是 $F\to D$，CPT 是确定性的（deterministic）：$P(D{=}f\mid F{=}f)=1$，其余为 0。这时 $D$ 只是 $F$ 的副本，观测到 $D$ 就等于知道了 $F$。`,
+            ],
+          },
+          {
+            t: 'graphs', r: 16, items: [
+              { nodes: { F: [210, 30], S1: [60, 140], S2: [160, 140], S3: [260, 140], T: [370, 140], D: [215, 250] }, labels: { S1: 'S₁', S2: 'S₂', S3: 'S₃' }, edges: 'F>S1 F>S2 F>S3 F>T S1>D S2>D S3>D T>D', cls: { D: 'hl' }, caption: '医生不准确：$D$ 由证据决定，CPT 是 0 到 1 之间的概率' },
+              { nodes: { F: [210, 30], S1: [60, 140], S2: [160, 140], S3: [260, 140], T: [370, 140], D: [215, 250] }, labels: { S1: 'S₁', S2: 'S₂', S3: 'S₃' }, edges: 'F>S1 F>S2 F>S3 F>T F>D', cls: { D: 'hl' }, caption: '医生完全准确：$D$ 是 $F$ 的副本，$P(D\\mid F)$ 全是 0/1' },
+            ],
+          },
+          { t: 'note', md: '和山火题（[第 3 节](#/T07/bushfire) 的 (c)(d)）同一个思路：准确 ⇒ CPT 全是 0/1；不准确 ⇒ 表里是 0 到 1 之间的概率。' },
+          { t: 'h4', text: '(c) 要算的分布' },
+          T`用模型做诊断，要的是：给定这位病人的症状，$F$ 的后验分布（posterior）$P(F\mid S_1=s_1,\dots,S_I=s_I)$；做了检测就把 $T=t$ 也放进条件。按 Bayes 规则算，分母就是对 $F$ 的两个取值求和：`,
+          { t: 'math', tex: T`P(F=1\mid s_1,\dots,s_I)=\frac{P(F=1)\prod_{i}P(s_i\mid F=1)}{\sum_{f\in\{0,1\}}P(F=f)\prod_{i}P(s_i\mid F=f)}` },
+          T`条件里不放 $D$：模型本身就是用来给出诊断的，医生的诊断不是这里的输入。`,
+          { t: 'h4', text: '(d) 怎么学 CPT' },
+          T`收集以往病人的完整记录：每人的症状 $S_1,\dots,S_I$、检测结果 $T$、医生诊断 $D$，以及后来确诊的真实 $F$（例如化验结果）。完整数据下 MLE 就是数数（[第 4 节](#/T07/mle)），每张表按父节点组合分组算比例：`,
+          {
+            t: 'ul', items: [
+              T`$\hat P(F{=}1)=\#\{F=1\}/n$（$n$ = 病人数）`,
+              T`$\hat P(S_i{=}1\mid F{=}f)=\#\{S_i=1,\ F=f\}/\#\{F=f\}$`,
+              T`$\hat P(T{=}1\mid F{=}0)=\#\{T=1,\ F=0\}/\#\{F=0\}$（假阳性率），假阴性率同理`,
+            ],
+          },
+          T`（如果数据里根本没有真实的 $F$，它就成了隐变量，要用 EM，今年不考，这里不展开。）`,
+          {
+            t: 'exam', md: T`(a) Nodes $F$, $S_1,\dots,S_I$, $T$ with edges $F\to S_i$ for every $i$ and $F\to T$: $P(F)\prod_i P(S_i\mid F)\,P(T\mid F)$. The flu causes the symptoms and the test result; the imperfect test is captured by a non-deterministic CPT $P(T\mid F)$, whose entries $P(T=1\mid F=0)$ and $P(T=0\mid F=1)$ are the false positive and false negative rates.
+(b) The doctor only sees the evidence, so for an inaccurate doctor add $D$ with parents $S_1,\dots,S_I,T$ and a CPT $P(D\mid S_1,\dots,S_I,T)$ with entries strictly between 0 and 1. If the doctor is perfectly accurate, $D$ always equals $F$: add $F\to D$ with a deterministic CPT ($P(D=f\mid F=f)=1$), so $D$ is just a copy of $F$.
+(c) The posterior $P(F\mid S_1=s_1,\dots,S_I=s_I)$ (also conditioning on $T=t$ if the test was done), i.e. $P(F=1\mid s_{1:I})\propto P(F=1)\prod_i P(s_i\mid F=1)$, normalised over $F\in\{0,1\}$.
+(d) Collect complete records of past patients (symptoms, test result, diagnosis and the confirmed flu status). With complete data, maximum likelihood decouples per table and each CPT entry is a relative frequency, e.g. $\hat P(S_i=1\mid F=1)=\#\{S_i=1,F=1\}/\#\{F=1\}$ and $\hat P(T=1\mid F=0)=\#\{T=1,F=0\}/\#\{F=0\}$.`,
+          },
+        ],
+      },
+      {
+        t: 'past', src: '2016 S2 exam Q12（12.1–12.4）', marks: '1 + 1 + 1 + 1（全题 5 分；12.5 学 CPT 见 c61 原题）', topic: 'L20 p8–p14, p27 · L21 推断',
+        q: T`Your task is to design a probabilistic graphical model (PGM) to capture a real-world scenario. Consider the problem of a student graduating from University and looking for a graduate job, by writing a CV and having a lecturer write them a reference letter. The CV is based on the student's marks for the $N$ subjects they have taken, and each mark is a reflection of the student's general skill. The reference letter is written by a lazy lecturer, basing their assessment purely on the mark obtained by the student in their subject. 1. Design a PGM to capture the above scenario, using as random variables: $M_i$: mark on subject $i$, with $i\in[1,N]$; $C$: quality of their CV; $S$: skill level; $R$: recommendation of reference letter. [1 mark] 2. Assuming each variable is binary (i.e., each value is high or low; or true or false), state the number of conditional probability tables and the number of free parameters in each table needed to specify the model. [1 mark] 3. CVs are not always written honestly, in that the marks may not always be reported correctly. Propose a change to the model and/or its parameterisation to best capture this situation. [1 mark] 4. Consider the role of a recruiter who wants to employ honest and skilful workers. Their task is to find the skill of the student and whether or not they are honest. What method might they use to determine these values, and what inputs would be required? [1 mark]`,
+        qzh: T`你的任务是设计一个概率图模型（PGM）来描述一个真实情境：学生大学毕业找工作，要写简历（CV），并请一位讲师写推荐信。简历基于学生修过的 $N$ 门课的成绩，每门成绩反映学生的总体能力（skill）。推荐信由一位"偷懒"的讲师写，他只根据学生在他那门课的成绩来评价。1. 用以下随机变量设计 PGM：$M_i$ 第 $i$ 门课的成绩，$i\in[1,N]$；$C$ 简历质量；$S$ 能力水平；$R$ 推荐信的推荐程度。[1 分] 2. 假设所有变量都是二元的（高/低，或真/假），写出确定这个模型需要几张条件概率表、每张表有几个自由参数。[1 分] 3. 简历不一定诚实：成绩可能报得不对。提出对模型和/或参数化的修改来最好地描述这种情况。[1 分] 4. 招聘方想雇诚实又有能力的人，要判断学生的能力以及是否诚实。他们可以用什么方法，需要哪些输入？[1 分]`,
+        azh: T`1. 对 $i=1,\dots,N$ 有 $S\to M_i$（每门成绩反映能力）；$M_1,\dots,M_N\to C$（简历基于成绩）；只有 $M_k\to R$，$k$ 是讲师教的那门课（偷懒的讲师只看这一个成绩）。联合分布：$P(S)\prod_i P(M_i\mid S)\,P(C\mid M_1,\dots,M_N)\,P(R\mid M_k)$。
+2. $N+3$ 张 CPT：$P(S)$ 有 1 个自由参数；$N$ 张 $P(M_i\mid S)$ 各 2 个；$P(C\mid M_1,\dots,M_N)$ 有 $2^N$ 个；$P(R\mid M_k)$ 有 2 个——合计 $2^N+2N+3$ 个。
+3. 把真实成绩 $M_i$ 和简历上报的成绩 $M_i'$ 分开，并加一个诚实变量 $H$：$M_i\to M_i'\leftarrow H$，简历取决于报的成绩（$M_1',\dots,M_N'\to C$），$R$ 仍取决于真实成绩 $M_k$。$H$ 为诚实时 $P(M_i'\mid M_i,H)$ 是确定性的（$M_i'=M_i$）；不诚实时允许虚报，例如 $P(M_i'=\text{high}\mid M_i=\text{low},H=\text{dishonest})>0$。
+4. 概率推断（probabilistic inference）：把报的成绩（或简历质量）和推荐信当作观测证据，计算后验 $P(S\mid m',r)$ 和 $P(H\mid m',r)$，例如用变量消元把未观测的真实成绩求和掉。输入：观测到的简历和推荐信，加上模型结构及其（事先学好的）CPT。`,
+        blocks: [{ t: 'note', md: T`第 5 问（CPT 怎么从数据学）略：能力 $S$ 和是否诚实在数据里永远观测不到，要用 EM，今年不考。` }],
+        sol: [
+          { t: 'h4', text: '12.1 画图：逐句翻成箭头' },
+          {
+            t: 'ul', items: [
+              T`"each mark is a reflection of the student's general skill"：能力是原因，$S\to M_i$（每门课一条）。`,
+              T`"The CV is based on the student's marks"：$M_1,\dots,M_N\to C$。`,
+              T`"lazy lecturer … purely on the mark … in their subject"：$R$ 只有一个父节点，就是讲师自己那门课的成绩 $M_k$；不连 $S$，也不连别的成绩。`,
+            ],
+          },
+          { t: 'math', tex: T`P(S,M_1,\dots,M_N,C,R)=P(S)\prod_{i=1}^{N}P(M_i\mid S)\;P(C\mid M_1,\dots,M_N)\;P(R\mid M_k)` },
+          { t: 'graph', nodes: { S: [200, 30], M1: [90, 130], M2: [200, 130], M3: [310, 130], C: [200, 240], R: [40, 240] }, labels: { M1: 'M₁', M2: 'M₂', M3: 'M₃' }, edges: 'S>M1 S>M2 S>M3 M1>C M2>C M3>C M1>R', w: 320, caption: '$N=3$ 时的画法（$N$ 门课就画 $N$ 个 $M$，不用 plate）；设讲师教第 1 门，所以 $R$ 只连 $M_1$。' },
+          { t: 'h4', text: '12.2 数 CPT（全部二元）' },
+          T`每个节点一张 CPT；自由参数 =（取值数 − 1）× 父节点组合数（[第 2 节](#/T07/count)）：`,
+          {
+            t: 'table', head: ['节点', 'CPT', '形状', '自由参数'], rows: [
+              ['$S$', '$P(S)$', '$2\\times1$', '1'],
+              ['$M_i$（$N$ 个）', '$P(M_i\\mid S)$', '$2\\times2$', '每张 2，共 $2N$'],
+              ['$C$', '$P(C\\mid M_1,\\dots,M_N)$', '$2\\times2^N$', '$2^N$'],
+              ['$R$', '$P(R\\mid M_k)$', '$2\\times2$', '2'],
+              ['合计', '$N+3$ 张', '', '$2^N+2N+3$'],
+            ],
+          },
+          T`例如 $N=3$：6 张表，$1+6+8+2=17$ 个自由参数。$C$ 的表最大，因为它有 $N$ 个父节点。`,
+          { t: 'h4', text: '12.3 简历不诚实' },
+          T`"成绩可能报错"就是：简历上写的成绩不一定是真实成绩。把两者分开，再加一个"是否诚实"的变量：`,
+          {
+            t: 'ul', items: [
+              T`真实成绩 $M_i$ 照旧由能力决定：$S\to M_i$。`,
+              T`新变量 $H$（学生是否诚实）；简历上写的成绩 $M_i'$ 由真实成绩和诚实度决定：$M_i\to M_i'$，$H\to M_i'$。`,
+              T`简历质量看写出来的成绩：$M_1',\dots,M_N'\to C$。`,
+              T`讲师知道真实成绩：$R$ 仍然只连真实的 $M_k$。`,
+            ],
+          },
+          T`参数化：$H=$ 诚实时，$P(M_i'\mid M_i,H)$ 是确定性的（$M_i'=M_i$，条目全是 0/1）；$H=$ 不诚实时允许"低报成高"，例如 $P(M_i'=\text{high}\mid M_i=\text{low},H=\text{dishonest})=q>0$。`,
+          { t: 'graph', nodes: { S: [220, 30], M1: [120, 115], M2: [220, 115], M3: [320, 115], H: [440, 115], R: [30, 205], P1: [120, 205], P2: [220, 205], P3: [320, 205], C: [220, 295] }, labels: { M1: 'M₁', M2: 'M₂', M3: 'M₃', P1: 'M₁′', P2: 'M₂′', P3: 'M₃′' }, edges: 'S>M1 S>M2 S>M3 M1>P1 M2>P2 M3>P3 H>P1 H>P2 H>P3 P1>C P2>C P3>C M1>R', cls: { H: 'hl', P1: 'hl', P2: 'hl', P3: 'hl' }, w: 380, caption: T`改后的模型（$N=3$）：蓝色是新加的 $H$ 和简历上的成绩 $M_i'$；推荐信 $R$ 仍连真实成绩 $M_1$。` },
+          { t: 'note', md: '和山火题 (d) 一个套路：把"观测到的值"（简历上的成绩）和"真实值"（真成绩）分开，中间那张 CPT 描述"会出错"。' },
+          { t: 'h4', text: '12.4 招聘方怎么判断' },
+          T`用概率推断（probabilistic inference）。能看到的是简历上的成绩 $M_i'$（或简历质量 $C$）和推荐信 $R$，把它们当观测，算后验 $P(S\mid m',r)$ 和 $P(H\mid m',r)$；看不到的真实成绩 $M_i$ 用消元算法求和掉（L21）。输入：这些观测值，加上模型结构和事先学好的 CPT。`,
+          T`直觉：推荐信只看真实成绩 $M_k$。如果简历上 $M_k'$ 写得很高，推荐信却很一般，$P(H=\text{dishonest})$ 就会上升。`,
+          {
+            t: 'exam', md: T`1. $S\to M_i$ for $i=1,\dots,N$ (each mark reflects skill); $M_1,\dots,M_N\to C$ (the CV is based on the marks); only $M_k\to R$, where $k$ is the lecturer's subject (the lazy lecturer uses only that mark). Joint: $P(S)\prod_i P(M_i\mid S)\,P(C\mid M_1,\dots,M_N)\,P(R\mid M_k)$.
+2. $N+3$ CPTs: $P(S)$ with 1 free parameter; $N$ tables $P(M_i\mid S)$ with 2 each; $P(C\mid M_1,\dots,M_N)$ with $2^N$; $P(R\mid M_k)$ with 2 — in total $2^N+2N+3$.
+3. Separate the true mark $M_i$ from the reported mark $M_i'$ and add an honesty variable $H$: $M_i\to M_i'\leftarrow H$, the CV depends on the reported marks ($M_1',\dots,M_N'\to C$), and $R$ still depends on the true mark $M_k$. $P(M_i'\mid M_i,H)$ is deterministic ($M_i'=M_i$) when $H$ is honest, and allows inflated marks, e.g. $P(M_i'=\text{high}\mid M_i=\text{low},H=\text{dishonest})>0$, otherwise.
+4. Probabilistic inference: treat the reported marks (or the CV quality) and the reference letter as evidence and compute the posteriors $P(S\mid m',r)$ and $P(H\mid m',r)$, e.g. by variable elimination summing out the unobserved true marks. Inputs: the observed CV and letter, plus the model structure and its (previously learned) CPTs.`,
+          },
+        ],
+      },
+
+      { t: 'h2', text: '7. 随机练习', id: 'practice' },
       { t: 'practice', gen: 'cpt', title: 'CPT 计数随机题' },
       {
         t: 'quiz', items: [

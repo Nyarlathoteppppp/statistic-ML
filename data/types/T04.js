@@ -66,8 +66,37 @@
         ],
       },
       { t: 'viz', id: 'svm-grid', opts: { preset: 'EX2026Q1c' } },
+      {
+        t: 'past', src: '2019 S2 practice Q4(b) / 2020 S2 practice Q3(b) / 2021 S1 practice Q3(b)', marks: '1–5', topic: 'L08 p25–p26',
+        q: 'Consider the data shown below with *hard-margin linear SVM decision boundary* shown between the classes. The right half is classified as red squares and the left half is classified as blue circles. Answer the following questions and explain your answers. *(Same figure as above: part (a) of this question is identical to 2026 practice Q1c.)*\n\n(b) What is the value of the *hard margin SVM loss* for point 3?',
+        qzh: '下图给出数据和硬间隔线性 SVM（hard-margin linear SVM）的决策边界（decision boundary），右半边判为红方，左半边判为蓝圆。回答下列问题并解释。*（就是上面那张图；这道题的 (a) 问和 2026 practice Q1c 完全相同。）* (b) 点 3 的硬间隔 SVM 损失（hard margin SVM loss）是多少？',
+        sol: [
+          T`课件 L08 p25–p26 的 hard-margin SVM loss 只有两个取值：`,
+          { t: 'math', tex: T`l_\infty=\begin{cases}0, & 1-y(\bw'\bx+b)\le0\ \ (\text{即 } y(\bw'\bx+b)\ge1)\\ \infty, & \text{otherwise}\end{cases}` },
+          T`它和 hinge loss 不同：点落在 margin 里面或分错时，hinge loss 给一个有限的罚 $1-y(\bw'\bx+b)$，hard-margin loss 直接是 $\infty$（硬约束不许违反）。`,
+          {
+            t: 'steps', items: [
+              T`点 3 是 $(8,8)$，红方。沿用上面"展开详解"的记号：红方 $y=+1$，$\bw=(2/3,\,0)$，$b=-3$。`,
+              T`$\bw'\bx+b=\tfrac23\times8+0\times8-3=\tfrac{16}{3}-3=\tfrac73\approx2.33$，乘 $y=+1$ 仍是 $\tfrac73$。`,
+              T`$\tfrac73\ge1$，即 $1-\tfrac73=-\tfrac43\le0$，所以 $l_\infty=0$。`,
+            ],
+          },
+          T`不算 $\bw$ 也能答：点 3 在正确一侧（$x=8>4.5$），到边界的距离 $3.5$ 大于 margin $1.5$，在 margin 外面，约束满足，损失为 0。这正是 2019 排版解答的理由。`,
+          {
+            t: 'table', head: ['点', '$y$', '$y(\\bw\'\\bx+b)$', '$l_\\infty$'], rows: [
+              ['1 (3, 9)', '−1', '1', '0'], ['2 (3, 4)', '−1', '1', '0'], ['6 (1, 2)', '−1', '7/3', '0'],
+              ['3 (8, 8)', '+1', '**7/3**', '**0**'], ['4 (6, 6)', '+1', '1', '0'], ['5 (9, 3)', '+1', '3', '0'],
+            ],
+          },
+          { t: 'note', md: '训练好的 hard-margin SVM 上，**每个**训练点的 hard-margin loss 都是 0：hard-margin SVM 要求所有点都满足 $y_i(\\bw\'\\bx_i+b)\\ge1$，这只在数据线性可分时做得到。损失为 $\\infty$ 的情况只会出现在"换一条边界"或"新加一个落在 margin 里的点"时。' },
+          {
+            t: 'exam', md: T`Zero. Point 3 $(8,8)$ is a red square ($y=+1$) on the correct side of the boundary $x=4.5$ and outside the margin (distance $3.5>1.5$). With $\mathbf w=(2/3,0)$, $b=-3$ its functional margin is $y(\mathbf w'\mathbf x+b)=16/3-3=7/3\ge1$, so the hard-margin loss ($0$ if $y(\mathbf w'\mathbf x+b)\ge1$, $\infty$ otherwise) is $0$.`,
+          },
+        ],
+        azh: T`零。点 3 $(8,8)$ 是红方（$y=+1$），在边界 $x=4.5$ 的正确一侧，并且在间隔（margin）之外（距离 $3.5>1.5$）。取 $\mathbf w=(2/3,0)$、$b=-3$，它的函数间隔（functional margin）是 $y(\mathbf w'\mathbf x+b)=16/3-3=7/3\ge1$，所以硬间隔损失（$y(\mathbf w'\mathbf x+b)\ge1$ 时为 $0$，否则为 $\infty$）为 $0$。`,
+      },
 
-      { t: 'h2', text: '3. 概念简答（2021 原题）', id: 'concepts' },
+      { t: 'h2', text: '3. 概念简答（往年原题）', id: 'concepts' },
       {
         t: 'past', src: '2021 S1 exam Q2', marks: 4, topic: 'L08 p17–p21',
         q: 'For the hard-margin support vector machine, data points that are support vectors have a margin of 1 from the decision boundary. Explain how this can be the case even when support vectors are further than 1 unit away from the decision boundary in Euclidean space.',
@@ -92,6 +121,79 @@
             t: 'exam', md: T`The dual's cost grows with the number of training examples $n$ (roughly $O(n^3)$, an $n\times n$ kernel matrix), whereas the primal's cost grows with the feature dimension. A quadratic kernel corresponds to an explicit feature map of only $O(m^2)$ dimensions for $m$ input features. So when the number of examples is very large and the number of original features is small ($n \gg m^2$), it is better to expand the features explicitly and solve the primal. (With an infinite-dimensional kernel such as RBF, the primal is not an option.)`,
           },
         ],
+      },
+      {
+        t: 'past', src: '2022 S1 exam Q1(f) / 2019 S2 practice Q3(b) / 2021 S1 practice Q2(b)', marks: '1–5', topic: 'L09 p6, p10',
+        q: '*Weak duality* guarantees that a primal optimum always upper bounds a dual optimum. How can we tell that the support vector machine\'s primal and dual optima are always equal? *(2019 / 2021 practice: Why do the primal and dual optima for the hard/soft-margin support vector machines coincide?)*',
+        qzh: '弱对偶（weak duality）保证原问题（primal）的最优值总是对偶问题（dual）最优值的上界。我们怎么知道支持向量机的原问题和对偶问题最优值总是相等？*（2019 / 2021 练习卷的问法：为什么硬间隔 / 软间隔 SVM 的原问题和对偶问题最优值相同？）*',
+        sol: [
+          T`先分清两个词（L09 p6）：**weak duality（弱对偶）**对任何优化问题都成立，只保证 dual 最优值 $\le$ primal 最优值，中间可以有差距（duality gap）；strong duality（强对偶）是两者相等。课件的结论是"For convex programs, optima of primal and dual problems coincide"，所以答题的关键词是 convex（凸）。`,
+          T`为什么 SVM 是凸问题：目标 $\tfrac12\|\bw\|^2$（soft margin 再加 $C\sum_i\xi_i$）是开口向上的二次函数加线性项，是凸的；约束 $y_i(\bw'\bx_i+b)\ge1-\xi_i$、$\xi_i\ge0$ 对 $(\bw,b,\boldsymbol\xi)$ 都是线性的。凸目标 + 线性约束 = 凸二次规划（QP），强对偶成立，所以"solving dual solves the primal"（L09 p10），可以由 dual 解出 $\bw^*=\sum_i\lambda_i^*y_i\bx_i$。`,
+          { t: 'note', md: '强对偶的一般条件（凸 + Slater 条件）课件没讲，写"convex objective, linear constraints ⇒ strong duality"就够。hard margin 还要求数据线性可分，否则 primal 根本无解。2019 排版解答只写了一句"strong duality holds due to convexity of the objectives"（1 分）；2022 年同主题 5 分，要把弱对偶、凸性、结论都写出来。' },
+          {
+            t: 'exam', md: T`Weak duality only gives dual $\le$ primal. The SVM primal (hard or soft margin) is a convex optimisation problem: the objective $\tfrac12\|\mathbf w\|^2$ (plus $C\sum_i\xi_i$) is convex and all constraints are linear in $(\mathbf w,b,\boldsymbol\xi)$, i.e. it is a convex quadratic program. For convex programs strong duality holds, so the duality gap is zero and the primal and dual optima are equal (for the hard margin, provided the data are linearly separable so the primal is feasible). This is why solving the dual, and recovering $\mathbf w^*=\sum_i\lambda_i^*y_i\mathbf x_i$ through the KKT conditions, solves the primal.`,
+          },
+        ],
+        azh: T`弱对偶只给出 dual $\le$ primal。SVM 的原问题（硬间隔或软间隔）是凸优化问题（convex optimisation problem）：目标函数 $\tfrac12\|\mathbf w\|^2$（加上 $C\sum_i\xi_i$）是凸的，所有约束对 $(\mathbf w,b,\boldsymbol\xi)$ 都是线性的，即它是一个凸二次规划（convex quadratic program）。凸规划满足强对偶（strong duality），所以对偶间隙（duality gap）为零，原问题和对偶问题的最优值相等（对硬间隔，前提是数据线性可分，原问题有可行解）。这就是为什么求解对偶问题、再通过 KKT 条件恢复 $\mathbf w^*=\sum_i\lambda_i^*y_i\mathbf x_i$，就解出了原问题。`,
+      },
+      {
+        t: 'past', src: '2020 S2 practice Q2(b)', marks: 5, topic: 'L08 p29–p34, L09 p15–p23',
+        q: 'How does SVM handle data that is not linearly separable? List two possible strategies.',
+        qzh: 'SVM 如何处理线性不可分（not linearly separable）的数据？列出两种可能的策略。',
+        sol: [
+          T`L08 p29 原话列了三种做法："Still use hard-margin SVM, but transform the data"；"Relax the constraints"；"The combination of 1 and 2"。两种策略就写前两种，各说清楚**怎么做、为什么有用**：`,
+          {
+            t: 'ul', items: [
+              T`soft margin（软间隔，L08 p30–p34）：给每个点一个 slack $\xi_i\ge0$，约束放松成 $y_i(\bw'\bx_i+b)\ge1-\xi_i$，目标加罚项 $C\sum_i\xi_i$（等价于 hinge loss）。允许点进入 margin 甚至分错，但按违反程度罚；$C$ 控制罚多重。`,
+              T`特征变换 / kernel（L09 p15–p23）：把数据映射到 $\varphi(\bx)$ 的高维空间，在那里线性可分（如 XOR，见 [T8](#/T08/xor)）；dual 里数据只以点积出现，换成 $K(\bx_i,\bx_j)=\varphi(\bx_i)'\varphi(\bx_j)$ 就不用显式算 $\varphi$（如 RBF kernel）。`,
+            ],
+          },
+          { t: 'note', md: '学生批注只写了一句"Use the radial basis function"，只是第二种策略的一个例子，不够 5 分。' },
+          {
+            t: 'exam', md: T`(1) Soft margin: introduce slack variables $\xi_i\ge0$ and relax the constraints to $y_i(\mathbf w'\mathbf x_i+b)\ge1-\xi_i$, adding the penalty $C\sum_i\xi_i$ to the objective (equivalently, minimise the hinge loss plus $\tfrac12\|\mathbf w\|^2$). Points may lie inside the margin or on the wrong side, but are penalised by the amount of violation; $C$ trades margin width against violations.
+(2) Transform the data: map the inputs to a higher-dimensional feature space $\varphi(\mathbf x)$ where the classes become linearly separable, and fit a (hard- or soft-margin) linear SVM there. Because the dual uses the data only through dot products, this is done with a kernel $K(\mathbf x_i,\mathbf x_j)=\varphi(\mathbf x_i)'\varphi(\mathbf x_j)$ (e.g. polynomial or RBF) without computing $\varphi$ explicitly. The two can also be combined.`,
+          },
+        ],
+        azh: T`(1) 软间隔（soft margin）：引入松弛变量（slack variables）$\xi_i\ge0$，把约束放松为 $y_i(\mathbf w'\mathbf x_i+b)\ge1-\xi_i$，在目标里加罚项 $C\sum_i\xi_i$（等价于最小化 hinge loss 加 $\tfrac12\|\mathbf w\|^2$）。点可以落在间隔以内甚至分错一侧，但按违反的程度受罚；$C$ 在间隔宽度和违反之间权衡。
+(2) 变换数据：把输入映射到更高维的特征空间 $\varphi(\mathbf x)$，使两类在那里线性可分，再在那里拟合（硬或软间隔）线性 SVM。因为对偶问题只通过点积使用数据，可以用核函数（kernel）$K(\mathbf x_i,\mathbf x_j)=\varphi(\mathbf x_i)'\varphi(\mathbf x_j)$（如多项式核或 RBF 核）完成，而不用显式计算 $\varphi$。两种方法也可以结合使用。`,
+      },
+      {
+        t: 'past', src: '2017 S2 exam Q3(a)', marks: 2, topic: 'L02 p29, L09 p11, p20',
+        q: 'A method is called *non-parametric* if it does not rely on a fixed number of parameters. Explain why a *SVM* can be considered *non-parametric*.',
+        qzh: '如果一个方法不依赖于固定数目的参数，就称它为非参数（non-parametric）方法。解释为什么 SVM 可以被看作非参数方法。',
+        sol: [
+          T`L02 p29：parametric = 参数个数固定、有限；non-parametric = 参数个数随数据增长，可能无限（见 [c09](#/c09)）。`,
+          T`看 SVM 的 dual 形式（L09 p11、p20）：训练求的是每个训练点一个乘子 $\lambda_i$，预测用 $s=b^*+\sum_i\lambda_i^*y_iK(\bx_i,\bx)$。模型要**存下支持向量本身**，参数个数（乘子 / 支持向量的个数）由数据决定、随 $n$ 增长，事先不固定。用 RBF 这类 kernel 时，特征空间无穷维，根本没有一个有限维的 $\bw$ 可以存，只能这样表示。`,
+          { t: 'note', md: '题目说"can be considered"：线性核的 SVM 在 primal 里只有 $d+1$ 个参数，是 parametric 的；非参数的说法针对 dual / kernel 形式，和 c09 的说明一致。' },
+          {
+            t: 'exam', md: T`In its dual (kernelised) form the SVM is represented by one multiplier $\lambda_i$ per training point and predicts with $s=b^*+\sum_{i=1}^n\lambda_i^*y_iK(\mathbf x_i,\mathbf x)$, so the model must store the support vectors themselves. The number of parameters (multipliers / support vectors) therefore grows with the training data rather than being fixed in advance, and with a kernel such as RBF the feature space is infinite-dimensional, so no fixed finite weight vector exists. Hence the SVM can be considered non-parametric.`,
+          },
+        ],
+        azh: T`在对偶（核化）形式下，SVM 由每个训练点一个乘子 $\lambda_i$ 表示，预测用 $s=b^*+\sum_{i=1}^n\lambda_i^*y_iK(\mathbf x_i,\mathbf x)$，所以模型必须存下支持向量本身。因此参数（乘子 / 支持向量）的个数随训练数据增长，而不是事先固定；用 RBF 这样的核时特征空间是无穷维的，不存在一个固定的有限维权重向量。所以 SVM 可以被看作非参数方法。`,
+      },
+      {
+        t: 'past', src: '2017 S2 exam Q1(d)', marks: 1, topic: 'L08 p10–p11, L10',
+        q: '*Perceptrons* and *hard-margin SVMs* are both *linear classifiers*. What is the difference between the two methods?',
+        qzh: '感知机（perceptron）和硬间隔 SVM（hard-margin SVM）都是线性分类器（linear classifier）。这两种方法的区别是什么？',
+        sol: [
+          T`两者都找一条分开两类的直线（超平面），区别在**找哪一条**。perceptron 用 SGD 最小化 perceptron loss，分对的点不产生损失（L10），所以一旦把训练数据全部分对就停，停在哪条线取决于初始权重和样本顺序。hard-margin SVM 在所有能分开数据的超平面里选 margin 最大的那一条（L08 p10），解唯一，对训练样本的抽样更稳健（L08 p11）。`,
+          {
+            t: 'exam', md: T`The perceptron stops at any hyperplane that separates the training data (it minimises the perceptron loss by SGD, so which separator it finds depends on the initial weights and the order of the examples), whereas the hard-margin SVM returns the unique separating hyperplane with the maximum margin (by solving a quadratic program), which is more robust to the sampling of the training data.`,
+          },
+        ],
+        azh: T`感知机停在任意一个能分开训练数据的超平面上（它用 SGD 最小化感知机损失 perceptron loss，所以找到哪个分隔超平面取决于初始权重和样本顺序）；而硬间隔 SVM 返回唯一的、间隔最大的分隔超平面（通过求解一个二次规划 quadratic program），对训练数据的抽样更稳健。`,
+      },
+      {
+        t: 'past', src: '2016 S2 exam, Q1.10', marks: 1, topic: 'L08 p13, L09 p11',
+        q: 'What are *support vectors*?',
+        qzh: '什么是支持向量（support vectors）？',
+        sol: [
+          T`1 分的定义题：几何定义（L08 p13 "Point(s) on margin boundaries called support vectors"）+ 一句它们为什么重要。dual 里它们正是 $\lambda_i>0$ 的点，解只由它们决定（L09 p11）。相关的 T13 卡片"Which training points determine the SVM solution"问的是后半句，见 [T13](#/T13)。`,
+          {
+            t: 'exam', md: T`Support vectors are the training points closest to the decision boundary, lying on the margin boundaries, i.e. $y_i(\mathbf w'\mathbf x_i+b)=1$ (in the soft-margin SVM also the points inside the margin or misclassified). They are the points with $\lambda_i>0$ in the dual, and the solution $\mathbf w^*=\sum_i\lambda_iy_i\mathbf x_i$ depends only on them.`,
+          },
+        ],
+        azh: T`支持向量是离决策边界最近、位于间隔边界（margin boundaries）上的训练点，即满足 $y_i(\mathbf w'\mathbf x_i+b)=1$ 的点（软间隔 SVM 中还包括落在间隔以内或被分错的点）。它们是对偶问题中 $\lambda_i>0$ 的点，解 $\mathbf w^*=\sum_i\lambda_iy_i\mathbf x_i$ 只由它们决定。`,
       },
 
       { t: 'h2', text: '4. 易错点', id: 'pitfalls' },

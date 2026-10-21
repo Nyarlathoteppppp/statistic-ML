@@ -227,6 +227,8 @@ details.deep.storyfold > summary { color: #b07a2a; font-weight: 500; }
 .outline .ol-kzh { color: #555; font-size: .92em; }
 .outline .ol-exq, .outline .ol-pit1 { margin: 1px 0; }
 .callout.examq { border-color: var(--line-2); }
+.examq-index .callout.examq details { margin-top: 4px; }
+.examq-index .callout.examq summary { cursor: pointer; color: var(--accent); font-size: .92em; }
 ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
 @media print {
   .noprint { display: none !important; }
@@ -235,6 +237,7 @@ ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
   .outline .katex { font-size: 1.02em; }
   .outline .ol-notes { border-left-color: #bbb; }
   .outline .ol-label { color: #000; }
+  .outline .ol-exq { font-size: .84em; line-height: 1.16; }
   .outline .ol-wtitle { break-after: avoid; }
   .outline .ol-ctitle { break-after: avoid; }
   .outline li, .outline .ol-exq, .outline .ol-pit1, .outline .ol-f { break-inside: avoid; }

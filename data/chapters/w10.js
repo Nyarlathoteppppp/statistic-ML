@@ -685,6 +685,12 @@
       T`Hammersley–Clifford：分布写成每个团（clique）上正值势函数（potential）的乘积。势函数是打分不是概率，可以大于 1；最后除以配分函数 $Z$（所有取值组合的打分之和）才归一化。`,
       T`BN 转 MRF：先 moralize 再去方向，每个 CPT 放进一个包含它全部变量的团，此时 $Z=1$。代价是丢失一些独立性，如未观测的共同孩子的两个父节点，结婚后就读不出独立了。`,
     ],
+    examQ: [
+      { src: '2022 S1 Q1(d)', q: T`Can the independence assumptions of all directed probabilistic graphical models be represented by undirected probabilistic graphical models? Why or why not?`,
+        a: T`No. The v-structure $X_1\to X_3\leftarrow X_2$ encodes $X_1\perp X_2$ but not $X_1\perp X_2\mid X_3$. An undirected graph without the edge $X_1$–$X_2$ implies $X_1\perp X_2\mid X_3$ (wrong); adding that edge, as moralisation does, loses $X_1\perp X_2$. So a BN can always be turned into a valid MRF, but some of its independences are lost.`,
+        qzh: T`所有有向概率图模型（directed PGM）的独立性假设，都能用无向概率图模型（undirected PGM）表示吗？为什么？`,
+        azh: T`不能。v 结构（v-structure）$X_1\to X_3\leftarrow X_2$ 表示 $X_1\perp X_2$，但给定 $X_3$ 时不独立。无向图里如果 $X_1$、$X_2$ 之间没有边，删掉 $X_3$ 就把它们分开，得出 $X_1\perp X_2\mid X_3$（错）；如果像 moralize 那样连上这条边，$X_1\perp X_2$ 又读不出来了。所以 BN 总能转成一个合法的 MRF，但会丢失一些独立性。（反过来 4-环 MRF 也没有对应的 BN，见 [T13](#/T13) 的 BN vs MRF 卡片。）` },
+    ],
     title: 'MRF、clique、BN→MRF', en: 'Markov random fields: cliques, potentials, partition function, converting BNs',
     summary: '**MRF（Markov random field，马尔可夫随机场）** 是**无向**图模型：边没有方向，独立性就是普通的图分离——删掉 $S$ 后 $X$、$Y$ 不连通 ⇒ $X\\perp Y\\mid S$。分布写成**团（clique）**上的正值 **potential（势函数）** 之积，再除以 **partition function（配分函数）** $Z$ 归一化（Hammersley–Clifford）。BN 可以转成 MRF：**moralize + 去方向**，每个 CPT 放进一个包含它的团里。下一周（W11）的推断算法都在 MRF 上做。',
     prereq: ['c53', 'c54'],

@@ -252,6 +252,12 @@
       T`多加父节点就多出参数，训练数据上的最大似然只会更高或不变，所以不能用它决定要哪些、要几个父节点。`,
       T`BIC＝最大对数似然减去"自由参数个数 ÷ 2 × log 行数"。整张图的分数是各节点局部分数之和，等价的图分数相同。`,
     ],
+    examQ: [
+      { src: '2017 S2 Q11(d)', q: T`(Flu model: $F$ = flu, symptoms $S_i$, $i=1\dots I$, test result $T$; all binary.) The parameters of the PGM are in the form of conditional probability tables. Explain how these parameters can be learned from data, and what kind of data would be required.`,
+        a: T`By maximum likelihood on complete data: records of many past patients, each giving the true flu status $F$ (e.g. confirmed later), all symptoms $S_i$ and the test result $T$. Each CPT entry is then a relative frequency, e.g. $\hat P(S_i=1\mid F=1)=\#(S_i=1,F=1)/\#(F=1)$, and $\hat P(F=1)$ is the fraction of patients with flu.`,
+        qzh: T`（流感模型：$F$ = 是否患流感，症状 $S_i$，$i=1\dots I$，检测结果 $T$（这里的 $T$ 不是本章的数据行数）；都是二值变量。）这个概率图模型的参数是条件概率表（CPT）。说明怎样从数据中学出这些参数，需要什么样的数据。（2016 S2 Q12.5 在求职 CV 模型里问的是同一件事，答法相同；只是那里的技能 $S$ 平时观测不到，带隐变量要用 EM，今年不考。）`,
+        azh: T`用完整数据（complete data）上的最大似然：需要很多以往病人的记录，每条都有这个人真实的流感状态 $F$（例如事后确诊）、所有症状 $S_i$ 和检测结果 $T$。这样每个 CPT 表项就是一个相对频率（relative frequency），例如 $\hat P(S_i=1\mid F=1)=\#(S_i=1,F=1)/\#(F=1)$，$\hat P(F=1)$ 是患流感病人所占的比例。（原理同 [c53](#/c53) 的 2025 Q4(b)，计数例题见 [T7](#/T07)。）` },
+    ],
     genesis: T`c53 里图是给定的，学习只剩"数数估 CPT"。可现实里往往连图都不知道：25 个基因表型之间谁影响谁（p31）？最自然的想法是"哪张图把数据拟合得最好就选哪张"。课件 p19 指出这条路走不通：父节点越多，可调的参数越多，训练数据上的似然只会更高，最后总会选出边最多的图——这就是过拟合（c18）。所以这一章先把参数估计写成计数公式，再给似然加上复杂度惩罚，得到能比较不同图的 **BIC 分数**；而且它能拆成每个节点各自一项，为 c62 的结构搜索铺路。`,
     title: '完整数据学 BN：参数 MLE 与 BIC 分数', en: 'Learning Bayesian networks from complete data: MLE of CPTs, log-likelihood and the BIC score',
     summary: '手里只有一张**完整的数据表**（每一格都有值），要学出 BN。课件把它拆成三件事（L23 p10–p13）：参数估计（图已知，估 CPT）、模型选择（给每张图打分）、结构搜索（找分最高的 DAG）。本章讲前两件：用 $r_i$、父节点配置 $j$、$\\theta_{ijk}$ 写出 CPT，条件对数似然按计数 $\\hat n_{ijk}$ 合并，MLE 就是每一列里数频率（p15–p18）；最大似然不能用来选父节点（p19），要减去复杂度惩罚，得到 BIC score（p20）；整张图的分数等于各节点局部分数之和（decomposable），等价的图分数相同（p21–p22）。',

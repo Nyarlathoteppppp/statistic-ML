@@ -62,6 +62,56 @@ So $k_3$ is an inner product in the feature space of $\varphi_3$ and is therefor
           { t: 'exam', md: T`Let $\Omega=\{\omega_1,\dots,\omega_N\}$ and define $\varphi(A)=(\mathbb 1[\omega_1\in A],\dots,\mathbb 1[\omega_N\in A])^\top$. Then $\varphi(A_1)^\top\varphi(A_2)=\sum_j \mathbb 1[\omega_j\in A_1]\mathbb 1[\omega_j\in A_2]=|A_1\cap A_2|$, so $k$ is an inner product of feature vectors and hence a valid kernel.` },
         ],
       },
+      {
+        t: 'past', src: '2016 S2 exam, Q8.2', marks: 1.5, topic: 'L09 p21, p33, p35',
+        q: T`Suppose $\mathbf u,\mathbf v\in\mathbb R^m$, $k:\mathbb R^m\times\mathbb R^m\to\mathbb R$ is a *kernel*, $c\in\mathbb R$, and $c>0$. Prove that $c\,k(\mathbf u,\mathbf v)$ is a *kernel*.`,
+        qzh: T`设 $\mathbf u,\mathbf v\in\mathbb R^m$，$k:\mathbb R^m\times\mathbb R^m\to\mathbb R$ 是一个核（kernel），$c\in\mathbb R$ 且 $c>0$。证明 $c\,k(\mathbf u,\mathbf v)$ 是核。`,
+        sol: [
+          T`注意：不能直接引用 L09 p33 的"$cK$ 合法"——题目要你证明的正是这条规则。回到定义（L09 p21）：kernel = 某个特征空间里的点积。和上面 2021 Q15 一样，**构造新的特征映射**：`,
+          {
+            t: 'steps', items: [
+              T`$k$ 是 kernel ⇒ 存在 $\varphi$ 使 $k(\bu,\bv)=\varphi(\bu)'\varphi(\bv)$。`,
+              T`因为 $c>0$，$\sqrt c$ 是实数。定义 $\psi(\bu)=\sqrt c\,\varphi(\bu)$（每个分量都乘 $\sqrt c$）。`,
+              T`$\psi(\bu)'\psi(\bv)=\sqrt c\,\sqrt c\,\varphi(\bu)'\varphi(\bv)=c\,k(\bu,\bv)$。所以 $c\,k$ 是 $\psi$ 特征空间里的点积，是 kernel。`,
+            ],
+          },
+          T`小例子：$k(\bu,\bv)=\bu'\bv$（$\varphi(\bu)=\bu$），$c=4$，$\bu=(1,2)$，$\bv=(3,1)$：$c\,k=4\times5=20$；$\psi(\bu)=2\bu=(2,4)$，$\psi(\bv)=(6,2)$，点积 $12+8=20$ ✓。`,
+          T`$c>0$ 为什么必要：$c<0$ 时没有实数 $\sqrt c$；例如 $c=-1$，取一个 $\varphi(\bx)\ne\mathbf 0$ 的点，它的 Gram 矩阵是 $[-k(\bx,\bx)]=[-\|\varphi(\bx)\|^2]<0$，不是 PSD（本页小测第 1 题）。`,
+          {
+            t: 'deep', title: '另一种写法：Mercer（Gram 矩阵 PSD）', blocks: [
+              T`任取点 $\bx_1,\dots,\bx_n$，$k$ 的 Gram 矩阵 $M$ 是 PSD。$c\,k$ 的 Gram 矩阵是 $cM$，对任意向量 $\mathbf a$：$\mathbf a'(cM)\mathbf a=c\,(\mathbf a'M\mathbf a)\ge0$（正数乘非负数），所以 $cM$ 也 PSD；对所有点集都成立，由 Mercer 定理（L09 p35）$c\,k$ 合法。`,
+            ],
+          },
+          {
+            t: 'exam', md: T`Since $k$ is a kernel, there is a feature map $\varphi$ with $k(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$. Because $c>0$, $\sqrt c$ is real, so define $\psi(\mathbf u)=\sqrt c\,\varphi(\mathbf u)$. Then
+$$\psi(\mathbf u)'\psi(\mathbf v)=\sqrt c\sqrt c\,\varphi(\mathbf u)'\varphi(\mathbf v)=c\,k(\mathbf u,\mathbf v),$$
+so $c\,k$ is a dot product in the feature space of $\psi$ and hence a kernel. (Equivalently, its Gram matrix $cM$ satisfies $\mathbf a'(cM)\mathbf a=c\,\mathbf a'M\mathbf a\ge0$ for all $\mathbf a$, so it is PSD.)`,
+          },
+        ],
+        azh: T`因为 $k$ 是核，存在特征映射 $\varphi$ 使 $k(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$。由于 $c>0$，$\sqrt c$ 是实数，定义 $\psi(\mathbf u)=\sqrt c\,\varphi(\mathbf u)$。则 $\psi(\mathbf u)'\psi(\mathbf v)=\sqrt c\sqrt c\,\varphi(\mathbf u)'\varphi(\mathbf v)=c\,k(\mathbf u,\mathbf v)$，所以 $c\,k$ 是 $\psi$ 特征空间中的点积，因此是核。（等价地：它的 Gram 矩阵 $cM$ 对所有 $\mathbf a$ 满足 $\mathbf a'(cM)\mathbf a=c\,\mathbf a'M\mathbf a\ge0$，所以是半正定（PSD）的。）`,
+      },
+      {
+        t: 'past', src: '2017 S2 exam Q3(b)', marks: 2, topic: 'L09 p21, p33',
+        q: 'Consider a definition of a *kernel* as the *dot product* in some *feature space*. Show that a sum of two *kernels* is a *kernel*.',
+        qzh: '把核（kernel）定义为某个特征空间（feature space）中的点积（dot product）。证明两个核之和是核。',
+        sol: [
+          T`和上面 2021 Q15 是同一招：把两个特征**拼接**起来。区别只在于：2021 的两个 kernel 作用在输入的两段上（$\mathbf a$ 和 $\mathbf b$），这里两个 kernel 作用在同一个输入 $\bu$ 上。题目已经把 kernel 定义成点积，所以证明就是构造出那个点积。`,
+          {
+            t: 'steps', items: [
+              T`$K_1(\bu,\bv)=\varphi_1(\bu)'\varphi_1(\bv)$，$K_2(\bu,\bv)=\varphi_2(\bu)'\varphi_2(\bv)$。`,
+              T`定义 $\varphi(\bu)=\begin{bmatrix}\varphi_1(\bu)\\ \varphi_2(\bu)\end{bmatrix}$（上下摞起来，维数相加）。`,
+              T`点积只把同一位置的分量相乘再相加，前半段对前半段、后半段对后半段：$\varphi(\bu)'\varphi(\bv)=\varphi_1(\bu)'\varphi_1(\bv)+\varphi_2(\bu)'\varphi_2(\bv)=K_1+K_2$。`,
+            ],
+          },
+          T`小例子：$K_1=\bu'\bv$（$\varphi_1(\bu)=\bu$），$K_2=(\bu'\bv)^2$（$\varphi_2(\bu)=[u_1^2,\sqrt2u_1u_2,u_2^2]$，见第 3 节）。$\bu=(1,2)$，$\bv=(3,1)$：$\bu'\bv=5$，$K_1+K_2=5+25=30$。拼接后 $\varphi(\bu)=(1,2,1,2\sqrt2,4)$，$\varphi(\bv)=(3,1,9,3\sqrt2,1)$，点积 $3+2+9+12+4=30$ ✓（$2\sqrt2\times3\sqrt2=6\times2=12$）。`,
+          {
+            t: 'exam', md: T`Let $K_1(\mathbf u,\mathbf v)=\varphi_1(\mathbf u)'\varphi_1(\mathbf v)$ and $K_2(\mathbf u,\mathbf v)=\varphi_2(\mathbf u)'\varphi_2(\mathbf v)$ for feature maps $\varphi_1,\varphi_2$. Define the concatenated feature map $\varphi(\mathbf u)=\begin{bmatrix}\varphi_1(\mathbf u)\\ \varphi_2(\mathbf u)\end{bmatrix}$. Then
+$$\varphi(\mathbf u)'\varphi(\mathbf v)=\varphi_1(\mathbf u)'\varphi_1(\mathbf v)+\varphi_2(\mathbf u)'\varphi_2(\mathbf v)=K_1(\mathbf u,\mathbf v)+K_2(\mathbf u,\mathbf v),$$
+so $K_1+K_2$ is a dot product in the feature space of $\varphi$, i.e. a kernel.`,
+          },
+        ],
+        azh: T`设 $K_1(\mathbf u,\mathbf v)=\varphi_1(\mathbf u)'\varphi_1(\mathbf v)$，$K_2(\mathbf u,\mathbf v)=\varphi_2(\mathbf u)'\varphi_2(\mathbf v)$，$\varphi_1,\varphi_2$ 是特征映射。定义拼接的特征映射 $\varphi(\mathbf u)=\begin{bmatrix}\varphi_1(\mathbf u)\\ \varphi_2(\mathbf u)\end{bmatrix}$。则 $\varphi(\mathbf u)'\varphi(\mathbf v)=\varphi_1(\mathbf u)'\varphi_1(\mathbf v)+\varphi_2(\mathbf u)'\varphi_2(\mathbf v)=K_1(\mathbf u,\mathbf v)+K_2(\mathbf u,\mathbf v)$，所以 $K_1+K_2$ 是 $\varphi$ 特征空间中的点积，即是核。`,
+      },
 
       { t: 'h2', text: '3. 写出 kernel 的特征映射', id: 'phi' },
       {
@@ -106,7 +156,41 @@ So $k_3$ is an inner product in the feature space of $\varphi_3$ and is therefor
           { t: 'note', md: '只加 $x_1+x_2$ 不行：$(0,0)\\to0$，$(0,1),(1,0)\\to1$，$(1,1)\\to2$，正类夹在两个负类中间，还是不能用一个阈值分开。一定要写出 $\\bw$ 并逐点验证，否则只能拿一半分。' },
         ],
       },
-      { t: 'h2', text: '5. 小测', id: 'quiz' },
+      { t: 'h2', text: '5. 往年简答：kernel 是什么、好在哪', id: 'concepts' },
+      T`2016 Q8.1（What is the kernel trick and what is the benefit of using it?）和 T13 的卡片"What is the kernel trick and why is it useful?"同题，答案见 [T13](#/T13)，这里不重复。`,
+      {
+        t: 'past', src: '2016 S2 exam, Q1.9', marks: 1, topic: 'L09 p21',
+        q: 'Define a *kernel* in the context of *SVM* learning.',
+        qzh: '在 SVM 学习的背景下，给核（kernel）下定义。',
+        sol: [
+          T`课件定义（L09 p21）："Kernel is a function that can be expressed as a dot product in some feature space, $K(\bu,\bv)=\varphi(\bu)'\varphi(\bv)$"。再加半句它在 SVM 里的作用：dual 里训练和预测都只用到点积，所以把 $\bx_i'\bx_j$ 换成 $K(\bx_i,\bx_j)$。`,
+          { t: 'note', md: '常见的不准确说法："kernel 把原特征空间变换到别的维度"。做变换的是 $\\varphi$；kernel 是变换**之后**的点积，而且不用真的算出 $\\varphi$。' },
+          {
+            t: 'exam', md: T`A kernel is a function $K(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$ that equals the dot product of the two inputs after mapping them into some feature space by $\varphi$. Because the SVM dual uses the data only through dot products, every $\mathbf x_i'\mathbf x_j$ can be replaced by $K(\mathbf x_i,\mathbf x_j)$, training the SVM in that feature space without computing $\varphi$ explicitly.`,
+          },
+        ],
+        azh: T`核是一个函数 $K(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$，它等于两个输入经 $\varphi$ 映射到某个特征空间之后的点积。因为 SVM 的对偶问题只通过点积使用数据，每个 $\mathbf x_i'\mathbf x_j$ 都可以换成 $K(\mathbf x_i,\mathbf x_j)$，从而在那个特征空间里训练 SVM，而不需要显式计算 $\varphi$。`,
+      },
+      {
+        t: 'past', src: '2017 S2 exam Q10(b)', marks: 1, topic: 'L09 p21–p24, WK06',
+        q: 'Question 10: Movie Recommendation. Your task is to design an automatic *movie recommendation* system for a company that provides an online movie streaming service. This company maintains a large *collection* of movies, and each movie can be accessed for a small fee. The service is only available for *registered users*. The users preview the movies and can pay for access to the full movie. For each *user*, the system keeps track of what movies were previewed and what movies were purchased. The aim of your system is to provide personalised *movie recommendations* to each user, as to maximise the number of purchases. Note that your system will only be applied for users that already have a history of a large number of previews. With all these considerations in mind, outline the design of your *movie recommendation* system.\n\n(b) You have decided to use a kernel classifier for this purpose. Outline why using a kernel might convey an advantage for this problem over other methods, such as a linear classifiers. [1 mark]',
+        qzh: '第 10 题：电影推荐。你要为一家提供在线电影流媒体服务的公司设计一个自动电影推荐系统。公司有大量电影，每部电影付一小笔费用就能看。服务只对注册用户开放。用户可以预览电影，并付费观看完整电影。系统为每个用户记录他预览过哪些电影、购买过哪些电影。系统的目标是给每个用户做个性化推荐，使购买数最大。注意：系统只用于已经有大量预览记录的用户。在这些前提下，概述你的推荐系统设计。(b) 你决定用一个核分类器（kernel classifier）。概述为什么在这个问题上用核可能比其他方法（例如线性分类器）有优势。[1 分]',
+        sol: [
+          T`1 分只要说出一个具体优势，并联系题目。最直接的两点：`,
+          {
+            t: 'ul', items: [
+              T`非线性：口味是特征之间的组合（"预览过很多科幻**并且**很多动作片的人才会买这部"），线性分类器在原始特征上学不到；kernel 等于在高维特征空间（含这些组合特征）里做线性分类，又不用显式构造这些特征（L09 p22–p24）。`,
+              T`可以直接在"集合"上定义相似度：每个用户的预览记录是一个电影集合，Worksheet 6 的 $k(A_1,A_2)=|A_1\cap A_2|$（两人共同预览过的电影数）就是合法 kernel（见本页第 2 节）。题目说用户都有很长的预览历史，正好适合这种相似度。`,
+            ],
+          },
+          {
+            t: 'exam', md: T`A kernel classifier can learn a non-linear decision boundary: whether a user buys a movie depends on combinations of their previews (e.g. many sci-fi and many action previews), which a linear classifier on the raw features cannot capture. The kernel trick fits a linear classifier in a high-dimensional feature space containing such interactions without constructing those features explicitly. Kernels can also be defined directly on the users' preview histories, e.g. $K(A_1,A_2)=|A_1\cap A_2|$, the number of movies both users previewed.`,
+          },
+        ],
+        azh: T`核分类器可以学到非线性的决策边界：用户买不买一部电影取决于他预览记录的组合（例如预览过很多科幻片并且很多动作片），线性分类器在原始特征上学不到这种关系。核技巧（kernel trick）相当于在包含这些交互项的高维特征空间里拟合线性分类器，而不用显式构造这些特征。核还可以直接定义在用户的预览历史上，例如 $K(A_1,A_2)=|A_1\cap A_2|$，即两个用户都预览过的电影数。`,
+      },
+
+      { t: 'h2', text: '6. 小测', id: 'quiz' },
       {
         t: 'quiz', items: [
           {

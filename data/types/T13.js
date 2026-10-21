@@ -118,7 +118,9 @@
         t: 'note', md: '2021 Q12（6 分，EM 为什么用坐标上升）目前 L1–L22 的课件都没讲 EM，下面是标准答案，等 L23–L24 发布后再核对课件说法。\n\n中文要点：$\\mathbf x$ 是观测到的数据，$\\mathbf z$ 是没观测到的隐变量，$\\theta$ 是要学的参数，$H(q)$ 是分布 $q$ 的熵。$F$ 是 $\\log p(\\mathbf x\\mid\\theta)$ 的下界：E 步固定 $\\theta$、调 $q$ 把 $F$ 拉到最大（得到 $q(\\mathbf z)=p(\\mathbf z\\mid\\mathbf x,\\theta)$）；M 步固定 $q$、调 $\\theta$ 把 $F$ 拉到最大。两块轮流优化，所以叫坐标上升。\n\n**EM is coordinate ascent on a lower bound of the log marginal likelihood**, $F(q,\\theta)=E_q[\\log p(\\mathbf x,\\mathbf z\\mid\\theta)]+H(q)\\le\\log p(\\mathbf x\\mid\\theta)$. The E-step maximises $F$ over the latent distribution $q$ with $\\theta$ fixed (giving $q(\\mathbf z)=p(\\mathbf z\\mid\\mathbf x,\\theta)$); the M-step maximises $F$ over $\\theta$ with $q$ fixed. Because the marginal likelihood has a sum inside the log, direct gradient ascent is awkward, whereas each block update is often closed-form and never decreases the likelihood — that split, not a general superiority of coordinate methods, is why EM uses coordinate ascent.\n\n2021 Q13(b) backprop 见 [T10](#/T10)。',
       },
 
-      { t: 'h2', text: '2. 高概率简答（按讲）', id: 'predicted' },
+      { t: 'h2', text: '2. 各章原题汇总（概念简答，按章节）', id: 'examq' },
+      { t: 'examqIndex' },
+      { t: 'h2', text: '3. 高概率简答（按讲）', id: 'predicted' },
       '以下不是往年原题，是根据每讲的结论预测的简答题。每题点"显示参考答案"自测。',
       { t: 'h3', text: 'L02–L05 统计基础、回归、正则化' },
       {

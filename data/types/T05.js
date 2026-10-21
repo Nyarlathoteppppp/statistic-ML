@@ -16,7 +16,7 @@
     en: 'Does a conditional independence statement hold in a Bayesian network?',
     chips: [
       { text: 'L20 p17–p25', href: '#/L20', cls: 'src' },
-      { text: '2026 practice Q4', cls: 'hot' }, { text: '2025 practice Q1c', cls: 'src' }, { text: '2021 exam Q18a', cls: 'src' },
+      { text: '2026 practice Q4', cls: 'hot' }, { text: '2025 practice Q1c', cls: 'src' }, { text: '2021 exam Q18a', cls: 'src' }, { text: '2017 exam Q9', cls: 'src' },
       { text: 'Workshop 12 Q1–Q2', href: '#/T05/ws12', cls: 'src' },
     ],
     lead: '课件只教了一种方法，考试就按这个方法写：**祖先图 → moralize → 去方向 → 删掉条件节点 → 看还连不连通**。每一步都写在卷面上，就能拿满步骤分。\n\n记号：$X\\perp Y\\mid S$ 里，竖线**右边**的就是"条件节点"（given 的节点），这一页把它们叫作**条件集**。注意 2026 真题里恰好有一个节点也叫 $S$——那道题的条件集是 $\\{V,W\\}$，节点 $S$ 是要判断的对象之一，不要删它。',
@@ -128,6 +128,61 @@
           },
           {
             t: 'exam', md: T`All of $b_1,\dots,b_T$ (and only those). The two chains are connected only through the $x_t$'s, which are common children (colliders) of $a_t$ and $b_t$. With nothing observed, the ancestral graph of $\{a_1,b_t\}$ contains no $x$ nodes, so no moral edges are added and $a_1$ is disconnected from the $b$ chain: $a_1\perp b_t$ for every $t$. Every $a_t$ and $x_t$ is connected to $a_1$ through the $a$ chain, so they are dependent on $a_1$.`,
+          },
+        ],
+      },
+      {
+        t: 'past', src: '2017 S2 exam Q9(a)(b)', marks: '1 + 2', topic: 'L20 p17 · 因子分解见 c53',
+        q: T`Consider the following directed probabilistic graphical model (PGM) over five binary-valued random variables, denoted $A,B,C,D$ and $E$. (a) State the form of the joint probability density function, $P(A,B,C,D,E)$. (b) State all the independence relations that hold between $B$ and $E$, considering both marginal and conditional independence.`,
+        qzh: T`考虑下面这个有向概率图模型（directed probabilistic graphical model, PGM），有五个二值随机变量 $A,B,C,D,E$。(a) 写出联合概率分布 $P(A,B,C,D,E)$ 的形式。(b) 写出 $B$ 和 $E$ 之间成立的所有独立关系，边缘独立（marginal independence）和条件独立（conditional independence）都要考虑。`,
+        azh: T`(a) $P(A,B,C,D,E)=P(B)\,P(A\mid B)\,P(C\mid B)\,P(D\mid B,C)\,P(E\mid C)$。(b) $B$ 和 $E$ 不是边缘独立的（有路径 $B\to C\to E$）。给定 $C$ 时它们条件独立：$B\perp E\mid C$；再同时给定 $A$ 和/或 $D$ 仍然成立：$B\perp E\mid A,C$；$B\perp E\mid C,D$；$B\perp E\mid A,C,D$。$B$ 和 $E$ 之间的每一条连接都经过 $C$（$B\to C\to E$ 和 $B\to D\leftarrow C\to E$）。道德化（moralise）不加新边，因为 $D$ 的父节点 $B,C$ 本来就相邻；所以删掉 $C$ 后 $E$ 与其余节点断开，而任何不含 $C$ 的条件集都留下 $B$–$C$–$E$ 这条通路。因此 $B\not\perp E$，$B\not\perp E\mid A$，$B\not\perp E\mid D$，$B\not\perp E\mid A,D$。`,
+        blocks: [{ t: 'graph', nodes: { B: [140, 40], C: [250, 40], A: [40, 130], E: [250, 140], D: [140, 220] }, edges: 'B>A B>C B>D C>D C>E', cls: { B: 'x', E: 'y' }, w: 260, caption: '题图（照原卷重画）：$B\\to A$，$B\\to C$，$B\\to D$，$C\\to D$，$C\\to E$。蓝圈 $B$、绿圈 $E$ 是 (b) 要判断的两点。' }],
+        sol: [
+          { t: 'h4', text: '(a) 联合分布：每个节点乘一个"给定父节点"的因子' },
+          {
+            t: 'table', head: ['节点', '父节点', '因子'], rows: [
+              ['$A$', '$B$', '$P(A\\mid B)$'], ['$B$', '无', '$P(B)$'], ['$C$', '$B$', '$P(C\\mid B)$'],
+              ['$D$', '$B,C$', '$P(D\\mid B,C)$'], ['$E$', '$C$', '$P(E\\mid C)$'],
+            ],
+          },
+          { t: 'math', tex: T`P(A,B,C,D,E)=P(B)\,P(A\mid B)\,P(C\mid B)\,P(D\mid B,C)\,P(E\mid C)` },
+          T`规则见 [c53](#/c53)：有向图的联合分布 = 每个节点在给定父节点时的条件概率之积。没有父节点的 $B$ 只写 $P(B)$。`,
+          { t: 'h4', text: '(b) 第 0 步：要判断哪些命题' },
+          T`"between $B$ and $E$" 指形如 $B\perp E\mid S$ 的命题，$S$ 取其余三个变量 $\{A,C,D\}$ 的任一子集，共 $2^3=8$ 种；$S$ 为空就是边缘独立。每一种都用第 2 节的四步法判断。`,
+          { t: 'h4', text: '(b) 第 1 步：先看全图的结构，一次判完 8 种' },
+          {
+            t: 'ul', items: [
+              T`**结婚不加新边。** 唯一有两个父节点的是 $D$（父节点 $B,C$），而 $B$—$C$ 本来就有边。所以不管祖先图里有没有 $D$，moralize 后都只是把 5 条边去掉方向：$A$—$B$，$B$—$C$，$B$—$D$，$C$—$D$，$C$—$E$。`,
+              T`$E$ 只和 $C$ 相连。所以条件集里有 $C$ 时，删掉 $C$ 后 $E$ 成了孤立点 ⇒ 独立。`,
+              T`条件集里没有 $C$ 时，$B$—$C$ 和 $C$—$E$ 这两条边都碰不到条件集里的点，删完还在，$B$—$C$—$E$ 连通 ⇒ 不独立。`,
+            ],
+          },
+          {
+            t: 'table', head: ['条件集 $S$', '祖先图', '删掉 $S$ 后', '$B\\perp E\\mid S$？'], rows: [
+              ['空（边缘）', '$\\{B,C,E\\}$', '$B$—$C$—$E$ 连通', '不成立'],
+              ['$\\{A\\}$', '$\\{A,B,C,E\\}$', '$B$—$C$—$E$ 连通', '不成立'],
+              ['$\\{D\\}$', '$\\{B,C,D,E\\}$', '$B$—$C$—$E$ 连通', '不成立'],
+              ['$\\{A,D\\}$', '全部 5 个点', '$B$—$C$—$E$ 连通', '不成立'],
+              ['$\\{C\\}$', '$\\{B,C,E\\}$', '$E$ 孤立', '**成立**'],
+              ['$\\{A,C\\}$', '$\\{A,B,C,E\\}$', '$E$ 孤立', '**成立**'],
+              ['$\\{C,D\\}$', '$\\{B,C,D,E\\}$', '$E$ 孤立', '**成立**'],
+              ['$\\{A,C,D\\}$', '全部 5 个点', '$E$ 孤立', '**成立**'],
+            ],
+          },
+          { t: 'graphs', r: 16, caption: '蓝圈 $B$、绿圈 $E$；被删掉的条件节点画成删除样式；红 = 找到的路径。', items: [
+            { nodes: { B: [140, 40], C: [250, 40], A: [40, 130], E: [250, 140], D: [140, 220] }, edges: 'B-A B-C B-D C-D C-E', cls: { B: 'x', E: 'y' }, caption: '① 结婚 + 去方向：$D$ 的父母 $B,C$ 本来就相连，没有新边' },
+            { nodes: { B: [140, 40], C: [250, 40], A: [40, 130], E: [250, 140], D: [140, 220] }, edges: 'B-A:gone B-D:gone C-D:gone B-C:path C-E:path', cls: { B: 'x', E: 'y', A: 'removed', D: 'removed' }, caption: '② 不含 $C$（例：给定 $A,D$）：$B$—$C$—$E$ 还连着 ⇒ 不独立' },
+            { nodes: { B: [140, 40], C: [250, 40], A: [40, 130], E: [250, 140], D: [140, 220] }, edges: 'B-A:gone B-C:gone B-D:gone C-D:gone C-E:gone', cls: { B: 'x', E: 'y', A: 'removed', C: 'removed', D: 'removed' }, caption: '③ 含 $C$（例：给定 $A,C,D$）：$E$ 成了孤立点 ⇒ 独立' },
+          ] },
+          {
+            t: 'exam', md: T`(a) $P(A,B,C,D,E)=P(B)\,P(A\mid B)\,P(C\mid B)\,P(D\mid B,C)\,P(E\mid C)$.
+
+(b) $B$ and $E$ are **not** marginally independent (path $B\to C\to E$). They are conditionally independent given $C$: $B\perp E\mid C$, and this still holds when $A$ and/or $D$ are also given: $B\perp E\mid A,C$; $B\perp E\mid C,D$; $B\perp E\mid A,C,D$. Every connection between $B$ and $E$ passes through $C$ ($B\to C\to E$ and $B\to D\leftarrow C\to E$). Moralising adds no new edge because $D$'s parents $B,C$ are already adjacent, so removing $C$ disconnects $E$, while any conditioning set without $C$ leaves $B$–$C$–$E$ connected. Hence $B\not\perp E$, $B\not\perp E\mid A$, $B\not\perp E\mid D$ and $B\not\perp E\mid A,D$.`,
+          },
+          {
+            t: 'warn', md: T`- 题目要 "all"：四条成立的都写出来，再写一句"不是边缘独立"。
+- 不要写和 $B$、$E$ 无关的命题（比如 $A\perp E\mid B$），题目只问 $B$ 和 $E$ 之间。
+- $D$ 是 $B$、$C$ 的共同孩子（collider）。只给定 $D$ 不会让 $B$、$E$ 独立：$B$ 到 $E$ 的每条连接都经过 $C$，删掉 $D$ 断不了 $B$—$C$—$E$。`,
           },
         ],
       },

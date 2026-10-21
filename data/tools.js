@@ -54,6 +54,15 @@
     });
     const box = el('div');
     box.innerHTML = '<div class="table-wrap"><table><thead><tr><th>真题</th><th>分值</th><th>在哪一页</th><th>课件</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
+    // chapter concept questions (examQ) — real past-exam short answers
+    const eq = [];
+    const shown = pastKeys();
+    examQs().forEach(({ id, page }) => page.examQ.forEach((e) => { if (!isShown(e.src, shown)) eq.push({ id, e }); }));
+    if (eq.length) {
+      box.insertAdjacentHTML('beforeend', '<h3>概念简答原题（在各章"Key points in English"框里，汇总见 <a href="#/T13/examq">T13</a>）</h3>');
+      const erows = eq.map(({ id, e }) => { const m = SML.app.metaOf(id); return '<tr><td>' + SML.md.esc(e.src || '') + '</td><td><a href="#/' + id + '">' + SML.md.inline((m.tag ? m.tag + ' ' : '') + m.title) + '</a></td></tr>'; });
+      box.insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>真题</th><th>在哪一章</th></tr></thead><tbody>' + erows.join('') + '</tbody></table></div>');
+    }
     // Canvas weekly quiz questions (tagged （平时小测原题） in chapter quizzes) — examinable too
     const quiz = [];
     collect('quiz').forEach(({ page, block }) => (block.items || []).forEach((it) => { if (/平时小测原题/.test(it.q || '')) quiz.push({ page, it }); }));
@@ -66,6 +75,59 @@
       });
       box.insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>章节</th><th>题目</th></tr></thead><tbody>' + qrows.join('') + '</tbody></table></div>');
     }
+    return box;
+  };
+
+  /* All chapter examQ (real past concept questions), grouped by chapter in course order.
+   * Question shown, answer folded (self-test). Used on T13 and the past index. */
+  function examQs() {
+    const out = [];
+    SML.app.order().forEach((id) => { const p = SML.content.get(id); if (p && p.examQ && p.examQ.length) out.push({ id: id, page: p }); });
+    return out;
+  }
+  // "2025 practice Q1(c)" and "2025 Q1c" name the same question: year + exam/practice + question + part.
+  // 2025 and 2026 papers are practice papers even when the label omits the word. A label may name several papers.
+  const QRE = /(\d{4})\s*(?:S\d\s*)?(practice\s*)?(?:exam\s*)?,?\s*Q(\d+(?:\.\d+)?)\s*\(?([a-z])?\)?/gi;
+  function qkeys(src) {
+    const out = [];
+    for (const m of String(src || '').matchAll(QRE)) {
+      const prac = m[2] || m[1] === '2025' || m[1] === '2026' ? 'P' : 'E';
+      out.push(m[1] + prac + m[3] + (m[4] || '').toLowerCase());
+    }
+    return out;
+  }
+  // keys of the past questions already shown as past blocks (T-pages); a whole question ("Q6", "Q10") covers all its parts ("Q6(c)", "Q10.3")
+  function pastKeys() {
+    const keys = new Set();
+    collect('past').forEach(({ block }) => qkeys(block.src).forEach((k) => keys.add(k)));
+    return keys;
+  }
+  // a key is covered by itself or by its whole question: "2016E1.10" ← "2016E1"; "2026P1c" ← "2026P1"
+  const parentKeys = (k) => { const out = [k]; let x = k; while (/[a-z]$|\.\d+$/.test(x)) { x = x.replace(/[a-z]$|\.\d+$/, ''); out.push(x); } return out; };
+  const isShown = (src, keys) => qkeys(src).some((k) => parentKeys(k).some((x) => keys.has(x)));
+
+  SML.render.blocks.examqIndex = function () {
+    const { el } = SML.render;
+    const { md, inline } = SML.md;
+    const box = el('div', 'examq-index');
+    const shown = pastKeys();
+    let n = 0;
+    examQs().forEach(({ id, page }) => {
+      const list = page.examQ.filter((e) => !isShown(e.src, shown));
+      if (!list.length) return;
+      const m = SML.app.metaOf(id);
+      box.insertAdjacentHTML('beforeend', '<h3><a href="#/' + id + '">' + inline((m.tag ? m.tag + ' · ' : '') + (m.title || page.title)) + '</a></h3>');
+      list.forEach((e) => {
+        n++;
+        const card = el('div', 'callout examq');
+        card.innerHTML = '<div class="ctitle"><span>' + SML.md.esc(e.src || '原题') + '</span></div>' + md('**Q.** ' + e.q) + (e.qzh ? md('题意：' + e.qzh) : '');
+        const d = el('details');
+        d.innerHTML = '<summary>看答案</summary>' + md('**A.** ' + e.a) + (e.azh ? md('中文意思：' + e.azh) : '');
+        card.appendChild(d);
+        box.appendChild(card);
+      });
+    });
+    box.insertAdjacentHTML('afterbegin', '<p class="small muted">共 ' + n + ' 道（本页第 1 节或题型页"真题全解"里已经完整讲过的不重复列出），按章节顺序；先自己答，再点"看答案"。每道也出现在对应章节顶部的"Key points in English"框里。</p>');
     return box;
   };
 
