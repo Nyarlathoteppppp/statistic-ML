@@ -14,6 +14,7 @@
     chips: [
       { text: 'L22 p6–p22', href: '#/L22', cls: 'src' }, { text: 'L21 消息传递', href: '#/L21', cls: 'src' }, { text: 'L20 p29（clique）', href: '#/L20', cls: 'src' },
       { text: '2026 practice Q5', cls: 'hot' }, { text: '2021 exam Q18b', cls: 'src' },
+      { text: 'Workshop 12 Q4', href: '#/T06/ws12', cls: 'src' },
     ],
     lead: '给一个无向图（MRF）和一个消元顺序，按顺序一个个删点：删之前把它的邻居两两连起来，记下"这个点 + 它的邻居"。最后去掉被包含的集合，剩下的就是 junction tree 的团。',
     blocks: [
@@ -115,7 +116,71 @@ A valid tree: $\{U,V,W,Y\}$ connected to $\{T,U,W\}$ (separator $\{U,W\}$), $\{U
           },
         ],
       },
-      { t: 'h2', text: '4. 随机练习', id: 'practice' },
+
+      { t: 'h2', text: '4. Workshop 12 Q4', id: 'ws12' },
+      T`Workshop 12 Q4 和 [上一节](#/T06/past) 的 2026 practice Q5 **是同一道题**（同一张图、同一个消元顺序），workshop 原题直接上了考卷。这里按 workshop 官方答案（WK12 p9）的格式写：每删一个点记一个团，最后划掉被包含的团。上一节还多画了 junction tree 本身。`,
+      {
+        t: 'past', src: 'Workshop 12 Q4', topic: 'L22 p6–p17 · WK12 p9',
+        q: T`Consider the following Markov Random field. Assume the following node elimination order: $T, X, Z, U, W, V, Y$. (Eliminate the first node in the list, then eliminate the second node in the list, then eliminate the third node in the list, etc.) What are the cliques in the junction tree (by using the above elimination order)?`,
+        qzh: T`考虑下面的马尔可夫随机场（Markov random field）。消元顺序（elimination order）为 $T, X, Z, U, W, V, Y$（先消去列表里的第一个节点，再消第二个，再消第三个……）。用这个消元顺序，联结树（junction tree）里的团（clique）有哪些？`,
+        azh: T`按 $T,X,Z,U,W,V,Y$ 的顺序消元，每次把被消节点的当前邻居两两相连，并记下团（节点 + 邻居）：
+
+- $T$：邻居 $U,W$，填补边（fill-in edge）$U$–$W$，团 $\{T,U,W\}$；
+- $X$：邻居 $U,Y$，填补边 $U$–$Y$，团 $\{U,X,Y\}$；
+- $Z$：邻居 $V,W,Y$，填补边 $W$–$Y$，团 $\{V,W,Y,Z\}$；
+- $U$：邻居 $V,W,Y$，没有填补边，团 $\{U,V,W,Y\}$；
+- $W$、$V$、$Y$：团 $\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$，它们是 $\{U,V,W,Y\}$ 的子集，丢掉。
+
+联结树的团就是这些极大团（maximal clique）：$\{T,U,W\}$、$\{U,X,Y\}$、$\{V,W,Y,Z\}$、$\{U,V,W,Y\}$。`,
+        blocks: [Object.assign({ t: 'graph', w: 240 }, q5('T-U T-W U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z', {}, '题图（位置照 tutorial 原图）：7 个点、10 条边的无向图。'))],
+        sol: [
+          T`做法（L22 p6–p17）：按给定顺序一次删一个点。删之前先看它此刻的全部邻居，把还没连上的邻居两两连起来（新加的边叫 fill-in edge，填补边），记下"被删的点 + 它的邻居"作为一个团（clique），再把这个点和它的边删掉。全部删完后，**划掉被别的团包含的团**，剩下的极大团（maximal clique）就是 junction tree（联结树）的团。`,
+          { t: 'h4', text: '第 0 步：把边抄下来' },
+          T`$T$—$U$，$T$—$W$，$U$—$V$，$U$—$X$，$V$—$W$，$V$—$Y$，$V$—$Z$，$W$—$Z$，$X$—$Y$，$Y$—$Z$，一共 10 条。`,
+          { t: 'h4', text: '第 1 步：按顺序消元，每步一行' },
+          {
+            t: 'table', head: ['被删节点', '当前邻居', 'fill-in 边', '团'], rows: [
+              ['$T$', '$U,W$', '$U$—$W$', T`$\{T,U,W\}$`],
+              ['$X$', '$U,Y$', '$U$—$Y$', T`$\{U,X,Y\}$`],
+              ['$Z$', '$V,W,Y$', '$W$—$Y$（$V$—$W$、$V$—$Y$ 原来就有）', T`$\{V,W,Y,Z\}$`],
+              ['$U$', '$V,W,Y$（$W$、$Y$ 是 fill-in 带来的）', '无（三者已两两相连）', T`$\{U,V,W,Y\}$`],
+              ['$W$', '$V,Y$', '无', T`$\{V,W,Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
+              ['$V$', '$Y$', '无', T`$\{V,Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
+              ['$Y$', '—', '无', T`$\{Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
+            ],
+          },
+          {
+            t: 'steps', items: [
+              T`删 $T$：邻居 $U,W$ 原来不相连，补上 $U$—$W$，记团 $\{T,U,W\}$。`,
+              T`删 $X$：邻居 $U,Y$ 原来不相连，补上 $U$—$Y$，记团 $\{U,X,Y\}$。`,
+              T`删 $Z$：邻居 $V,W,Y$。$V$—$W$、$V$—$Y$ 原来就有，缺 $W$—$Y$，补上；记团 $\{V,W,Y,Z\}$。`,
+              T`删 $U$：原图里 $U$ 的邻居是 $T,V,X$，其中 $T,X$ 已经删了；再加上前两步补的 $U$—$W$、$U$—$Y$，此刻的邻居是 $V,W,Y$。这三个点两两都连着（$W$—$Y$ 是上一步补的），不用加边；记团 $\{U,V,W,Y\}$。`,
+              T`删 $W$、$V$、$Y$：此刻的邻居分别是 $V,Y$、只剩 $Y$、一个也没有，都不用加边。记下的 $\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$ 都装在 $\{U,V,W,Y\}$ 里。`,
+            ],
+          },
+          { t: 'h4', text: '第 2 步：只留极大团' },
+          T`7 个团里，后 3 个都是 $\{U,V,W,Y\}$ 的子集，不带新信息，划掉（L22 p17）。前 4 个谁也不包含谁，全部留下：$\{T,U,W\}$，$\{U,X,Y\}$，$\{V,W,Y,Z\}$，$\{U,V,W,Y\}$。`,
+          Object.assign({ t: 'graph', w: 250 }, q5('T-U T-W U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z U-W:fill U-Y:fill W-Y:fill', {}, T`核对：把 3 条 fill-in 边（紫色虚线）画回原图，4 个极大团 $\{T,U,W\}$、$\{U,X,Y\}$、$\{V,W,Y,Z\}$、$\{U,V,W,Y\}$ 在这张图里都是两两相连的。`)),
+          {
+            t: 'exam', md: T`Eliminate the nodes in the order $T,X,Z,U,W,V,Y$, each time connecting the current neighbours of the eliminated node (fill-in edges) and recording the clique "node + neighbours":
+
+- $T$: neighbours $U,W$, fill-in $U$–$W$, clique $\{T,U,W\}$;
+- $X$: neighbours $U,Y$, fill-in $U$–$Y$, clique $\{U,X,Y\}$;
+- $Z$: neighbours $V,W,Y$, fill-in $W$–$Y$, clique $\{V,W,Y,Z\}$;
+- $U$: neighbours $V,W,Y$, no fill-in, clique $\{U,V,W,Y\}$;
+- $W$, $V$, $Y$: cliques $\{V,W,Y\}$, $\{V,Y\}$, $\{Y\}$, which are subsets of $\{U,V,W,Y\}$ and are dropped.
+
+The cliques in the junction tree are the maximal cliques $\{T,U,W\}$, $\{U,X,Y\}$, $\{V,W,Y,Z\}$, $\{U,V,W,Y\}$.`,
+          },
+          {
+            t: 'warn', md: T`- **删 $U$ 时只看原图的邻居**（$T,V,X$ 去掉已删的，只剩 $V$），会把团写成 $\{U,V\}$。邻居要按当前的图算，前面补的 fill-in 边也算。
+- 不要把 $\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$ 写进最终答案：被别的团包含的团要划掉。
+- 团要把被删的点自己写进去：删 $Z$ 记的是 $\{V,W,Y,Z\}$，不是 $\{V,W,Y\}$。`,
+          },
+        ],
+      },
+
+      { t: 'h2', text: '5. 随机练习', id: 'practice' },
       { t: 'practice', gen: 'elim', title: '消元随机题' },
       {
         t: 'quiz', items: [
@@ -128,6 +193,10 @@ A valid tree: $\{U,V,W,Y\}$ connected to $\{T,U,W\}$ (separator $\{U,W\}$), $\{U
             q: '为什么消元顺序会影响答案？', type: 'show',
             answerText: '不同顺序产生的 fill-in 边不同，团的大小也不同。',
             explain: '好的顺序 fill-in 少、最大团小，推断代价就低（代价随最大团大小指数增长）。所以题目会指定顺序。',
+          },
+          {
+            type: 'num', q: T`Workshop 12 Q4（顺序 $T,X,Z,U,W,V,Y$）：消掉 $T,X,Z$ 之后轮到 $U$。这一步记下的团有几个节点？`, answer: 4,
+            explain: T`$U$ 在原图里的邻居是 $T,V,X$，其中 $T,X$ 已经删掉；但删 $T$ 时补了 fill-in 边 $U$—$W$，删 $X$ 时补了 $U$—$Y$，所以 $U$ 此刻的邻居是 $V,W,Y$。团 = $U$ 自己 + 当前邻居 = $\{U,V,W,Y\}$，共 4 个节点。这 4 个点已经两两相连（$W$—$Y$ 是删 $Z$ 时补的），不用再加边。只看原图会答成 $\{U,V\}$，也就是 2，这正是这道题设的坑。`,
           },
         ],
       },

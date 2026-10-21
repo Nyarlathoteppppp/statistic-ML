@@ -174,7 +174,7 @@
       T`$\hat\sigma^2_{\text{MLE}}=\text{RSS}/n$. Adding a zero-mean Gaussian prior on $\bw$ and taking the MAP gives ridge regression.`,
     ],
     keyZh: [
-      T`模型：$y$ = 直线上的值 + 均值为 0 的高斯噪声；取 log 后，似然里和 $\bw$ 有关的只剩"负的 RSS × 一个正常数"，所以最大化似然 ⇔ 最小二乘。`,
+      T`模型：$y$ = 直线上的值 + 均值为 0、方差都是 $\sigma^2$、互相独立（i.i.d.）的高斯噪声；取 log 后，似然里和 $\bw$ 有关的只剩"负的 RSS × 一个正常数"，所以最大化似然 ⇔ 最小二乘。`,
       T`正规方程（normal equations）：令 RSS 的梯度为 0 得到的方程组；$\mathbf X'\mathbf X$ 可逆时，两边乘它的逆就是闭式解 $\hat\bw$。`,
       T`可逆要求 $\mathbf X$ 列满秩（full column rank）：没有共线（重复）的特征，且样本数不少于参数个数；否则最小二乘解有无穷多个。`,
       T`噪声方差的 MLE = RSS ÷ $n$。再给 $\bw$ 加一个均值为 0 的高斯先验、求 MAP，就得到岭回归（ridge regression）。`,

@@ -52,14 +52,26 @@
       return '<tr><td>' + SML.md.esc(block.src) + '</td><td>' + SML.md.esc(String(block.marks || '')) + '</td><td><a href="#/' + page + '">' +
         SML.md.inline((m.tag ? m.tag + ' ' : '') + m.title) + '</a></td><td>' + SML.md.inline(block.topic || '') + '</td></tr>';
     });
-    const box = el('div', 'table-wrap');
-    box.innerHTML = '<table><thead><tr><th>真题</th><th>分值</th><th>在哪一页</th><th>课件</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+    const box = el('div');
+    box.innerHTML = '<div class="table-wrap"><table><thead><tr><th>真题</th><th>分值</th><th>在哪一页</th><th>课件</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
+    // Canvas weekly quiz questions (tagged （平时小测原题） in chapter quizzes) — examinable too
+    const quiz = [];
+    collect('quiz').forEach(({ page, block }) => (block.items || []).forEach((it) => { if (/平时小测原题/.test(it.q || '')) quiz.push({ page, it }); }));
+    if (quiz.length) {
+      box.insertAdjacentHTML('beforeend', '<h3>平时小测原题（Canvas quiz）</h3><p class="small muted">官方说 quiz 也在考试范围内。点章节名去那一章的小测里做。</p>');
+      const qrows = quiz.map(({ page, it }) => {
+        const m = SML.app.metaOf(page);
+        const q = String(it.q).replace(/（平时小测原题）\s*/, '');
+        return '<tr><td><a href="#/' + page + '/quiz">' + SML.md.inline((m.tag ? m.tag + ' ' : '') + m.title) + '</a></td><td>' + SML.md.inline(q.length > 140 ? q.slice(0, 140) + '…' : q) + '</td></tr>';
+      });
+      box.insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>章节</th><th>题目</th></tr></thead><tbody>' + qrows.join('') + '</tbody></table></div>');
+    }
     return box;
   };
 
   SML.content.add([
     { id: 'mistakes', title: '错题本', lead: '小测答错的题。点页面名回去重做。', blocks: [{ t: 'mistakes' }] },
     { id: 'phrases', title: '英文答题句式库', lead: '全站所有"卷面写法"（紫色框）汇总在这里，按页面分组。考前通读一遍，重点背关键词。', blocks: [{ t: 'phraseIndex' }] },
-    { id: 'pastindex', title: '真题索引', lead: '三份往年卷的每道题在网站哪一页有完整解答。', blocks: [{ t: 'pastIndex' }] },
+    { id: 'pastindex', title: '真题索引', lead: '三份往年卷的每道题在网站哪一页有完整解答；下面另列平时小测（Canvas quiz）原题。', blocks: [{ t: 'pastIndex' }] },
   ]);
 })(window);

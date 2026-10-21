@@ -338,7 +338,7 @@
     keyZh: [
       T`点积（dot product）两种算法：对应分量相乘再相加，或"长度 × 长度 × 夹角余弦"；等于 0 说明两向量垂直（正交），为负说明夹角大于 90°。`,
       T`超平面（hyperplane）= 满足 $\bw'\bx+b=0$ 的所有点；$\bw$ 是法向量（normal vector），垂直于超平面；把 $\bx$ 代入看正负，就知道它在哪一侧。`,
-      T`点到超平面的距离 = 代入值的绝对值 ÷ $\|\bw\|$。必须除，因为 $\bw$、$b$ 同乘一个正数时超平面不动，代入值却跟着变大。`,
+      T`点到超平面的距离 = 代入值的绝对值 ÷ $\|\bw\|$。必须除，因为 $\bw$、$b$ 同乘一个正数 $c$ 时超平面不动，代入值却变成 $c$ 倍。`,
       T`范数（norm）衡量向量长度：$L_2$ 是平方和开根号（ridge 惩罚它的平方），$L_1$ 是绝对值之和（lasso 惩罚它）。`,
     ],
     title: '线代：向量、点积、超平面、范数', en: 'Vectors, dot product, hyperplanes, norms',
@@ -490,8 +490,8 @@
     ],
     keyZh: [
       T`线性相关（linearly dependent）：某个向量能由其余向量各乘一个数再相加得到，即它是多余的；$\mathbf X$ 的列线性相关 = 有一个特征是多余的（如米和厘米两列）。`,
-      T`特征值（eigenvalue）$\lambda$：矩阵作用在特征向量上只拉伸 $\lambda$ 倍、不改方向。二次型对所有 $\bv$ 都 ≥ 0 叫 PSD（半正定，特征值全 ≥ 0）；对非零 $\bv$ 严格 > 0 叫 PD（正定，特征值全 > 0）。`,
-      T`$\mathbf X'\mathbf X$ 一定是 PSD，因为它的二次型就是 $\|\mathbf X\bv\|^2$，平方长度不会为负；只有 $\mathbf X$ 的列线性无关时它才是 PD，也就是可逆。`,
+      T`特征值（eigenvalue）$\lambda$：矩阵作用在特征向量上只把它缩放 $\lambda$ 倍（$\lambda<0$ 时方向反过来），不会转到别的方向。对称矩阵的二次型对所有 $\bv$ 都 ≥ 0 叫 PSD（半正定，特征值全 ≥ 0）；对非零 $\bv$ 严格 > 0 叫 PD（正定，特征值全 > 0）。`,
+      T`$\mathbf X'\mathbf X$ 一定是 PSD，因为它的二次型就是 $\|\mathbf X\bv\|^2$，平方长度不会为负；$\mathbf X$ 的列线性无关时它就是 PD（可逆），反过来也成立。`,
       T`链条：列线性相关 ⇒ 有特征值 0 ⇒ $\mathbf X'\mathbf X$ 不可逆；ridge 加上 $\lambda\mathbf I$，每个特征值抬高 $\lambda$，又可逆了。合法 kernel 的 Gram 矩阵必须是 PSD。`,
     ],
     title: '矩阵、特征值、PSD', en: 'Linear independence, matrices, eigenvalues, positive semidefinite',

@@ -23,7 +23,7 @@
   }
 
   // every formula of a page in reading order: fx cards first, then math blocks, skipping folded not-examinable parts.
-  // A formula under the generic "1 · 它是什么" heading gets the key 'cNN:k' (its k-th one) so it can be named per chapter.
+  // A formula under a generic section heading ("1 · 它是什么", "4 · 数学定义") gets the key 'cNN:k' (its k-th one) so it can be named per chapter.
   function formulas(page) {
     const out = [], seen = new Set();
     let what = 0;
@@ -32,7 +32,7 @@
       if (seen.has(k)) return;
       seen.add(k);
       const l = noRef(label);
-      out.push({ label: /^1 · /.test(l) ? page.id + ':' + (++what) : l, tex: t });
+      out.push({ label: /^\d+ · /.test(l) ? page.id + ':' + (++what) : l, tex: t });
     };
     (page.blocks || []).forEach((b) => { if (b && b.t === 'fx') add(b.title || '', b.tex); });
     let sec = '', h = '';
@@ -115,6 +115,12 @@
         }
         const zh = (t) => (t ? ' <span class="ol-kzh">' + inline(t) + '</span>' : '');
         (p.examQ || []).forEach((e) => left.appendChild(el('div', 'ol-exq', label('Past ' + inline(e.src || '')) + '<b>Q.</b> ' + inline(e.q) + zh(e.qzh) + ' <b>A.</b> ' + inline(e.a) + zh(e.azh))));
+        // Canvas quiz questions of this chapter (tagged （平时小测原题）): question + answer, like the past questions
+        sectionBlocks(p, 'quiz').filter((x) => x && x.t === 'quiz').forEach((qb) => (qb.items || []).forEach((it) => {
+          if (!/平时小测原题/.test(it.q || '')) return;
+          const ans = it.type === 'mc' ? (it.options || [])[it.answer] : (it.answerText || (it.answer != null ? String(it.answer) : ''));
+          left.appendChild(el('div', 'ol-exq', label('Quiz') + '<b>Q.</b> ' + inline(String(it.q).replace(/（平时小测原题）\s*/, '')) + zh(it.qzh) + ' <b>A.</b> ' + inline(ans || '') + zh(it.azh)));
+        }));
         const pit = sectionBlocks(p, 'pitfalls').find((x) => x && x.t === 'table');
         if (pit && pit.rows && pit.rows.length) left.appendChild(el('div', 'ol-pit1', label('易错') + '✗ ' + inline(pit.rows[0][0]) + ' → ✓ ' + inline(pit.rows[0][1])));
         const box = el('div', 'ol-ch');

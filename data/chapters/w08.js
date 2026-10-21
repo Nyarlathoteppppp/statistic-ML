@@ -17,7 +17,7 @@
       T`50% error is the chance-level baseline for balanced binary classes, not a lower bound; when errors have different costs use a cost-sensitive loss $\frac1n\sum_iCost(g(x_i),y_i)$.`,
     ],
     keyZh: [
-      T`从混淆矩阵（confusion matrix）算，关键看分母：precision（精确率）除以判成正的，recall（召回率）除以真正例，specificity（特异度）除以真负例；$F_1$ 是 P、R 的调和平均。回归改用 MSE、RMSE、MAE。`,
+      T`从混淆矩阵（confusion matrix）算，关键看分母：precision（精确率）除以判成正的，recall（召回率）除以真实为正的全部（$TP+FN$），specificity（特异度）除以真实为负的全部（$TN+FP$）；$F_1$ 是 P、R 的调和平均。回归改用 MSE、RMSE、MAE。`,
       T`两类分布有重叠，任何阈值（threshold）都会在重叠区犯错，移动阈值只是在两种错误之间换，所以要成对报告。类别不平衡时 accuracy（准确率）会骗人：全猜多数类也很高。`,
       T`ROC 曲线：每个阈值得到一对 (specificity, sensitivity)，画成一个点，连成曲线；AUC（曲线下面积）用一个数概括它：0.5 等于瞎猜，1 是完美分类器。`,
       T`两类各占一半时，瞎猜的错误率就是 50%：这是要超过的基线（chance level），不是下限，学反了的模型可以更差。漏诊、误诊代价不同时，用按代价表加权的 cost-sensitive loss。`,

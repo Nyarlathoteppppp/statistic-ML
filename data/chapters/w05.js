@@ -329,7 +329,7 @@
     keyZh: [
       T`合法 kernel = 能写成某个特征映射的点积。一种证法是直接构造映射：例如 $k_1+k_2$，把两边的特征向量拼接起来，新点积正好是两个点积之和（2021 Q15）。`,
       T`组合规则：合法 kernel 的和、积、正数倍，以及左右各乘 $f(\bu)$、$f(\bv)$，结果仍合法；相减不一定合法（对角可能变负）。`,
-      T`Mercer 定理：对任意有限点集，由两两 kernel 值组成的 Gram 矩阵都半正定（PSD），$K$ 才合法。否定只需一个反例，例如某点 $K(\bx,\bx)<0$。`,
+      T`Mercer 定理：$K$ 合法，当且仅当对任意有限点集，由两两 kernel 值组成的 Gram 矩阵都半正定（PSD）。否定只需一个反例，例如某点 $K(\bx,\bx)<0$。`,
       T`表示定理（representer theorem）：最小化"经验风险 + 随 $\|f\|$ 单调递增的惩罚"时，最优解总能写成各训练点上 kernel 的加权和，所以 ridge、logistic regression、PCA 等都能核化。`,
     ],
     title: '合法 kernel、Mercer、representer', en: 'Valid kernels, Mercer\'s theorem, representer theorem',

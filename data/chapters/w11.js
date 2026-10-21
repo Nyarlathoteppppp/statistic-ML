@@ -14,6 +14,9 @@
   const STAR_FILL = (() => { const o = 'BCDEFGHL'.split(''), have = new Set(['BC', 'DE', 'FG', 'HL']), out = [];
     o.forEach((a, i) => o.slice(i + 1).forEach((b) => { if (!have.has(a + b)) out.push(a + '-' + b + ':fill'); })); return out.join(' '); })();
   const g = (base, extra) => Object.assign({}, base, extra);
+  /* Workshop 12 Q3 的星形 MRF（c57 数值例子），位置照 tutorial 原图。 */
+  const WS12Q3 = { nodes: { R: [40, 30], S: [140, 30], T: [240, 30], U: [40, 120], V: [140, 120], W: [240, 120], X: [40, 210], Y: [140, 210], Z: [240, 210] } };
+  const WS12Q3_EDGES = 'R-V S-V T-V U-V W-V Y-V U-X W-Z';
 
   /* 本周手算用的同一个小例子：链 x1—x2—x3，变量取 0/1。PSI = 两张打分表（potential）；PSI_MAT = 同一组数的矩阵简写说明。 */
   const PSI = { t: 'table', cls: 'compact', caption: '两张打分表（potential）：每格是"前一个变量·后一个变量"这种组合的分数。例：$\\psi_{12}$ 的"1·0"格是 1，即 $\\psi_{12}(1,0)=1$——$x_1=1$、$x_2=0$ 这个组合打 1 分。', head: ['边', '0·0', '0·1', '1·0', '1·1'], rows: [
@@ -371,6 +374,59 @@
           { ask: '归一化后的概率 = ?', answer: 0.375, show: T`要除以四种 $(x_2,x_3)$ 组合的总和，不是只看这一格：$m_{1\to2}(x_2)\,\psi_{23}(x_2,x_3)$ 四格是 $4\times2=8$、$4\times1=4$、$3\times1=3$、$3\times3=9$，总和 $24$（就是 $Z$）。$9/24=0.375$`, sg: 3 },
         ] },
       ] },
+      { t: 'h3', text: 'Workshop 12 Q3：星形图上读边缘、写消息' },
+      T`这道 workshop 原题不用算数字，只考两条规则的"形状"：边缘是哪几条消息相乘；发出去的消息乘哪几条、对谁求和。两条规则就是 [c56](#/c56) 最后归纳的 Observation 1 和 2（L21 p22–p23）。`,
+      {
+        t: 'past', src: 'Workshop 12 Q3', topic: 'L21 p22–p23 · WK12 p8',
+        q: T`Consider the following Markov random field. After running the Belief Propagation algorithm, how should we correctly compute the marginal distribution $P(V)$? Assume we want to send a message from $V$ to $S$. How should we correctly compute the message $m_{V\to S}(S)$?`,
+        qzh: T`考虑下面的马尔可夫随机场（Markov random field）。运行完信念传播（belief propagation）算法后，应该怎样正确地计算边缘分布（marginal distribution）$P(V)$？假设要从 $V$ 向 $S$ 发一条消息（message），应该怎样正确地计算 $m_{V\to S}(S)$？`,
+        azh: T`运行完信念传播后，$V$ 的每个邻居都已经给 $V$ 发过消息，边缘正比于所有来信的乘积（再对 $V$ 的取值归一化）：
+
+$$P(V)\propto m_{R\to V}(V)\,m_{S\to V}(V)\,m_{T\to V}(V)\,m_{U\to V}(V)\,m_{W\to V}(V)\,m_{Y\to V}(V)$$
+
+从 $V$ 发给 $S$ 的消息：把外出的势函数（potential）$\psi_{VS}$ 乘上 $V$ 从除 $S$ 以外所有邻居收到的消息，再对 $V$ 求和：
+
+$$\begin{aligned}m_{V\to S}(S)=\sum_{V}\psi_{VS}(V,S)\,&m_{R\to V}(V)\,m_{T\to V}(V)\\&\times m_{U\to V}(V)\,m_{W\to V}(V)\,m_{Y\to V}(V)\end{aligned}$$`,
+        blocks: [g(WS12Q3, { t: 'graph', edges: WS12Q3_EDGES, cls: { V: 'q' }, w: 260, caption: '题图：$V$（红圈）在中心，连着 $R,S,T,U,W,Y$ 六个点；$X$ 只连 $U$，$Z$ 只连 $W$。没有环，是一棵树。' })],
+        sol: [
+          { t: 'h4', text: '第 0 步：数清 $V$ 的邻居' },
+          T`和 $V$ 直接连边的点是 $R,S,T,U,W,Y$，一共 6 个，记作 $N(V)$。$X$ 和 $Z$ 不是 $V$ 的邻居：$X$ 挂在 $U$ 上，$Z$ 挂在 $W$ 上。这张图有 9 个点、8 条边、没有环，是一棵树，所以 BP 算出的边缘是精确的。`,
+          T`"跑完 BP"的意思是 collect 和 distribute 两轮都做完了：8 条边、每条两个方向各一条消息，共 16 条。不管 root 选的是谁，$V$ 的 6 个邻居都已经各给 $V$ 发过一条消息。`,
+          { t: 'h4', text: '第 1 问：边缘 $P(V)$ = 所有来信相乘' },
+          T`规则（L21 p23，Observation 2）：一个节点的边缘正比于它收到的全部消息之积。$V$ 有 6 个邻居，就乘 6 条：`,
+          { t: 'math', tex: T`P(V)\propto m_{R\to V}(V)\,m_{S\to V}(V)\,m_{T\to V}(V)\,m_{U\to V}(V)\,m_{W\to V}(V)\,m_{Y\to V}(V)` },
+          T`这只是"正比于"：对 $V$ 的每个取值各算一个乘积，再除以这些乘积的总和，才是概率。$X$ 的信息已经装在 $m_{U\to V}$ 里，因为 $m_{U\to V}(V)=\sum_U\psi_{UV}(U,V)\,m_{X\to U}(U)$；$Z$ 的信息同样装在 $m_{W\to V}$ 里，所以不用另外再乘。`,
+          { t: 'h4', text: T`第 2 问：消息 $m_{V\to S}(S)$ = 其他来信 × 外出 potential，再对 $V$ 求和` },
+          T`规则（L21 p22，Observation 1）：$m_{i\to j}(x_j)=\sum_{x_i}\psi_{ij}(x_i,x_j)\prod_{k\in N(i)\setminus j}m_{k\to i}(x_i)$。这里发送者 $i=V$，收件人 $j=S$，除了 $S$ 以外的邻居是 $N(V)\setminus S=\{R,T,U,W,Y\}$：`,
+          { t: 'math', tex: T`\begin{aligned}m_{V\to S}(S)=\sum_{V}\psi_{VS}(V,S)\,&m_{R\to V}(V)\,m_{T\to V}(V)\\&\times m_{U\to V}(V)\,m_{W\to V}(V)\,m_{Y\to V}(V)\end{aligned}` },
+          {
+            t: 'steps', items: [
+              T`乘 5 条来信，不乘 $m_{S\to V}$：那条消息带的是 $S$ 那一侧的信息，再发回给 $S$ 就算了两遍。`,
+              T`外出 potential 是 $V$ 和 $S$ 之间那条边的打分表 $\psi_{VS}(V,S)$。WK12 p8 写成 $\psi_{SV}(S,V)$，是同一张表，下标先写谁都行。`,
+              T`对发送者 $V$ 求和：把 $V$ 的每个取值代进去算乘积，再加起来。求完以后 $V$ 消失了，结果只依赖 $S$，也就是 $S$ 每个取值一个数。`,
+            ],
+          },
+          { t: 'graphs', r: 15, caption: '绿色箭头 = 用到的消息；红圈 = 要算的那个变量。', items: [
+            g(WS12Q3, { edges: 'R>V:msg S>V:msg T>V:msg U>V:msg W>V:msg Y>V:msg U-X W-Z', cls: { V: 'q' }, caption: '① $P(V)$：6 条来信全部相乘' }),
+            g(WS12Q3, { edges: 'R>V:msg T>V:msg U>V:msg W>V:msg Y>V:msg V>S:path U-X W-Z', cls: { V: 'hl2', S: 'q' }, caption: T`② $m_{V\to S}$：5 条来信（没有 $S$ 发来的那条）× $\psi_{VS}$，对 $V$ 求和，沿红箭头发给 $S$` }),
+          ] },
+          {
+            t: 'exam', md: T`After belief propagation has finished, every neighbour of $V$ has sent $V$ a message, and the marginal of $V$ is proportional to the product of all its incoming messages (normalised over the values of $V$):
+
+$$P(V)\propto m_{R\to V}(V)\,m_{S\to V}(V)\,m_{T\to V}(V)\,m_{U\to V}(V)\,m_{W\to V}(V)\,m_{Y\to V}(V)$$
+
+The message from $V$ to $S$ multiplies the outgoing potential $\psi_{VS}$ with the messages $V$ receives from all its neighbours except $S$, and sums out $V$:
+
+$$\begin{aligned}m_{V\to S}(S)=\sum_{V}\psi_{VS}(V,S)\,&m_{R\to V}(V)\,m_{T\to V}(V)\\&\times m_{U\to V}(V)\,m_{W\to V}(V)\,m_{Y\to V}(V)\end{aligned}$$`,
+          },
+          {
+            t: 'warn', md: T`- **两条规则别混**：边缘乘全部 6 条（包括 $m_{S\to V}$）；只有发消息时才去掉收件人那一条。
+- 发给 $S$ 的消息是对 $V$ 求和，不是对 $S$ 求和；结果必须是 $S$ 的函数。
+- 不要写 $m_{X\to V}$、$m_{Z\to V}$：$X,Z$ 不是 $V$ 的邻居，这两条消息不存在。
+- 边缘公式里没有 $\psi$：potential 只出现在发消息的求和里。`,
+          },
+        ],
+      },
     ],
     viz: [
       { id: 'msg-passing', how: '同 c56 的工具，这次一直点到 distribute 结束：每条边两个方向各一条消息。下方输出区最后给出每个节点的边缘，并和暴力枚举核对。',
@@ -400,6 +456,12 @@
       { type: 'num', q: '7 个节点的树做 belief propagation，一共发几条消息？', answer: 12, explain: T`belief propagation（信念传播）分两轮：collect（收）从叶子到 root，每条边朝 root 方向发一条消息；distribute（发）从 root 回到叶子，每条边反方向再发一条。所以消息数 = 边数 × 2。$n$ 个节点的树恰好有 $n-1$ 条边：$7-1=6$ 条，消息 $6\times2=12$ 条。陷阱：用节点数算成 $7\times2=14$，要数的是边。` },
       { type: 'num', q: '节点 $x$（取 0/1）有 3 个邻居，来信分别为 $(1,2)$、$(2,1)$、$(3,1)$（括号按 $(x=0,\\ x=1)$）。$P(x=1)=?$', answer: 0.25, explain: T`要算的是 $x$ 的边缘：$P(x)\propto$ 所有来信的乘积，每个取值分开乘。$x=0$ 取三条来信的第一个数：$1\times2\times3=6$；$x=1$ 取第二个数：$2\times1\times1=2$。乘积只是"正比于"，还要除以两个取值的总和：$P(x=1)=\frac{2}{6+2}=0.25$。陷阱：忘了归一化直接答 2，或者把三条来信相加而不是相乘。` },
       { type: 'mc', q: '在有环的图上直接跑 belief propagation 叫：', options: ['junction tree', 'loopy belief propagation', 'variable elimination', 'Gibbs sampling'], answer: 1, explain: 'L21 p36，结果是近似。' },
+      { type: 'mc', q: T`Workshop 12 Q3 的星形 MRF：$V$ 的邻居是 $R,S,T,U,W,Y$，另外还有边 $U$—$X$、$W$—$Z$。计算 $m_{V\to S}(S)$ 时，除了 $\psi_{VS}(V,S)$，还要乘哪些消息？`, options: [
+        T`$m_{R\to V},\ m_{T\to V},\ m_{U\to V},\ m_{W\to V},\ m_{Y\to V}$（5 条）`,
+        T`$V$ 收到的全部 6 条，包括 $m_{S\to V}$`,
+        T`上面 5 条，再加 $m_{X\to U}$ 和 $m_{Z\to W}$`,
+        T`只乘 $m_{S\to V}$`,
+      ], answer: 0, explain: T`发消息的规则（L21 p22）：发送者 $V$ 把除收件人 $S$ 以外所有邻居的来信相乘，乘上外出 potential $\psi_{VS}$，再对 $V$ 求和。$V$ 有 6 个邻居，去掉 $S$ 剩 5 条。第二项错：$m_{S\to V}$ 带的是 $S$ 那一侧的信息，再发回给 $S$ 就算了两遍；乘全部 6 条是求边缘 $P(V)$ 的做法。第三项错：$X$、$Z$ 不是 $V$ 的邻居，它们的信息已经装在 $m_{U\to V}$、$m_{W\to V}$ 里。第四项正好把该去掉的那条留下、该乘的 5 条全丢了。` },
     ],
   });
 
@@ -741,6 +803,6 @@
       { type: 'mc', q: '下面哪一步**不属于**构造 junction tree？', options: ['moralize', '按顺序消元记录团', '去掉非极大团', '对团按大小排序后连成链'], answer: 3, explain: '应该取 clique graph 的最大权重生成树。' },
       { type: 'show', q: '（英文）Why is loopy belief propagation only approximate?', answer: T`Belief propagation is exact on trees because removing a node separates the graph, so each message summarises an independent part of the graph. In a graph with cycles, information sent from a node can travel around a loop and come back to it, so evidence is counted more than once and the messages are no longer exact summaries; the fixed point (if it converges) only approximates the true marginals. Exact inference instead clusters the variables into a junction tree.`, qzh: '为什么环状信念传播（loopy belief propagation）只是近似的？', azh: '信念传播（belief propagation）在树上是精确的，因为删掉一个节点就会把图分开，所以每条消息概括的是图中一个独立的部分。在有环的图中，从一个节点发出的信息可以绕环一圈再回到它自己，于是证据被重复计算，消息不再是精确的概括；（如果收敛的话）不动点（fixed point）也只是近似真实的边缘分布（marginals）。精确推断则是把变量聚成一棵联结树（junction tree）。' },
     ],
-    next: 'W12（L23–L24）课件发布后补充。到这里 L1–L22 的所有考点都覆盖了：去 [今日复习](#/daily) 做间隔复习卡，或去 [模拟卷](#/mock) 计时练习。',
+    next: '下一周 [W12](#/c60) 把方向反过来：图和参数都不给，从数据里**学**出来（L23 学 Bayesian network，L24 学 MRF）。另外 Workshop 12 的 4 道手算题就是 2026 practice Q4、Q5 的原题，见 [T5](#/T05/ws12)、[T6](#/T06/ws12)。',
   }));
 })(window);

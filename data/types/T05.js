@@ -3,6 +3,11 @@
   'use strict';
   const T = String.raw;
   const Q4 = { nodes: { S: [140, 40], T: [240, 40], U: [40, 130], V: [140, 130], W: [240, 130], X: [40, 220], Y: [140, 220], Z: [240, 220] } };
+  /* Workshop 12：Q1 和 2026 Q4 是同一张 BN（沿用 Q4 的位置）；Q2 是 MRF，位置照 tutorial 原图。 */
+  const WS1_EDGES = 'S>V S>W T>W U>V U>Y X>Y V>Z W>Z Y>Z';
+  const WS1_MORAL = 'S-U:moral S-T:moral U-X:moral V-W:moral V-Y:moral W-Y:moral';
+  const WS2 = { nodes: { T: [140, 40], U: [40, 130], V: [140, 130], W: [240, 130], X: [40, 220], Y: [140, 220], Z: [240, 220] } };
+  const WS2_EDGES = 'T-W U-V V-W U-X V-Y W-Z X-Y Y-Z';
 
   root.SML.content.add({
     id: 'T05',
@@ -12,6 +17,7 @@
     chips: [
       { text: 'L20 p17–p25', href: '#/L20', cls: 'src' },
       { text: '2026 practice Q4', cls: 'hot' }, { text: '2025 practice Q1c', cls: 'src' }, { text: '2021 exam Q18a', cls: 'src' },
+      { text: 'Workshop 12 Q1–Q2', href: '#/T05/ws12', cls: 'src' },
     ],
     lead: '课件只教了一种方法，考试就按这个方法写：**祖先图 → moralize → 去方向 → 删掉条件节点 → 看还连不连通**。每一步都写在卷面上，就能拿满步骤分。\n\n记号：$X\\perp Y\\mid S$ 里，竖线**右边**的就是"条件节点"（given 的节点），这一页把它们叫作**条件集**。注意 2026 真题里恰好有一个节点也叫 $S$——那道题的条件集是 $\\{V,W\\}$，节点 $S$ 是要判断的对象之一，不要删它。',
     blocks: [
@@ -126,7 +132,80 @@
         ],
       },
 
-      { t: 'h2', text: '6. 随机练习', id: 'practice' },
+      { t: 'h2', text: '6. Workshop 12 练习（Q1 BN、Q2 MRF）', id: 'ws12' },
+      T`Workshop 12 的前两题都是"读条件独立"。Q1 是 BN（Bayesian network，贝叶斯网络），照第 2 节的四步法做。它和 [上一节](#/T05/past) 的 2026 practice Q4 **是同一道题**（同一张图、同一个问题），workshop 原题直接上了考卷；这里按 workshop 官方答案（WK12 p6）的四张图再走一遍。Q2 换成 MRF（Markov random field，马尔可夫随机场，边没有箭头的无向图），四步只剩最后两步。`,
+      {
+        t: 'past', src: 'Workshop 12 Q1', topic: 'L20 p17 · WK12 p6',
+        q: T`Consider the following Bayesian network. Does the conditional independence statement $S\perp Z\mid V,W$ hold in this Bayesian network?`,
+        qzh: T`考虑下面的贝叶斯网络（Bayesian network）。在这个贝叶斯网络中，条件独立（conditional independence）命题 $S\perp Z\mid V,W$ 成立吗？`,
+        azh: T`不成立。每个节点都是 $Z$ 的祖先，所以 $\{S,Z,V,W\}$ 的祖先图（ancestral graph）就是整张网络。道德化（moralise）把每个共同孩子的父节点两两相连：$S$–$U$（$V$ 的父节点）、$S$–$T$（$W$ 的父节点）、$U$–$X$（$Y$ 的父节点），以及 $V$–$W$、$V$–$Y$、$W$–$Y$（$Z$ 的父节点）；然后去掉所有边的方向。删除条件节点 $V$ 和 $W$ 后，剩下 $S$–$U$、$S$–$T$、$U$–$X$、$U$–$Y$、$X$–$Y$、$Y$–$Z$，仍能沿 $S$–$U$–$Y$–$Z$ 从 $S$ 走到 $Z$。因此给定 $\{V,W\}$ 时 $S$ 和 $Z$ 没有被分隔，$S\perp Z\mid V,W$ **不**成立。`,
+        blocks: [Object.assign({ t: 'graph' }, Q4, { edges: WS1_EDGES, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, w: 260, caption: '题图（位置照 tutorial 原图）。蓝圈 $S$、绿圈 $Z$ 是要判断的两点；灰色 $V,W$ 是条件集，也就是竖线右边的节点。' })],
+        sol: [
+          { t: 'h4', text: '第 0 步：把边抄下来' },
+          T`$S\to V$，$S\to W$，$T\to W$，$U\to V$，$U\to Y$，$X\to Y$，$V\to Z$，$W\to Z$，$Y\to Z$，一共 9 条。先抄一遍再做，读图就不容易漏边。`,
+          { t: 'h4', text: '第 1 步：祖先图（ancestral graph）' },
+          T`要保留 $S$、$Z$、$V$、$W$ 这四个点，以及它们所有的祖先（父母、父母的父母……）。从 $Z$ 往上找：$Z$ 的父母是 $V,W,Y$；$V$ 的父母是 $S,U$；$W$ 的父母是 $S,T$；$Y$ 的父母是 $U,X$。8 个点全被找到了，所以祖先图就是整张原图，一个点也不删。`,
+          { t: 'h4', text: '第 2 步：moralize（父母"结婚"），再去掉方向' },
+          {
+            t: 'table', head: ['孩子', '它的父节点', '两两连上的无向边'], rows: [
+              ['$V$', '$S,U$', '$S$—$U$'],
+              ['$W$', '$S,T$', '$S$—$T$'],
+              ['$Y$', '$U,X$', '$U$—$X$'],
+              ['$Z$', '$V,W,Y$（3 个父节点，两两配对共 3 对）', '$V$—$W$，$V$—$Y$，$W$—$Y$'],
+            ],
+          },
+          T`一共加 6 条结婚边。然后把 9 条原边的箭头去掉，变成无向边，图里现在有 $9+6=15$ 条边。`,
+          { t: 'h4', text: '第 3 步：删掉条件集 $V,W$' },
+          T`把 $V$、$W$ 两个点删掉，一端碰到 $V$ 或 $W$ 的边也一起删，共 9 条：$S$—$V$，$U$—$V$，$V$—$Z$，$S$—$W$，$T$—$W$，$W$—$Z$，$V$—$W$，$V$—$Y$，$W$—$Y$。剩下 6 条：$S$—$U$，$S$—$T$，$U$—$X$，$U$—$Y$，$X$—$Y$，$Y$—$Z$。`,
+          { t: 'h4', text: '第 4 步：$S$ 还能走到 $Z$ 吗' },
+          T`从 $S$ 出发：先走 $S$—$U$，再走 $U$—$Y$，再走 $Y$—$Z$，到了。只要找到一条路，$S$ 和 $Z$ 就没有被 $\{V,W\}$ 分开，所以 $S\perp Z\mid V,W$ 不成立。注意第一段 $S$—$U$ 是第 2 步加的结婚边，原图里没有。`,
+          { t: 'graphs', r: 15, caption: 'WK12 p6 的四张图（蓝圈 $S$、绿圈 $Z$；灰 = 条件集 $V,W$；橙色虚线 = 结婚边；红 = 找到的路径）。', items: [
+            Object.assign({}, Q4, { edges: WS1_EDGES, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, caption: '① 祖先图 = 原图' }),
+            Object.assign({}, Q4, { edges: WS1_EDGES + ' ' + WS1_MORAL, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, caption: '② 结婚：加 6 条边' }),
+            Object.assign({}, Q4, { edges: 'S-V S-W T-W U-V U-Y X-Y V-Z W-Z Y-Z ' + WS1_MORAL, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, caption: '③ 去掉方向' }),
+            Object.assign({}, Q4, { edges: 'S-V:gone S-W:gone T-W:gone U-V:gone V-Z:gone W-Z:gone V-W:gone V-Y:gone W-Y:gone S-T U-X X-Y S-U:path U-Y:path Y-Z:path', cls: { S: 'x', Z: 'y', V: 'removed', W: 'removed' }, caption: '④ 删 $V,W$：$S$—$U$—$Y$—$Z$ 还连着' }),
+          ] },
+          {
+            t: 'exam', md: T`No. Every node is an ancestor of $Z$, so the ancestral graph of $\{S,Z,V,W\}$ is the whole network. Moralising connects the parents of each common child: $S$–$U$ (parents of $V$), $S$–$T$ (parents of $W$), $U$–$X$ (parents of $Y$), and $V$–$W$, $V$–$Y$, $W$–$Y$ (parents of $Z$); then all edge directions are dropped. Removing the conditioning nodes $V$ and $W$ leaves $S$–$U$, $S$–$T$, $U$–$X$, $U$–$Y$, $X$–$Y$, $Y$–$Z$, so we can still go from $S$ to $Z$ along $S$–$U$–$Y$–$Z$. Hence $S$ and $Z$ are not separated given $\{V,W\}$, and $S\perp Z\mid V,W$ does **not** hold.`,
+          },
+          {
+            t: 'warn', title: '易错：先删条件集、再结婚，会错答"成立"', blocks: [
+              T`有人一上来就把 $V,W$ 删掉，再去找共同孩子结婚。这时 $V$ 已经不在了，$S$ 和 $U$ 不再有共同孩子，结婚边 $S$—$U$ 根本不会出现；$S$ 原来只有 $S\to V$、$S\to W$ 两条边，删完后 $S$ 成了孤立点，于是得出"成立"的错误结论。`,
+              Object.assign({ t: 'graph' }, Q4, { edges: 'U-Y X-Y Y-Z U-X:moral', cls: { S: 'x', Z: 'y', V: 'removed', W: 'removed' }, w: 230, caption: '错误顺序的结果：$S$ 和 $T$ 都成了孤立点，$S$ 走不到 $Z$，于是误判"成立"。' }),
+              T`为什么必须先结婚：$V$ 在条件集里，表示 $V$ 的值已经知道了；知道了共同孩子，它的两个父母 $S$、$U$ 就变得相关（第 2 节"展开详解"里的硬币例子）。结婚边 $S$—$U$ 记录的正是这一点，所以顺序永远是：祖先图 → 结婚 → 去方向 → 删条件集。`,
+            ],
+          },
+        ],
+      },
+      {
+        t: 'past', src: 'Workshop 12 Q2', topic: 'L20 p36 · WK12 p7',
+        q: T`Consider the following Markov random field. Does the conditional independence statement $W\perp Y\mid V,Z$ hold in this Markov random field?`,
+        qzh: T`考虑下面的马尔可夫随机场（Markov random field）。在这个马尔可夫随机场中，条件独立命题 $W\perp Y\mid V,Z$ 成立吗？`,
+        azh: T`成立。在马尔可夫随机场中，如果删掉 $S$ 里的节点后 $X$ 和 $Y$ 被分开，那么 $X\perp Y\mid S$ 成立（普通的图分离（graph separation），不需要祖先图或道德化）。删掉 $V$ 和 $Z$ 后只剩边 $T$–$W$、$U$–$X$、$X$–$Y$，$W$ 只和 $T$ 相连，到不了 $Y$。因此 $W\perp Y\mid V,Z$ 成立。`,
+        blocks: [Object.assign({ t: 'graph' }, WS2, { edges: WS2_EDGES, cls: { W: 'x', Y: 'y', V: 'given', Z: 'given' }, w: 260, caption: '题图：无向图，边没有箭头。蓝圈 $W$、绿圈 $Y$ 是要判断的两点；灰色 $V,Z$ 是条件集。' })],
+        sol: [
+          T`MRF 的边没有箭头，谈不上"父母"和"祖先"，所以四步法的前两步（取祖先图、结婚）直接跳过，只做后两步：删掉条件集，看还连不连通。课件 L20 p36 说的就是这条规则：删掉条件集以后两点不连通，就条件独立（详细讲解见 [c55](#/c55)）。`,
+          { t: 'h4', text: '第 0 步：把边抄下来' },
+          T`$T$—$W$，$U$—$V$，$V$—$W$，$U$—$X$，$V$—$Y$，$W$—$Z$，$X$—$Y$，$Y$—$Z$，一共 8 条。`,
+          { t: 'h4', text: '第 1 步：删掉条件集 $V,Z$' },
+          T`删 $V$ 带走 $U$—$V$、$V$—$W$、$V$—$Y$ 三条边；删 $Z$ 带走 $W$—$Z$、$Y$—$Z$ 两条。剩下 3 条：$T$—$W$，$U$—$X$，$X$—$Y$。`,
+          { t: 'h4', text: '第 2 步：$W$ 还能走到 $Y$ 吗' },
+          T`$W$ 只连着 $T$，而 $T$ 没有别的边；$Y$ 在 $U$—$X$—$Y$ 那一块。两块之间没有边，$W$ 走不到 $Y$，所以 $W\perp Y\mid V,Z$ 成立。`,
+          { t: 'graphs', r: 15, caption: 'WK12 p7：删掉 $V,Z$ 后图断成两块。', items: [
+            Object.assign({}, WS2, { edges: WS2_EDGES, cls: { W: 'x', Y: 'y', V: 'given', Z: 'given' }, caption: '① 原图：灰色 $V,Z$ 是条件集' }),
+            Object.assign({}, WS2, { edges: 'U-V:gone V-W:gone V-Y:gone W-Z:gone Y-Z:gone T-W U-X X-Y', cls: { W: 'x', Y: 'y', V: 'removed', Z: 'removed' }, caption: T`② 删 $V,Z$：$\{T,W\}$ 和 $\{U,X,Y\}$ 不相连，成立` }),
+          ] },
+          {
+            t: 'exam', md: T`Yes. In a Markov random field, $X\perp Y\mid S$ holds when removing the nodes in $S$ separates $X$ from $Y$ (ordinary graph separation; no ancestral graph or moralisation is needed). Removing $V$ and $Z$ leaves only the edges $T$–$W$, $U$–$X$ and $X$–$Y$, so $W$ is connected only to $T$ and cannot reach $Y$. Hence $W\perp Y\mid V,Z$ holds.`,
+          },
+          {
+            t: 'warn', md: T`- **只删 $V$ 不够**：删掉 $V$ 后 $W$—$Z$—$Y$ 这条路还在，所以 $W\perp Y\mid V$ 不成立。快速检查法：$W$ 的邻居只有 $T,V,Z$，$T$ 是死胡同，$V$ 和 $Z$ 都被删了，$W$ 就出不去。
+- 不要把 BN 的步骤搬过来：MRF 的边没有方向，没有"父母"，不用取祖先图，也不用结婚加边。多加的边可能把本来分开的两点连起来，答案就反了。`,
+          },
+        ],
+      },
+
+      { t: 'h2', text: '7. 随机练习', id: 'practice' },
       '随机生成一张 DAG 和一个问题。先在纸上按四步法做，再看解答。',
       { t: 'practice', gen: 'dsep', title: 'D-separation 随机题' },
       {
@@ -145,6 +224,16 @@
             q: '同一张图 $A\\to C\\leftarrow B$，$C\\to D$，条件集为空。$A\\perp B$ 成立吗？',
             options: ['成立', '不成立'], answer: 0,
             explain: '祖先图只有 $\\{A,B\\}$（$C,D$ 不是它们的祖先），没有边 ⇒ 成立。',
+          },
+          {
+            q: T`Workshop 12 Q1（和 2026 practice Q4 同一题）：删掉 $V,W$ 以后，路径 $S$—$U$—$Y$—$Z$ 的第一段 $S$—$U$ 是从哪里来的？`,
+            options: [T`原图里就有边 $S\to U$`, T`$V$ 的两个父节点 $S,U$ 结婚`, T`$W$ 的两个父节点 $S,T$ 结婚`, T`$Z$ 的父节点两两结婚`], answer: 1,
+            explain: T`原图里 $S$ 只有两条边 $S\to V$、$S\to W$，没有 $S\to U$。$V$ 有两个父节点 $S$ 和 $U$，moralize 时给它们连上 $S$—$U$；这条边不碰 $V$ 和 $W$，删条件集时留了下来，于是 $S$ 能沿 $S$—$U$—$Y$—$Z$ 走到 $Z$。$W$ 的父母结婚得到的是 $S$—$T$，但删掉 $W$ 后 $T$ 只连着 $S$，是死胡同。$Z$ 的父母结婚得到 $V$—$W$、$V$—$Y$、$W$—$Y$，每条都碰到 $V$ 或 $W$，全被删掉了。`,
+          },
+          {
+            q: T`Workshop 12 Q2 的 MRF（边：$T$—$W$，$U$—$V$，$V$—$W$，$U$—$X$，$V$—$Y$，$W$—$Z$，$X$—$Y$，$Y$—$Z$），条件集只剩 $V$。$W\perp Y\mid V$ 成立吗？`,
+            options: ['成立', '不成立'], answer: 1,
+            explain: T`MRF 只看普通的图分离：删掉 $V$ 和它的 3 条边（$U$—$V$、$V$—$W$、$V$—$Y$），剩下 $T$—$W$、$U$—$X$、$W$—$Z$、$X$—$Y$、$Y$—$Z$。$W$—$Z$—$Y$ 这条路还在，$W$ 能走到 $Y$，所以不成立。原题把 $Z$ 也放进条件集，这条路才断开，原题因此成立。`,
           },
         ],
       },

@@ -43,8 +43,8 @@
     L20: { tag: 'L20', title: '速览 · 概率图模型', en: 'Probabilistic graphical models' },
     L21: { tag: 'L21', title: '速览 · 树上的推断（消息传递）', en: 'Inference on trees' },
     L22: { tag: 'L22', title: '速览 · 一般图上的推断（junction tree）', en: 'Inference on general graphs' },
-    L23: { tag: 'L23', title: '速览 · （课件未发布）', pending: true },
-    L24: { tag: 'L24', title: '速览 · （课件未发布）', pending: true },
+    L23: { tag: 'L23', title: '速览 · 学习 Bayesian network', en: 'Learning Bayesian networks' },
+    L24: { tag: 'L24', title: '速览 · 学习 Markov random field', en: 'Learning Markov random fields' },
 
     // v2 concept chapters (generated from COURSE_MAP §13)
     c01: { tag: '1', title: '概率：随机变量、期望、方差', lec: 'L01', src: 'L01 p11–p18', star: 1, chapter: true },
@@ -106,6 +106,11 @@
     c57: { tag: '57', title: 'Evidence 与 belief propagation', lec: 'L21', src: 'L21 p24–p37', star: 2, chapter: true },
     c58: { tag: '58', title: '消元找团、junction tree', lec: 'L22', src: 'L22 p4–p26', star: 3, chapter: true },
     c59: { tag: '59', title: '消元顺序', lec: 'L22', src: 'L22 p26–p33', star: 2, chapter: true },
+    c60: { tag: '60', title: 'BN 等价：什么时候两张图是同一个模型', lec: 'L23', src: 'L23 p3–p7', star: 2, chapter: true },
+    c61: { tag: '61', title: '完整数据学 BN：参数 MLE 与 BIC 分数', lec: 'L23', src: 'L23 p8–p22', star: 2, chapter: true },
+    c62: { tag: '62', title: 'Bayesian score 与结构搜索', lec: 'L23', src: 'L23 p23–p34', star: 2, chapter: true },
+    c63: { tag: '63', title: 'MRF 参数学习：moment matching', lec: 'L24', src: 'L24 p3–p12', star: 2, chapter: true },
+    c64: { tag: '64', title: 'MRF 结构学习：互信息与最大权生成树', lec: 'L24', src: 'L24 p13–p23', star: 2, chapter: true },
 
     // weekly review pages (js/ui/review.js)
     r01: { tag: 'R1', title: 'W1 复习：概率与统计学派', review: true },
@@ -119,6 +124,7 @@
     r09: { tag: 'R9', title: 'W9 复习：Bandits 与 Bayesian 回归', review: true },
     r10: { tag: 'R10', title: 'W10 复习：Bayesian 分类与图模型', review: true },
     r11: { tag: 'R11', title: 'W11 复习：图模型推断', review: true },
+    r12: { tag: 'R12', title: 'W12 复习：学习图模型', review: true },
 
     formulas: { title: '闭卷必背公式', countable: false },
     phrases: { title: '英文答题句式库', countable: false },
@@ -145,6 +151,7 @@
           { title: 'W9 · Bandits、Bayesian 回归', items: ['c47', 'c48', 'c49', 'c50', 'r09'] },
           { title: 'W10 · Bayesian 分类、图模型', items: ['c51', 'c52', 'c53', 'c54', 'c55', 'r10'] },
           { title: 'W11 · 图模型推断', items: ['c56', 'c57', 'c58', 'c59', 'r11'] },
+          { title: 'W12 · 学习图模型', items: ['c60', 'c61', 'c62', 'c63', 'c64', 'r12'] },
         ],
       },
       { id: 'types', title: '题型训练', items: ['T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09', 'T10', 'T11', 'T12', 'T13'] },
