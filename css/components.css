@@ -205,42 +205,72 @@ details.deep.notexam > summary { color: var(--muted); font-weight: 500; }
 details.deep.storyfold { border-color: color-mix(in srgb, #b07a2a 40%, var(--line)); background: transparent; }
 details.deep.storyfold > summary { color: #b07a2a; font-weight: 500; }
 
-/* printable outline (js/ui/outline.js): compact handout, English exam words, blank notes column */
+/* printable outline (js/ui/outline.js): compact two-column edition in the layout of the COMP90054 精简复习版 */
 .outline .ol-bar { display: flex; gap: 12px; align-items: center; margin: 0 0 1rem; }
-.outline .ol-row { display: grid; grid-template-columns: 1fr 12%; gap: 8px; }
-.outline .ol-notes { border-left: 1px dashed var(--line-2); }
-.outline .ol-h1 { font-weight: 700; font-size: 1.15em; }
-.outline .ol-head p { margin: 2px 0; }
-.outline .ol-week { margin-top: .9em; }
-.outline .ol-wtitle { font-weight: 700; font-size: 1.08em; border-bottom: 1.5px solid var(--ink); padding-bottom: 1px; }
-.outline .ol-story { margin: 2px 0 1px; }
-.outline .ol-ch { border-top: 1px solid var(--line-2); padding: 2px 0 3px; }
-.outline .ol-zht { color: var(--muted); font-size: .9em; }
-.outline .ol-meta { color: var(--muted); font-size: .85em; font-weight: 400; }
-.outline .ol-label { font-size: .85em; font-weight: 700; color: var(--accent); margin-right: 4px; }
-.outline .ol-key, .outline .ol-steps { margin: 1px 0 1px 1.2em; padding: 0; }
-.outline .ol-key li, .outline .ol-steps li { margin: 0; }
-.outline .ol-fxs { margin: 1px 0; }
-.outline .ol-f { display: inline; margin-right: 10px; }
-.outline .ol-fxt { color: var(--muted); font-size: .9em; }
-.outline .ol-sep { color: var(--muted); }
-.outline .ol-kzh { color: #555; font-size: .92em; }
-.outline .ol-exq, .outline .ol-pit1 { margin: 1px 0; }
+.outline.pc { line-height: 1.3; width: 65.8rem; max-width: none; }
+@media screen { .page:has(.outline.pc) { overflow-x: auto; } }
+.pc-cover h1 { margin: 0 0 2px; font-size: 1.45em; }
+.pc-cover p { margin: 2px 0 4px; }
+.pc-legend { font-size: .86em; color: var(--muted); line-height: 1.9; }
+.pc-chain { line-height: 1.8; font-size: .8em; margin: 4px 0 2px; }
+.pc-chip { display: inline-block; padding: 0 6px; border: 1px solid var(--line-2); border-radius: 6px; }
+.pc-chip small { margin-left: 4px; color: var(--muted); }
+.pc-arrow { margin: 0 4px; color: var(--muted); }
+.pc-flow { column-count: 2; column-gap: 16px; column-rule: 0.4pt solid var(--line-2); margin-top: 8px; }
+.pc-h2 { margin: 0 0 4px; font-size: 1.15em; break-after: avoid; }
+.pc-h3 { margin: 6px 0 4px; font-size: .98em; border-bottom: 1pt solid var(--ink); padding-bottom: 1px; break-after: avoid; }
+.pc-sub { font-size: .86em; color: var(--muted); margin: 0 0 4px; }
+.pc-fstep { break-inside: avoid; margin: 0 0 5px; padding-bottom: 3px; border-bottom: 0.4pt dashed var(--line-2); }
+.pc-fhead { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+.pc-chref { font-size: .74em; color: var(--accent); white-space: nowrap; }
+.pc-short { font-size: .9em; margin-left: .4em; }
+.pc-tex .katex-display { margin: .05em 0 .05em .4em; text-align: left; font-size: .92em; overflow: visible; }
+.pc-tex .katex-display > .katex { text-align: left; }
+.pc-must { break-inside: avoid; margin: 0 0 6px; padding-bottom: 4px; border-bottom: 0.5pt solid var(--line-2); font-size: .94em; }
+.pc-mhead { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.pc-look { font-size: .92em; color: var(--muted); margin: 1px 0; }
+ol.pc-steps { padding-left: 1.5em; margin: 2px 0; }
+ol.pc-steps li { margin: 1px 0; }
+.pc-papers { font-size: .8em; color: var(--muted); }
+.pc-weekhead { margin: 10px 0 2px; padding: 2px 0; border-bottom: 1.2pt solid var(--ink); break-after: avoid; font-size: 1.05em; }
+.pc-story { font-size: .84em; color: var(--muted); margin: 0 0 4px; line-height: 1.3; }
+.pc-ch { margin: 0 0 6px; padding-bottom: 3px; border-bottom: 0.5pt solid var(--line-2); }
+.pc-head { display: flex; gap: 5px; align-items: baseline; flex-wrap: wrap; margin-bottom: 2px; break-after: avoid; }
+.pc-num { font-weight: 700; color: var(--accent); }
+.pc-en { font-size: .78em; color: var(--muted); }
+.pc-pill { display: inline-block; font-size: .72em; font-weight: 700; padding: 0 5px; border-radius: 999px; white-space: nowrap; margin-right: 3px; line-height: 1.5; }
+.pc-pill.new { background: #1d4ed8; color: #fff; }
+.pc-pill.hot { background: #c2410c; color: #fff; }
+.pc-pill.key { border: 0.6pt solid #c2410c; color: #c2410c; }
+.pc-pill.low { border: 0.6pt solid var(--line-2); color: var(--muted); font-weight: 600; }
+.pc-pill.src { border: 0.6pt solid #1d4ed8; color: #1d4ed8; font-weight: 600; }
+.pc-formula { margin: 2px 0 3px; break-inside: avoid; }
+.pc-fname { font-size: .82em; color: var(--muted); }
+ul.pc-points { margin: 2px 0 0; padding-left: 0; list-style: none; }
+ul.pc-points li { position: relative; padding-left: 1.2em; margin: 2px 0; break-inside: avoid; }
+ul.pc-points li::before { content: '□'; position: absolute; left: 0; color: var(--muted); }
+.pc-zh { font-size: .86em; color: var(--muted); line-height: 1.28; }
+ul.pc-qa { margin: 3px 0 0; padding: 2px 0 0 6px; list-style: none; border-left: 2pt solid #c2410c; font-size: .86em; line-height: 1.35; }
+ul.pc-qa li { margin: 0 0 3px; break-inside: avoid; }
+.pc-qsrc { font-size: .82em; font-weight: 700; color: #c2410c; }
+table.pc-mini { display: inline-table; border-collapse: collapse; margin: 2px 4px; font-size: .9em; vertical-align: top; }
+table.pc-mini td, table.pc-mini th { border: 0.4pt solid var(--line-2); padding: 0 4px; text-align: center; }
+.pc-light { font-size: .82em; color: var(--muted); margin: 2px 0 4px; }
+.pc-notes { height: 3em; margin: 2px 0 8px; border: 0.5pt dashed var(--line-2); border-radius: 4px; padding: 2px 6px; font-size: .8em; color: var(--muted); break-inside: avoid; }
 .callout.examq { border-color: var(--line-2); }
 .examq-index .callout.examq details { margin-top: 4px; }
 .examq-index .callout.examq summary { cursor: pointer; color: var(--accent); font-size: .92em; }
 ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
 @media print {
   .noprint { display: none !important; }
-  @page { size: A4; margin: 6mm 6mm 7mm; }
-  .outline { font-size: 7.6pt; line-height: 1.2; color: #000; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  .outline .katex { font-size: 1.02em; }
-  .outline .ol-notes { border-left-color: #bbb; }
-  .outline .ol-label { color: #000; }
-  .outline .ol-exq { font-size: .84em; line-height: 1.16; }
-  .outline .ol-wtitle { break-after: avoid; }
-  .outline .ol-ctitle { break-after: avoid; }
-  .outline li, .outline .ol-exq, .outline .ol-pit1, .outline .ol-f { break-inside: avoid; }
+  @page { size: A4; margin: 9mm 9mm 10mm; }
+  /* the page is laid out 63rem wide on screen and on paper (so formula fitting measures the printed columns);
+     printing sets the root size to 11px, so 65.8rem = 724px fits the A4 text width and body text is about 8.2 pt */
+  html:has(.outline.pc) { font-size: 11px !important; }
+  .outline.pc { width: 65.8rem; font-size: 1rem; line-height: 1.3; color: #000; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .pc-flow { column-fill: auto; }
+  .pc-qa .pc-zh { display: none; }  /* page budget: the questions' Chinese stays on the site */
   body:has(.outline) .page-head { display: none; }
   html:has(.outline), body:has(.outline), body:has(.outline) .shell, body:has(.outline) .main, body:has(.outline) .page { background: #fff !important; }
+  body:has(.outline) .main, body:has(.outline) .page { max-width: none !important; padding: 0 !important; margin: 0 !important; }
 }

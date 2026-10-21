@@ -261,6 +261,17 @@ for (const pid of Object.keys(pages)) {
 }
 
 Object.values(global.SML.terms.all()).forEach((t) => checkMarkdownString(t.plain, 'terms', t.en));
+/* formula storyline (data/formula-chain.js) for the handout: chapter ids exist, formulas and text render */
+(global.SML.formulaChain || []).forEach((st, si) => {
+  checkMarkdownString(st.title, 'formulaChain', `[${si}].title`);
+  (st.steps || []).forEach((x, i) => {
+    const loc = `[${si}].steps[${i}]`;
+    if (!pages[x.ch]) addProblem('formulaChain', loc, 'unknown chapter ' + x.ch);
+    checkMarkdownString(x.name, 'formulaChain', loc + '.name');
+    checkTeX(x.tex, true, 'formulaChain', loc + '.tex');
+    checkMarkdownString(x.how || '', 'formulaChain', loc + '.how');
+  });
+});
 /* internal links: every #/id must be a page or a catalogue entry */
 for (const pid of Object.keys(pages)) {
   const text = JSON.stringify(pages[pid]);
