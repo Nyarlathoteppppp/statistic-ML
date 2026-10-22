@@ -305,13 +305,13 @@
     const bNeg = btn('让 r₁ 变成负数', () => { neg = !neg; k = 0; draw(); });
     const counter = node('span', 'pos');
     ui.tools.append(bPush, bBack, prev, next, bNeg, counter);
-    const picture = box(ui.body);
+    const given = box(ui.body), picture = box(ui.body);
     const pos = { v: [0.8, 2.3], r: [2.8, 2.3], u: [4.8, 2.3], z: [6.8, 2.3], L: [8.7, 2.3], w: [6.8, 0.55] };
     const edges = [['v', 'r'], ['r', 'u'], ['u', 'z'], ['z', 'L'], ['w', 'z']];
     function states() {
       const s = vals(), relu = neg ? '$r_1=' + n(s.r) + '<0$，ReLU 在这里是平的（输出恒为 0），斜率 $g\'(r_1)=0$' : '$r_1=' + n(s.r) + '>0$，ReLU 原样输出，斜率 $g\'(r_1)=1$';
       if (mode === 'push') return [
-        { e: [], hl: [], md: '先正常前向算一遍（$x_1=2$，$y=0$，其他隐藏单元给 $z$ 的贡献固定为 $-1.5$）：$r_1=v_{11}x_1+b=0.5\\times2' + (neg ? '-3.5' : '+0.5') + '=' + n(s.r) + '$，$u_1=\\text{ReLU}(r_1)=' + n(s.u) + '$，$z=w_1u_1-1.5=' + n(s.z) + '$，$L=\\tfrac12(z-y)^2=' + n(s.L) + '$。\n\n问题：**$v_{11}$ 动一点点，$L$ 会动多少？** 下面把 $v_{11}$ 加 0.01，看这点变化一节一节传到 $L$。' },
+        { e: [], hl: [], md: '先用上面的已知数正常前向算一遍：$r_1=v_{11}x_1+b=0.5\\times2' + (neg ? '-3.5' : '+0.5') + '=' + n(s.r) + '$，$u_1=\\text{ReLU}(r_1)=' + n(s.u) + '$，$z=w_1u_1-1.5=' + n(s.z) + '$，$L=\\tfrac12(z-y)^2=' + n(s.L) + '$。\n\n问题：**$v_{11}$ 动一点点，$L$ 会动多少？** 下面把 $v_{11}$ 加 0.01，看这点变化一节一节传到 $L$。' },
         { e: [0], hl: ['v', 'r'], md: '$v_{11}$ 加 0.01。因为 $r_1=v_{11}x_1+b$，$v_{11}$ 每加 1，$r_1$ 就加 $x_1=2$。所以 $r_1$ 加 $2\\times0.01=' + n(s.Dr) + '$。\n\n这一节的**倍数**是 $\\dfrac{\\partial r_1}{\\partial v_{11}}=x_1=2$。' },
         { e: [1], hl: ['r', 'u'], md: relu + '，所以 $u_1$ 加 $' + s.g + '\\times' + n(s.Dr) + '=' + n(s.Du) + '$。\n\n倍数 $\\dfrac{\\partial u_1}{\\partial r_1}=g\'(r_1)=' + s.g + '$。' + (neg ? '变化在这里**被挡住了**，后面都不会动。' : '') },
         { e: [2], hl: ['u', 'z'], md: '$z=w_1u_1+\\cdots$，$u_1$ 每加 1，$z$ 加 $w_1=2$。所以 $z$ 加 $2\\times' + n(s.Du) + '=' + n(s.Dz) + '$。\n\n倍数 $\\dfrac{\\partial z}{\\partial u_1}=w_1=2$。' },
@@ -333,6 +333,8 @@
       bPush.className = mode === 'push' ? 'btn primary' : 'btn'; bBack.className = mode === 'back' ? 'btn primary' : 'btn';
       bNeg.textContent = neg ? '让 r₁ 变回正数' : '让 r₁ 变成负数';
       prev.disabled = k === 0; next.disabled = k === st.length - 1; counter.textContent = '第 ' + (k + 1) + ' / ' + st.length + ' 步';
+      given.innerHTML = md('**已知**：输入 $x_1=2$，权重 $v_{11}=0.5$，偏置（bias）$b=' + n(s.b) + '$' + (neg ? '（点了"变成负数"后改成 $-3.5$）' : '') +
+        '，输出权重 $w_1=2$，其他隐藏单元给 $z$ 的贡献固定为 $-1.5$，真值 $y=0$。\n\n**前向公式**：$r_1=v_{11}x_1+b$，$u_1=\\text{ReLU}(r_1)=\\max(0,r_1)$，$z=w_1u_1-1.5$，$L=\\tfrac12(z-y)^2$。');
       picture.innerHTML = '';
       const pl = P().frame(picture, { w: 560, h: 230, x: [0, 9.5], y: [-0.1, 3.6], grid: false, axes: false, margin: { l: 4, r: 4, t: 6, b: 6 } });
       const mult = ['×x₁ = 2', '×ReLU′ = ' + s.g, '×w₁ = 2', '×(z−y) = ' + n(s.dz), '×u₁ = ' + n(s.u)];
