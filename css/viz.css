@@ -108,6 +108,7 @@ svg.plot .vec { stroke: var(--bad); stroke-width: 2.4; }
 svg.plot .vec.head { fill: var(--bad); stroke: none; }
 svg.plot .vec.b { stroke: var(--accent); } svg.plot .vec.b.head { fill: var(--accent); stroke: none; }
 svg.plot .vec.g { stroke: var(--good); } svg.plot .vec.g.head { fill: var(--good); stroke: none; }
+svg.plot .vec.m { stroke: var(--line-2); stroke-width: 1.6; } svg.plot .vec.m.head { fill: var(--line-2); stroke: none; }
 svg.plot .pt { fill: var(--accent); }
 svg.plot .pt.pos { fill: #c9463d; } svg.plot .pt.neg { fill: #3b78c4; }
 svg.plot .pt.ghost { fill: var(--line-2); }

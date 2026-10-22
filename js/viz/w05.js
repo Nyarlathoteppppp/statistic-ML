@@ -285,91 +285,90 @@
     draw();
   });
 
-  // c34 · the chain rule on one path v11 → r1 → u1 → z → L: nudge v11 forward, then multiply the same local factors back from L
+  // c34 · backprop on a standard drawing: inputs x0=1 (bias) and x1 → one ReLU unit (r1, u1) plus hidden bias u0=1 → output z → loss L.
+  // One stepper: forward, what a derivative means (nudge v11), then backward with the reason for every multiplication.
   SML.viz.register('chain-nudge', function (el) {
-    const ui = shell(el, '链式法则：往前推一下 / 从 L 往回乘');
-    const x = 2, v = 0.5, w = 2, c = -1.5, y = 0, h = 0.01;
-    let mode = 'push', k = 0, neg = false;
-    function vals() {
-      const b = neg ? -3.5 : 0.5, r = v * x + b, u = Math.max(0, r), g = r > 0 ? 1 : 0, z = w * u + c, L = 0.5 * (z - y) * (z - y);
-      const r2 = (v + h) * x + b, z2 = w * Math.max(0, r2) + c, L2 = 0.5 * (z2 - y) * (z2 - y);
-      const dz = z - y, du = dz * w, dr = du * g;
-      return { b: b, r: r, u: u, g: g, z: z, L: L, dz: dz, du: du, dr: dr, dv: dr * x, dw: dz * u,
-        Dr: x * h, Du: g * x * h, Dz: w * g * x * h, DL: dz * w * g * x * h, DLexact: L2 - L, L2: L2 };
-    }
+    const ui = shell(el, 'Backpropagation：前向 → 导数是什么 → 反向（每一步为什么这样算）');
+    const x1 = 2, v11 = 0.5, w0 = -1.5, w1 = 2, y = 0, h = 0.01;
+    let k = 0, neg = false;
     const n = (a) => f3(Math.abs(a) < 1e-12 ? 0 : a);
-    const bPush = btn('① 往前推一下', () => { mode = 'push'; k = 0; draw(); });
-    const bBack = btn('② 从 L 往回乘', () => { mode = 'back'; k = 0; draw(); });
+    function vals() {
+      const b = neg ? -3.5 : 0.5, r = b * 1 + v11 * x1, u = Math.max(0, r), g = r > 0 ? 1 : 0, z = w0 * 1 + w1 * u, L = 0.5 * (z - y) * (z - y);
+      const r2 = b + (v11 + h) * x1, z2 = w0 + w1 * Math.max(0, r2), L2 = 0.5 * (z2 - y) * (z2 - y);
+      const d = z - y, du = d * w1, eps = du * g;
+      return { b: b, r: r, u: u, g: g, z: z, L: L, L2: L2, d: d, du: du, eps: eps, gw0: d * 1, gw1: d * u, gb: eps * 1, gv: eps * x1 };
+    }
     const prev = btn('上一步', () => { k = Math.max(0, k - 1); draw(); });
     const next = btn('下一步', () => { k = Math.min(states().length - 1, k + 1); draw(); }, 'btn primary');
-    const bNeg = btn('让 r₁ 变成负数', () => { neg = !neg; k = 0; draw(); });
+    const again = btn('重来', () => { k = 0; draw(); });
+    const bNeg = btn('让 r₁ 变成负数', () => { neg = !neg; draw(); });
     const counter = node('span', 'pos');
-    ui.tools.append(bPush, bBack, prev, next, bNeg, counter);
+    ui.tools.append(prev, next, again, bNeg, counter);
     const given = box(ui.body), picture = box(ui.body);
-    const pos = { v: [0.8, 2.3], r: [2.8, 2.3], u: [4.8, 2.3], z: [6.8, 2.3], L: [8.7, 2.3], w: [6.8, 0.55] };
-    const edges = [['v', 'r'], ['r', 'u'], ['u', 'z'], ['z', 'L'], ['w', 'z']];
+    // nodes and edges of the drawing (data units: x 0–10, y −0.2–4.6)
+    const P0 = { x0: [0.9, 3.5], x1: [0.9, 1.5], r: [3.4, 2.5], u: [5.4, 2.5], u0: [5.4, 4.0], z: [7.6, 2.5], L: [9.4, 2.5] };
+    const E = [['x0', 'r'], ['x1', 'r'], ['r', 'u'], ['u0', 'z'], ['u', 'z'], ['z', 'L']];
+    const sx = 59.2, sy = 60, rad = 19;
+    function ends(a, b) {
+      const dx = (b[0] - a[0]) * sx, dy = (b[1] - a[1]) * sy, len = Math.hypot(dx, dy), f = (rad + 3) / len;
+      return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, b[0] - (b[0] - a[0]) * f, b[1] - (b[1] - a[1]) * f];
+    }
     function states() {
-      const s = vals(), relu = neg ? '$r_1=' + n(s.r) + '<0$，ReLU 在这里是平的（输出恒为 0），斜率 $g\'(r_1)=0$' : '$r_1=' + n(s.r) + '>0$，ReLU 原样输出，斜率 $g\'(r_1)=1$';
-      if (mode === 'push') return [
-        { e: [], hl: [], md: '先用上面的已知数正常前向算一遍：$r_1=v_{11}x_1+b=0.5\\times2' + (neg ? '-3.5' : '+0.5') + '=' + n(s.r) + '$，$u_1=\\text{ReLU}(r_1)=' + n(s.u) + '$，$z=w_1u_1-1.5=' + n(s.z) + '$，$L=\\tfrac12(z-y)^2=' + n(s.L) + '$。\n\n问题：**$v_{11}$ 动一点点，$L$ 会动多少？** 下面把 $v_{11}$ 加 0.01，看这点变化一节一节传到 $L$。' },
-        { e: [0], hl: ['v', 'r'], md: '$v_{11}$ 加 0.01。因为 $r_1=v_{11}x_1+b$，$v_{11}$ 每加 1，$r_1$ 就加 $x_1=2$。所以 $r_1$ 加 $2\\times0.01=' + n(s.Dr) + '$。\n\n这一节的**倍数**是 $\\dfrac{\\partial r_1}{\\partial v_{11}}=x_1=2$。' },
-        { e: [1], hl: ['r', 'u'], md: relu + '，所以 $u_1$ 加 $' + s.g + '\\times' + n(s.Dr) + '=' + n(s.Du) + '$。\n\n倍数 $\\dfrac{\\partial u_1}{\\partial r_1}=g\'(r_1)=' + s.g + '$。' + (neg ? '变化在这里**被挡住了**，后面都不会动。' : '') },
-        { e: [2], hl: ['u', 'z'], md: '$z=w_1u_1+\\cdots$，$u_1$ 每加 1，$z$ 加 $w_1=2$。所以 $z$ 加 $2\\times' + n(s.Du) + '=' + n(s.Dz) + '$。\n\n倍数 $\\dfrac{\\partial z}{\\partial u_1}=w_1=2$。' },
-        { e: [3], hl: ['z', 'L'], md: '$L=\\tfrac12(z-y)^2$ 在当前位置的斜率是 $z-y=' + n(s.dz) + '$。所以 $L$ 大约加 $' + n(s.dz) + '\\times' + n(s.Dz) + '=' + n(s.DL) + '$。\n\n倍数 $\\dfrac{\\partial L}{\\partial z}=z-y=' + n(s.dz) + '$。' },
-        { e: [0, 1, 2, 3], hl: ['v', 'r', 'u', 'z', 'L'], md: '**整条链的倍数 = 每一节的倍数相乘**：$2\\times' + s.g + '\\times2\\times' + n(s.dz) + '=' + n(s.dv) + '$。也就是 $v_{11}$ 动 0.01，$L$ 动约 $' + n(s.dv) + '\\times0.01=' + n(s.DL) + '$。真的把 $v_{11}=0.51$ 代进去重算一遍：$L$ 从 $' + n(s.L) + '$ 变成 $' + f4(s.L2) + '$，多了 $' + f4(s.DLexact) + '$，和估计的一样（差一点点是因为 0.01 不是无穷小）。\n\n这个"倍数"就是梯度：$\\dfrac{\\partial L}{\\partial v_{11}}=' + n(s.dv) + '$。**链式法则就是：沿着依赖链，把每一节的局部倍数乘起来。**' },
-      ];
+      const s = vals(), bTxt = n(s.b), neg1 = neg;
+      const reluWhy = neg1 ? '$r_1=' + n(s.r) + '<0$，ReLU 在这里是平的（输出恒为 0），$r_1$ 再动 $u_1$ 也不动，倍数 $=0$' : '$r_1=' + n(s.r) + '>0$，ReLU 在这里就是 $u_1=r_1$，$r_1$ 动 1，$u_1$ 也动 1，倍数 $=1$';
+      const F = 'f', B = 'b';
       return [
-        { e: [3], hl: ['z', 'L'], md: '往回推时，手里始终拿着一个数：**"这个节点动 1，$L$ 动多少"**。从最后一节开始：$L=\\tfrac12(z-y)^2$，所以\n\n$\\dfrac{\\partial L}{\\partial z}=z-y=' + n(s.dz) + '$。课件把它叫 $\\delta$（输出误差）。' },
-        { e: [2, 4], hl: ['u', 'z', 'w'], md: '往回穿过 $w_1$ 这条边，乘这一节的倍数 $w_1=2$：$\\dfrac{\\partial L}{\\partial u_1}=\\delta\\times w_1=' + n(s.dz) + '\\times2=' + n(s.du) + '$。\n\n顺手算出 $w_1$ 的梯度：$z=w_1u_1+\\cdots$，$w_1$ 每加 1，$z$ 加 $u_1=' + n(s.u) + '$，所以 $\\dfrac{\\partial L}{\\partial w_1}=\\delta\\times u_1=' + n(s.dz) + '\\times' + n(s.u) + '=' + n(s.dw) + '$。$w_1$ 在 ReLU 后面，到这里就算完了，不用管 ReLU。' },
-        { e: [1], hl: ['r', 'u'], md: '往回穿过 ReLU，乘 ReLU 的斜率：' + relu + '。\n\n$\\dfrac{\\partial L}{\\partial r_1}=' + n(s.du) + '\\times' + s.g + '=' + n(s.dr) + '$。课件把它叫 $\\varepsilon_1$（隐藏单元的误差）。' + (neg ? '它是 0：误差在这里被 ReLU 挡住了。' : '') },
-        { e: [0], hl: ['v', 'r'], md: '最后往回穿过 $v_{11}$ 这条边，乘倍数 $x_1=2$：\n\n$\\dfrac{\\partial L}{\\partial v_{11}}=\\varepsilon_1\\times x_1=' + n(s.dr) + '\\times2=' + n(s.dv) + '$。' },
-        { e: [0, 1, 2, 3, 4], hl: ['v', 'r', 'u', 'z', 'L', 'w'], md: (neg ? '$r_1<0$ 时 $u_1=0$，所以 $w_1$ 和 $v_{11}$ 的梯度都是 0：这个隐藏单元这一步什么都学不到。点"让 r₁ 变回正数"对比。\n\n' :
-          '和"① 往前推一下"量出来的 ' + n(s.dv) + ' 一样：两个方向乘的是**同一串倍数**（$' + n(s.dz) + '\\times2\\times1\\times2$），只是顺序反过来。\n\n') +
-          '**为什么要从 $L$ 往回乘？** 因为中间结果可以共用：$\\delta$ 算一次，所有连到 $z$ 的权重（$w_1,w_2,\\dots$）都用它；$\\varepsilon_1$ 算一次，所有连到 $r_1$ 的权重（$v_{11},v_{21},\\dots$）都用它。网络有一百万个权重，也只要从后往前走一遍。\n\n课件的四个公式就是刚才这四步：$\\delta=z-y$，$\\dfrac{\\partial L}{\\partial w_j}=\\delta u_j$，$\\varepsilon_j=\\delta w_jg\'(r_j)$，$\\dfrac{\\partial L}{\\partial v_{ij}}=\\varepsilon_jx_i$。' },
+        { part: '前向', e: [[0, F], [1, F]], hl: ['x0', 'x1', 'r'], md: '**前向第 1 步：隐藏单元先求加权和。** 每条边把起点的值乘上边上的权重送过去，在 $r_1$ 加起来：\n\n$r_1=b\\cdot x_0+v_{11}\\cdot x_1=' + bTxt + '\\times1+0.5\\times2=' + n(s.r) + '$\n\nbias 就是一条从常数节点 $x_0=1$ 出来的边，它的权重就是 $b$（课件写成 $v_{01}$）。' },
+        { part: '前向', e: [[2, F]], hl: ['r', 'u'], md: '**前向第 2 步：过激活函数。** $u_1=\\text{ReLU}(r_1)=\\max(0,r_1)=' + n(s.u) + '$。' },
+        { part: '前向', e: [[3, F], [4, F]], hl: ['u0', 'u', 'z'], md: '**前向第 3 步：输出层同样求加权和**（隐藏层也有一个 bias 节点 $u_0=1$）：\n\n$z=w_0\\cdot u_0+w_1\\cdot u_1=-1.5\\times1+2\\times' + n(s.u) + '=' + n(s.z) + '$（回归，输出不再过激活函数）。' },
+        { part: '前向', e: [[5, F]], hl: ['z', 'L'], md: '**前向第 4 步：算损失。** $L=\\tfrac12(z-y)^2=\\tfrac12(' + n(s.z) + '-0)^2=' + n(s.L) + '$。\n\n训练要让 $L$ 变小，所以要知道**每个权重往哪边调、调多少**，也就是每个权重的梯度 $\\partial L/\\partial(\\text{权重})$。前向时把 $r_1,u_1,z$ 都存下来，反向要用。' },
+        { part: '导数是什么', e: [[1, F], [2, F], [4, F], [5, F]], hl: ['r', 'u', 'z', 'L'], nudge: true, md: '**梯度的意思：这个权重动一点，$L$ 动几倍。** 拿 $v_{11}$ 试：把它加 0.01，变化顺着网络往后传，每过一节乘一个"倍数"：\n\n- $r_1=\\cdots+v_{11}x_1$：$v_{11}$ 动 1，$r_1$ 动 $x_1=2$。所以 $r_1$ 动 $0.02$。\n- ReLU 的倍数是 ' + s.g + '：$u_1$ 动 $' + n(0.02 * s.g) + '$。\n- $z=\\cdots+w_1u_1$：$u_1$ 动 1，$z$ 动 $w_1=2$。所以 $z$ 动 $' + n(0.04 * s.g) + '$。\n- $L=\\tfrac12(z-y)^2$ 的斜率是 $z-y=' + n(s.d) + '$：$L$ 动约 $' + n(0.04 * s.g * s.d) + '$。\n\n倍数连乘：$2\\times' + s.g + '\\times2\\times' + n(s.d) + '=' + n(s.gv) + '$，这就是 $\\partial L/\\partial v_{11}$（真把 $v_{11}=0.51$ 代进去重算，$L$ 变成 $' + f4(s.L2) + '$，确实多了约 $' + n(s.gv) + '\\times0.01$）。\n\n**问题**：每个权重都这样从头推一遍太慢。注意后半段"$\\times2\\times' + n(s.d) + '$"（$z$ 之后的部分）对 $b$、$v_{11}$ 都一样。反向传播就是**从 $L$ 往回，先把后半段算好，给前面所有权重共用**。' },
+        { part: '反向', e: [[5, B]], hl: ['z', 'L'], md: '**反向第 1 步：$L$ 对 $z$ 的导数。**\n\n- 要算：$\\delta=\\partial L/\\partial z$，意思是"$z$ 动 1，$L$ 动多少"。\n- 为什么这样算：$L=\\tfrac12(z-y)^2$，对 $z$ 求导就是 $z-y$。\n- 代数字：$\\delta=' + n(s.z) + '-0=' + n(s.d) + '$。\n\n从这里开始，每个节点都会得到一个"它动 1，$L$ 动多少"的数（红字）。' },
+        { part: '反向', e: [[3, B], [4, B]], hl: ['u0', 'u', 'z'], md: '**反向第 2 步：输出层权重 $w_0,w_1$ 的梯度。**\n\n- 为什么这样算：$z=w_0u_0+w_1u_1$。$w_1$ 只出现在 $w_1u_1$ 这一项里，$w_1$ 动 1，$z$ 就动 $u_1$（**这条边起点的值**）。$z$ 动 1，$L$ 又动 $\\delta$。两个倍数相乘。\n- 代数字：$\\dfrac{\\partial L}{\\partial w_1}=\\delta\\times u_1=' + n(s.d) + '\\times' + n(s.u) + '=' + n(s.gw1) + '$；$\\dfrac{\\partial L}{\\partial w_0}=\\delta\\times u_0=' + n(s.d) + '\\times1=' + n(s.gw0) + '$（bias 起点永远是 1，所以 bias 的梯度就是 $\\delta$ 本身）。\n\n规则：**权重的梯度 = 这条边终点的红字 × 这条边起点的值**。' },
+        { part: '反向', e: [[4, B]], hl: ['u', 'z'], md: '**反向第 3 步：把红字传到 $u_1$。** 想算更前面的 $b$、$v_{11}$，得先知道"$u_1$ 动 1，$L$ 动多少"。\n\n- 为什么乘 $w_1$：$z=w_0u_0+w_1u_1$，$u_1$ 动 1，$z$ 动 $w_1=2$；$z$ 动 1，$L$ 动 $\\delta$。\n- 代数字：$\\dfrac{\\partial L}{\\partial u_1}=\\delta\\times w_1=' + n(s.d) + '\\times2=' + n(s.du) + '$。\n\n**往回传要乘权重，就是因为权重正是"前一个节点到后一个节点"的倍数。** 这一步必须在第 1 步之后：不知道 $\\delta$，就算不出它。所以只能从 $L$ 往回算。' },
+        { part: '反向', e: [[2, B]], hl: ['r', 'u'], md: '**反向第 4 步：穿过 ReLU，传到 $r_1$。**\n\n- 为什么乘 ReLU 的斜率：' + reluWhy + '。\n- 代数字：$\\varepsilon_1=\\dfrac{\\partial L}{\\partial r_1}=\\dfrac{\\partial L}{\\partial u_1}\\times\\text{ReLU}\'(r_1)=' + n(s.du) + '\\times' + s.g + '=' + n(s.eps) + '$。课件把它叫 $\\varepsilon_1$（隐藏单元的误差）。' + (neg1 ? '\n\n它是 0：误差在这里被 ReLU 挡住，前面的权重都学不到东西。' : '') },
+        { part: '反向', e: [[0, B], [1, B]], hl: ['x0', 'x1', 'r'], md: '**反向第 5 步：隐藏层权重 $b$、$v_{11}$ 的梯度。** 和第 2 步同一条规则：\n\n- 为什么：$r_1=b\\cdot x_0+v_{11}\\cdot x_1$，$v_{11}$ 动 1，$r_1$ 动 $x_1$（这条边起点的值）。\n- 代数字：$\\dfrac{\\partial L}{\\partial v_{11}}=\\varepsilon_1\\times x_1=' + n(s.eps) + '\\times2=' + n(s.gv) + '$（和"导数是什么"那一步推出来的一样）；$\\dfrac{\\partial L}{\\partial b}=\\varepsilon_1\\times x_0=' + n(s.eps) + '\\times1=' + n(s.gb) + '$。' },
+        { part: '总结', e: [[0, B], [1, B], [2, B], [3, B], [4, B], [5, B]], hl: ['r', 'u', 'z', 'L'], md: '**反向传播只用两条规则：**\n\n1. **节点往回传**：前一个节点的红字 = 后一个节点的红字 × 两者之间的倍数。两个节点之间是一条边，倍数就是边上的**权重**；两个节点之间是激活函数，倍数就是它的**斜率**。要先有后面的红字，才能算前面的，所以从 $L$ 往回算。一个节点连向好几个节点时，各条路算出来的**相加**。\n2. **权重的梯度** = 这条边**终点的红字 × 起点的值**。\n\n对上课件的四个公式：$\\delta=z-y$；$\\dfrac{\\partial L}{\\partial w_j}=\\delta u_j$（规则 2）；$\\varepsilon_j=\\delta w_j\\,g\'(r_j)$（规则 1，乘权重再乘斜率）；$\\dfrac{\\partial L}{\\partial v_{ij}}=\\varepsilon_jx_i$（规则 2）。\n\n最后用这些梯度一起更新：$\\text{权重}\\leftarrow\\text{权重}-\\eta\\times\\text{梯度}$（全部用更新前的旧权重算）。' },
       ];
     }
     function draw() {
       const s = vals(), st = states(), cur = st[k];
-      bPush.className = mode === 'push' ? 'btn primary' : 'btn'; bBack.className = mode === 'back' ? 'btn primary' : 'btn';
+      prev.disabled = k === 0; next.disabled = k === st.length - 1;
+      counter.textContent = cur.part + ' · 第 ' + (k + 1) + ' / ' + st.length + ' 步';
       bNeg.textContent = neg ? '让 r₁ 变回正数' : '让 r₁ 变成负数';
-      prev.disabled = k === 0; next.disabled = k === st.length - 1; counter.textContent = '第 ' + (k + 1) + ' / ' + st.length + ' 步';
-      given.innerHTML = md('**已知**：输入 $x_1=2$，权重 $v_{11}=0.5$，偏置（bias）$b=' + n(s.b) + '$' + (neg ? '（点了"变成负数"后改成 $-3.5$）' : '') +
-        '，输出权重 $w_1=2$，其他隐藏单元给 $z$ 的贡献固定为 $-1.5$，真值 $y=0$。\n\n**前向公式**：$r_1=v_{11}x_1+b$，$u_1=\\text{ReLU}(r_1)=\\max(0,r_1)$，$z=w_1u_1-1.5$，$L=\\tfrac12(z-y)^2$。');
+      given.innerHTML = md('**已知**：输入 $x_1=2$；bias 输入 $x_0=1$、$u_0=1$（永远是 1）；隐藏层权重 $b=' + n(s.b) + '$' + (neg ? '（点了"变成负数"后改成 $-3.5$）' : '') + '、$v_{11}=0.5$；输出层权重 $w_0=-1.5$、$w_1=2$；真值 $y=0$。');
       picture.innerHTML = '';
-      const pl = P().frame(picture, { w: 560, h: 230, x: [0, 9.5], y: [-0.1, 3.6], grid: false, axes: false, margin: { l: 4, r: 4, t: 6, b: 6 } });
-      const mult = ['×x₁ = 2', '×ReLU′ = ' + s.g, '×w₁ = 2', '×(z−y) = ' + n(s.dz), '×u₁ = ' + n(s.u)];
-      edges.forEach((ed, j) => {
-        const a = pos[ed[0]], b = pos[ed[1]], on = cur.e.indexOf(j) >= 0;
-        pl.line(a[0], a[1], b[0], b[1], on ? 'curve bad' : 'curve thin prior');
-        if (j === 4) pl.text(a[0] + 0.15, a[1] + 0.5, mult[j], on ? 'note r' : 'note', 'start');
-        else pl.text((a[0] + b[0]) / 2, a[1] + 0.32, mult[j], on ? 'note r' : 'note');
+      const pl = P().frame(picture, { w: 600, h: 300, x: [0, 10], y: [-0.2, 4.6], grid: false, axes: false, margin: { l: 4, r: 4, t: 6, b: 6 } });
+      const act = {}; cur.e.forEach((p) => { act[p[0]] = p[1]; });
+      E.forEach((ed, j) => {
+        const c = ends(P0[ed[0]], P0[ed[1]]);
+        if (act[j] === 'b') pl.arrow(c[2], c[3], c[0], c[1], 'vec');
+        else pl.arrow(c[0], c[1], c[2], c[3], act[j] === 'f' ? 'vec b' : 'vec m');
       });
-      const label = { v: 'v₁₁', r: 'r₁', u: 'u₁', z: 'z', L: 'L', w: 'w₁' };
-      const value = { v: '= 0.5', r: '= ' + n(s.r), u: '= ' + n(s.u), z: '= ' + n(s.z), L: '= ' + n(s.L), w: '= 2' };
-      Object.keys(pos).forEach((id) => {
-        const p = pos[id];
-        pl.dot(p[0], p[1], 17, cur.hl.indexOf(id) >= 0 ? 'pt hit big' : 'pt ghost big');
-        const t = pl.text(p[0], p[1], label[id], 'note'); t.setAttribute('dominant-baseline', 'central');
-        if (id === 'z') pl.text(p[0] - 0.12, p[1] - 0.62, value[id], 'note', 'end');
-        else pl.text(p[0], p[1] - (id === 'w' ? 0.5 : 0.62), value[id], 'note');
+      const wl = [['b = ' + n(s.b), 2.15, 3.33], ['v₁₁ = 0.5', 2.15, 1.67], ['ReLU', 4.4, 2.78], ['w₀ = −1.5', 6.75, 3.55], ['w₁ = 2', 6.5, 2.17], ['½(z−y)²', 8.5, 2.78]];
+      wl.forEach((t, j) => pl.text(t[1], t[2], t[0], act[j] ? (act[j] === 'b' ? 'note r' : 'note a') : 'note'));
+      const lab = { x0: 'x₀', x1: 'x₁', r: 'r₁', u: 'u₁', u0: 'u₀', z: 'z', L: 'L' };
+      const val = { x0: '= 1', x1: '= 2', r: '= ' + n(s.r), u: '= ' + n(s.u), u0: '= 1', z: '= ' + n(s.z), L: '= ' + n(s.L) };
+      Object.keys(P0).forEach((id) => {
+        const p = P0[id];
+        pl.dot(p[0], p[1], rad, cur.hl.indexOf(id) >= 0 ? 'pt hit big' : 'pt ghost big');
+        const t = pl.text(p[0], p[1], lab[id], 'note'); t.setAttribute('dominant-baseline', 'central');
+        if (id === 'u0') pl.text(p[0] - 0.42, p[1], val[id] + '（bias）', 'note', 'end');
+        else pl.text(p[0], p[1] - 0.56, val[id] + (id === 'x0' ? '（bias）' : ''), 'note');
       });
-      const top = {};
-      if (mode === 'push') {
-        if (k >= 1) { top.v = 'Δ = +0.01'; top.r = 'Δ = +' + n(s.Dr); }
-        if (k >= 2) top.u = 'Δ = +' + n(s.Du);
-        if (k >= 3) top.z = 'Δ = +' + n(s.Dz);
-        if (k >= 4) top.L = 'Δ ≈ +' + n(s.DL);
-      } else {
-        top.z = '∂L/∂z = ' + n(s.dz);
-        if (k >= 1) { top.u = '∂L/∂u₁ = ' + n(s.du); top.w = '∂L/∂w₁ = ' + n(s.dw); }
-        if (k >= 2) top.r = '∂L/∂r₁ = ' + n(s.dr);
-        if (k >= 3) top.v = '∂L/∂v₁₁ = ' + n(s.dv);
+      // red numbers: node sensitivities and weight gradients collected so far; blue: changes in the nudge step
+      const back = st.slice(0, k + 1).filter((x) => x.part === '反向' || x.part === '总结').length;
+      const red = [];
+      if (cur.nudge) {
+        red.push(['Δ = +0.01', 2.15, 1.37, 'note a'], ['Δ = +0.02', 3.4, 3.08, 'note a'], ['Δ = +' + n(0.02 * s.g), 5.4, 3.08, 'note a'],
+          ['Δ = +' + n(0.04 * s.g), 7.45, 3.08, 'note a', 'start'], ['Δ ≈ +' + n(0.04 * s.g * s.d), 9.4, 3.08, 'note a']);
       }
-      Object.keys(top).forEach((id) => {
-        const p = pos[id];
-        if (id === 'w') pl.text(p[0] - 0.35, p[1], top[id], 'note r', 'end');
-        else pl.text(p[0], p[1] + 0.85 + (id === 'v' || id === 'u' || id === 'L' ? 0.32 : 0), top[id], 'note r');
-      });
+      if (back >= 1) red.push(['δ = ∂L/∂z = ' + n(s.d), 7.45, 3.08, 'note r', 'start']);
+      if (back >= 2) red.push(['∂L/∂w₀ = ' + n(s.gw0), 6.75, 3.85, 'note r'], ['∂L/∂w₁ = ' + n(s.gw1), 6.5, 1.87, 'note r']);
+      if (back >= 3) red.push(['∂L/∂u₁ = ' + n(s.du), 5.4, 3.08, 'note r']);
+      if (back >= 4) red.push(['ε₁ = ∂L/∂r₁ = ' + n(s.eps), 3.4, 3.08, 'note r'], ['×ReLU′ = ' + s.g, 4.4, 2.22, 'note r']);
+      if (back >= 5) red.push(['∂L/∂b = ' + n(s.gb), 2.15, 3.63, 'note r'], ['∂L/∂v₁₁ = ' + n(s.gv), 2.15, 1.37, 'note r']);
+      red.forEach((t) => pl.text(t[1], t[2], t[0], t[3], t[4]));
       ui.out.innerHTML = md(cur.md);
     }
     draw();
