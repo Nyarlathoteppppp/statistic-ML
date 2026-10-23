@@ -74,6 +74,9 @@
     ],
     intuition: [
       T`**平底山谷 vs 碗。** 共线时 RSS 曲面沿着 $w_1+w_2=$ 常数的方向是**平的**（L05 p11：一条水平的谷底）——凸但不严格凸，谷底每一点都是最优。加上 $\lambda\|\bw\|^2$（一个以原点为中心的碗）后，整个曲面在所有方向都向上弯，变成**严格凸**，最低点唯一（L05 p14）。`,
+      { t: 'slide', src: 'L05/p11', caption: '共线时 RSS 曲面沿 $w_1+w_2=$ 常数的方向是**平的**：图上标 unstable 的那条谷底，整条线上每一点误差都一样，所以最优解不唯一。' },
+      { t: 'slide', src: 'L05/p14', caption: T`同一个曲面加上 $\lambda\|\bw\|^2$ 之后变成处处向上弯的碗（标 stable），最低点唯一——这就是「每个特征值加 $\lambda$」的几何含义。` },
+      T`把两页放在一起看：二次曲面的**特征值就是它在这个方向上的弯曲程度**。特征值 0 = 那个方向完全平（像山谷的谷底，沿它走多远误差都不变）；加上 $\lambda\mathbf I$ 等于给每个方向的弯曲程度都加 $\lambda$，最平的方向也变弯了，于是有了唯一的最低点。`,
       T`**特征值加 $\lambda$。** $\mathbf X'\mathbf X$ 是 PSD，特征值 $\ge0$；有 0 就不可逆。$\mathbf X'\mathbf X+\lambda\mathbf I$ 的特征值是原来的每个加 $\lambda$（若 $\bv$ 是 $\mathbf A$ 的特征向量、特征值 $\mu$，则 $(\mathbf A+\lambda\mathbf I)\bv=\mathbf A\bv+\lambda\bv=(\mu+\lambda)\bv$——同一个特征向量，特征值加 $\lambda$），全部 $\ge\lambda>0$ ⇒ 正定 ⇒ 可逆。`,
       { t: 'think', q: T`在克隆特征的例子里，ridge 会怎么在 $w_1$ 和 $w_2$ 之间"分配"？`, a: T`平均分配。因为 $w_1+w_2$ 固定时，$w_1^2+w_2^2$ 在 $w_1=w_2$ 时最小——ridge 惩罚偏好"把权重摊开"。下面例 1 就算出 $w_1=w_2$。` },
       { t: 'story', title: 'Ridge 名字的由来', md: 'Hoerl 和 Kennard 在 1970 年提出 ridge regression，用来处理工程数据里的共线问题。名字来自他们分析时画的"ridge trace"（岭迹）——系数随 $\\lambda$ 变化的曲线。同样的想法在数学里更早就有，叫 Tikhonov 正则化。' },
@@ -240,6 +243,8 @@
       { t: 'h3', text: '④ Lasso 也是 MAP：Laplace 先验（L05 p18）' },
       T`把 Gaussian 先验换成在 0 处有尖角的 **Laplace 先验**，同样的三步就得到 lasso：`,
       T`$p(\bw)\propto e^{-\alpha\|\bw\|_1}$，取 log 得 $-\alpha\|\bw\|_1$。和 Gaussian 似然 $-\frac{1}{2\sigma^2}\text{RSS}$ 相加后乘 $2\sigma^2$，就是 $\text{RSS}+\lambda\|\bw\|_1$，其中 $\lambda=2\sigma^2\alpha$（课件简写成同一个 $\lambda$，常数因子不影响结论）。为什么稀疏：$\log$ 先验 $-\alpha|w|$ 在 0 处有一个**尖角**（不可导），这个尖角能把最优点"卡"在 $w=0$；Gaussian 的 $-w^2$ 在 0 处是平滑的，没有这个效果。`,
+      { t: 'slide', src: 'L05/p18', caption: '最后一列就是两种先验的形状：Gaussian 是平滑的钟形，Laplace 在 0 处有一个尖峰。中间两列的圆和菱形是对应的约束区域（前两章已经用过）。' },
+      T`**尖峰为什么等于稀疏。** 先验说的是「离 0 越远越不可能」：高斯先验在 0 附近几乎是平的，把 $w$ 从 0 挪一小步几乎不损失概率，所以数据稍一支持，最优点就挪出去；Laplace 先验在 0 处是尖的，一离开 0 概率就按线性速度掉，代价很大，于是数据不够强时最优点干脆停在 $w=0$。换成导数的说法更直白：ridge 的惩罚在 0 处导数为 0，没有力把 $w$ 推向 0；lasso 的惩罚在 0 处左右导数分别是 $\pm\lambda$，总有一个不小于 $\lambda$ 的力把 $w$ 按在 0 上——数据给出的「拉力」$\bx'\by$ 不够大，就按不动。`
     ],
     why: [
       T`这一章把 W1 的 Bayesian（c08）和 W3 的正则化连起来：**"加惩罚项" ⇔ "加先验"**。这是课程里最常被考的"联系"之一（T13：MLE vs MAP、ridge vs lasso）。`,
@@ -373,6 +378,8 @@
     what: [
       T`c16 说正则化能防止 overfitting（过拟合），但"太简单"和"太复杂"在数据上分别长什么样，还没看过。看课件的同一批带噪声的数据：`,
       T`**L05 p21–p24 的例子**：50 个点来自 $y=x\sin x$ 加噪声。`,
+      { t: 'slide', src: 'L05/p23', caption: T`黑点是 50 个训练点。蓝实线是直线（欠拟合），蓝虚线是光滑曲线（过拟合）：它几乎穿过每个点，却在点之间上下乱摆——真实函数 $x\sin x$ 的波形被噪声盖住了。` },
+      T`注意看虚线的**摆动幅度**：它跟着每个点的随机起伏走，而这些起伏是噪声，换一批数据就完全变了。记住这个画面——c19 会给它一个名字：高 variance（方差）。`,
       { t: 'ul', items: [
         T`**Underfitting（欠拟合）**（p22）：用直线 $y=wx+b$ 拟合——模型太简单，抓不住波浪形，训练误差和测试误差都大。`,
         T`**Overfitting（过拟合）**（p23）：用一条穿过每个点的光滑曲线（非参数平滑）——训练误差为 0，但曲线在点之间乱摆，测试误差极大。`,
@@ -405,7 +412,10 @@
       T`误差曲线：训练 $E_{\text{RMS}}$ 随 $\lambda$ 增大而单调上升；测试 $E_{\text{RMS}}$ 先降后升，在 $\ln\lambda\approx-18$ 附近最小。`,
       { t: 'h3', text: '训练 vs 测试误差（L05 p39）' },
       T`横轴从简单到复杂：训练误差单调下降趋于 0；测试误差呈 **U 形**。左边是 underfit 区，右边是 overfit 区，最低点是最佳复杂度。`,
+      { t: 'slide', src: 'L05/p39', caption: '两条线的形状就是全章重点：Training error 一路单调下降，Test error 先降后升。最低点左边欠拟合，右边过拟合。' },
+      T`这张图直接解释了为什么不能按训练误差挑模型：它在整条横轴上只会往右指（越复杂越好）。而想找的是测试误差的**最低点**，它在中间——所以必须留出没参与训练的数据来打分。`,
       { t: 'note', title: '最后一步别忘了', md: '模型选择完成后要**用全部数据（训练 + 验证）重新训练**选中的模型（L05 p25 第 4 步）。' },
+      { t: 'graph', nodes: { D: [60, 130], TR: [210, 50], VA: [210, 210], M: [370, 50], P: [510, 130], R: [660, 130] }, edges: 'D>TR=切分 D>VA=切分 TR>M=每个_d_训练 M>P=评分 P>VA=选最小 P>R=重训', labels: { D: '数据', TR: 'D_train', VA: 'D_validate', M: 'f_d', P: 'd̂', R: 'f_d̂' }, notes: { D: '全部数据', VA: '只在选模型时用', R: '最终的模型' }, cls: { P: 'hl', R: 'given' }, w: 560, caption: T`显式模型选择：先把数据切成两份，在 $D_{\text{train}}$ 上把每个候选次数 $d$ 都训练一遍（$f_d$），在 $D_{\text{validate}}$ 上打分，选出验证误差最小的 $\hat d$（蓝），最后用**全部**数据重训 $f_{\hat d}$。测试集全程不碰。` },
     ],
     fx: [
       {
@@ -516,6 +526,7 @@
         T`**Irreducible error（不可约误差）**：$\mathrm{Var}[Y]$，数据本身的噪声，任何模型都消除不了。下式左边的 $\mathbb E$ **同时**对训练集 $D$ 的随机性（影响 $\hat f$）和测试标签的噪声（影响 $Y$）求平均。`,
       ] },
       { t: 'math', tex: T`\mathbb E\big[(Y-\hat f)^2\big]=\underbrace{\big(\mathbb E[Y]-\mathbb E[\hat f]\big)^2}_{\text{bias}^2}+\underbrace{\mathrm{Var}[\hat f]}_{\text{variance}}+\underbrace{\mathrm{Var}[Y]}_{\text{irreducible error}}` },
+      T`**这个期望你看不见。** 现实里你只拿到一份数据、只训练出一个 $\hat f$，所以 bias² 和 variance 都**不是能算出来的数**——它们是思想实验：假装把数据重新采很多次。这就是为什么式子里要对 $D$ 求期望（描述「换一批数据」的平均表现），也是为什么 $Y$ 与 $D$ 独立（测试点没参与训练）。它的用途是**解释过拟合**，而不是做题时拿来算。`
     ],
     why: [
       T`这是往年简答的高频题（T13 预测："State the bias–variance decomposition and what increases each term"）。它也是理解正则化、模型选择、集成方法（如 bagging 降 variance）的统一框架。`,
@@ -671,6 +682,7 @@
         ['理想', '小', '小（且接近 $\\hat R$）'],
       ] },
       T`真实风险的定义（L06 p14）：$R[f]=\int l(Y,f(X))\,P(X,Y)\,dX\,dY$。对 0-1 loss，它就是**泛化误差（generalisation error，期望测试错误率）**。`,
+      { t: 'graph', nodes: { P: [60, 80], D: [60, 200], F: [250, 140], RH: [430, 70], R: [460, 210] }, edges: 'P>D=抽样 D>F=ERM F>RH=数错误 F>R=求期望 P>R:moral', labels: { P: 'P 未知', D: 'D', F: 'f̂_D', RH: 'R̂_D', R: 'R[f̂_D]' }, notes: { F: '与数据有关，是随机的', RH: '算得出：训练错误率', R: '算不出：泛化误差' }, cls: { P: 'given', F: 'hl', R: 'y' }, w: 500, caption: T`两个风险在这里分岔。左边是现实：分布 $P$ 未知，只能抽到一份训练集 $D$；$D$ 经 ERM 决定 $\hat f_D$（所以 $\hat f_D$ 跟数据一样是随机的）。往右上走，把 $\hat f_D$ 拿到 $D$ 上数错误，得到能算的经验风险；往右下走，把 $\hat f_D$ 放回未知的 $P$ 上求期望，得到真正关心的真实风险——它算不出，只能被上界估计（c21）。` },
     ],
     fx: [
       {
@@ -795,12 +807,15 @@
       { t: 'h3', text: '③ 用它来选模型类：SRM（L06 p18）' },
       T`**Structural Risk Minimisation（SRM，结构风险最小化）**（L06 p18）：有多个候选模型类时（如单特征类 vs 多特征类），选使"经验风险 + 惩罚项"最小的那个类。`,
       T`**SRM 的权衡**（L06 p18）：简单类经验风险大、惩罚小；复杂类经验风险小、惩罚大——和 c19 的 bias–variance 是同一个故事的另一种讲法。`,
+      { t: 'slide', src: 'L06/p18', caption: T`两个括号就是取舍本身：左边 $\hat R_D[\hat f_D]$ 对简单类大、对复杂类小；右边根号里的惩罚对简单类小（$|\mathcal F|$ 小）、对复杂类大。SRM 选两者之和最小的类。` },
+      T`换个名字就是 c19：左边是 bias（简单类压不下去的训练误差），右边是 variance（类太大带来的不确定性）。所以「用最复杂的类」和「用最简单的类」都不对，答案在中间——正是 bias–variance 那条 U 形曲线的最低点。`,
     ],
     why: [
       T`这是第一次给"过拟合"一个**定量**的回答：真实风险最多比训练风险高 $\varepsilon$，而 $\varepsilon$ 由模型复杂度和样本量决定。T12 的泛化界计算题就基于它；c24 的 VC 界是同一个形状，只是把 $\log|\mathcal F|$ 换成和 VC 维相关的量。`,
     ],
     intuition: [
       { t: 'think', q: '样本量变成 4 倍，$\\varepsilon$ 变成原来的几倍？', a: T`$\varepsilon\propto1/\sqrt n$，所以变成 $1/2$。` },
+      T`**这个根号是怎么来的。** 想同时信任 $|\mathcal F|=8$ 个候选，就不能给每个只要求 $1-\delta$：用 union bound，让每个分类器的「坏概率」不超过 $\delta/8$，8 个加起来才不超过 $\delta$。Hoeffding 说，$n$ 个样本下，一个固定分类器的偏差超过 $\varepsilon$ 的概率不超过 $e^{-2n\varepsilon^2}$。令它等于 $\delta/|\mathcal F|$ 再解出 $\varepsilon$，就得到 $\sqrt{(\log|\mathcal F|+\log(1/\delta))/(2n)}$——$\log|\mathcal F|$ 来自「$\delta$ 要除以 $|\mathcal F|$」，根号来自解指数方程。`,
       { t: 'story', title: 'Hoeffding 与 PAC', md: 'Hoeffding 不等式来自 Wassily Hoeffding 1963 年的论文。把它和 union bound 结合来分析学习算法，是 Leslie Valiant 1984 年提出的 PAC（Probably Approximately Correct）学习框架的核心思想——"大概率（probably）近似正确（approximately correct）"正是这个界的形状。Valiant 因此获得 2010 年图灵奖。' },
     ],
     math: [
