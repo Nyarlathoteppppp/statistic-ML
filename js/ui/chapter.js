@@ -76,7 +76,7 @@
     if (b.pages) h += '<span class="badge src">课件 ' + SML.md.esc(b.pages) + '</span>';
     (b.types || []).forEach((t) => { const m = SML.app.metaOf(t); h += '<a class="badge type" href="#/' + t + '">练 ' + m.tag + ' ' + SML.md.esc(m.title) + '</a>'; });
     h += '</div>';
-    if (b.notExam) h += '<div class="callout ext"><div class="ctitle">不考的部分</div>' + md(b.notExam) + '</div>';
+    if (b.notExam) h += '<div class="callout ext"><div class="ctitle">不考或优先级最低的部分</div>' + md(b.notExam) + '</div>';
     if (b.goals.length) h += '<div class="ch-goals"><b>学完本章你应该能</b><ul>' + b.goals.map((g) => '<li>' + inline(g) + '</li>').join('') + '</ul></div>';
     if (b.prereq.length) h += '<div class="ch-prereq">先修：' + b.prereq.map((p) => '<a href="#/' + p + '">' + SML.md.esc(SML.app.metaOf(p).tag || p) + ' ' + SML.md.esc(SML.app.metaOf(p).title || '') + '</a>').join('，') + '</div>';
     if (b.symbols && b.symbols.length) {

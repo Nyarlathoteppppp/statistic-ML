@@ -67,7 +67,7 @@
         q: 'Design a system for alerting residents of the Dandenongs that they should evacuate for an impending bushfire. If any of three sensors $S_1,S_2,S_3$ are ‘on’ then residents should evacuate. However if either of the closer sensors $C_1,C_2$ are ‘on’ then residents should stay put. (a) Model the problem as a directed PGM relating $S_1,S_2,S_3,C_1,C_2$ and an additional random variable $A$ for alerting residents to evacuate. (b) How many CPTs should be specified, and what should these tables’ dimensions be? (c) Suppose the sensors are always accurate. What could you say about your CPTs? *(2025 also:)* (d) How would you change your model if sensor $S_1$ is not perfectly accurate? (e) Given this final model, how would you use it to drive the alarm?',
         qzh: '设计一个系统，在山火（bushfire）即将来临时提醒丹德农山区（Dandenongs）的居民撤离。如果三个传感器 $S_1,S_2,S_3$ 中任意一个为"开"（on），居民就应撤离。但如果较近的两个传感器 $C_1,C_2$ 中任意一个为"开"，居民就应留在原地。(a) 把这个问题建模为一个有向概率图模型（directed PGM），关联 $S_1,S_2,S_3,C_1,C_2$ 以及一个额外的随机变量 $A$（提醒居民撤离）。(b) 需要指定多少张条件概率表（CPT），这些表的维度应是多少？(c) 假设传感器总是准确的。关于你的 CPT 能说些什么？*（2025 年还有：）* (d) 如果传感器 $S_1$ 不是完全准确的，你会怎样修改模型？(e) 有了这个最终模型，你会如何用它来驱动警报？',
         azh: T`(a) 节点 $S_1,S_2,S_3,C_1,C_2,A$；边 $S_1\to A$、$S_2\to A$、$S_3\to A$、$C_1\to A$、$C_2\to A$，即 $P(S_1)P(S_2)P(S_3)P(C_1)P(C_2)P(A\mid S_1,S_2,S_3,C_1,C_2)$。
-(b) 六张 CPT：五张传感器的 $2\times1$ 表，以及一张给定五个父节点时 $A$ 的 $2\times2^5=2\times32$ 表。
+(b) 六张 CPT：五张传感器的 $2\times1$ 表，以及一张给定五个父节点时 $A$ 的 $2\times2^5=2\times32$ 表。（2025 原题按变量数算列：传感器表各 1 列，$A$ 的表 6 列。）
 (c) $A$ 的 CPT 变成确定性的（deterministic，所有条目都是 0 或 1）：当且仅当至少一个 $S_i$ 为开、且 $C_1,C_2$ 都为关时，$P(A=1\mid\cdot)=1$；传感器的先验（prior）不受影响。
 (d) 加一个隐变量（latent variable）$F_1$（$S_1$ 附近是否真的有火），边为 $F_1\to S_1$，并用 $F_1\to A$ 替换 $S_1\to A$；$P(S_1\mid F_1)$ 对误报（false positive）和漏报（false negative）建模。
 (e) 观测所有传感器读数，通过对 $F_1$ 求和（边缘化，marginalising）计算 $P(A=1\mid s_1,s_2,s_3,c_1,c_2)$；超过阈值就发出警报。`,
@@ -87,7 +87,7 @@
           { t: 'note', md: '两套口径数的是同一张表。**课件口径**（上面）：行 = $A$ 的取值（2 行），列 = 5 个父节点的组合 $2^5=32$，形状 $2\\times32$，共 64 格、32 个自由参数。**2025 题的口径**问"每张表几**列**"，把表里出现的变量各算一列：5 张根节点表各 1 列，$A$ 的表 6 列（$A$ 加 5 个父节点）；把所有赋值一行一行列出来共 $2^6=64$ 行——这 64 行就是上面那 64 格，只是换了排法。' },
           { t: 'good', title: '官方答案的写法（2026 practice 解答）', md: '官方把表画成"一行 = 一种父节点组合，只写取 True 的概率"（False 的概率就是 1 减它）：5 个传感器的表各 **1 行**（只有 $P(S_i=\\text{True})$）；$A$ 的表有 6 列（5 个父节点 + $A$）、**32 行**（$2^5=32$ 种父节点组合，每行给 $P(A=\\text{True}\\mid\\cdot)$）。和上面课件口径的 $2\\times32$ 是同一张表，只是转置、并省掉了"1 减"的那一半。考试按任一种写都行，写清楚行和列各代表什么。' },
           { t: 'h4', text: '(c) 传感器绝对准确' },
-          '$A$ 的 CPT 变成**确定性**的：每个条目都是 0 或 1。32 种父节点组合中：三个 $S$ 有 $2^3=8$ 种，去掉全 off 的 1 种，"至少一个为 1"有 7 种；$C_1=C_2=0$ 只有 1 种；所以 $7\\times1=7$ 种组合 $P(A{=}1)=1$，其余 $32-7=25$ 种 $P(A{=}1)=0$。传感器本身的先验 $P(S_i),P(C_j)$ **不**变成 0/1（"准确"不代表火灾不随机）。',
+          '$A$ 的 CPT 变成**确定性**的：每个条目都是 0 或 1。32 种父节点组合中：三个 $S$ 有 $2^3=8$ 种，去掉全 off 的 1 种，"至少一个为 1"有 7 种；$C_1=C_2=0$ 只有 1 种；所以 $7\\times1=7$ 种父节点组合下 $P(A{=}1\\mid s_1,s_2,s_3,c_1,c_2)=1$，其余 $32-7=25$ 种组合下这个条件概率为 0。传感器本身的先验 $P(S_i),P(C_j)$ **不**变成 0/1（"准确"不代表火灾不随机）。',
           { t: 'h4', text: '(d) $S_1$ 不准确' },
           '加一个隐变量 $F_1$ = $S_1$ 位置真实是否有火。$F_1\\to S_1$（**原因 → 观测**：先有真实火情，传感器读数才随之出现，误报 / 漏报是测量噪声；不要画成 $S_1\\to F_1$），并把 $S_1\\to A$ 换成 $F_1\\to A$（应该根据真实火情决定）。新增 CPT：$P(F_1)$ 和 $P(S_1\\mid F_1)$（$2\\times2$，表示误报率与漏报率，不是 0/1）。$A$ 的规则不变，只是用 $F_1$ 代替 $S_1$。',
           { t: 'note', md: '这和课件 L20 p8–p11 的硬币例子同一思路：第三人的报告 $X_3$ 只有 90% 准确，所以用 $P(X_3\\mid X_1,X_2)$ 这张非 0/1 的表来表示"报告有噪声"。' },
@@ -96,7 +96,7 @@
           {
             t: 'exam', title: 'Exam phrasing · (a)–(e) 要点',
             md: T`(a) Nodes $S_1,S_2,S_3,C_1,C_2,A$; edges $S_1\to A$, $S_2\to A$, $S_3\to A$, $C_1\to A$, $C_2\to A$, i.e. $P(S_1)P(S_2)P(S_3)P(C_1)P(C_2)P(A\mid S_1,S_2,S_3,C_1,C_2)$.
-(b) Six CPTs: five $2\times1$ tables for the sensors and one $2\times2^5=2\times32$ table for $A$ given its five parents.
+(b) Six CPTs: five $2\times1$ tables for the sensors and one $2\times2^5=2\times32$ table for $A$ given its five parents (counting variable columns as in the 2025 question: one column per sensor table and six for $A$'s table).
 (c) The CPT of $A$ becomes deterministic (all entries 0 or 1): $P(A=1\mid\cdot)=1$ iff at least one $S_i$ is on and both $C_1,C_2$ are off; the sensor priors are unaffected.
 (d) Add a latent variable $F_1$ (true fire near $S_1$) with $F_1\to S_1$ and $F_1\to A$ replacing $S_1\to A$; $P(S_1\mid F_1)$ models false positives/negatives.
 (e) Observe all sensor readings and compute $P(A=1\mid s_1,s_2,s_3,c_1,c_2)$ by marginalising $F_1$; raise the alarm if it exceeds a threshold.`,
@@ -105,7 +105,7 @@
       },
 
       { t: 'h2', text: '4. MLE 估计 CPT（数数）', id: 'mle' },
-      '完整观测（每个变量都观测到）时，MLE 就是**计数比例**（和 L02 的 Bernoulli MLE $\\hat\\theta=k/n$ 一样，只是按父节点组合分组）。某个父节点组合在数据里一次都没出现时，分母为 0，MLE 无定义，需要额外约定（例如平滑）：',
+      '完整观测（每个变量都观测到）时，MLE 就是**计数比例**（和 L02 的 Bernoulli MLE $\\hat\\theta=k/n$ 一样，只是按父节点组合分组）。某个父节点组合在数据里一次都没出现时，计数比例是 $0/0$，数据定不下这一列（任何归一化的分布似然都一样大），需要额外约定（例如平滑）：',
       { t: 'math', tex: T`\hat P(X=x\mid \text{pa}=u)=\frac{\#\{X=x,\ \text{pa}=u\}}{\#\{\text{pa}=u\}}` },
       {
         t: 'past', src: '2025 S1 practice Q4', marks: '5 + 5 + 5', topic: 'L20 p9–p11, L02 MLE',
@@ -159,10 +159,10 @@
         t: 'past', src: '2021 S1 exam Q14(c)', marks: 4, topic: 'L04 logistic, L20 CPT',
         q: 'Instead of implementing $P(D\\mid A,B)$ as a large conditional probability table, we decide to use a logistic regression model with three parameters (one for each of the two conditioning variables, and a bias term). Besides reducing the number of parameters, state another important consequence of this change.',
         qzh: T`我们不把 $P(D\mid A,B)$ 实现为一张大的条件概率表，而是决定使用一个有三个参数的逻辑回归（logistic regression）模型（两个条件变量各一个参数，外加一个偏置项（bias term））。除了减少参数数量之外，说出这一改变的另一个重要后果。`,
-        azh: T`CPT 可以表示父节点配置上的任意条件分布，而逻辑回归 $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ 把对数几率（log-odds）限制为 $A$ 和 $B$ 的线性函数。因此模型失去了表达能力（expressiveness）：$A$ 和 $B$ 之间的交互作用（例如类似 XOR 的依赖关系）不再能被表示，也就是说模型的偏差（bias）更大。作为交换，参数在不同父节点配置之间共享，所以估计更稳定，训练中从未出现过的配置也能得到合理的概率。`,
+        azh: T`CPT 可以表示父节点配置上的任意条件分布，而逻辑回归 $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ 把对数几率（log-odds）限制为 $A$ 和 $B$ 的线性函数。因此模型失去了表达能力（expressiveness）：$A$ 和 $B$ 之间的交互作用（例如类似 XOR 的依赖关系）不再能被表示，也就是说模型的偏差（bias）更大。作为交换，参数在不同父节点配置之间共享，可能降低估计的方差；训练中从未出现过的配置也能给出预测，但不保证准确。`,
         sol: [
           '中文要点：$\\sigma(s)=1/(1+e^{-s})$ 把分数压到 0 和 1 之间；logistic 的分数只有 $w_0+w_AA+w_BB$（$A,B$ 取 0 或 1），$A$ 和 $B$ 的影响只能**相加**。CPT 可以给 4 种父节点组合各填一个任意概率；logistic 做不到"$A,B$ 不同时 $D=1$、相同时 $D=0$"这种 XOR 式的依赖。',
-          { t: 'exam', md: T`The CPT can represent any conditional distribution over the parent configurations, whereas logistic regression $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ restricts the log-odds to be linear in $A$ and $B$. So the model loses expressiveness: interactions between $A$ and $B$ (e.g. an XOR-like dependence) can no longer be represented, i.e. the model is more biased. In exchange, parameters are shared across parent configurations, so estimates are more stable and configurations never seen in training still get sensible probabilities.` },
+          { t: 'exam', md: T`The CPT can represent any conditional distribution over the parent configurations, whereas logistic regression $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ restricts the log-odds to be linear in $A$ and $B$. So the model loses expressiveness: interactions between $A$ and $B$ (e.g. an XOR-like dependence) can no longer be represented, i.e. the model is more biased. In exchange, parameters are shared across parent configurations, which can reduce estimation variance, and configurations never seen in training still get a prediction (though not necessarily an accurate one).` },
         ],
       },
 
@@ -182,7 +182,7 @@
           { t: 'math', tex: T`P(F,S_1,\dots,S_I,T)=P(F)\prod_{i=1}^{I}P(S_i\mid F)\;P(T\mid F)` },
           T`"检测会出错"体现在 CPT 上：$P(T\mid F)$ 是一张不全是 0/1 的 $2\times2$ 表，$P(T{=}1\mid F{=}0)$ 是假阳性率（false positive rate），$P(T{=}0\mid F{=}1)$ 是假阴性率（false negative rate）。这个形状还表示"知道是不是流感以后，各症状和检测结果互相独立"，和山火题一样是"一个原因、多个结果"。`,
           { t: 'graph', nodes: { F: [210, 30], S1: [60, 140], S2: [160, 140], S3: [260, 140], T: [370, 140] }, labels: { S1: 'S₁', S2: 'S₂', S3: 'S₃' }, edges: 'F>S1 F>S2 F>S3 F>T', w: 340, caption: '$I=3$ 时的画法：$I$ 种症状就画 $I$ 个 $S$ 节点。' },
-          { t: 'warn', md: T`方向别画反：$S_i\to F$ 的意思是"症状导致流感"。题目给的变量要全部用上，$T$ 也要和 $F$ 相连。` },
+          { t: 'warn', md: T`方向别画反：设计题按因果方向建模，流感引起症状，所以是 $F\to S_i$；画成 $S_i\to F$ 就成了"症状导致流感"。题目给的变量要全部用上，$T$ 也要和 $F$ 相连。` },
           { t: 'h4', text: '(b) 加上医生的诊断 D' },
           T`关键：医生看不到真实的 $F$，只看到证据（症状和检测结果）。`,
           {

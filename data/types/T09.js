@@ -87,7 +87,7 @@
       { text: 'L02 p20–p27', href: '#/L02', cls: 'src' }, { text: 'L18', href: '#/L18', cls: 'src' }, { text: 'L19', href: '#/L19', cls: 'src' }, { text: 'WK02', cls: 'src' },
       { text: '2026/2025 Q1b', cls: 'hot' }, { text: '2021 Q5, Q6, Q10, Q11', cls: 'hot' },
     ],
-    lead: '往年卷这一块主要是**简答**（定义 + 解释），计算题是共轭先验的一步代入：多数是 Beta–Binomial，2016 年还考过 Poisson–Gamma（第 3 节）。原题全解已放在 [T13 简答题库](#/T13/past)，这一页把背后的公式理清楚。',
+    lead: '往年卷这一块主要是**简答**（定义 + 解释），计算题是共轭先验的一步代入：课件和 Workshop 2 的手算重点是 Beta–Binomial；往年真题里唯一的共轭计算题是 2016 年的 Poisson–Gamma（第 3 节）。原题全解已放在 [T13 简答题库](#/T13/past)，这一页把背后的公式理清楚。',
     blocks: [
       { t: 'h2', text: '1. 三个估计，一张表', id: 'three' },
       {
@@ -139,7 +139,7 @@
           ['Poisson', 'Gamma', 'counts（计数）', '$\\alpha+\\sum_i x_i$，$\\beta+n$（本节）'],
         ],
       },
-      T`两个分布考试会给出公式，不用背：Poisson 分布（Poisson distribution）描述"一段时间里发生几次"（例如每小时的点击数），$p(x\mid\lambda)=\frac{\lambda^xe^{-\lambda}}{x!}$，$x=0,1,2,\dots$，参数 $\lambda>0$ 是平均次数；Gamma 分布（Gamma distribution）是 $\lambda>0$ 上的密度 $\frac{\lambda^{\alpha-1}e^{-\lambda\beta}}{Z(\alpha,\beta)}$，$Z(\alpha,\beta)$ 是让它积分为 1 的常数。`,
+      T`两个分布在 2016 真题里给了公式（今年不保证再给，保险起见记住这两个密度）：Poisson 分布（Poisson distribution）描述"一段时间里发生几次"（例如每小时的点击数），$p(x\mid\lambda)=\frac{\lambda^xe^{-\lambda}}{x!}$，$x=0,1,2,\dots$，参数 $\lambda>0$ 是平均次数；Gamma 分布（Gamma distribution）是 $\lambda>0$ 上的密度 $\frac{\lambda^{\alpha-1}e^{-\lambda\beta}}{Z(\alpha,\beta)}$，$Z(\alpha,\beta)$ 是让它积分为 1 的常数。`,
       {
         t: 'steps', items: [
           T`写出似然 $p(x\mid\theta)$ 和先验 $p(\theta)$（题目给公式）。`,
@@ -209,6 +209,7 @@ Consider a random variable over $X\in\{0,1,2,\dots\}$ governed by a *Poisson*($\
       },
 
       { t: 'h2', text: '4. Bayesian 线性回归', id: 'blr' },
+      '（本节按 L18 假设噪声方差 $\\sigma^2$ 已知；$\\sigma^2$ 也未知时先验要加 Inverse-Gamma，预测变成 Student-t，课件只简单提到。）',
       '符号：$\\bx\'\\bw$ 的撇是转置（点积）；$\\bX$ 把每个训练点 $\\bx_i\'$ 排成一行，$\\by$ 是标签列，$\\bx_*$ 是要预测的新点；$\\mathcal N(\\text{均值},\\text{方差或协方差})$；$\\sigma^2$ 是噪声方差，$\\gamma^2$ 是先验里每个权重的方差（越大先验越松），$I$ 是单位矩阵；$V_N$ 是后验协方差，$\\bw_N$ 是后验均值（也是 MAP）。',
       {
         t: 'table', head: ['量', '公式（L18 p15–p24）'], rows: [

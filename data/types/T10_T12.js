@@ -64,7 +64,7 @@
           ],
         },
         { t: 'h2', text: '2. 三个公式', id: 'formulas' },
-        { t: 'math', tex: T`\delta=\frac{\partial L}{\partial s}=z-y,\qquad \frac{\partial L}{\partial w_j}=\delta\,u_j,\qquad \frac{\partial L}{\partial v_{ij}}=\underbrace{\delta\,w_j\,g'(r_j)}_{\varepsilon_j}\,x_i` },
+        { t: 'math', tex: T`\delta=\frac{\partial L}{\partial s}=(z-y)\,h'(s)\ \ (=z-y\text{ when }z=s),\qquad \frac{\partial L}{\partial w_j}=\delta\,u_j,\qquad \frac{\partial L}{\partial v_{ij}}=\underbrace{\delta\,w_j\,g'(r_j)}_{\varepsilon_j}\,x_i` },
         T`五个因子逐项：$\partial L/\partial z=z-y$（$L=\frac12(z-y)^2$，$\frac12$ 就是为了消掉求导出来的 2）；$\partial z/\partial s=h'(s)$，回归时 $h$ 是恒等，这一项是 1——所以 $\delta=z-y$ **只在平方损失 + 恒等输出时成立**；$\partial s/\partial u_j=w_j$（输出层权重）；$\partial u_j/\partial r_j=g'(r_j)$；$\partial r_j/\partial v_{ij}=x_i$。五个相乘就是 $\delta\,w_j\,g'(r_j)\,x_i$。`,
         T`**记号撞车提醒**：2021 Q13(b) 题目把隐藏层权重叫 $w$；本页和课件把隐藏层权重叫 $v_{ij}$（输入 $i$ → 隐藏单元 $j$），输出层权重叫 $w_j$。所以题目问的 $\partial L/\partial w$ 就是这里的 $\partial L/\partial v_{ij}$；答题时先声明记号，别让两个 $w$ 混在一个式子里。`,
         {
@@ -186,7 +186,7 @@ So the gradient of the filter is $\delta$ times the $2\times2$ input patch that 
           t: 'note', md: T`为什么是**加** $\eta y\mathbf x$：分错时损失 $\max(0,-y\mathbf w'\mathbf x)$ 对 $\mathbf w$ 的梯度是 $-y\mathbf x$；梯度下降 $\mathbf w\leftarrow\mathbf w-\eta\cdot(-y\mathbf x)=\mathbf w+\eta y\mathbf x$。`,
         },
         {
-          t: 'exam', md: T`Perceptron update: for each training example, compute $s=\mathbf w'\mathbf x$ (with $x_0=1$); if $y\,s\le0$ the example is misclassified and we set $\mathbf w\leftarrow\mathbf w+\eta\,y\,\mathbf x$, otherwise $\mathbf w$ is unchanged. This is stochastic gradient descent on the perceptron loss $\max(0,-y\,\mathbf w'\mathbf x)$, whose gradient is $-y\mathbf x$ for misclassified points and $\mathbf 0$ otherwise.`,
+          t: 'exam', md: T`Perceptron update: for each training example, compute $s=\mathbf w'\mathbf x$ (with $x_0=1$); if $y\,s\le0$ (misclassified, or exactly on the boundary) we set $\mathbf w\leftarrow\mathbf w+\eta\,y\,\mathbf x$, otherwise $\mathbf w$ is unchanged. This is stochastic gradient descent on the perceptron loss $\max(0,-y\,\mathbf w'\mathbf x)$, whose gradient is $-y\mathbf x$ for misclassified points and $\mathbf 0$ otherwise.`,
         },
         { t: 'h3', text: 'Worksheet 5 Ex3 全解' },
         T`题目：$\mathbf X$ 的四行 $(1,1,1),(1,1,2),(1,0,0),(1,-1,0)$（第一列是 bias 输入 $x_0=1$），$\mathbf y=(1,1,-1,-1)$，$\eta=0.1$，$\bw$ 从 $\mathbf 0$ 开始，按顺序过样本。题目要求用 **pseudocode 规则**：先预测 $\hat y$（$s\ge0$ 判 $+1$，否则 $-1$），$\hat y\ne y$ 才做 $\bw\leftarrow\bw+\eta y\bx$。`,

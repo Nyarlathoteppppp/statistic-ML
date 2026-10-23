@@ -71,7 +71,7 @@
       {
         t: 'deep', title: '展开详解：好的顺序 vs 坏的顺序（L22 p27–p32，简答题素材）', blocks: [
           '同一张图：中心 $A$ 连着 4 个三角形 $\\{A,B,C\\},\\{A,D,E\\},\\{A,F,G\\},\\{A,H,L\\}$。',
-          { t: 'table', head: ['顺序', '发生了什么', '最大团'], rows: [['$B,C,D,E,F,G,H,L,A$（先删外围）', '每次删的点只有两个邻居且已相连，**不加任何边**；极大团是 4 个三角形', '3 个点'], ['$A,B,\\dots,L$（先删中心）', '删 $A$ 时它的 8 个邻居 $B,\\dots,L$ 要两两相连：两两共 $8\\times7/2=28$ 条，已有 $BC,DE,FG,HL$ 4 条，**加 $28-4=24$ 条**；第一个团就是 $A$ + 8 个邻居 = 全部 9 个点', '9 个点']] },
+          { t: 'table', head: ['顺序', '发生了什么', '最大团'], rows: [['$B,C,D,E,F,G,H,L,A$（先删外围）', '每次删的点至多两个邻居，有两个时它们已经相连，**不加任何边**；极大团是 4 个三角形', '3 个点'], ['$A,B,\\dots,L$（先删中心）', '删 $A$ 时它的 8 个邻居 $B,\\dots,L$ 要两两相连：两两共 $8\\times7/2=28$ 条，已有 $BC,DE,FG,HL$ 4 条，**加 $28-4=24$ 条**；第一个团就是 $A$ + 8 个邻居 = 全部 9 个点', '9 个点']] },
           '（推断 = 在图上算某个变量的概率，要把其他变量加起来消掉；团里有 $s$ 个二元变量，一次就要处理 $2^s$ 种组合。）推断代价随最大团大小指数增长，所以顺序很关键。找最优顺序是困难的问题；常用的近视启发式：**下一个删"会产生最小团"的点**（p26）。',
           { t: 'exam', md: T`The elimination order determines the fill-in edges and hence the cliques of the junction tree. Inference cost grows exponentially with the size of the largest clique, so a good order (e.g. eliminating peripheral nodes first) keeps cliques small, while a bad order (e.g. eliminating a hub first) can create one huge clique. Finding the optimal order is hard; a greedy heuristic eliminates next the variable that creates the smallest clique.` },
         ],
@@ -88,7 +88,7 @@ $\{T,U,W\},\ \{U,X,Y\},\ \{V,W,Y,Z\},\ \{U,V,W,Y\}$。
         blocks: [{ t: 'fig', src: 'assets/figures/ex2026_q5_mrf.png', w: 240 }],
         sol: [
           '边：$T$—$U$，$T$—$W$，$U$—$V$，$U$—$X$，$V$—$W$，$V$—$Y$，$V$—$Z$，$W$—$Z$，$X$—$Y$，$Y$—$Z$。',
-          { t: 'graphs', r: 17, caption: '按 $T,X,Z,U$ 的顺序消元（黄 = 正在消，浅色 = 已消掉，紫色虚线 = 消元时加的 fill-in 边）。后面的 $W,V,Y$ 不再产生新团。', items: [
+          { t: 'graphs', r: 17, caption: '按 $T,X,Z,U$ 的顺序消元（黄 = 正在消，浅色 = 已消掉，紫色虚线 = 消元时加的 fill-in 边）。后面的 $W,V,Y$ 记录的团都被前面更大的团包含，最后会划掉。', items: [
             q5('T-U T-W U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z U-W:fill', { T: 'cur' }, '① 消 $T$：邻居 $U,W$ 没连 ⇒ 加 $U$—$W$；团 $\\{T,U,W\\}$'),
             q5('T-U:gone T-W:gone U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z U-W:fill U-Y:fill', { T: 'done', X: 'cur' }, '② 消 $X$：邻居 $U,Y$ 没连 ⇒ 加 $U$—$Y$；团 $\\{U,X,Y\\}$'),
             q5('T-U:gone T-W:gone U-V U-X:gone W-V W-Z V-Y V-Z X-Y:gone Y-Z U-W:fill U-Y:fill W-Y:fill', { T: 'done', X: 'done', Z: 'cur' }, '③ 消 $Z$：邻居 $V,W,Y$；$V$—$W$、$V$—$Y$ 已有，加 $W$—$Y$；团 $\\{V,W,Y,Z\\}$'),
@@ -105,7 +105,7 @@ $\{T,U,W\},\ \{U,X,Y\},\ \{V,W,Y,Z\},\ \{U,V,W,Y\}$。
               ['$Y$', '—', '无', '$\\{Y\\}$ ⊂'],
             ],
           },
-          { t: 'graph', r: 26, nodes: { c4: [200, 120], c1: [60, 40], c2: [60, 200], c3: [360, 120] }, labels: { c1: 'c₁', c2: 'c₂', c3: 'c₃', c4: 'c₄' }, notes: { c1: '{T,U,W}', c2: '{U,X,Y}', c3: '{V,W,Y,Z}', c4: '{U,V,W,Y}' }, edges: 'c4-c1:hl={U,W} c4-c2:hl={U,Y} c4-c3:hl={V,W,Y}', w: 440, caption: '一个合法的 junction tree：4 个极大团都和 $\\{U,V,W,Y\\}$ 相连，边上写的是 separator（两团的交集）。边权 = 共享变量个数：$\\{U,W\\}$ 2、$\\{U,Y\\}$ 2、$\\{V,W,Y\\}$ 3，合计 7；其它团对只共享 1 个变量，换掉任何一条都会变小，所以这是最大权重生成树（4 个团、3 条边、无环）。题目只问团时，树可以不画。' },
+          { t: 'graph', r: 26, nodes: { c4: [200, 120], c1: [60, 40], c2: [60, 200], c3: [360, 120] }, labels: { c1: 'c₁', c2: 'c₂', c3: 'c₃', c4: 'c₄' }, notes: { c1: '{T,U,W}', c2: '{U,X,Y}', c3: '{V,W,Y,Z}', c4: '{U,V,W,Y}' }, edges: 'c4-c1:hl={U,W} c4-c2:hl={U,Y} c4-c3:hl={V,W,Y}', w: 440, caption: '一个合法的 junction tree：其余 3 个极大团都和 $\\{U,V,W,Y\\}$ 相连，边上写的是 separator（两团的交集）。边权 = 共享变量个数：$\\{U,W\\}$ 2、$\\{U,Y\\}$ 2、$\\{V,W,Y\\}$ 3，合计 7；其它团对只共享 1 个变量，换掉任何一条都会变小，所以这是最大权重生成树（4 个团、3 条边、无环）。题目只问团时，树可以不画。' },
           {
             t: 'exam', md: T`Eliminating in order $T,X,Z,U,W,V,Y$ (connecting the remaining neighbours of each eliminated node) adds fill-in edges $U$–$W$, $U$–$Y$, $W$–$Y$ and produces the cliques $\{T,U,W\}$, $\{U,X,Y\}$, $\{V,W,Y,Z\}$, $\{U,V,W,Y\}$, $\{V,W,Y\}$, $\{V,Y\}$, $\{Y\}$. Removing those contained in larger ones, the junction tree cliques are
 $\{T,U,W\},\ \{U,X,Y\},\ \{V,W,Y,Z\},\ \{U,V,W,Y\}$.
@@ -138,7 +138,7 @@ A valid tree: $\{U,V,W,Y\}$ connected to $\{T,U,W\}$ (separator $\{U,W\}$), $\{U
           T`抄下所有有向边，找出有 2 个及以上父节点的点。`,
           T`moralize：这些点的父节点两两连边（moral 边），再把所有箭头去掉。`,
           T`照第 2 节消元：被删节点 | 当前邻居 | fill-in | 团。邻居按当前的图算，moral 边和前面的 fill-in 都算。`,
-          T`重构图 = 原图所有边（去掉方向）+ moral 边 + 全部 fill-in 边；被消掉的点也留在图里。最大团就是消元表里最大的那个团。`,
+          T`重构图 = 原图所有边（去掉方向）+ moral 边 + 全部 fill-in 边；被消掉的点也留在图里。全部节点都消完时，最大团就是消元表里最大的那个团；题目只消掉部分节点时，还要检查剩下的图里有没有更大的团。`,
           T`复杂度：每一步要处理"团里所有变量的取值组合"，二元变量时最多 $2^k$ 个（$k$ = 最大团大小），所以是 $O(n\,2^{k})$：随 $k$ 指数增长（[c59](#/c59)）。`,
         ],
       },

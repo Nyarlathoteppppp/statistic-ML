@@ -26,7 +26,7 @@
    * ===================================================================== */
   add({
     id: 'c63', week: 'W12', lec: 'L24', pages: 'L24 p3–p12', star: 1,
-    notExam: T`两处推导讲者明确说不推：$\partial\log Z/\partial\theta_{kl}(x'_k,x'_l)=P(x'_k,x'_l;\theta)$——"I'm not going to derive this mathematically"；树形分布为什么能写成"单变量边缘 × 每条边的修正因子"——"we won't go through the full derivation here"（"you can do it at home, it's not hard"）。两处推导放在"不考"折叠框里，**结论公式要会用**。`,
+    notExam: T`两处推导讲者明确说不推：$\partial\log Z/\partial\theta_{kl}(x'_k,x'_l)=P(x'_k,x'_l;\theta)$——"I'm not going to derive this mathematically"；树形分布为什么能写成"单变量边缘 × 每条边的修正因子"——"we won't go through the full derivation here"（"you can do it at home, it's not hard"）。两处推导放在折叠框里（讲者没推导不等于明确不考，但优先级最低），**结论公式要会用**。`,
     keyEn: [
       T`Learning the parameters (or the structure) of an MRF requires inference even with complete observations, because the distribution is globally normalised: $Z(\theta)$ depends on every parameter.`,
       T`With the graph fixed, $l(D;\theta)=\sum_{(i,j)\in E}\sum_{x_i,x_j}\hat n(x_i,x_j)\,\theta_{ij}(x_i,x_j)-T\log Z(\theta)$; the pairwise counts $\hat n(x_i,x_j)$ are sufficient statistics, and $l$ is concave, so it has no local optima that are not global.`,
@@ -92,15 +92,15 @@
         T`第二行 → 第三行：把相同的项合并。样本 $t$ 在边 $(i,j)$ 上贡献 $\theta_{ij}(x_{ti},x_{tj})$；有 $\hat n(x_i,x_j)$ 个样本在这条边上取 $(x_i,x_j)$，这一项就出现 $\hat n(x_i,x_j)$ 次。$-\log Z$ 每个样本一份，共 $T$ 份。`,
       ] },
       T`**数据只通过计数 $\hat n(x_i,x_j)$ 进入似然**——只要每条边上每种组合的出现次数相同，两份数据给出完全一样的似然。所以这些计数叫 sufficient statistics（充分统计量）。讲者的定义：the smallest set of the numbers that we need to compute from the data——有了它们，就不再需要原始数据。`,
-      T`课件还说：这是参数的 concave（凹，"convex down"）函数，所以没有局部最优解。意思是：凹函数像一座只有一个山顶区域的山，任何"局部山顶"就是全局最高点，沿梯度往上爬一定能爬到最好。讲者："there is one maximum"，用梯度上升找到局部最优时，可以放心它就是全局最优。`,
+      T`课件还说：这是参数的 concave（凹，"convex down"）函数，所以没有"非全局"的局部最优解。意思是：凹函数像一座只有一个山顶区域的山，任何"局部山顶"就是全局最高点（梯度上升能不能收敛还要看步长等条件）。讲者："there is one maximum"，用梯度上升找到局部最优时，可以放心它就是全局最优。`,
       { t: 'h3', text: '⑤ 求导：数据计数 − 模型预测计数（L24 p7）' },
       T`盯住一个参数：边 $(k,l)$ 上取值组合 $(x'_k,x'_l)$ 的 $\theta_{kl}(x'_k,x'_l)$，对它求导：`,
       { t: 'math', tex: T`\frac{\partial l(D;\theta)}{\partial\theta_{kl}(x'_k,x'_l)}=\hat n(x'_k,x'_l)-T\cdot P(x'_k,x'_l;\theta)` },
       { t: 'steps', items: [
         T`第一部分 $\sum\sum\hat n\,\theta$ 是一堆"计数 × 参数"的和，只有一项含 $\theta_{kl}(x'_k,x'_l)$，求导剩下它的系数 $\hat n(x'_k,x'_l)$。`,
-        T`第二部分 $-T\log Z(\theta)$：结论是 $\frac{\partial\log Z}{\partial\theta_{kl}(x'_k,x'_l)}=P(x'_k,x'_l;\theta)$（当前模型下 $x_k,x_l$ 取这对值的边缘概率），乘上 $-T$。讲者："I'm not going to derive this mathematically"——结论要记住，推导放在下面的"不考"折叠框。`,
+        T`第二部分 $-T\log Z(\theta)$：结论是 $\frac{\partial\log Z}{\partial\theta_{kl}(x'_k,x'_l)}=P(x'_k,x'_l;\theta)$（当前模型下 $x_k,x_l$ 取这对值的边缘概率），乘上 $-T$。讲者："I'm not going to derive this mathematically"——结论要记住，推导放在下面的折叠框（讲者没推导，优先级最低）。`,
       ] },
-      { t: 'fold', title: '为什么 $\\partial\\log Z/\\partial\\theta=P$（L24 p7，讲者不推导）', blocks: [
+      { t: 'deep', title: '为什么 $\\partial\\log Z/\\partial\\theta=P$（L24 p7，讲者不推导）', blocks: [
         T`记 $s(\mathbf x)=\sum_{(i,j)\in E}\theta_{ij}(x_i,x_j)$，则 $Z=\sum_{\mathbf x}e^{s(\mathbf x)}$。参数 $\theta_{kl}(x'_k,x'_l)$ 只出现在"$x_k=x'_k$ 且 $x_l=x'_l$"的那些组合的 $s(\mathbf x)$ 里（系数 1），其他组合与它无关。`,
         { t: 'math', tex: T`\frac{\partial Z}{\partial\theta_{kl}(x'_k,x'_l)}=\sum_{\mathbf x:\ x_k=x'_k,\ x_l=x'_l}e^{s(\mathbf x)},\qquad\frac{\partial\log Z}{\partial\theta_{kl}(x'_k,x'_l)}=\frac1Z\sum_{\mathbf x:\ x_k=x'_k,\ x_l=x'_l}e^{s(\mathbf x)}=P(x'_k,x'_l;\theta)` },
         T`最后一步：$e^{s(\mathbf x)}/Z$ 就是组合 $\mathbf x$ 的概率，把所有满足 $x_k=x'_k,x_l=x'_l$ 的组合加起来，就是这两个变量取这对值的边缘概率。`,
@@ -124,7 +124,7 @@
       T`p12 把它推广成只用边缘概率的一般公式：任何树形分布都能**只用单变量边缘和相邻两点的边缘**写出来（讲者："the tree structure allows us to construct the joint distribution just from this local probabilities"）：`,
       { t: 'math', tex: T`P(x_1,\dots,x_n)=\Big[\prod_{i=1}^nP_i(x_i)\Big]\prod_{(i,j)\in E}\frac{P_{ij}(x_i,x_j)}{P_i(x_i)P_j(x_j)}` },
       T`讲者的读法：第一部分是所有单变量边缘之积——如果变量全都独立（图里没有边），这就已经是联合分布；第二部分给每条边乘一个"修正因子"（correction factor）$\frac{P_{ij}}{P_iP_j}$，把这条边上的相关性补进来。`,
-      { t: 'fold', title: '为什么树形分布能写成这个公式（L24 p12，讲者不推导）', blocks: [
+      { t: 'deep', title: '为什么树形分布能写成这个公式（L24 p12，讲者不推导）', blocks: [
         T`讲者："we won't go through the full derivation here"，并说可以自己在家推（"you can do it at home, it's not hard"）。思路：把 BN 的每个条件概率写成"联合 ÷ 边缘"，$P(x_2\mid x_1)=\frac{P_{12}(x_1,x_2)}{P_1(x_1)}$，$P(x_3\mid x_2)=\frac{P_{23}}{P_2}$，$P(x_4\mid x_2)=\frac{P_{24}}{P_2}$，代进 p10 的 BN 分解：`,
         { t: 'math', tex: T`P(x_1)\frac{P_{12}}{P_1}\frac{P_{23}}{P_2}\frac{P_{24}}{P_2}=\big[P_1P_2P_3P_4\big]\cdot\frac{P_{12}}{P_1P_2}\cdot\frac{P_{23}}{P_2P_3}\cdot\frac{P_{24}}{P_2P_4}` },
         T`右边展开约分：分子 $P_1P_2P_3P_4P_{12}P_{23}P_{24}$，分母 $P_1P_2\cdot P_2P_3\cdot P_2P_4$，约掉后剩 $\frac{P_{12}P_{23}P_{24}}{P_2P_2}$，和左边一样。`,
@@ -174,7 +174,7 @@
         title: '树的 MLE（L24 p11–p12）', tex: T`P(x_1,\dots,x_n)=\htmlClass{fx-p1}{\Big[\prod_{i=1}^n\hat P_i(x_i)\Big]}\prod_{(i,j)\in E}\htmlClass{fx-p2}{\frac{\hat P_{ij}(x_i,x_j)}{\hat P_i(x_i)\hat P_j(x_j)}},\qquad\htmlClass{fx-p3}{\hat P_{ij}=\frac{\hat n_{ij}}{T},\ \hat P_i=\frac{\hat n_i}{T}}`,
         parts: [
           { label: '单变量频率', note: '每个变量自己的分布，$n$ 个都乘上。' },
-          { label: '每条边一个比值', note: '讲者叫它修正因子（correction factor）："一起出现的频率"除以"假如独立时的频率"，把边上的相关性补进来；两变量越相关，这个比值离 1 越远。' },
+          { label: '每条边一个比值', note: '讲者叫它修正因子（correction factor）："一起出现的频率"除以"假如独立时的频率"，把边上的相关性补进来；独立时每一格的比值都是 1，某一格偏离 1，说明这对取值偏离了独立。' },
           { label: '数出来的频率', note: '只要计数，不用迭代、不用推断。' },
         ],
       },
@@ -197,7 +197,7 @@
         ['预测计数 $T\\cdot P$', '2', '2', '2', '2'],
         ['梯度', '$3-2=+1$', '$1-2=-1$', '$1-2=-1$', '$3-2=+1$'],
       ] },
-      T`意思：模型低估了"$x_1,x_2$ 相同"（数据 3 次，模型只预测 2 次），所以 $\theta_{12}(0,0)$、$\theta_{12}(1,1)$ 要调高，另外两个调低。边 (2,3) 的计数一样，梯度也一样。一般的图要这样一步步迭代；**这是树**，可以直接写出答案。`,
+      T`意思：模型低估了"$x_1,x_2$ 相同"（数据里 $(0,0)$、$(1,1)$ 各出现 3 次，模型各只预测 2 次），所以 $\theta_{12}(0,0)$、$\theta_{12}(1,1)$ 要调高，另外两个调低。边 (2,3) 的计数一样，梯度也一样。一般的图要这样一步步迭代；**这是树**，可以直接写出答案。`,
       { t: 'h4', text: '第 3 步：树的 MLE——直接代频率' },
       T`$\hat P_{12}=(\frac38,\frac18,\frac18,\frac38)$，$\hat P_{23}$ 相同，$\hat P_2=(\frac12,\frac12)$。链的 p12 公式约分后是 $P(\mathbf x)=\hat P_1\hat P_2\hat P_3\cdot\frac{\hat P_{12}}{\hat P_1\hat P_2}\cdot\frac{\hat P_{23}}{\hat P_2\hat P_3}=\frac{\hat P_{12}(x_1,x_2)\,\hat P_{23}(x_2,x_3)}{\hat P_2(x_2)}$。逐个算 8 种组合：`,
       { t: 'table', cls: 'compact', head: ['$(x_1,x_2,x_3)$', '$\\hat P_{12}\\times\\hat P_{23}\\div\\hat P_2$', '$P(\\mathbf x)$'], rows: [
@@ -267,7 +267,7 @@
       { type: 'mc', q: '链 $x_1$—$x_2$—$x_3$ 用 MLE 拟合后，下面哪个**不一定**成立？', options: ['模型对 $(x_1,x_2)$ 每种组合的预测计数 = 数据计数', '模型对 $(x_2,x_3)$ 每种组合的预测计数 = 数据计数', '模型对 $(x_1,x_3)$ 每种组合的预测计数 = 数据计数', '对数似然的梯度为 0'], answer: 2,
         explain: T`moment matching 只对图里有边的变量对成立（L24 p9）：$(1,2)$、$(2,3)$ 有边、有参数，最优处梯度为 0 正是这两条边上"预测 = 数据"。$x_1$ 和 $x_3$ 之间没有边，没有对应的方程。本章例子里数据中 $(x_1,x_3)=(0,0)$ 出现 2 次，模型预测 $8\times\frac{10}{32}=2.5$ 次。` },
       { type: 'mc', q: 'L24 p6 说对数似然是参数的 concave 函数。由此可以得出：', options: ['任何局部最大值都是全局最大值', '最优参数唯一', '可以直接写出闭式解', '不需要推断'], answer: 0,
-        explain: T`凹函数（concave，"convex down"）的局部最大值就是全局最大值，所以课件说 no locally optimal solutions（没有"卡住"的局部最优），梯度上升一定能到达最优。但凹不等于严格凹：p7 明说最优参数 not unique（例如一条边的四个 $\theta$ 同加一个常数，分布不变）。凹也不意味着有闭式解，梯度里的 $P(x'_k,x'_l;\theta)$ 仍要推断。` },
+        explain: T`凹函数（concave，"convex down"）的局部最大值就是全局最大值，所以课件说 no locally optimal solutions（没有"卡住"的局部最优）：梯度上升如果收敛到局部最大值，那就是全局最大值。但凹不等于严格凹：p7 明说最优参数 not unique（例如一条边的四个 $\theta$ 同加一个常数，分布不变）。凹也不意味着有闭式解，梯度里的 $P(x'_k,x'_l;\theta)$ 仍要推断。` },
       { type: 'show', q: '（英文）Explain moment matching for MRF parameter estimation.', answer: T`With the graph fixed, the log-likelihood is $\sum_{(i,j)\in E}\sum_{x_i,x_j}\hat n(x_i,x_j)\theta_{ij}(x_i,x_j)-T\log Z(\theta)$. Its derivative with respect to $\theta_{kl}(x'_k,x'_l)$ is $\hat n(x'_k,x'_l)-T\,P(x'_k,x'_l;\theta)$, the count estimated from the data minus the count predicted by the model. At the maximum-likelihood solution the gradient is zero, so for every edge in the graph and every pair of values the model's predicted counts equal the empirical counts: the parameters are chosen to match the statistics (moments) of the data. The matching holds only for edges included in the graph, and computing the model's marginals requires inference.`, qzh: '解释 MRF 参数估计中的 moment matching（矩匹配）。', azh: T`图固定时，对数似然是 $\sum_{(i,j)\in E}\sum_{x_i,x_j}\hat n(x_i,x_j)\theta_{ij}(x_i,x_j)-T\log Z(\theta)$。它对 $\theta_{kl}(x'_k,x'_l)$ 的导数是 $\hat n(x'_k,x'_l)-T\,P(x'_k,x'_l;\theta)$，即数据里的计数减去模型预测的计数。最大似然解处梯度为 0，所以对图中每条边、每对取值，模型预测的计数都等于数据里的计数：参数被选成让模型匹配数据的统计量（矩）。这种匹配只对图里有的边成立，而计算模型的边缘概率需要推断。` },
       { type: 'num', q: '（讲者的例子）100 个训练样本中，组合 $x_k=1,x_l=1$ 出现 30 次；当前模型给 $P(x_k=1,x_l=1;\\theta)=0.2$。对数似然对 $\\theta_{kl}(1,1)$ 的梯度是多少？', answer: 10,
         explain: T`梯度 = 数据计数 − 模型预测计数 $=30-100\times0.2=30-20=10$。梯度为正，说明模型低估了这个组合（预测 20 次，实际 30 次），梯度上升会调高 $\theta_{kl}(1,1)$，让模型的统计量向数据靠拢。这是 L24 讲者在课上举的例子。` },
@@ -280,26 +280,26 @@
   const MW_ALL = 'x1-x2=1.5 x2-x4=0.9 x3-x4=1 x1-x3=3 x1-x4=0.7 x2-x3=2';
   add({
     id: 'c64', week: 'W12', lec: 'L24', pages: 'L24 p13–p23', star: 1,
-    notExam: T`p14 的"熵 + 互信息"形式是怎么推出来的，讲者说"we won't derive fully"（熵那一项也是"I will omit the details here"）。推导放在"不考"折叠框里；**结论** $l(D;\hat\theta)=T[-\sum_i\hat H(X_i)+\sum_{(i,j)\in E}\hat I(X_i;X_j)]$ 以及熵、互信息的定义要会用。`,
+    notExam: T`p14 的"熵 + 互信息"形式是怎么推出来的，讲者说"we won't derive fully"（熵那一项也是"I will omit the details here"）。推导放在折叠框里（讲者没推导不等于明确不考，但优先级最低）；**结论** $l(D;\hat\theta)=T[-\sum_i\hat H(X_i)+\sum_{(i,j)\in E}\hat I(X_i;X_j)]$ 以及熵、互信息的定义要会用。`,
     keyEn: [
       T`For a tree with its ML parameters, $l(D;\hat\theta)=T\big[-\sum_{i=1}^n\hat H(X_i)+\sum_{(i,j)\in E}\hat I(X_i;X_j)\big]$; the sum of entropies is the same for all trees, so the best-scoring tree includes edges with high (empirical) mutual information.`,
       T`Maximum weighted spanning tree: start with an empty tree and iteratively add the candidate edge with the maximum weight if it does not create a cycle, until $n-1$ edges have been added.`,
       T`The log-likelihood does not suffice as a selection criterion ($\hat I\ge0$, so it always fills a spanning tree); the BIC score of an edge is $T\hat I(X_i;X_j)-\frac{r_ir_j-r_i-r_j+1}{2}\log T$.`,
       T`The highest-scoring tree (forest) is found by a maximum weighted spanning tree algorithm over the edges with positive BIC scores; only the empirical $\hat P_{ij}$ and $\hat P_i$ for all pairs are needed.`,
       T`The same algorithm builds the junction tree (c58), but there the edge weights are the numbers of variables shared by two cliques; here they are mutual information (or BIC scores) between two variables.`,
-      T`In Markov random fields there are no equivalence classes: unlike BN structure learning, where the result is one member of an equivalence class, the highest-scoring MRF structure is just one graph.`,
+      T`In Markov random fields there are no equivalence classes: unlike BN structure learning, where the result is one member of an equivalence class, the highest-scoring MRF structure is just one graph (although several structures can still tie for the highest score).`,
     ],
     keyZh: [
-      T`树的对数似然 = 熵项（所有树都一样）+ 各条边互信息之和，所以要选互信息总和最大的树。`,
+      T`树的对数似然 = $T$ ×（熵项 + 各条边互信息之和），熵项对所有树都一样，所以要选互信息总和最大的树。`,
       T`最大权生成树：从空树开始，每次加剩下权重最大的边，会成环就跳过，加满 $n-1$ 条为止。`,
       T`只看似然不够：互信息总是 ≥0，加边从不吃亏，总会连满一整棵树；BIC 给每条边扣一个罚分。`,
       T`只在 BIC 为正的边上跑最大权生成树，结果可能是森林；整个过程只需要两两计数。`,
       T`junction tree 也用最大权生成树，但权重是两团共享的变量个数；这里是两个变量的互信息或 BIC。`,
-      T`MRF 没有等价类的概念：BN 学出的图只是等价类里的一个，MRF 得分最高的结构就是唯一的一张图。`,
+      T`MRF 没有等价类的概念：BN 学出的图只是等价类里的一个，MRF 得分最高的结构就是一张图（分数并列时也可能有好几张）。`,
     ],
-    genesis: T`c63 解决了"图已知、学参数"。可图本身往往也不知道：哪些变量之间该连边？L23 学 BN 结构时（[c62](#/c62)），要在所有可能的图里找得分最高的，这是 NP-hard 问题，只能用启发式搜索，还不保证找到最好的。L24 换一个思路：**只在树里找**。树的好处是 c63 已经给出了闭式的 MLE，代进去后对数似然拆成"所有树都一样的常数 + 每条边一个互信息"——比较树就是比较边上互信息的总和。于是"找最好的树"变成图论里的老问题：最大权生成树，从大到小贪心加边就能精确找到。最后再用 BIC 罚掉没用的弱边。`,
+    genesis: T`c63 解决了"图已知、学参数"。可图本身往往也不知道：哪些变量之间该连边？L23 学 BN 结构时（[c62](#/c62)），要在所有可能的图里找得分最高的，这是 NP-hard 问题，通常用启发式搜索（不保证找到最好的），变量少时也可以做代价很大的精确搜索。L24 换一个思路：**只在树里找**。树的好处是 c63 已经给出了闭式的 MLE，代进去后对数似然拆成"所有树都一样的常数 + 每条边一个互信息"——比较树就是比较边上互信息的总和。于是"找最好的树"变成图论里的老问题：最大权生成树，从大到小贪心加边就能精确找到。最后再用 BIC 罚掉没用的弱边。`,
     title: 'MRF 结构学习：互信息与最大权生成树', en: 'Learning the structure of tree MRFs: mutual information, maximum weighted spanning tree and BIC',
-    summary: '要从数据学出**哪些边**该连，L24 只在树里找。把 c63 的树 MLE 代进对数似然：$l=T[-\\sum_i\\hat H(X_i)+\\sum_{(i,j)\\in E}\\hat I(X_i;X_j)]$，熵那一项对所有树都一样，所以**最好的树 = 边上互信息（mutual information）总和最大的树**。找它用最大权生成树（maximum weighted spanning tree）：从空树开始，每次加权重最大、且不成环的边。只看似然会把所有边都连上（互信息 ≥ 0），所以改用 BIC：每条边扣罚分，只在 BIC 为正的边上跑，结果可能是森林（forest）。',
+    summary: '要从数据学出**哪些边**该连，L24 只在树里找。把 c63 的树 MLE 代进对数似然：$l=T[-\\sum_i\\hat H(X_i)+\\sum_{(i,j)\\in E}\\hat I(X_i;X_j)]$，熵那一项对所有树都一样，所以**最好的树 = 边上互信息（mutual information）总和最大的树**。找它用最大权生成树（maximum weighted spanning tree）：从空树开始，每次加权重最大、且不成环的边。只看似然会连成一棵完整的生成树（$n-1$ 条边都加上，因为互信息 ≥ 0），所以改用 BIC：每条边扣罚分，只在 BIC 为正的边上跑，结果可能是森林（forest）。',
     prereq: ['c63', 'c58', 'c62'],
     symbols: [
       [T`$\hat H(X_i)$`, T`变量 $x_i$ 的经验熵（entropy）：它有多"不确定"；$x_i\in\{1,\dots,r_i\}$`],
@@ -336,7 +336,7 @@
       T`**用 c63 的 8 条数据核对这个公式**。三个变量都是 4 个 0、4 个 1：$\hat H=-(\frac12\ln\frac12+\frac12\ln\frac12)=\ln2=0.6931$。互信息 $\hat I(X_1;X_2)$：四格 $\hat P_{12}=(\frac38,\frac18,\frac18,\frac38)$，独立时每格应为 $\frac12\times\frac12=\frac14$，比值 $\frac{3/8}{1/4}=1.5$ 或 $\frac{1/8}{1/4}=0.5$：`,
       { t: 'math', tex: T`\begin{aligned}\hat I(X_1;X_2)&=2\times\tfrac38\ln1.5+2\times\tfrac18\ln0.5\\&=0.75\times0.4055+0.25\times(-0.6931)=0.3041-0.1733=0.1308\end{aligned}` },
       T`$\hat I(X_2;X_3)$ 相同（计数一样）$=0.1308$；$\hat I(X_1;X_3)$：四格都是 $\frac28=\frac14$，比值全是 1，$=0$。链 $x_1$—$x_2$—$x_3$ 的对数似然 $=8\times[-3\times0.6931+0.1308+0.1308]=8\times(-2.0794+0.2616)=8\times(-1.8178)=-14.54$——和 c63 第 6 步直接算的 $-14.5425$ 一样 ✓。如果改用树 $x_1$—$x_3$—$x_2$，边权 $0+0.1308$，似然更低：这份数据最好的树就是原来那条链。`,
-      { t: 'fold', title: 'p14 公式的推导：从树分解式到熵 + 互信息（讲者不推导）', blocks: [
+      { t: 'deep', title: 'p14 公式的推导：从树分解式到熵 + 互信息（讲者不推导）', blocks: [
         T`讲者对熵那一项说"I will omit the details here"，对互信息那一项说"we won't derive fully"。下面是推导思路。把 c63 的树 MLE $P(\mathbf x)=\prod_i\hat P_i(x_i)\prod_{(i,j)\in E}\frac{\hat P_{ij}(x_i,x_j)}{\hat P_i(x_i)\hat P_j(x_j)}$ 代入 $l=\sum_t\log P(\mathbf x_t)$，log 把乘积拆成和：`,
         { t: 'math', tex: T`l=\sum_i\underbrace{\sum_t\log\hat P_i(x_{ti})}_{(1)}+\sum_{(i,j)\in E}\underbrace{\sum_t\log\frac{\hat P_{ij}(x_{ti},x_{tj})}{\hat P_i(x_{ti})\hat P_j(x_{tj})}}_{(2)}` },
         T`(1)：按 $x_i$ 的取值把样本分组，取值 $x_i$ 出现 $\hat n_i(x_i)=T\hat P_i(x_i)$ 次，所以 $(1)=\sum_{x_i}T\hat P_i(x_i)\log\hat P_i(x_i)=-T\hat H(X_i)$。`,
@@ -376,8 +376,8 @@
         T`把分数交给最大权生成树算法（课件写作 MWSP，应指 MWST）。`,
       ] },
       { t: 'slide', src: 'L24/p22', caption: 'L24 p22：得到的最高分树形模型。16 号变量是中心，连着 9 个变量。讲者解释线的粗细：边越粗，这条边的参数越强，即两个变量的共现关系越强。' },
-      T`讲者还强调一个和 L23 的区别：L23 学到的 BN 只是等价类（equivalence class）里的一个例子；MRF 没有等价类的概念（"in Markov random fields we don't really have the equivalence classes"），得分最高的就是**唯一的一张图**。（讲者口头说数据有 922 行，随后又说除以 926；以课件的 926 为准。）`,
-      T`**补充观察**（课件和讲者都没说）：图上只有 24 个编号，没有 10 号，边一共 23 条。在课件能看到的几行数据里，$x_{10}$ 全是 0——一个几乎不变的变量，和谁的互信息都很小，BIC 都是负的，就成了孤立点。这正好是"结果可能是森林"的样子。`,
+      T`讲者还强调一个和 L23 的区别：L23 学到的 BN 只是等价类（equivalence class）里的一个例子；MRF 没有等价类的概念（"in Markov random fields we don't really have the equivalence classes"），得分最高的就是**一张图**，不是一个类（分数并列时也可能有好几张）。（讲者口头说数据有 922 行，随后又说除以 926；以课件的 926 为准。）`,
+      T`**补充观察**（课件和讲者都没说）：图上只有 24 个编号，没有 10 号，边一共 23 条。在课件能看到的几行数据里，$x_{10}$ 全是 0；如果它在全部 926 行里也几乎不变，和谁的互信息都很小、边的 BIC 都是负的，就会成为孤立点（"结果可能是森林"）。但这几行不足以确定，课件也没说原因。`,
       { t: 'h3', text: '⑥ Mini summary（L24 p23）' },
       { t: 'ul', items: [
         T`Parameter estimation based on maximum likelihood leads to moment matching（[c63](#/c63)）。`,
@@ -386,7 +386,7 @@
     ],
     why: [
       T`**考试情况**：往年卷（2021、2025 practice、2026 practice）都没有出过 L24 的题，没有往年题可参考；按官方范围仍要会。最像考题的是：给几条边的互信息，手动跑最大权生成树（和 T6 里取 junction tree 的那一步是同一个动作）；给 $T$、$r_i$、$\hat I$，算一条边的 BIC 判断要不要加；以及概念简答"为什么只看互信息""为什么要 BIC""为什么结果可能是森林"。`,
-      T`**在主线里的位置**：W12 = 学参数 → 学结构。BN 的结构搜索（[c62](#/c62)）是 NP-hard，只能启发式；MRF 限制成树后，c63 的闭式 MLE 让似然按边拆开，结构搜索变成精确可解的最大权生成树。`,
+      T`**在主线里的位置**：W12 = 学参数 → 学结构。BN 的结构搜索（[c62](#/c62)）是 NP-hard，通常用启发式（也有昂贵的精确搜索）；MRF 限制成树后，c63 的闭式 MLE 让似然按边拆开，结构搜索变成精确可解的最大权生成树。`,
     ],
     intuition: [
       T`**$n-1$ 个名额，留给最有用的边。** 一棵树只能有 $n-1$ 条边。互信息衡量"这条边能帮模型多猜对多少"，所以名额当然先给互信息最大的边——但不能浪费在已经连通的两点之间（成环那条只是重复的信息通道）。`,
@@ -520,7 +520,7 @@
         explain: T`拟合好的树的对数似然 $=T[-\sum\hat H+\sum_E\hat I]$，每条边贡献 $T\hat I\ge0$。所以似然只会让我们连满一整棵生成树，哪怕某些变量对的相关只是有限样本的噪声——这是过拟合（c18）。BIC 给每条边减去 $\frac{(r_i-1)(r_j-1)}{2}\log T$，弱边的分数变负就不加（L24 p20）。另外三项都和课件相反：似然能算；互信息 $\ge0$；熵之和对所有树相同。` },
       { type: 'num', q: '用 c63 的 8 条数据（$T=8$，二元变量），$\\hat I(X_1;X_2)=0.1308$。这条边的 BIC 分数是多少？（$\\ln8=2.0794$）', answer: 0.0068, tol: 0.001,
         explain: T`边的 BIC $=T\hat I-\frac{(2-1)(2-1)}{2}\ln T=8\times0.1308-\frac12\times2.0794=1.0465-1.0397=0.0068$。刚好为正，所以这条边勉强留下：只有 8 条数据时，罚分几乎吃掉了全部似然增益。` },
-      { type: 'show', q: '（英文）Compare the use of a maximum weighted spanning tree in building a junction tree (L22) and in learning a tree-structured MRF (L24).', answer: T`Both use the same greedy algorithm: start from an empty tree and repeatedly add the highest-weight edge that does not create a cycle. In a junction tree the nodes are maximal cliques and the edge weight is the number of variables two cliques share; the spanning tree is used for inference and gives the running intersection property. In structure learning the nodes are the variables and the weight of an edge is the empirical mutual information $\hat I(X_i;X_j)$ (or its BIC score $T\hat I-\frac{(r_i-1)(r_j-1)}{2}\log T$), because the log-likelihood of a fitted tree is a constant plus the sum of the mutual information on its edges. BIC scores can be negative; such edges are left out, so the result can be a forest.`, qzh: '比较最大权生成树在构造联结树（junction tree，L22）和学习树形 MRF（L24）中的用法。', azh: T`两者用同一个贪心算法：从空树开始，反复加入权重最大且不成环的边。在联结树里，节点是极大团（maximal cliques），边权是两个团共享的变量个数；这棵生成树用于推断，并保证 running intersection 性质。在结构学习里，节点是变量，边权是经验互信息 $\hat I(X_i;X_j)$（或它的 BIC 分数 $T\hat I-\frac{(r_i-1)(r_j-1)}{2}\log T$），因为拟合好的树的对数似然 = 常数 + 树上各边互信息之和。BIC 分数可以为负，这样的边不加，所以结果可能是森林（forest）。` },
+      { type: 'show', q: '（英文）Compare the use of a maximum weighted spanning tree in building a junction tree (L22) and in learning a tree-structured MRF (L24).', answer: T`Both use the same greedy algorithm: start from an empty tree and repeatedly add the highest-weight edge that does not create a cycle. In a junction tree the nodes are maximal cliques and the edge weight is the number of variables two cliques share; the spanning tree is used for inference and gives the running intersection property. In structure learning the nodes are the variables and the weight of an edge is the empirical mutual information $\hat I(X_i;X_j)$ (or its BIC score $T\hat I-\frac{(r_i-1)(r_j-1)}{2}\log T$), because the log-likelihood of a fitted tree is a constant plus $T$ times the sum of the empirical mutual information on its edges. BIC scores can be negative; such edges are left out, so the result can be a forest.`, qzh: '比较最大权生成树在构造联结树（junction tree，L22）和学习树形 MRF（L24）中的用法。', azh: T`两者用同一个贪心算法：从空树开始，反复加入权重最大且不成环的边。在联结树里，节点是极大团（maximal cliques），边权是两个团共享的变量个数；这棵生成树用于推断，并保证 running intersection 性质。在结构学习里，节点是变量，边权是经验互信息 $\hat I(X_i;X_j)$（或它的 BIC 分数 $T\hat I-\frac{(r_i-1)(r_j-1)}{2}\log T$），因为拟合好的树的对数似然 = 常数 + $T$ × 树上各边经验互信息之和。BIC 分数可以为负，这样的边不加，所以结果可能是森林（forest）。` },
     ],
   });
 })(window);

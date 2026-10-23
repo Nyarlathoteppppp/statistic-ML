@@ -255,7 +255,7 @@
     examQ: [
       { src: '2017 S2 Q11(d)', q: T`(Flu model: $F$ = flu, symptoms $S_i$, $i=1\dots I$, test result $T$; all binary.) The parameters of the PGM are in the form of conditional probability tables. Explain how these parameters can be learned from data, and what kind of data would be required.`,
         a: T`By maximum likelihood on complete data: records of many past patients, each giving the true flu status $F$ (e.g. confirmed later), all symptoms $S_i$ and the test result $T$. Each CPT entry is then a relative frequency, e.g. $\hat P(S_i=1\mid F=1)=\#(S_i=1,F=1)/\#(F=1)$, and $\hat P(F=1)$ is the fraction of patients with flu.`,
-        qzh: T`（流感模型：$F$ = 是否患流感，症状 $S_i$，$i=1\dots I$，检测结果 $T$（这里的 $T$ 不是本章的数据行数）；都是二值变量。）这个概率图模型的参数是条件概率表（CPT）。说明怎样从数据中学出这些参数，需要什么样的数据。（2016 S2 Q12.5 在求职 CV 模型里问的是同一件事，答法相同；只是那里的技能 $S$ 平时观测不到，带隐变量要用 EM，今年不考。）`,
+        qzh: T`（流感模型：$F$ = 是否患流感，症状 $S_i$，$i=1\dots I$，检测结果 $T$（这里的 $T$ 不是本章的数据行数）；都是二值变量。）这个概率图模型的参数是条件概率表（CPT）。说明怎样从数据中学出这些参数，需要什么样的数据。（2016 S2 Q12.5 在求职 CV 模型里问的是同一件事，但那里的技能 $S$ 平时观测不到，完整数据数数的方法直接用不上（带隐变量要用 EM，今年不考，见 T7）。）`,
         azh: T`用完整数据（complete data）上的最大似然：需要很多以往病人的记录，每条都有这个人真实的流感状态 $F$（例如事后确诊）、所有症状 $S_i$ 和检测结果 $T$。这样每个 CPT 表项就是一个相对频率（relative frequency），例如 $\hat P(S_i=1\mid F=1)=\#(S_i=1,F=1)/\#(F=1)$，$\hat P(F=1)$ 是患流感病人所占的比例。（原理同 [c53](#/c53) 的 2025 Q4(b)，计数例题见 [T7](#/T07)。）` },
     ],
     genesis: T`c53 里图是给定的，学习只剩"数数估 CPT"。可现实里往往连图都不知道：25 个基因表型之间谁影响谁（p31）？最自然的想法是"哪张图把数据拟合得最好就选哪张"。课件 p19 指出这条路走不通：父节点越多，可调的参数越多，训练数据上的似然只会更高，最后总会选出边最多的图——这就是过拟合（c18）。所以这一章先把参数估计写成计数公式，再给似然加上复杂度惩罚，得到能比较不同图的 **BIC 分数**；而且它能拆成每个节点各自一项，为 c62 的结构搜索铺路。`,
@@ -606,10 +606,10 @@
       ] },
     ],
     why: [
-      T`这一章把"学结构"的故事讲完：c61 的 BIC 是一种打分，这里给出另一种打分（Bayesian score）和打完分之后的搜索。L23 往年卷还没考过，定 ★。可能的考法是概念短答：Bayesian score 和 BIC 有什么不同、先验的三条准则、为什么要求等价的图同分、为什么结构搜索难。闭式公式如果考，会给出，要会认符号、会代数（推导不考）。`,
+      T`这一章把"学结构"的故事讲完：c61 的 BIC 是一种打分，这里给出另一种打分（Bayesian score）和打完分之后的搜索。L23 往年卷还没考过，定 ★。可能的考法是概念短答：Bayesian score 和 BIC 有什么不同、先验的三条准则、为什么要求等价的图同分、为什么结构搜索难。闭式公式要会认符号、会代入计数（讲者说推导不用会；Ed 说复杂公式考试会给一部分，但不保证给这一条）。`,
     ],
     intuition: [
-      T`**（补充理解）Bayesian score ＝ 一行一行地"预测下一行"。** 把闭式解展开，它等于按顺序预测每一行的概率之积：读到第 $t$ 行时，在它的父节点配置 $j$ 里，猜 $x_1=k$ 的概率是 $\frac{(\text{之前这一列里 }k\text{ 出现的次数})+\alpha_{1jk}}{(\text{之前这一列的行数})+\alpha_{1j}}$——就是 c51 的"计数 + 伪计数"（日出问题的 $\frac{k+1}{k+2}$ 也是这个形状）。例 1 用它验证了闭式解。`,
+      T`**（补充理解）Bayesian score ＝ 一行一行地"预测下一行"。** 把闭式解展开，它等于按顺序预测每一行的概率之积再取 log（即逐行预测的 log 概率之和）：读到第 $t$ 行时，在它的父节点配置 $j$ 里，猜 $x_1=k$ 的概率是 $\frac{(\text{之前这一列里 }k\text{ 出现的次数})+\alpha_{1jk}}{(\text{之前这一列的行数})+\alpha_{1j}}$——就是 c51 的"计数 + 伪计数"（日出问题的 $\frac{k+1}{k+2}$ 也是这个形状）。例 1 用它验证了闭式解。`,
       T`**复杂度控制藏在"每一列从零学起"里。** 父节点越多，列越多；每一列第一次出现时没有任何真实计数，只能按先验猜（二元时是 1/2）。只有当一列后来被反复用到、而且每次都猜对，才能把多付的"学费"挣回来。数据少时付学费不划算，所以 Bayesian score 不会盲目选父节点多的结构。`,
       T`**$\alpha$ 的大小 ＝ 先验有多固执。** $\alpha$ 大：伪计数多，预测长时间停在均匀附近，数据要很多才能推开；$\alpha$ 小：很快相信数据。它和 c51 里 $\mathrm{Beta}(\alpha,\beta)$ 的 $\alpha+\beta$ 是同一个意思。`,
       { t: 'think', q: '为什么不能每个节点各自挑局部分数最高的父节点集合，再拼成一张图？', a: T`拼出来可能有环，不是 DAG。例 2：$x_1$ 局部最好的父节点是 $\{x_2\}$，$x_2$ 局部最好的父节点是 $\{x_1\}$，拼起来 $x_1\to x_2$ 和 $x_2\to x_1$ 同时存在，是环。无环是全局约束，所以要搜索。` },
@@ -625,7 +625,7 @@
         T`整数：$\Gamma(m)=(m-1)!$，例如 $\Gamma(4)=3!=6$，$\Gamma(10)=9!=362880$。`,
         T`递推：$\Gamma(x+1)=x\,\Gamma(x)$，所以 $\frac{\Gamma(x+n)}{\Gamma(x)}=x(x+1)\cdots(x+n-1)$——$n$ 个连续数相乘，$x$ 是分数也能算。例：$\frac{\Gamma(\frac13+2)}{\Gamma(\frac13)}=\frac13\times\frac43=\frac49$。`,
       ] },
-      T`（补充理解）用第二条，一列的两项合起来就是"逐行预测"的乘积：$\frac{\Gamma(\alpha_{j})}{\Gamma(\alpha_{j}+\hat n_{j})}\prod_k\frac{\Gamma(\alpha_{k}+\hat n_{k})}{\Gamma(\alpha_{k})}=\frac{\prod_k\alpha_k(\alpha_k+1)\cdots(\alpha_k+\hat n_k-1)}{\alpha_j(\alpha_j+1)\cdots(\alpha_j+\hat n_j-1)}$。分母的每个因子是"第几次用到这一列 + 伪计数"，分子的每个因子是"这个值第几次出现 + 伪计数"。`,
+      T`（补充理解）用第二条，一列积分的结果（还没取 log）就是"逐行预测"的乘积：$\frac{\Gamma(\alpha_{j})}{\Gamma(\alpha_{j}+\hat n_{j})}\prod_k\frac{\Gamma(\alpha_{k}+\hat n_{k})}{\Gamma(\alpha_{k})}=\frac{\prod_k\alpha_k(\alpha_k+1)\cdots(\alpha_k+\hat n_k-1)}{\alpha_j(\alpha_j+1)\cdots(\alpha_j+\hat n_j-1)}$。分母的每个因子是"第几次用到这一列 + 伪计数"，分子的每个因子是"这个值第几次出现 + 伪计数"。`,
     ],
     fx: [
       {
@@ -656,7 +656,7 @@
       {
         title: '闭式 Bayesian score（L23 p28）', tex: T`\mathrm{score}(1|2,3;D)=\sum_{j=1}^{q_1}\Big[\htmlClass{fx-p1}{\log\frac{\Gamma(\alpha_{1j})}{\Gamma(\alpha_{1j}+\hat n_{1j})}}+\sum_{k=1}^{r_1}\htmlClass{fx-p2}{\log\frac{\Gamma(\alpha_{1jk}+\hat n_{1jk})}{\Gamma(\alpha_{1jk})}}\Big]`,
         parts: [
-          { label: '每列一项（分母）', note: '这一列伪计数总和 $\\alpha_{1j}$、真实行数 $\\hat n_{1j}$。这一项 $\\le0$：用到这一列的行越多，扣得越多。' },
+          { label: '每列一项（分母）', note: '这一列伪计数总和 $\\alpha_{1j}$、真实行数 $\\hat n_{1j}$。这一项不一定 $\\le0$（例如 $\\alpha_{1j}=2/3$、只有 1 行时是 $\\log1.5>0$），不能单独当成复杂度惩罚，要和这一列的分子各项合起来看。' },
           { label: '每格一项（分子）', note: '这一格伪计数 $\\alpha_{1jk}$、真实计数 $\\hat n_{1jk}$。计数集中在少数格子（数据很"纯"）时这一项大。' },
         ],
       },
@@ -708,7 +708,7 @@
     ],
     viz: [
       { id: 'bn3-lab', opts: { mode: 'search' }, how: '课件数据前三列（$T=6$）上的完整结构搜索。用按钮定边的方向，表格给出每个节点的 BIC 和 Bayesian score（$\\alpha$ 可调），合计就是整张图的分数。"枚举 25 张 DAG"按分数把所有图排好，并标出哪些图属于同一个等价类。',
-        try: '① 点"枚举 25 张 DAG（BIC）"，看前两名是不是 $x_1\\to x_2$ 和 $x_2\\to x_1$（并列，同一类）。② 换成按 Bayesian score 排，再把 $\\alpha$ 从 4 改到 1 或 12，看排名怎么变。③ 试着同时画 $x_1\\to x_2$ 和 $x_2\\to x_1$：工具会提示有环。' },
+        try: '① 点"枚举 25 张 DAG（BIC）"，看前两名是不是 $x_1\\to x_2$ 和 $x_2\\to x_1$（并列，同一类）。② 换成按 Bayesian score 排，再把 $\\alpha$ 从 4 改到 1 或 12，看排名怎么变。③ 试着画 $x_1\\to x_2\\to x_3\\to x_1$：工具会提示有环。' },
     ],
     compare: [
       { t: 'table', head: ['', 'BIC（c61）', 'Bayesian score'], rows: [
@@ -780,14 +780,14 @@
         g(X3, { edges: 'x1>x2', caption: 'BN（c62 例 2，课件数据前三列）：BIC 最高的是 $x_1\\to x_2$，和 $x_2\\to x_1$ 并列——同一个等价类' }),
         g(MW4, { edges: 'x1-x3:path=3 x2-x3:path=2 x3-x4:path=1 x1-x2:gone=1.5 x2-x4:gone=0.9 x1-x4:gone=0.7', caption: 'MRF（L24 p15–p19）：以互信息为边权的最大权生成树（红），总权重 $3+2+1=6$；1.5 那条会成环，跳过' }),
       ] },
-      T`**两边共同的套路**：最大似然只会偏爱更复杂的结构，所以要加复杂度惩罚（BIC）；分数能拆成局部之和（BN 按节点、树形 MRF 按边），改一处只重算一处。不同之处在搜索：BN 要在所有 DAG 里找，受"整张图无环"这个全局约束，只能启发式；MRF 限制成树以后，问题变成最大权生成树——和 c58 构造 junction tree 是同一个贪心算法，只是边权从"共享变量个数"换成了互信息（或边的 BIC）。`,
+      T`**两边共同的套路**：最大似然只会偏爱更复杂的结构，所以要加复杂度惩罚（BIC）；分数能拆成局部之和（BN 按节点、树形 MRF 按边），改一处只重算受影响的局部项。不同之处在搜索：BN 要在所有 DAG 里找，受"整张图无环"这个全局约束，通常用启发式（变量少时也可以做代价很大的精确搜索）；MRF 限制成树以后，问题变成最大权生成树——和 c58 构造 junction tree 是同一个贪心算法，只是边权从"共享变量个数"换成了互信息（或边的 BIC）。`,
     ],
     recall: [
       { q: '两张 DAG 什么时候等价？', a: T`当且仅当骨架相同（忽略方向的边一样）且 immoral v 结构相同（$a\to c\leftarrow b$，$a,b$ 之间没有边）。等价 = 声明的独立性完全相同（L23 p4–p6）。`, ch: 'c60' },
       { q: '链、分叉、v 结构，哪些等价？三角形的类有几张图？', a: T`链 $A\to B\to C$、反向链、分叉 $A\leftarrow B\to C$ 等价（都是 $A\perp C\mid B$）；v 结构 $A\to B\leftarrow C$（$A\perp C$）自成一类。三角形 6 种无环定向全部等价（父节点相连，不 immoral）。`, ch: 'c60' },
       { q: '完整数据下，BN 一张 CPT 的 MLE 怎么算？', a: T`$\hat\theta_{1jk}=\hat n_{1jk}/\sum_l\hat n_{1jl}$：在父节点配置为 $j$ 的那些行里，$x_1=k$ 的比例。似然按 CPT、按列拆开，每列单独数频率（L23 p17–p18）。`, ch: 'c61' },
       { q: '为什么不能用最大似然挑父节点？BIC 怎么修正？', a: T`多一个父节点就多出参数，大模型包含小模型，训练数据上的最大似然只升不降，会选边最多的图（过拟合，p19）。BIC $=l(\hat\theta)-\frac{(r_1-1)q_1}{2}\log T$：每个自由参数罚 $\frac12\log T$（p20）。`, ch: 'c61' },
-      { q: '"可分解（decomposable）"是什么意思，有什么用？', a: T`$\mathrm{score}(G;D)=\sum_i\mathrm{score}(i\mid pa_i;D)$：图的分数是每个节点给定父节点的局部分数之和。改一条边只改变一个节点的父节点，只重算那一项（p21）。`, ch: 'c61' },
+      { q: '"可分解（decomposable）"是什么意思，有什么用？', a: T`$\mathrm{score}(G;D)=\sum_i\mathrm{score}(i\mid pa_i;D)$：图的分数是每个节点给定父节点的局部分数之和。加、删一条边只改变一个节点的父节点，翻转一条边会改变两个节点的父节点；只重算受影响的局部分数（p21）。`, ch: 'c61' },
       { q: 'Bayesian score 的三条准则？它们给出什么先验？', a: T`parameter independence（各列参数独立）、parameter modularity（同一张表在不同图里先验相同）、likelihood equivalence（等价图同分）。只允许 Dirichlet：每个 CPT 列一个，$\alpha_{1jk}=\alpha/(r_1q_1)$，$\alpha$ 是 equivalent sample size（p25–p27）。`, ch: 'c62' },
       { q: '分数可分解，为什么 BN 结构搜索仍然难？', a: T`各节点的父节点选择合起来必须是无环图（全局约束），局部最好的选择拼起来可能有环（c62 例 2：$x_1$ 想要 $x_2$、$x_2$ 想要 $x_1$）。找最高分的 DAG 是计算上很难的问题，用局部 / 随机 / 精确（昂贵）搜索（p30）。`, ch: 'c62' },
       { q: '数据完整时，为什么学 MRF 参数还要推断？什么是 moment matching？', a: T`$Z(\theta)$ 含所有参数（全局归一化），似然不能按因子拆开。梯度 $\hat n(x'_k,x'_l)-T\cdot P(x'_k,x'_l;\theta)$ 里的模型边缘要靠推断算。最优时数据计数 = 模型预测计数，只对图里有边的变量对成立（L24 p4–p9）。`, ch: 'c63' },
@@ -825,9 +825,9 @@
       { type: 'mc', q: '数据完整（没有缺失值）。下面哪一种参数估计**需要**反复做推断？', options: ['BN 的 CPT：每一列数频率', '树形 MRF：代入成对频率和单变量频率', '有环的一般 MRF：让数据计数 = 模型预测计数', '给一张 BN 算 BIC'], answer: 2,
         explain: T`一般 MRF 全局归一化，$Z(\theta)$ 含所有参数，梯度 $\hat n(x'_k,x'_l)-T\cdot P(x'_k,x'_l;\theta)$ 里的模型边缘只能靠推断算，所以要迭代、每步推断（L24 p4–p8）。BN 的 CPT 每列自己归一化，数频率即可（c61）；树形 MRF 有闭式解（L24 p10–p12）；BIC 只用计数和 $\log$。` },
       { type: 'show', q: '（英文）Compare structure learning for Bayesian networks (L23) and for tree-structured Markov random fields (L24).',
-        answer: T`Both score candidate structures with a penalised likelihood, because the maximised likelihood alone always prefers more edges; both scores decompose into local terms. For Bayesian networks we score each DAG with BIC or the Bayesian (Dirichlet) score, a sum of local scores per node given its parents, but the parent sets must jointly form an acyclic graph, so finding the highest-scoring DAG is computationally hard and needs local, stochastic or costly exact search; equivalent graphs get the same score, so only an equivalence class is identified. For tree MRFs the fitted log-likelihood is a constant plus the sum of the empirical mutual information on the edges, so the best tree is a maximum weighted spanning tree found exactly and efficiently by greedily adding the heaviest edge that creates no cycle; using edge BIC scores and keeping only positive ones may give a forest.`,
+        answer: T`Both score candidate structures with a penalised likelihood, because the maximised likelihood alone always prefers more edges; both scores decompose into local terms. For Bayesian networks we score each DAG with BIC or the Bayesian (Dirichlet) score, a sum of local scores per node given its parents, but the parent sets must jointly form an acyclic graph, so finding the highest-scoring DAG is computationally hard and needs local, stochastic or costly exact search; equivalent graphs get the same score, so only an equivalence class is identified. For tree MRFs the fitted log-likelihood is a constant plus $T$ times the sum of the empirical mutual information on the edges, so the best tree is a maximum weighted spanning tree found exactly and efficiently by greedily adding the heaviest edge that creates no cycle; using edge BIC scores and keeping only positive ones may give a forest.`,
         qzh: '比较 Bayesian network（L23）和树形 Markov random field（L24）的结构学习。',
-        azh: '两者都用"惩罚后的似然"给结构打分，因为只看最大似然总会偏向更多的边；两种分数都能拆成局部项。BN 用 BIC 或 Bayesian（Dirichlet）score，按节点（给定父节点）求和，但所有父节点合起来必须无环，所以找最高分的 DAG 计算上很难，要用局部、随机或昂贵的精确搜索；等价的图同分，只能确定等价类。树形 MRF 拟合后的对数似然 = 常数 + 边上经验互信息之和，所以最好的树是最大权生成树，贪心地加最重且不成环的边就能精确、高效地找到；改用边的 BIC 并只保留正分的边时，结果可能是森林。',
+        azh: '两者都用"惩罚后的似然"给结构打分，因为只看最大似然总会偏向更多的边；两种分数都能拆成局部项。BN 用 BIC 或 Bayesian（Dirichlet）score，按节点（给定父节点）求和，但所有父节点合起来必须无环，所以找最高分的 DAG 计算上很难，要用局部、随机或昂贵的精确搜索；等价的图同分，只能确定等价类。树形 MRF 拟合后的对数似然 = 常数 + $T$ × 边上经验互信息之和，所以最好的树是最大权生成树，贪心地加最重且不成环的边就能精确、高效地找到；改用边的 BIC 并只保留正分的边时，结果可能是森林。',
         explain: '要点：共同点（惩罚似然、可分解）；BN 难在全局无环约束、只能找到等价类（c60–c62）；树形 MRF 变成最大权生成树、可能是森林（c64）。' },
     ],
     next: 'W12 是最后一周。接下来：在 [今日复习](#/daily) 刷到期的回忆卡（打开过本页后，这里的 10 张卡也会进入每日卡组）；限时做模考，先做 [新题模考](#/mock2)，再做 [原卷复现](#/mock)；考前把 [打印版：脉络与知识点](#/outline) 打印出来，在页边记下自己卡住的地方。',

@@ -434,7 +434,7 @@
       names.forEach(function (name) {
         const rows = Object.keys(estimates[name]).map(function (config) {
           const item = estimates[name][config];
-          const mle = item.total ? values[name].map(function (value) { return value + ': ' + exactFraction(item.counts[value], item.total); }).join('；') : '未观测配置（MLE 无定义）';
+          const mle = item.total ? values[name].map(function (value) { return value + ': ' + exactFraction(item.counts[value], item.total); }).join('；') : '未观测配置（数据定不下这一列）';
           const counts = values[name].map(function (value) { return value + '=' + item.counts[value]; }).join(', ');
           return [name, config || '∅', counts + ' (n=' + item.total + ')', mle];
         });
