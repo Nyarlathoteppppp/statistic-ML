@@ -6,23 +6,23 @@
   root.SML.content.add({
     id: 'T02',
     eyebrow: '题型 T2 · 6–8 分',
-    title: 'UCB：算每个臂的值，选下一个臂',
+    title: 'UCB（上置信界）：算每个臂的值，选下一个臂',
     en: 'Upper Confidence Bound (UCB) for multi-armed bandits',
     chips: [
       { text: 'L17 p6–p26', href: '#/L17', cls: 'src' },
       { text: '2026 practice Q2', cls: 'hot' }, { text: '2021 exam Q17', cls: 'hot' }, { text: 'Worksheet 10 同题', cls: 'src' },
       { text: '2022 exam Q6（20 分设计题）', cls: 'hot' },
     ],
-    lead: '一个公式，三个数代进去。难点只有两个：**$t$ 等于多少**，以及**不用计算器怎么开根号**（题目会给 $\\ln$ 的近似值，数字也会设计成能开方）。',
+    lead: '一个公式，三个数代进去。$t$ 是当前要决策的轮次。难点只有两个：确定 $t$，以及不用计算器怎么开根号。$\\ln$ 表示自然对数；题目会给 $\\ln t$ 的近似值，直接代入即可，数字也会设计成能开方。',
     blocks: [
       { t: 'h2', text: '1. 设定（30 秒看懂）', id: 'setting' },
       {
         t: 'table', head: ['符号', '含义'], rows: [
-          ['$k$ 个 arm', '$k$ 台老虎机，每台的奖励分布 $P_i$ 均值 $\\mu_i$ 未知（L17 p6）'],
+          ['$k$ 个臂（arm）', '多臂老虎机（multi-armed bandit）有 $k$ 个可选项，每个选项叫一个臂；拉臂就是选择它并获得一次奖励。$i=1,\\ldots,k$ 是臂编号，$P_i$ 是第 $i$ 个臂的奖励分布，$\\mu_i$ 是该分布的真实均值；这些分布和均值未知（L17 p6）'],
           ['第 $t$ 轮', '选一个臂 $i_t$，**只**看到这个臂的奖励 $R_{i_t}(t)$，没选的臂这一轮奖励未知——这叫部分反馈（对比 W8 的 experts：每轮能看到所有专家的对错）'],
           ['$N_{t-1}(i)$', '前 $t-1$ 轮里臂 $i$ 被拉了几次'],
           ['$\\hat\\mu_{t-1}(i)$', '臂 $i$ 到目前为止的平均奖励'],
-          ['目标', '最小化 cumulative regret $\\mu^*T-\\sum_t E[R_{i_t}(t)]$：$\\mu^*$ 是最好那只臂的真实均值（未知），$T$ 是总轮数（不是当前轮 $t$）；regret = "一直拉最好的臂"的期望总奖励减去你的期望总奖励。计算题只要求算 $Q$ 选臂，不用算 regret'],
+          ['目标', '最小化累计遗憾（cumulative regret）$\\mu^*T-\\sum_t E[R_{i_t}(t)]$。$E[\\cdot]$ 表示期望，即考虑随机性后的平均值；$\\sum_t$ 表示把第 1 到第 $T$ 轮的量相加。这里，$\\mu^*$ 是最好那只臂的真实均值（未知），$T$ 是总轮数（不是当前轮 $t$）；regret = "一直拉最好的臂"的期望总奖励减去你的期望总奖励。计算题只要求算 $Q$ 选臂，不用算 regret'],
         ],
       },
 
@@ -30,9 +30,9 @@
       {
         t: 'fx', title: 'UCB 值（L17 p18）',
         tex: T`Q_{t-1}(i)=\htmlClass{fx-p1}{\hat\mu_{t-1}(i)}+\htmlClass{fx-p2}{\sqrt{\frac{\htmlClass{fx-p3}{2\ln t}}{\htmlClass{fx-p4}{N_{t-1}(i)}}}}`,
-        intro: '每一轮对**所有**臂算这个值，拉值最大的那个（平局随机）。没拉过的臂直接用初始值 $Q_0$。',
+        intro: '$Q_{t-1}(i)$ 是用前 $t-1$ 轮数据算出的臂 $i$ 的 UCB 评分，用它决定第 $t$ 轮选谁。每轮比较所有臂的评分，拉最大的那个；并列最大时从中随机选一个。未拉过的臂有 $N_{t-1}(i)=0$，不能代入根号公式，而用预先设定的初始评分 $Q_0$。$Q_0$ 是人为设置的参数，具体取值看题目；设为 $+\\infty$（正无穷，比任何有限评分都大）时，会优先尝试未拉过的臂。',
         parts: [
-          { label: 'exploitation', note: '经验平均奖励 $=\\dfrac{\\text{该臂累计奖励}}{\\text{该臂被拉次数}}$。2026 卷（第 5 节的题）arm 1 拉了 64 次、其中 40 次奖励为 1：$40/64=5/8=0.625$。' },
+          { label: 'exploitation', note: '利用（exploitation）：依据已有数据，偏向平均奖励高的臂。经验平均奖励 $=\\dfrac{\\text{该臂累计奖励}}{\\text{该臂被拉次数}}$。以下沿用第 5 节的 2026 算例。已知：奖励只可能为 0 或 1；臂 1 拉了 64 次，其中 40 次得 1；臂 2 拉了 16 次，其中 10 次得 1；臂 3 拉了 4 次，其中 2 次得 1；其余都得 0。题目给出 $\\ln85\\approx4.5$。因此臂 1 的累计奖励为 40，均值为 $40/64=5/8=0.625$。' },
           { label: 'exploration bonus', note: '不确定性奖励。拉得越少，这一项越大，所以被冷落的臂会被"乐观地"高估（optimism in the face of uncertainty）。' },
           { label: '$2\\ln t$', note: '$t$ 是**当前这一轮的编号** = 已拉总次数 + 1，所有臂用同一个 $t$。随时间缓慢增长，所以长期没被拉的臂的 bonus 会慢慢变大。2026 卷：$64+16+4=84$ 次已拉，$t=85$。' },
           { label: '$N_{t-1}(i)$', note: '该臂自己被拉的次数。每个臂不同，是 bonus 差别的来源。' },
@@ -46,7 +46,7 @@
       { t: 'h2', text: '3. 解题步骤', id: 'steps' },
       {
         t: 'steps', items: [
-          T`写出 $t=\sum_i N_{t-1}(i)+1$。`,
+          T`写出 $t=\sum_i N_{t-1}(i)+1$：把所有臂已经被拉的次数相加，再加 1。以下计算某个臂 $i$ 时，简写 $N=N_{t-1}(i)$、$\hat\mu=\hat\mu_{t-1}(i)$、$Q=Q_{t-1}(i)$；$Q(i)$ 也表示这个臂当前的 UCB 评分。`,
           T`每个臂算 $\hat\mu=$ 奖励 / 次数。`,
           T`每个臂算 bonus $\sqrt{2\ln t/N}$。用题目给的 $\ln t$；分子分母凑成完全平方（$2\times4.5=9$，$9/64=(3/8)^2$）。`,
           T`$Q=\hat\mu+\text{bonus}$，列成表。`,
@@ -82,13 +82,13 @@ $Q(1)=\tfrac{40}{64}+\sqrt{9/64}=0.625+0.375=1.0$；$Q(2)=\tfrac{10}{16}+\sqrt{9
             ],
           },
           '结论：拉 **arm 3**。arm 1 和 arm 2 的均值一样（0.625），但 arm 2 拉得少，所以 bonus 更大；arm 3 均值最低，但只拉了 4 次，不确定性最大，UCB 认为它"可能很好"，值得探索。',
-          { t: 'note', md: '题目给的 $\\ln 4,\\ln 16,\\ln 64$ 是干扰项：有人会错用"每个臂自己的次数"代替 $t$。所有臂用同一个 $t=85$。Workshop 10 的手算题就是这一道（写明 $\\rho=2$），官方答案同样是 $t=85$、$Q=(1,\\ 11/8,\\ 2)$、拉 arm 3；它还多给了 $\\ln 5,\\ln 17,\\ln 65$，是给"每个臂的次数 + 1"这种错用准备的干扰项。' },
+          { t: 'note', md: '题目给的 $\\ln 4,\\ln 16,\\ln 64$ 是干扰项：有人会错用"每个臂自己的次数"代替 $t$。所有臂用同一个 $t=85$。Workshop 10 的手算题就是这一道（把根号分子中的常数 2 写成探索强度参数 $\\rho>0$，并给定 $\\rho=2$；$\\rho$ 越大，探索奖励越大），官方答案同样是 $t=85$、$Q=(1,\\ 11/8,\\ 2)$、拉 arm 3；它还多给了 $\\ln 5,\\ln 17,\\ln 65$，是给"每个臂的次数 + 1"这种错用准备的干扰项。' },
         ],
       },
       {
         t: 'past', src: '2021 S1 exam Q17', marks: 8, topic: 'L17 p8–p9, p18',
         q: 'Describe two mechanisms used by the Upper Confidence Bound (UCB) multi-armed bandit (MAB) to explore arms that so far have no demonstrated high rewards. *(Formula given: $Q_{t-1}(i)=\\hat\\mu_{t-1}(i)+\\sqrt{\\rho\\log t/N_{t-1}(i)}$; unobserved arms are initialised with value estimate $Q_0$, a hyperparameter.)*',
-        qzh: T`描述上置信界（Upper Confidence Bound, UCB）多臂老虎机（multi-armed bandit, MAB）用来探索那些目前还没有表现出高奖励的臂的两种机制。*（给定公式：$Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log t/N_{t-1}(i)}$；未被观测过的臂用值估计 $Q_0$ 初始化，$Q_0$ 是一个超参数（hyperparameter）。）*`,
+        qzh: T`描述上置信界（Upper Confidence Bound, UCB）多臂老虎机（multi-armed bandit, MAB）用来探索那些目前还没有表现出高奖励的臂的两种机制。*（给定公式：$Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log t/N_{t-1}(i)}$，这里的 $\log$ 与前面的 $\ln$ 都表示自然对数；未被观测过的臂用值估计 $Q_0$ 初始化，$Q_0$ 是一个超参数（hyperparameter）。）*`,
         azh: T`(1) 乐观初始化（optimistic initialisation）：从未被拉过的臂取值 $Q_0$；当 $Q_0=+\infty$（大于任何可达到的值）时，在开始利用（exploitation）之前，每个臂都至少会被尝试一次。
 (2) 探索奖励（exploration bonus）$\sqrt{\rho\log t/N_{t-1}(i)}$：一个臂被拉的次数少时它很大；而且对一个被冷落的臂，$\log t$ 不断增长而 $N_{t-1}(i)$ 保持不变，所以它的奖励项会一直增大，直到它最终再次被拉。$\rho$ 越大，探索越多。`,
         sol: [
@@ -108,14 +108,14 @@ $Q(1)=\tfrac{40}{64}+\sqrt{9/64}=0.625+0.375=1.0$；$Q(2)=\tfrac{10}{16}+\sqrt{9
       },
 
       { t: 'h2', text: '6. Section C 设计题：把业务问题写成 contextual bandit', id: 'design' },
-      T`Section C 是设计题（design and application question）：把课上的方法套到一个真实场景里，答案约一页。2022 年的 Section C 整题 20 分，就是 contextual bandit（上下文老虎机）建模；2026 年 Section C 考什么不确定（往年多数是 PGM 建模，见 [T7](#/T07)）。这类题没有唯一答案，按下面的步骤把每个要素对上 L17 的术语，就能拿到大部分分。`,
+      T`Section C 是设计题（design and application question）：把课上的方法套到一个真实场景里，答案约一页。2022 年的 Section C 整题 20 分，就是 contextual bandit（上下文老虎机）建模；2026 年 Section C 考什么不确定（往年多数是概率图模型（probabilistic graphical model, PGM）建模，见 [T7](#/T07)）。这类题没有唯一答案，按下面的步骤把每个要素对上 L17 的术语，就能拿到大部分分。`,
       {
         t: 'steps', items: [
           T`**reward**：把业务目标翻译成每一轮的一个数。管理层看什么指标，reward 就是它在一轮里的增量（点击 = 1，没点 = 0；累计 reward = 总点击数）。`,
           T`**arms**：每一轮要在哪些选项里挑一个。写清楚一个 arm 具体是什么（例如一篇文章的一个"标题 + 图片"组合）。`,
           T`**round**：什么时候做一次选择、并马上看到 reward（例如一个用户打开首页、某篇文章的预览要显示的那一次）。`,
-          T`**context**：做选择前能看到的信息，写成每个臂的特征向量 $\bX_i(t)$ = 用户特征 + 这个臂的特征。奖励估计变成回归 $E[R_i(t)\mid\bX_i(t)]$，仍然选 UCB 最大的臂，只是 UCB 加在回归预测上（L17 p25，[c49](#/c49)）。`,
-          T`**检查假设**：标准 MAB 假设每个臂的奖励 i.i.d.（L17 p6）。说清楚哪里不成立、上下文能补救多少；顺便确认动作不改变下一个状态（否则就是强化学习 RL，L17 p26）。`,
+          T`**context**：做选择前能看到的信息，对第 $t$ 轮的每个候选臂 $i$，把用户特征和这个臂的特征按顺序拼成一个数值列表，记作上下文向量 $\bX_i(t)$。这里是拼接，不是把两组数逐项相加。$R_i(t)$ 表示这一轮选择臂 $i$ 会得到的奖励；$E[R_i(t)\mid\bX_i(t)]$ 中的竖线表示“给定上下文”，整个式子表示这种上下文下的平均奖励。回归就是从过去的“特征、奖励”记录中学习如何用特征预测奖励。普通 UCB 用该臂的历史平均奖励作预测；contextual bandit 改用回归预测值，再加上该预测的不确定性奖励，得到 UCB 评分，最后选评分最大的臂（L17 p25，[c49](#/c49)）。`,
+          T`**检查假设**：标准 MAB 假设每个臂各次产生的奖励独立同分布（independent and identically distributed, i.i.d.）：对同一个臂，一次奖励不影响另一次，且各次都来自同一个固定分布；不同臂之间的分布可以不同（L17 p6）。说清楚哪里不成立、上下文能补救多少；顺便确认动作不改变下一个状态（否则就是强化学习 RL，L17 p26）。`,
           T`**评估**：要离线比较很多算法，就收集一份臂是均匀随机选的日志，用 replay 回放评估（Workshop 10，[c48](#/c48) ⑥）。`,
         ],
       },
@@ -147,7 +147,7 @@ $Q(1)=\tfrac{40}{64}+\sqrt{9/64}=0.625+0.375=1.0$；$Q(2)=\tfrac{10}{16}+\sqrt{9
 
 **Rewards:** 1 if the user clicks the article preview, 0 otherwise. The cumulative reward is then exactly the total number of clicks management uses to judge the system, so maximising cumulative reward (minimising regret) is the business goal.
 
-Because users' tastes differ, each round we also observe a context vector $\mathbf X_i(t)$ for each arm, estimate $E[R_i(t)\mid\mathbf X_i(t)]$ by regression, and play the arm with the highest UCB on the regression prediction (e.g. LinUCB).`,
+Because users' tastes differ, each round we also observe a context vector $\mathbf X_i(t)$ for each arm, estimate $E[R_i(t)\mid\mathbf X_i(t)]$ by regression, and play the arm with the highest UCB on the regression prediction (e.g. LinUCB：用线性回归预测奖励，再加探索奖励的上下文 UCB 方法).`,
           },
           { t: 'h4', text: '(b) context vectors（6 分）' },
           '6 分要写出几类具体特征，并说明它们来自 TechNews 的哪些数据、为什么能帮助预测点击。L17 p25 的三类例子是"访问者资料（state）、网页内容（state）、候选广告的特征（arm）"，照这个思路分类：',
@@ -158,10 +158,10 @@ Because users' tastes differ, each round we also observe a context vector $\math
               ['本次访问（匿名用户也有）', '设备（手机 / 电脑）、时段、星期几、从哪个页面进来', '没登录的用户只能靠这些'],
               ['文章本身', '类别、关键词 / 主题、作者、发布了多久', '新文章也能借用老文章的经验'],
               ['臂本身（标题、图片）', '标题长度、风格（疑问句、数字、引语）、情感倾向；图片类型（人脸、场景、图表）、颜色等图像特征', '对应 L17 p25 的 features of a potential ad (arm)'],
-              ['交叉特征', '例如"该用户对这篇文章所属类别的历史点击率"', '线性回归学不到乘积关系，要手工构造（[c12](#/c12) 的 basis expansion 思路）'],
+              ['交叉特征', '把用户特征与文章特征组合，例如“用户的体育类历史点击率 × 文章是否属于体育类（是为 1，否为 0）”', '只输入原始特征的线性回归会把各项分别加权相加，不会自动生成它们的乘积；把乘积也作为输入，就能表达“体育迷遇到体育文章”的搭配效果。这叫基展开（basis expansion，见 [c12](#/c12)）'],
             ],
           },
-          '编码：类别型特征用 one-hot，数值特征标准化，再拼成一个向量。特征里有文章和臂的特征，回归就能在不同文章之间共享信息：一个新标题还没被展示几次，也能先得到一个合理的点击率估计（冷启动 cold start）。',
+          '编码：类别型特征用独热编码（one-hot），即每个类别占一个位置，所属类别记 1，其余记 0；例如类别只有“本地、国际、评论”时，国际新闻编码为 $(0,1,0)$。数值特征标准化，即减去训练数据中该特征的均值，再除以其标准差，避免不同量纲造成数值大小悬殊。最后把这些数按固定顺序拼成一个向量。特征里有文章和臂的特征，回归就能在不同文章之间共享信息：一个新标题还没被展示几次，也能先得到一个合理的点击率估计（冷启动 cold start）。',
           {
             t: 'exam', title: 'Exam phrasing · (b)',
             md: T`The context vector $\mathbf X_i(t)$ for arm $i$ in round $t$ concatenates (categorical features one-hot encoded, numerical features standardised):
@@ -193,8 +193,8 @@ Context makes the assumption **more realistic**: conditioning on user, article a
           {
             t: 'ul', items: [
               '收集什么：在一小部分流量上，每一轮从这篇文章的候选组合里**均匀随机**选一个展示；记录这一轮所有臂的上下文向量、实际展示的臂、点没点（以及时间戳）。上下文一定要一起记，否则没法回放 contextual bandit。',
-              'replay 怎么用：按时间顺序回放日志，让被评估的 bandit 看同样的上下文、选一个臂；和日志里的臂相同，就把日志里的奖励给它、更新它、计分；不同就跳过这一条。',
-              '为什么必须均匀随机：（每轮候选臂个数相同时）保留下来的轮次和这个算法真的上线时遇到的情况一样，评估没有偏差；候选个数不同的文章要分开评估。如果日志是某个现有算法选的，它偏爱的臂被记录得多，评估就会偏。',
+              'replay 怎么用：按时间顺序读取日志，让被评估的 bandit 只看该条记录的上下文并选一个臂，再核对是否与日志展示的臂相同。相同才把记录中的奖励交给它、更新模型，并累计奖励和匹配条数；不同则跳过，不交付奖励、不更新模型，也不计入匹配条数。最后用“匹配记录的奖励总和 / 匹配条数”估计该算法的平均奖励；在本题就是点击率。',
+              '为什么必须均匀随机：若每轮都有 $k$ 个候选臂，无论待评算法看到什么上下文、选哪个臂，日志恰好展示同一个臂的概率都是 $1/k$。因此匹配筛选不会特别偏向某类上下文，保留下来的轮次可代表该算法上线时遇到的情况，评估没有偏差。候选臂个数不同时，匹配概率也不同，所以这里把候选个数不同的文章分开评估。如果日志是某个现有算法选的，它偏爱的臂被记录得多，评估就会偏。',
               T`为什么高效：一份日志可以回放给任意多个 bandit，不用逐个上线。代价是 $k$ 个臂时平均只有约 $1/k$ 的轮次能对上（例如 3 个标题 × 4 张图 = 12 个臂，只能用约 $1/12\approx8\%$），所以日志要足够大。`,
             ],
           },
@@ -232,11 +232,11 @@ Any number of bandit learners can then be evaluated offline on this one log by r
       { t: 'h2', text: '8. 同一讲里还可能考什么', id: 'related' },
       {
         t: 'table', head: ['方法', '规则', '课件结论'], rows: [
-          ['Greedy', '$i_t\\in\\argmax_i Q_{t-1}(i)$，$Q$ = 经验均值（注意：这里的 $Q$ 没有 bonus；UCB 的 $Q$ 才是均值 + 根号）', '只利用不探索；行为取决于 $Q_0$（p7）'],
-          ['Greedy, $Q_0=-\\infty$（悲观）', '', '第一次拉了谁，以后永远拉它（p8）'],
+          ['Greedy（贪心）', '$i_t\\in\\argmax_i Q_{t-1}(i)$：$\\argmax_i$ 表示使评分最大的臂编号集合，$\\in$ 表示从这个集合里选一个，即选当前经验均值最高的臂。已拉过的臂 $Q$ = 经验均值，未拉过的臂仍用 $Q_0$（这里的 $Q$ 没有 bonus；UCB 的 $Q$ 才是均值 + 根号）', '只利用不探索；行为取决于 $Q_0$（p7）'],
+          ['Greedy, $Q_0=-\\infty$（悲观）', '负无穷比任何有限值都小。起初各臂同分；第一次拉过的臂得到有限的经验均值，其他臂仍为负无穷，所以贪心算法一直选已拉过的那个', '第一次拉了谁，以后永远拉它（p8）'],
           ['Greedy, $Q_0=+\\infty$（乐观）', '', '前 $k$ 轮每个臂各拉一次，之后纯利用（p9）'],
-          ['$\\varepsilon$-greedy', '概率 $1-\\varepsilon$ 选最优，概率 $\\varepsilon$ 均匀随机', '探索是"盲目"的，不看哪个臂更有希望（p10、p14）'],
-          ['UCB', '均值 + bonus', 'regret $O(\\log t)$，平均 regret → 0（p22）'],
+          ['$\\varepsilon$-greedy（带随机探索的贪心）', '$0\\le\\varepsilon\\le1$ 是每轮进行随机探索的概率：以概率 $1-\\varepsilon$ 按贪心规则选当前估计均值最高的臂；以概率 $\\varepsilon$ 从全部 $k$ 个臂中均匀随机选一个，每个臂被选的概率都是 $1/k$', '探索是"盲目"的，不看哪个臂更有希望（p10、p14）'],
+          ['UCB', '均值 + bonus', '累计 regret 为 $O(\\log t)$：大 O 表示增长上界，即轮数足够大时，累计 regret 不超过某个固定常数乘以 $\\log t$。平均 regret = 累计 regret / 已进行轮数；→ 0 表示轮数越来越多时，每轮平均损失趋近于 0（p22）'],
         ],
       },
       {
@@ -244,7 +244,7 @@ Any number of bandit learners can then be evaluated offline on this one log by r
         blocks: [
           'Hoeffding 不等式（L17 p17）：$n$ 个 $[0,1]$ 上 i.i.d. 的奖励，样本均值 $\\bar R_n$，以至少 $1-\\varepsilon$ 的概率',
           { t: 'math', tex: T`\mu\le\bar R_n+\sqrt{\frac{\log(1/\varepsilon)}{2n}}` },
-          '（这里的 $\\varepsilon$ 是"不等式不成立的概率"，不是 ε-greedy 的探索概率；$\\mu$ 是这只臂的真实均值。）令 $n=N_{t-1}(i)$，$\\varepsilon=1/t^4$：$\\log(1/\\varepsilon)=4\\log t$，于是 $\\sqrt{\\frac{4\\log t}{2N}}=\\sqrt{\\frac{2\\log t}{N}}$（$4/2=2$），正好是 UCB 的 bonus。所以 $Q$ 是均值的一个**高概率上界**（upper confidence bound），名字由此而来。',
+          '（这里的 $\\varepsilon$ 是"不等式不成立的概率"，不是 ε-greedy 的探索概率；$\\mu$ 是这只臂的真实均值。）把样本数取为该臂已被拉的次数，即 $n=N_{t-1}(i)$。再人为选定失败概率 $\\varepsilon=1/t^4$，不是从奖励记录算出来的；轮数越大，允许的失败概率越小。于是 $1/\\varepsilon=1/(1/t^4)=t^4$，再用对数的幂次规则（幂次可移到对数前面），得到 $\\log(1/\\varepsilon)=\\log(t^4)=4\\log t$，于是 $\\sqrt{\\frac{4\\log t}{2N}}=\\sqrt{\\frac{2\\log t}{N}}$（$4/2=2$），正好是 UCB 的 bonus。所以 $Q$ 是均值的一个**高概率上界**（upper confidence bound），名字由此而来。',
           { t: 'errata', md: 'L17 p17 同时提到 $\\varepsilon=1/t$（Lai & Robbins）和"take $\\varepsilon=1/t^4$"。和公式里的 2 对应的是 $1/t^4$。' },
           '把 2 换成可调的 $\\rho>0$（p22）可以控制探索强度，也能处理奖励在其他已知有界区间里的情况（按区间宽度调系数）。',
         ],

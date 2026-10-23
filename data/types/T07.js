@@ -13,7 +13,7 @@
       { text: '2026 practice Q6', cls: 'hot' }, { text: '2025 practice Q1d–e, Q4, Q6', cls: 'hot' }, { text: '2021 exam Q14', cls: 'src' },
       { text: '2017 exam Q11 · 2016 exam Q12', href: '#/T07/more', cls: 'src' },
     ],
-    lead: '这一类题分值最高，套路也最固定：**画图 → 写因子分解 → 数 CPT → 填 0/1 或数数估计 → 解释怎么用模型做决定**。山火题（Dandenongs / Bayesville）在 2025 和 2026 都出现了，务必背熟。',
+    lead: '这一类题分值最高，套路也最固定：**画图 → 写因子分解 → 数 CPT → 填 0/1 或数数估计 → 解释怎么用模型做决定**。山火题（Dandenongs / Bayesville）在 2025 和 2026 都出现了，务必背熟。全页缩写：PGM = 概率图模型（probabilistic graphical model），CPT = 条件概率表（conditional probability table），MLE = 最大似然估计（maximum likelihood estimate）。',
     blocks: [
       { t: 'h2', text: '1. 基础：图 ↔ 因子分解 ↔ CPT', id: 'basics' },
       {
@@ -33,17 +33,17 @@
       },
 
       { t: 'h2', text: '2. 数 CPT：三种口径都要会', id: 'count' },
-      '设变量 $X$ 有 $k$ 种取值，父节点的取值组合共 $c$ 种（各父节点取值数相乘，没有父节点时 $c=1$）。',
+      '先约定记号：$k$ 是变量 $X$ 的取值个数（布尔变量——只取 0/1、真/假——则 $k=2$）；$c$ 是父节点的取值组合数（各父节点的取值个数相乘；没有父节点时 $c=1$，即只有一种组合）。下面三种「口径」就是同一张表的三种数法。',
       {
         t: 'table', head: ['口径', '公式', '布尔变量、2 个父节点时', '什么时候用'], rows: [
           ['表的形状（L20 p11 的画法）', '$k\\times c$：行是 $X$ 的取值，列是父节点组合', '$2\\times4$', '问"dimensions of the table"'],
           ['概率条目数 / 列出所有赋值的行数', '$k\\cdot c$', '8', '问"how many rows"'],
-          ['自由参数（independent parameters）', '$(k-1)\\cdot c$（每列和为 1，少一个）', '4', '问"how many parameters"'],
+          ['自由参数（independent parameters，英文答案也写成 free parameters，是同一个东西）', '$(k-1)\\cdot c$（每列和为 1，少一个）', '4', '问"how many parameters"'],
         ],
       },
       {
         t: 'good', title: '卷面策略',
-        md: '口径不确定时，**写出你用的口径，再顺手给出另一种**。例如："$P(A\\mid S_1,\\dots,C_2)$ is a $2\\times32$ table (32 parent configurations), i.e. 64 entries / 32 free parameters." 阅卷人按哪种口径都能找到对应的数。',
+        md: '口径不确定时，**写出你用的口径，再顺手给出另一种**。例如（用的就是第 3 节山火题的 5 个传感器网络）："$P(A\\mid S_1,\\dots,C_2)$ is a $2\\times32$ table (32 parent configurations), i.e. 64 entries / 32 free parameters." 阅卷人按哪种口径都能找到对应的数。',
       },
       {
         t: 'past', src: '2025 S1 practice Q1(d)(e)', marks: '5 + 5', topic: 'L20 p9–p11',
@@ -54,7 +54,7 @@
         blocks: [{ t: 'graph', nodes: { X: [40, 40], Y: [150, 40], Z: [260, 40], V: [95, 150] }, edges: 'X>V Y>V', w: 300, caption: '(e) 的图：$X,Y,Z$ 互相独立（没有父节点），$V$ 的父节点是 $X,Y$。每个节点存一张"给定父节点"的表。' }],
         sol: [
           '(d) 全联合表：4 个布尔变量，$2^4=2\\times2\\times2\\times2=$ **16** 行（概率加起来为 1，所以 $16-1=15$ 个自由参数）。',
-          '(e) $P(X)P(Y)P(Z)P(V\\mid X,Y)$：$X,Y,Z$ 没有父节点，各存 2 行（取 0、取 1）；$V$ 的表是 $V$ 的 2 个取值 × 父节点 $X,Y$ 的 4 种组合 $=2^3=8$ 行。合计 $2+2+2+8=$ **14** 行（题目问的是行数）。自由参数每张表每列少 1 个：$1+1+1+4=7$。(d) 的 15 是 $16-1$。',
+          '(e) $P(X)P(Y)P(Z)P(V\\mid X,Y)$：$X,Y,Z$ 没有父节点，各存 2 行（取 0、取 1）；$V$ 的表有 2 个取值 × 父节点 $X,Y$ 的 4 种组合，共 $2^3=8$ 个条目（这里把它们全部列出来，所以算 8"行"；若按第 2 节"行 = $X$ 的取值"的口径，它是 $2\\times4$ 的表、只有 2 行）。合计 $2+2+2+8=$ **14** 行（题目问的是行数）。自由参数每张表每列少 1 个：$1+1+1+4=7$。(d) 的 15 是 $16-1$。',
           { t: 'exam', md: T`(d) $2^4=16$ rows (one per joint assignment; 15 free parameters since they sum to 1).
 (e) The joint factorises as $P(X)P(Y)P(Z)P(V\mid X,Y)$, so we store $2+2+2+2^3=14$ rows (only $1+1+1+4=7$ free parameters).` },
         ],
@@ -83,16 +83,16 @@
               }).join('') + '<g class="node"><circle cx="180" cy="120" r="20"/><text x="180" y="120">A</text></g></svg>',
           },
           { t: 'h4', text: '(b) 数 CPT' },
-          '6 个节点 ⇒ **6 张 CPT**：$P(S_1),P(S_2),P(S_3),P(C_1),P(C_2)$ 各是 $2\\times1$；$P(A\\mid S_1,S_2,S_3,C_1,C_2)$ 是 $2\\times2^5=2\\times32$。',
+          '6 个节点 ⇒ **6 张 CPT**：$P(S_1),P(S_2),P(S_3),P(C_1),P(C_2)$ 各是 $2\\times1$（2 个取值 × 只有 1 种父节点组合：根节点没有父节点，$c=1$）；$P(A\\mid S_1,S_2,S_3,C_1,C_2)$ 是 $2\\times2^5=2\\times32$。',
           { t: 'note', md: '两套口径数的是同一张表。**课件口径**（上面）：行 = $A$ 的取值（2 行），列 = 5 个父节点的组合 $2^5=32$，形状 $2\\times32$，共 64 格、32 个自由参数。**2025 题的口径**问"每张表几**列**"，把表里出现的变量各算一列：5 张根节点表各 1 列，$A$ 的表 6 列（$A$ 加 5 个父节点）；把所有赋值一行一行列出来共 $2^6=64$ 行——这 64 行就是上面那 64 格，只是换了排法。' },
           { t: 'good', title: '官方答案的写法（2026 practice 解答）', md: '官方把表画成"一行 = 一种父节点组合，只写取 True 的概率"（False 的概率就是 1 减它）：5 个传感器的表各 **1 行**（只有 $P(S_i=\\text{True})$）；$A$ 的表有 6 列（5 个父节点 + $A$）、**32 行**（$2^5=32$ 种父节点组合，每行给 $P(A=\\text{True}\\mid\\cdot)$）。和上面课件口径的 $2\\times32$ 是同一张表，只是转置、并省掉了"1 减"的那一半。考试按任一种写都行，写清楚行和列各代表什么。' },
           { t: 'h4', text: '(c) 传感器绝对准确' },
           '$A$ 的 CPT 变成**确定性**的：每个条目都是 0 或 1。32 种父节点组合中：三个 $S$ 有 $2^3=8$ 种，去掉全 off 的 1 种，"至少一个为 1"有 7 种；$C_1=C_2=0$ 只有 1 种；所以 $7\\times1=7$ 种父节点组合下 $P(A{=}1\\mid s_1,s_2,s_3,c_1,c_2)=1$，其余 $32-7=25$ 种组合下这个条件概率为 0。传感器本身的先验 $P(S_i),P(C_j)$ **不**变成 0/1（"准确"不代表火灾不随机）。',
           { t: 'h4', text: '(d) $S_1$ 不准确' },
           '加一个隐变量 $F_1$ = $S_1$ 位置真实是否有火。$F_1\\to S_1$（**原因 → 观测**：先有真实火情，传感器读数才随之出现，误报 / 漏报是测量噪声；不要画成 $S_1\\to F_1$），并把 $S_1\\to A$ 换成 $F_1\\to A$（应该根据真实火情决定）。新增 CPT：$P(F_1)$ 和 $P(S_1\\mid F_1)$（$2\\times2$，表示误报率与漏报率，不是 0/1）。$A$ 的规则不变，只是用 $F_1$ 代替 $S_1$。',
-          { t: 'note', md: '这和课件 L20 p8–p11 的硬币例子同一思路：第三人的报告 $X_3$ 只有 90% 准确，所以用 $P(X_3\\mid X_1,X_2)$ 这张非 0/1 的表来表示"报告有噪声"。' },
+          { t: 'note', md: '这和"传感器会出错"的通用做法一样：观测到的读数可能有噪声时，不把它当成真值，而是加一个"真实状态"节点，再用一张不全是 0/1 的表 $P(\\text{读数}\\mid\\text{真实状态})$ 表示出错的概率，这里就是 $P(S_1\\mid F_1)$。' },
           { t: 'h4', text: '(e) 怎么用模型报警' },
-          '$F_1$（真实火情）看不到，所以要求和掉；$s_1$ 是读到的传感器数。$A$ 的父节点现在是 $F_1,S_2,S_3,C_1,C_2$（不含 $S_1$）；没观测 $A$ 时 $F_1$ 只和 $S_1$ 有关，所以 $P(f\\mid s_1,\\dots,c_2)=P(f\\mid s_1)$。$f$ 只有 0、1 两项。观测到五个读数后，对隐变量 $F_1$ 求和，算后验 $P(A=1\\mid s_1,s_2,s_3,c_1,c_2)=\\sum_{f}P(A=1\\mid f,s_2,s_3,c_1,c_2)\\,P(f\\mid s_1)$。超过阈值（如 0.5，或按疏散的代价调整）就报警。若 $C_1$ 或 $C_2$ 为 1，求和里两项的 $P(A=1\\mid\\cdot)$ 都是 0，后验为 0，不报警。',
+          '$F_1$（真实火情）看不到，所以要求和掉；$s_1$ 是读到的传感器 $S_1$ 的取值（0 或 1；$s_2,c_1$ 等小写字母同理，都是对应变量被观测到的值）。$A$ 的父节点现在是 $F_1,S_2,S_3,C_1,C_2$（不含 $S_1$）；为什么 $P(f\\mid s_1,\\dots,c_2)=P(f\\mid s_1)$：$F_1$ 和其他读数 $S_2,\\dots,C_2$ 只通过 $A$ 连在一起（$F_1\\to A\\leftarrow S_2$ 这种形状），$A$ 是它们的共同孩子而且没被观测，这条路是断的（[D-separation](#/T05) 的 v-structure 规则）。所以知道 $s_1$ 以后，其他读数不再提供 $F_1$ 的信息。$P(f\\mid s_1)$ 用 Bayes 公式由先验 $P(f)$ 和 $P(s_1\\mid f)$ 算出。$f$ 只有 0、1 两项。观测到五个读数后，对隐变量 $F_1$ 求和，算后验 $P(A=1\\mid s_1,s_2,s_3,c_1,c_2)=\\sum_{f}P(A=1\\mid f,s_2,s_3,c_1,c_2)\\,P(f\\mid s_1)$。超过阈值就报警。题目没给阈值：最朴素的选择是 0.5（后验大于一半就报警），也可以按漏报 / 误报的代价来定。若 $C_1$ 或 $C_2$ 为 1，求和里两项的 $P(A=1\\mid\\cdot)$ 都是 0，后验为 0，不报警。',
           {
             t: 'exam', title: 'Exam phrasing · (a)–(e) 要点',
             md: T`(a) Nodes $S_1,S_2,S_3,C_1,C_2,A$; edges $S_1\to A$, $S_2\to A$, $S_3\to A$, $C_1\to A$, $C_2\to A$, i.e. $P(S_1)P(S_2)P(S_3)P(C_1)P(C_2)P(A\mid S_1,S_2,S_3,C_1,C_2)$.
@@ -105,12 +105,12 @@
       },
 
       { t: 'h2', text: '4. MLE 估计 CPT（数数）', id: 'mle' },
-      '完整观测（每个变量都观测到）时，MLE 就是**计数比例**（和 L02 的 Bernoulli MLE $\\hat\\theta=k/n$ 一样，只是按父节点组合分组）。某个父节点组合在数据里一次都没出现时，计数比例是 $0/0$，数据定不下这一列（任何归一化的分布似然都一样大），需要额外约定（例如平滑）：',
+      '完整观测（每个变量都观测到）时，MLE 就是**计数比例**（和 L02 的 Bernoulli MLE 一样：$\\hat\\theta=k/n$，其中 $n$ = 样本数，$k$ = "成功"出现的次数，$\\hat\\theta$ = 成功概率的估计；Bernoulli 指只有 0/1 两种结果的变量。注意这里的 $k$ 和第 2 节"$X$ 有 $k$ 种取值"的 $k$ 无关；MLE 在这里只是把样本按父节点组合分组）。某个父节点组合在数据里一次都没出现时，计数比例是 $0/0$，数据定不下这一列（任何归一化的分布似然都一样大），需要额外约定（例如平滑：每个计数都加一个伪计数，比如 1，就不会出现 0/0）。下面公式里 $\\#\\{\\cdots\\}$ 读作"满足条件的数据点个数"（$\\#$ 就是"数个数"），$x$ 是 $X$ 的某个具体取值，$\\text{pa}=u$ 表示父节点取某一组具体取值，$u$ 是那组取值的代号：',
       { t: 'math', tex: T`\hat P(X=x\mid \text{pa}=u)=\frac{\#\{X=x,\ \text{pa}=u\}}{\#\{\text{pa}=u\}}` },
       {
         t: 'past', src: '2025 S1 practice Q4', marks: '5 + 5 + 5', topic: 'L20 p9–p11, L02 MLE',
         q: 'Consider the directed PGM $A\\to C\\leftarrow B$ with Boolean variables. (a) Write the format (with empty values) of the conditional probability tables. (b) Suppose we observe $n$ sets of values of $A,B,C$ (complete observations). What does the maximum-likelihood principle say to do? (c) Suppose we observe 5 training examples for $(A,B,C)$: $(F,F,F)$; $(F,F,T)$; $(F,T,F)$; $(T,F,T)$; $(T,T,T)$. Determine maximum-likelihood estimates for your tables.',
-        qzh: T`考虑布尔变量的有向概率图模型（directed PGM）$A\to C\leftarrow B$。(a) 写出条件概率表（conditional probability table）的格式（数值留空）。(b) 假设我们观测到 $n$ 组 $A,B,C$ 的取值（完整观测，complete observations）。最大似然原则（maximum-likelihood principle）要求怎么做？(c) 假设我们观测到 5 个 $(A,B,C)$ 训练样本：$(F,F,F)$；$(F,F,T)$；$(F,T,F)$；$(T,F,T)$；$(T,T,T)$。求你的表的最大似然估计（maximum-likelihood estimate）。`,
+        qzh: T`考虑布尔变量的有向概率图模型（directed PGM）$A\to C\leftarrow B$。(a) 写出条件概率表（conditional probability table）的格式（数值留空）。(b) 假设我们观测到 $n$ 组 $A,B,C$ 的取值（完整观测，complete observations）。最大似然原则（maximum-likelihood principle）要求怎么做？(c) 假设我们观测到 5 个 $(A,B,C)$ 训练样本（$T$ = True = 真，$F$ = False = 假）：$(F,F,F)$；$(F,F,T)$；$(F,T,F)$；$(T,F,T)$；$(T,T,T)$。求你的表的最大似然估计（maximum-likelihood estimate）。`,
         azh: T`(b) 选择使观测数据的似然（likelihood）$\prod_{i=1}^{n}P(a_i)P(b_i)P(c_i\mid a_i,b_i)$ 最大（等价地，使对数似然最大）的 CPT 条目，约束是每个分布之和为 1。在完整数据下，这个问题按表分解（decouple），解就是相对频率（relative frequency）：每个条目等于该取值（在该父节点配置下）的计数除以该父节点配置的计数。`,
         blocks: [{ t: 'fig', src: 'assets/figures/ex2025_q4_bn.png', w: 220 }],
         sol: [
@@ -158,8 +158,8 @@
       {
         t: 'past', src: '2021 S1 exam Q14(c)', marks: 4, topic: 'L04 logistic, L20 CPT',
         q: 'Instead of implementing $P(D\\mid A,B)$ as a large conditional probability table, we decide to use a logistic regression model with three parameters (one for each of the two conditioning variables, and a bias term). Besides reducing the number of parameters, state another important consequence of this change.',
-        qzh: T`我们不把 $P(D\mid A,B)$ 实现为一张大的条件概率表，而是决定使用一个有三个参数的逻辑回归（logistic regression）模型（两个条件变量各一个参数，外加一个偏置项（bias term））。除了减少参数数量之外，说出这一改变的另一个重要后果。`,
-        azh: T`CPT 可以表示父节点配置上的任意条件分布，而逻辑回归 $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ 把对数几率（log-odds）限制为 $A$ 和 $B$ 的线性函数。因此模型失去了表达能力（expressiveness）：$A$ 和 $B$ 之间的交互作用（例如类似 XOR 的依赖关系）不再能被表示，也就是说模型的偏差（bias）更大。作为交换，参数在不同父节点配置之间共享，可能降低估计的方差；训练中从未出现过的配置也能给出预测，但不保证准确。`,
+        qzh: T`我们不把 $P(D\mid A,B)$ 实现为一张大的条件概率表，而是决定使用一个有三个参数的逻辑回归（logistic regression：把线性分数 $w_0+w_AA+w_BB$ 用 sigmoid $\sigma(s)=1/(1+e^{-s})$ 压成 0–1 之间的概率）模型（两个条件变量各一个参数，外加一个偏置项（bias term））。除了减少参数数量之外，说出这一改变的另一个重要后果。`,
+        azh: T`CPT 可以表示父节点配置上的任意条件分布，而逻辑回归 $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ 把对数几率（log-odds）限制为 $A$ 和 $B$ 的线性函数。因此模型失去了表达能力（expressiveness）：$A$ 和 $B$ 之间的交互作用（例如类似 XOR 的依赖关系）不再能被表示，也就是说模型的偏差（bias）更大（这里的 bias 指"模型太简单带来的系统性误差"，和上面那个偏置项 bias term 不是一回事）。作为交换，参数在不同父节点配置之间共享，可能降低估计的方差；训练中从未出现过的配置也能给出预测，但不保证准确。`,
         sol: [
           '中文要点：$\\sigma(s)=1/(1+e^{-s})$ 把分数压到 0 和 1 之间；logistic 的分数只有 $w_0+w_AA+w_BB$（$A,B$ 取 0 或 1），$A$ 和 $B$ 的影响只能**相加**。CPT 可以给 4 种父节点组合各填一个任意概率；logistic 做不到"$A,B$ 不同时 $D=1$、相同时 $D=0$"这种 XOR 式的依赖。',
           { t: 'exam', md: T`The CPT can represent any conditional distribution over the parent configurations, whereas logistic regression $P(D=1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ restricts the log-odds to be linear in $A$ and $B$. So the model loses expressiveness: interactions between $A$ and $B$ (e.g. an XOR-like dependence) can no longer be represented, i.e. the model is more biased. In exchange, parameters are shared across parent configurations, which can reduce estimation variance, and configurations never seen in training still get a prediction (though not necessarily an accurate one).` },
@@ -180,14 +180,14 @@
           { t: 'h4', text: '(a) 画图：原因 → 结果' },
           T`流感 $F$ 是原因，症状 $S_1,\dots,S_I$ 和检测结果 $T$ 都是它的结果，所以箭头都从 $F$ 出发：每个 $i$ 一条 $F\to S_i$，再加 $F\to T$。因子分解：`,
           { t: 'math', tex: T`P(F,S_1,\dots,S_I,T)=P(F)\prod_{i=1}^{I}P(S_i\mid F)\;P(T\mid F)` },
-          T`"检测会出错"体现在 CPT 上：$P(T\mid F)$ 是一张不全是 0/1 的 $2\times2$ 表，$P(T{=}1\mid F{=}0)$ 是假阳性率（false positive rate），$P(T{=}0\mid F{=}1)$ 是假阴性率（false negative rate）。这个形状还表示"知道是不是流感以后，各症状和检测结果互相独立"，和山火题一样是"一个原因、多个结果"。`,
+          T`"检测会出错"体现在 CPT 上：$P(T\mid F)$ 是一张不全是 0/1 的 $2\times2$ 表，$P(T{=}1\mid F{=}0)$ 是假阳性率（false positive rate），$P(T{=}0\mid F{=}1)$ 是假阴性率（false negative rate）。上面那个因子分解（也就是下图的结构）还表示"知道是不是流感以后，各症状和检测结果互相独立"，和山火题一样是"一个原因、多个结果"。`,
           { t: 'graph', nodes: { F: [210, 30], S1: [60, 140], S2: [160, 140], S3: [260, 140], T: [370, 140] }, labels: { S1: 'S₁', S2: 'S₂', S3: 'S₃' }, edges: 'F>S1 F>S2 F>S3 F>T', w: 340, caption: '$I=3$ 时的画法：$I$ 种症状就画 $I$ 个 $S$ 节点。' },
           { t: 'warn', md: T`方向别画反：设计题按因果方向建模，流感引起症状，所以是 $F\to S_i$；画成 $S_i\to F$ 就成了"症状导致流感"。题目给的变量要全部用上，$T$ 也要和 $F$ 相连。` },
           { t: 'h4', text: '(b) 加上医生的诊断 D' },
           T`关键：医生看不到真实的 $F$，只看到证据（症状和检测结果）。`,
           {
             t: 'ul', items: [
-              T`**医生不完全准确**：$D$ 的父节点是证据 $S_1,\dots,S_I,T$，CPT $P(D\mid S_1,\dots,S_I,T)$ 的条目在 0 和 1 之间（同样的证据，医生有时判对、有时判错）。这张表有 $2^{I+1}$ 种父节点组合。`,
+              T`**医生不完全准确**：$D$ 的父节点是证据 $S_1,\dots,S_I,T$，CPT $P(D\mid S_1,\dots,S_I,T)$ 的条目在 0 和 1 之间（同样的证据，医生有时判对、有时判错）。这张表的父节点是 $I$ 个症状加 1 个检测结果 $T$，共 $I+1$ 个布尔变量，所以有 $2^{I+1}$ 种父节点组合。`,
               T`**医生完全准确**：$D$ 永远等于真实的 $F$。最简单的画法是 $F\to D$，CPT 是确定性的（deterministic）：$P(D{=}f\mid F{=}f)=1$，其余为 0。这时 $D$ 只是 $F$ 的副本，观测到 $D$ 就等于知道了 $F$。`,
             ],
           },
@@ -251,7 +251,7 @@
               ['合计', '$N+3$ 张', '', '$2^N+2N+3$'],
             ],
           },
-          T`例如 $N=3$：6 张表，$1+6+8+2=17$ 个自由参数。$C$ 的表最大，因为它有 $N$ 个父节点。`,
+          T`例如 $N=3$：6 张表，自由参数 $1+6+8+2=17$ 个（1 来自 $P(S)$；6 = 3 张 $P(M_i\mid S)$ 各 2 个；8 = $C$ 的表的 $2^3$ 种父节点组合；2 来自 $P(R\mid M_k)$）。$C$ 的表最大，因为它有 $N$ 个父节点。`,
           { t: 'h4', text: '12.3 简历不诚实' },
           T`"成绩可能报错"就是：简历上写的成绩不一定是真实成绩。把两者分开，再加一个"是否诚实"的变量：`,
           {
