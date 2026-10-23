@@ -12,28 +12,28 @@
       { text: 'L08 p13–p34', href: '#/L08', cls: 'src' }, { text: 'L09 p4–p13', href: '#/L09', cls: 'src' },
       { text: '2026 practice Q1c', cls: 'hot' }, { text: '2021 exam Q2, Q3', cls: 'hot' },
     ],
-    lead: '这类题分两种：**看图找支持向量**（纯几何），和**解释 margin / primal / dual 的简答**（要会英文说法）。',
+    lead: 'SVM 是支持向量机；margin（间隔）在本页指分界线到最近训练点的垂直距离。primal（原问题）直接求权重和截距；dual（对偶问题）改为求每个训练点对应的系数。硬间隔（hard margin）要求所有训练点都分对，并满足规定的间隔约束。这类题分两种：**看图找支持向量**（纯几何），和**解释 margin / primal / dual 的简答**（要会英文说法）。',
     blocks: [
       { t: 'h2', text: '1. 必背的几个式子', id: 'core' },
       {
         t: 'fx', title: 'Hard-margin SVM（L08 p21）',
         tex: T`\htmlClass{fx-p1}{\argmin_{\bw,b}\ \tfrac12\|\bw\|^2}\quad\text{s.t.}\quad \htmlClass{fx-p2}{y_i(\bw'\bx_i+b)}\htmlClass{fx-p3}{\ \ge 1},\ \ i=1,\dots,n`,
-        intro: '符号：$\\bw$ 是分界线的法向量（垂直于分界线的权重），$b$ 是截距；$\\bx_i$ 是第 $i$ 个点的坐标，$y_i\\in\\{+1,-1\\}$ 是它的类别；$\\bw\'\\bx$ 的撇是转置 = 对应分量相乘再相加；$\\argmin$ = "找出使后面式子最小的 $\\bw,b$"，s.t. = "并且必须满足"。最大化 margin 等价于最小化 $\\|\\bw\\|$（再取平方乘 ½，方便求导，解不变）。',
+        intro: '符号：$n$ 是训练点总数，$i=1,\\dots,n$ 是训练点编号；$\\bw$ 是分界线的法向量（垂直于分界线的权重），$b$ 是截距；$\\bx$ 表示任意输入点，决策边界满足 $\\bw\'\\bx+b=0$，这个表达式大于 0 时判为 $+1$，小于 0 时判为 $-1$；二维时边界是一条直线，更高维时叫超平面；$\\bx_i$ 是第 $i$ 个点的坐标，$y_i\\in\\{+1,-1\\}$ 是它的类别；$\\bw\'\\bx$ 的撇是转置 = 对应分量相乘再相加；$\\argmin$ = "找出使后面式子最小的 $\\bw,b$"，s.t. = "并且必须满足"。$\\|\\bw\\|$ 表示权重向量的长度：二维时若 $\\bw=(w_1,w_2)$，则 $\\|\\bw\\|=\\sqrt{w_1^2+w_2^2}$；更多维时也把各分量平方后相加再开根号。最大化 margin 等价于最小化 $\\|\\bw\\|$（再取平方乘 ½，方便求导，解不变）。',
         parts: [
           { label: '目标', note: 'margin（边界到最近点的距离）是 $1/\\|\\bw\\|$，所以最大化 margin = 最小化 $\\|\\bw\\|$。' },
-          { label: 'functional margin', note: '$y_i(\\bw\'\\bx_i+b)$：分对时为正。除以 $\\|\\bw\\|$ 才是真实距离（L08 p17）。' },
+          { label: 'functional margin（函数间隔）', note: '$y_i(\\bw\'\\bx_i+b)$：分对时为正。除以 $\\|\\bw\\|$ 才是真实距离（L08 p17）。' },
           { label: '$\\ge 1$', note: 'canonical scaling：$\\bw,b$ 同乘一个正数，边界不变，所以规定离边界最近的点 functional margin 恰好为 1（p19–p20）。等号成立的点就是 **support vectors**。' },
         ],
       },
       {
         t: 'table', head: ['量', '公式', '出处'], rows: [
           ['点到超平面的距离', '$\\dfrac{y_i(\\bw\'\\bx_i+b)}{\\|\\bw\\|}$', 'L08 p17'],
-          ['margin（单侧）', '$1/\\|\\bw\\|$；两条虚线之间的宽度是 $2/\\|\\bw\\|$', 'p21'],
+          ['margin（单侧）', '$1/\\|\\bw\\|$；两条 margin 线（满足 $\\bw\'\\bx+b=+1$ 和 $\\bw\'\\bx+b=-1$，画图时可补成虚线）之间的宽度是 $2/\\|\\bw\\|$', 'p21'],
           ['support vectors', '$y_i(\\bw\'\\bx_i+b)=1$ 的点，在 margin 线上', 'p13、p20'],
-          ['hinge loss', '$\\max(0,\\,1-y_i(\\bw\'\\bx_i+b))$', 'p31–p32'],
-          ['soft margin', '$\\tfrac12\\|\\bw\\|^2+C\\sum_i\\xi_i$，s.t. $y_i(\\bw\'\\bx_i+b)\\ge1-\\xi_i,\\ \\xi_i\\ge0$', 'p33–p34'],
-          ['dual', '$\\max_\\lambda\\sum\\lambda_i-\\tfrac12\\sum_i\\sum_j\\lambda_i\\lambda_jy_iy_j\\bx_i\'\\bx_j$，s.t. $\\lambda_i\\ge0$（soft：$\\le C$），$\\sum\\lambda_iy_i=0$。$\\lambda_i$ 是训练时要求的非负系数（每个训练点一个），不是坐标；$\\bx_i\'\\bx_j$ 是两点的点积。soft margin 里 $C$ 越大，违反 margin 罚得越重，越接近 hard margin', 'L09 p10、p12'],
-          ['从 dual 恢复', '$\\bw^*=\\sum_i\\lambda_i^*y_i\\bx_i$；只有 support vectors 的 $\\lambda_i^*>0$', 'L09 p9、p11'],
+          ['hinge loss（合页损失）', '$\\max(0,\\,1-y_i(\\bw\'\\bx_i+b))$。$\\max$ 表示取括号中较大的值：函数间隔至少为 1 时损失为 0，否则损失为 1 减去函数间隔', 'p31–p32'],
+          ['soft margin（软间隔）', '最小化 $\\tfrac12\\|\\bw\\|^2+C\\sum_i\\xi_i$，s.t. $y_i(\\bw\'\\bx_i+b)\\ge1-\\xi_i,\\ \\xi_i\\ge0$。$\\xi_i$ 是第 $i$ 个点的松弛变量（slack variable），表示允许它违反间隔约束的量；$C>0$ 是预先选定的惩罚强度；$\\sum_i\\xi_i$ 表示把全部 $n$ 个训练点的松弛量相加', 'p33–p34'],
+          ['dual', '$\\max_\\lambda\\sum\\lambda_i-\\tfrac12\\sum_i\\sum_j\\lambda_i\\lambda_jy_iy_j\\bx_i\'\\bx_j$，s.t. $\\lambda_i\\ge0$（soft：$\\le C$），$\\sum\\lambda_iy_i=0$。$\\lambda_i$ 是训练时要求解的非负系数（每个训练点一个），不是坐标；$\\lambda$ 表示整组系数 $(\\lambda_1,\\dots,\\lambda_n)$，$\\max_\\lambda$ 就是在满足约束的系数组合中找目标最大的那一组。$i,j$ 都是训练点编号，各从 1 到 $n$；$\\sum_i\\sum_j$ 表示对所有训练点配对求和，未写下标的 $\\sum\\lambda_i$ 和 $\\sum\\lambda_i y_i$ 也都是对全部训练点求和；$\\bx_i\'\\bx_j$ 是两点的点积。soft margin 里 $C$ 越大，违反 margin 罚得越重，越接近 hard margin', 'L09 p10、p12'],
+          ['从 dual 恢复', '上标 $*$ 表示求解后得到的最优值，不是乘号；例如 $\\lambda_i^*$ 是最优系数，$\\bw^*$ 是最优权重。$\\bw^*=\\sum_i\\lambda_i^*y_i\\bx_i$；只有 support vectors 的 $\\lambda_i^*>0$', 'L09 p9、p11'],
         ],
       },
 
@@ -41,7 +41,7 @@
       {
         t: 'steps', items: [
           '确认边界（题目给了就直接用）。',
-          '算每个点到边界的**垂直**距离。竖直边界 $x=c$ 时就是 $|x_i-c|$。',
+          '算每个点到边界的**垂直**距离。二维图中，$x$ 表示横坐标，$x_i$ 是第 $i$ 个点的横坐标，不是整个点向量；$c$ 是竖直边界所在的横坐标。竖直边界 $x=c$ 时，距离就是 $|x_i-c|$，竖线表示取绝对值。',
           '两类各自离边界最近的点就是 support vectors。hard-margin 最优解两侧最近距离相等，可以用这一点检查边界读得对不对。',
           '同一侧有几个点**并列最近**，就全部都是 support vectors。',
         ],
@@ -112,11 +112,11 @@
       {
         t: 'past', src: '2021 S1 exam Q3', marks: 4, topic: 'L09 p10, p13, p21–p23',
         q: 'For a support vector machine with a quadratic kernel, in what situation, if any, would it be better to use the primal program instead of the dual program for training?',
-        qzh: '对于使用二次核（quadratic kernel）的支持向量机，在什么情况下（如果存在的话）用原问题（primal program）训练比用对偶问题（dual program）更好？',
-        azh: T`对偶问题的计算代价随训练样本数 $n$ 增长（大约 $O(n^3)$，需要一个 $n\times n$ 的核矩阵（kernel matrix）），而原问题的代价随特征维数增长。对 $m$ 个输入特征，二次核对应的显式特征映射（feature map）只有 $O(m^2)$ 维。所以当样本数非常大、原始特征很少（$n \gg m^2$）时，更好的做法是显式展开特征并求解原问题。（对于 RBF 这样的无穷维核，原问题不可行。）`,
+        qzh: '对于使用二次核（quadratic kernel）的支持向量机，在什么情况下（如果存在的话）用原问题（primal program）训练比用对偶问题（dual program）更好？补充术语：核函数（kernel）用两个输入算出它们在新特征空间中的点积。二次核对应包含两两乘积的特征，例如两个输入特征 $x_1,x_2$ 可展开出 $x_1^2,x_1x_2,x_2^2$（具体形式也可含常数和一次项）；把这些新特征实际算出来，就叫显式特征映射。',
+        azh: T`对偶问题的计算代价随训练样本数 $n$ 增长（大约 $O(n^3)$，需要一个 $n\times n$ 的核矩阵（kernel matrix）），而原问题的代价随特征维数增长。对 $m$ 个输入特征，二次核对应的显式特征映射（feature map）只有 $O(m^2)$ 维。所以当样本数非常大、原始特征很少（$n \gg m^2$）时，更好的做法是显式展开特征并求解原问题。（RBF 是 radial basis function，中文为径向基函数；这里指按两点距离定义相似度的核，对应无穷维特征空间，不能像二次核一样列出有限个特征来求解原问题。）`,
         sol: [
-          '课件结论：一般方法求解 dual 的代价随**样本数** $n$ 增长（$O(n^3)$），primal 随**特征维数** $d$ 增长（$O(d^3)$）（L09 p10、p13）。二次核对应的显式特征空间维数大约是原维数的平方量级（$m$ 维输入 → $O(m^2)$ 个二次单项式，L09 p32）。（二次单项式 = 每对特征相乘 $x_ix_j$，$i\\le j$，约 $m(m+1)/2$ 个，所以是 $O(m^2)$；$O(n^3)$ 的意思是样本数翻倍，计算量约变成 8 倍）',
-          '所以：当**样本很多、原始特征很少**时（$n\\gg m^2$），直接在显式的二次特征上解 primal 更便宜；反之（高维、样本少，或用 RBF 这类无穷维核）就用 dual + kernel。',
+          '课件结论：一般方法求解 dual 的代价随**样本数** $n$ 增长（$O(n^3)$），primal 随**特征维数** $d$ 增长（$O(d^3)$）；这里 $d$ 是展开后的特征维数，$m$ 是原始输入维数，二次展开时 $d=O(m^2)$（L09 p10、p13）。二次核对应的显式特征空间维数大约是原维数的平方量级（$m$ 维输入 → $O(m^2)$ 个二次单项式，L09 p32）。（二次单项式 = 同一个样本的每对特征分量相乘 $x_rx_s$，$1\\le r\\le s\\le m$；这里 $r,s$ 是特征编号，不是训练点编号，共约 $m(m+1)/2$ 个，所以是 $O(m^2)$；$O(n^3)$ 的意思是样本数翻倍，计算量约变成 8 倍）',
+          '所以：当**样本很多、原始特征很少**时（$n\\gg m^2$，即样本数 $n$ 远大于展开后的特征数的量级 $m^2$），直接在显式的二次特征上解 primal 更便宜；反之（高维、样本少，或用 RBF 这类无穷维核）就用 dual + kernel。',
           {
             t: 'exam', md: T`The dual's cost grows with the number of training examples $n$ (roughly $O(n^3)$, an $n\times n$ kernel matrix), whereas the primal's cost grows with the feature dimension. A quadratic kernel corresponds to an explicit feature map of only $O(m^2)$ dimensions for $m$ input features. So when the number of examples is very large and the number of original features is small ($n \gg m^2$), it is better to expand the features explicitly and solve the primal. (With an infinite-dimensional kernel such as RBF, the primal is not an option.)`,
           },
@@ -128,8 +128,8 @@
         qzh: '弱对偶（weak duality）保证原问题（primal）的最优值总是对偶问题（dual）最优值的上界。我们怎么知道支持向量机的原问题和对偶问题最优值总是相等？*（2019 / 2021 练习卷的问法：为什么硬间隔 / 软间隔 SVM 的原问题和对偶问题最优值相同？）*',
         sol: [
           T`先分清两个词（L09 p6）：**weak duality（弱对偶）**对任何优化问题都成立，只保证 dual 最优值 $\le$ primal 最优值，中间可以有差距（duality gap）；strong duality（强对偶）是两者相等。课件的结论是"For convex programs, optima of primal and dual problems coincide"，所以答题的关键词是 convex（凸）。`,
-          T`为什么 SVM 是凸问题：目标 $\tfrac12\|\bw\|^2$（soft margin 再加 $C\sum_i\xi_i$）是开口向上的二次函数加线性项，是凸的；约束 $y_i(\bw'\bx_i+b)\ge1-\xi_i$、$\xi_i\ge0$ 对 $(\bw,b,\boldsymbol\xi)$ 都是线性的。凸目标 + 线性约束 = 凸二次规划（QP），强对偶成立，所以"solving dual solves the primal"（L09 p10），可以由 dual 解出 $\bw^*=\sum_i\lambda_i^*y_i\bx_i$。`,
-          { t: 'note', md: '强对偶的一般条件（凸 + Slater 条件）课件没讲，写"convex objective, linear constraints ⇒ strong duality"就够。hard margin 还要求数据线性可分，否则 primal 根本无解。2019 排版解答只写了一句"strong duality holds due to convexity of the objectives"（1 分）；2022 年同主题 5 分，要把弱对偶、凸性、结论都写出来。' },
+          T`为什么 SVM 是凸问题：目标 $\tfrac12\|\bw\|^2$（soft margin 再加 $C\sum_i\xi_i$）是开口向上的二次函数加线性项，是凸的；约束 $y_i(\bw'\bx_i+b)\ge1-\xi_i$、$\xi_i\ge0$ 对 $(\bw,b,\boldsymbol\xi)$ 都是线性的；$\boldsymbol\xi=(\xi_1,\dots,\xi_n)$ 表示全部松弛变量组成的向量。判断线性时，训练数据 $\bx_i,y_i$ 都是已知常数，待求的是 $\bw,b,\xi_i$；约束中这些待求量只出现一次方，也没有彼此相乘。凸目标 + 线性约束 = 凸二次规划（QP），强对偶成立，所以"solving dual solves the primal"（L09 p10），可以由 dual 解出 $\bw^*=\sum_i\lambda_i^*y_i\bx_i$。后面答案提到的 KKT（Karush–Kuhn–Tucker）条件，是连接原问题与对偶问题最优解的一组最优性条件；这里恢复权重的公式就是由它们得到的，本题无需推导这些条件。`,
+          { t: 'note', md: '更一般的强对偶定理还需检查额外条件，本题不要求展开，写"convex objective, linear constraints ⇒ strong duality"就够。hard margin 还要求数据线性可分，否则 primal 根本无解。2019 排版解答只写了一句"strong duality holds due to convexity of the objectives"（1 分）；2022 年同主题 5 分，要把弱对偶、凸性、结论都写出来。' },
           {
             t: 'exam', md: T`Weak duality only gives dual $\le$ primal. The SVM primal (hard or soft margin) is a convex optimisation problem: the objective $\tfrac12\|\mathbf w\|^2$ (plus $C\sum_i\xi_i$) is convex and all constraints are linear in $(\mathbf w,b,\boldsymbol\xi)$, i.e. it is a convex quadratic program. For convex programs strong duality holds, so the duality gap is zero and the primal and dual optima are equal (for the hard margin, provided the data are linearly separable so the primal is feasible). This is why solving the dual, and recovering $\mathbf w^*=\sum_i\lambda_i^*y_i\mathbf x_i$ through the KKT conditions, solves the primal.`,
           },
@@ -144,8 +144,8 @@
           T`L08 p29 原话列了三种做法："Still use hard-margin SVM, but transform the data"；"Relax the constraints"；"The combination of 1 and 2"。两种策略就写前两种，各说清楚**怎么做、为什么有用**：`,
           {
             t: 'ul', items: [
-              T`soft margin（软间隔，L08 p30–p34）：给每个点一个 slack $\xi_i\ge0$，约束放松成 $y_i(\bw'\bx_i+b)\ge1-\xi_i$，目标加罚项 $C\sum_i\xi_i$（等价于 hinge loss）。允许点进入 margin 甚至分错，但按违反程度罚；$C$ 控制罚多重。`,
-              T`特征变换 / kernel（L09 p15–p23）：把数据映射到 $\varphi(\bx)$ 的高维空间，在那里线性可分（如 XOR，见 [T8](#/T08/xor)）；dual 里数据只以点积出现，换成 $K(\bx_i,\bx_j)=\varphi(\bx_i)'\varphi(\bx_j)$ 就不用显式算 $\varphi$（如 RBF kernel）。`,
+              T`soft margin（软间隔，L08 p30–p34）：给每个点一个 slack $\xi_i\ge0$，约束放松成 $y_i(\bw'\bx_i+b)\ge1-\xi_i$，目标加罚项 $C\sum_i\xi_i$。为什么等价于 hinge loss：约束要求 $\xi_i\ge1-y_i(\bw'\bx_i+b)$，同时 $\xi_i\ge0$；固定 $\bw,b$ 后，因为 $C>0$，最小化目标会选最小可行的 $\xi_i=\max(0,1-y_i(\bw'\bx_i+b))$，这正是该点的 hinge loss。允许点进入 margin 甚至分错，但按违反程度罚；$C$ 控制罚多重。`,
+              T`特征变换 / kernel（L09 p15–p23）：把数据映射到 $\varphi(\bx)$ 的高维空间，在那里线性可分（如异或分类（XOR：两个二值输入不同时归为一类，相同时归为另一类），见 [T8](#/T08/xor)）；dual 里数据只以点积出现，换成 $K(\bx_i,\bx_j)=\varphi(\bx_i)'\varphi(\bx_j)$ 就不用显式算 $\varphi$（如 RBF kernel）。`,
             ],
           },
           { t: 'note', md: '学生批注只写了一句"Use the radial basis function"，只是第二种策略的一个例子，不够 5 分。' },
@@ -163,8 +163,8 @@
         qzh: '如果一个方法不依赖于固定数目的参数，就称它为非参数（non-parametric）方法。解释为什么 SVM 可以被看作非参数方法。',
         sol: [
           T`L02 p29：parametric = 参数个数固定、有限；non-parametric = 参数个数随数据增长，可能无限（见 [c09](#/c09)）。`,
-          T`看 SVM 的 dual 形式（L09 p11、p20）：训练求的是每个训练点一个乘子 $\lambda_i$，预测用 $s=b^*+\sum_i\lambda_i^*y_iK(\bx_i,\bx)$。模型要**存下支持向量本身**，参数个数（乘子 / 支持向量的个数）由数据决定、随 $n$ 增长，事先不固定。用 RBF 这类 kernel 时，特征空间无穷维，根本没有一个有限维的 $\bw$ 可以存，只能这样表示。`,
-          { t: 'note', md: '题目说"can be considered"：线性核的 SVM 在 primal 里只有 $d+1$ 个参数，是 parametric 的；非参数的说法针对 dual / kernel 形式，和 c09 的说明一致。' },
+          T`看 SVM 的 dual 形式（L09 p11、p20）：训练求的是每个训练点一个乘子 $\lambda_i$，预测用 $s=b^*+\sum_i\lambda_i^*y_iK(\bx_i,\bx)$，其中 $\bx$ 是待预测的新点，$s$ 是实数决策分数，不是类别标签；$s>0$ 时预测为 $+1$，$s<0$ 时预测为 $-1$。模型要**存下支持向量本身**，参数个数（乘子 / 支持向量的个数）由数据决定、随 $n$ 增长，事先不固定。用 RBF 这类 kernel 时，特征空间无穷维，根本没有一个有限维的 $\bw$ 可以存，只能这样表示。`,
+          { t: 'note', md: '题目说"can be considered"：线性核的 SVM 在 primal 里只有 $d+1$ 个参数（$d$ 是输入特征数：$d$ 个权重加一个截距 $b$），是 parametric 的；非参数的说法针对 dual / kernel 形式，和 c09 的说明一致。' },
           {
             t: 'exam', md: T`In its dual (kernelised) form the SVM is represented by one multiplier $\lambda_i$ per training point and predicts with $s=b^*+\sum_{i=1}^n\lambda_i^*y_iK(\mathbf x_i,\mathbf x)$, so the model must store the support vectors themselves. The number of parameters (multipliers / support vectors) therefore grows with the training data rather than being fixed in advance, and with a kernel such as RBF the feature space is infinite-dimensional, so no fixed finite weight vector exists. Hence the SVM can be considered non-parametric.`,
           },
@@ -176,7 +176,7 @@
         q: '*Perceptrons* and *hard-margin SVMs* are both *linear classifiers*. What is the difference between the two methods?',
         qzh: '感知机（perceptron）和硬间隔 SVM（hard-margin SVM）都是线性分类器（linear classifier）。这两种方法的区别是什么？',
         sol: [
-          T`两者都找一条分开两类的直线（超平面），区别在**找哪一条**。perceptron 用 SGD 最小化 perceptron loss，分对的点不产生损失（L10），所以一旦把训练数据全部分对就停，停在哪条线取决于初始权重和样本顺序。hard-margin SVM 在所有能分开数据的超平面里选 margin 最大的那一条（L08 p10），解唯一，对训练样本的抽样更稳健（L08 p11）。`,
+          T`两者都找一条分开两类的直线（超平面），区别在**找哪一条**。perceptron 用 SGD（随机梯度下降：每次用一个训练点计算更新方向并调整权重）最小化 perceptron loss（感知机损失），分对的点不产生损失（L10），所以一旦把训练数据全部分对就停，停在哪条线取决于初始权重和样本顺序。hard-margin SVM 在所有能分开数据的超平面里选 margin 最大的那一条（L08 p10），解唯一，对训练样本的抽样更稳健（L08 p11）。`,
           {
             t: 'exam', md: T`The perceptron stops at any hyperplane that separates the training data (it minimises the perceptron loss by SGD, so which separator it finds depends on the initial weights and the order of the examples), whereas the hard-margin SVM returns the unique separating hyperplane with the maximum margin (by solving a quadratic program), which is more robust to the sampling of the training data.`,
           },
@@ -207,7 +207,7 @@
         ],
       },
       {
-        t: 'errata', md: 'L08 p33 写 $C=1/\\lambda$。按 p32 的 $\\sum l_h+\\lambda\\|\\bw\\|^2$ 和 p33 的 $\\tfrac12\\|\\bw\\|^2+C\\sum\\xi_i$ 对比，严格是 $C=1/(2\\lambda)$。考试写"$C$ 与 $\\lambda$ 成反比"最稳。',
+        t: 'errata', md: '这里 $\\lambda>0$ 是正则化强度，不是前面的逐点对偶系数 $\\lambda_i$；$l_h$ 表示单个训练点的 hinge loss，$\\sum l_h$ 表示把全部训练点的 hinge loss 相加。L08 p33 写 $C=1/\\lambda$。按 p32 的 $\\sum l_h+\\lambda\\|\\bw\\|^2$ 和 p33 的 $\\tfrac12\\|\\bw\\|^2+C\\sum\\xi_i$ 对比：把前一个目标整体除以正数 $2\\lambda$（不改变最优解），得到 $\\tfrac12\\|\\bw\\|^2+\\frac{1}{2\\lambda}\\sum l_h$；再用最小可行的 $\\xi_i=l_h$ 对照后一个目标中损失项的系数，得到 $C=1/(2\\lambda)$。考试写"$C$ 与 $\\lambda$ 成反比"最稳。',
       },
       {
         t: 'quiz', items: [

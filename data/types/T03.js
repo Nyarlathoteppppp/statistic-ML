@@ -6,25 +6,25 @@
   root.SML.content.add({
     id: 'T03',
     eyebrow: '题型 T3 · 同一张图考了两次 · 3–10 分',
-    title: 'CNN 参数计数',
+    title: 'CNN（卷积神经网络）参数计数',
     en: 'How many parameters does this CNN have?',
     chips: [
       { text: 'L13 p6–p17', href: '#/L13', cls: 'src' }, { text: 'WS08 / WK08', cls: 'src' },
       { text: '2026 practice Q1d', cls: 'hot' }, { text: '2025 practice Q5', cls: 'hot' },
     ],
-    lead: '核心只有一句话：**卷积层的权重是共享的**（weight sharing），一个 filter 不管滑到哪里都用同一组参数。所以卷积层的参数不按输出位置重复计：权重数 = filter 个数 × 输入通道数 × filter 大小（含 bias 时每个 filter 再加 1），和输出有多少个单元无关。真题那种一维、单通道、单 filter 的层，权重数就等于 filter 宽度。',
+    lead: '核心只有一句话：**卷积层的权重是共享的**（weight sharing），filter（卷积核）是一组随窗口在输入上滑动的可学习权重。一个 filter 不管滑到哪里都用同一组参数。所以卷积层的参数不按输出位置重复计：权重数 = filter 个数 × 输入通道数 × filter 的空间格子数（一维数宽度；二维数高 × 宽，例如 5 × 5 算 25；含 bias 时每个 filter 再加 1），和输出有多少个单元无关。真题那种一维、单通道、单 filter 的层，权重数就等于 filter 宽度。',
     blocks: [
       { t: 'h2', text: '1. 三条公式', id: 'rules' },
-      '符号：1D 里 $n$ 是输入长度、$k$ 是 filter 宽（每次连看几个数）、$s$ 是 stride（窗口每次滑几格，没写就是 1）。2D 里 $H$ 是输入的高（宽用同一个公式）、$K$ 是正方形 filter 的边长、$P$ 是 padding（四周补几圈 0，没写就是 0）、$S$ 是 stride、$C_{in}$ 是输入通道数（黑白 1、RGB 3）、$C_{out}$ 是 filter 个数（= 输出通道数）。bias 是每个 filter / 每个输出单元额外加的一个常数。最终输出写成"高 × 宽 × 通道"，如 $28\\times28\\times6$。',
+      '符号：1D（一维序列）里 $n$ 是输入长度、$k$ 是 filter 宽（每次连看几个数）、$s$ 是 stride（窗口每次滑几格，没写就是 1）。2D（二维图像）里 $H$ 是输入的高（宽用同一个公式）、$K$ 是正方形 filter 的边长、$P$ 是 padding（四周补几圈 0，没写就是 0）、$S$ 是 stride、$C_{in}$ 是输入通道数（同一像素位置记录几种数，就有几个通道：灰度图记录 1 种亮度；RGB 彩色图记录红、绿、蓝 3 种分量，所以是 3 通道）、$C_{out}$ 是 filter 个数（= 输出通道数）。bias（偏置）是额外加上的可学习常数。卷积层每个 filter 有 1 个 bias，在该 filter 的所有输出位置共享；全连接层则每个输出单元有 1 个 bias。最终输出写成"高 × 宽 × 通道"，如 $28\\times28\\times6$。下面公式中的 $\\lfloor\\cdot\\rfloor$ 表示向下取整，即取不超过原数的最大整数，例如 $\\lfloor2.8\\rfloor=2$。',
       {
-        t: 'table', head: ['层', '权重（weights）', 'bias', '输出大小'], rows: [
-          ['1D 卷积，宽 $k$，1 个 filter', '$k$', '$1$', '$\\lfloor (n-k)/s\\rfloor+1$'],
+        t: 'table', head: ['层', '权重（weights）', 'bias', '输出大小（2D 这里只算高；宽同法计算，通道数另写）'], rows: [
+          ['1D 卷积（单通道、无 padding），宽 $k$，1 个 filter', '$k$', '$1$', '$\\lfloor (n-k)/s\\rfloor+1$'],
           ['2D 卷积，$C_{out}$ 个 $K\\times K$ filter，输入 $C_{in}$ 通道', '$C_{out}\\cdot C_{in}\\cdot K^2$', '$C_{out}$', '$\\lfloor (H+2P-K)/S\\rfloor+1$'],
-          ['全连接 $n_{in}\\to n_{out}$', '$n_{in}\\cdot n_{out}$', '$n_{out}$', '$n_{out}$'],
-          ['Max pooling', '0', '0', '$\\lfloor (H-K)/S\\rfloor+1$'],
+          ['全连接 $n_{in}\\to n_{out}$（$n_{in}$ 是输入单元数，$n_{out}$ 是输出单元数；每对输入、输出单元之间各有一个独立权重）', '$n_{in}\\cdot n_{out}$', '$n_{out}$', '$n_{out}$'],
+          ['Max pooling（最大池化：每个通道内按窗口取最大值；窗口边长 $K$，无 padding，通道数不变）', '0', '0', '$\\lfloor (H-K)/S\\rfloor+1$'],
         ],
       },
-      '来源：卷积和 weight sharing 见 L13 p9–p17；参数计数公式 $C_{out}C_{in}K^2+C_{out}$ 和输出尺寸公式见 WS08 / worksheet 8。题目说 *exclude the bias* 时不加 bias 列。',
+      '来源：卷积和 weight sharing 见 L13 p9–p17；参数计数公式 $C_{out}C_{in}K^2+C_{out}$ 和输出尺寸公式见 WS08 / worksheet 8。题目说 *exclude the bias* 时不加 bias 列。输出边长的来由：补零后共有 $H+2P$ 格，窗口宽 $K$，所以窗口起点最多能移动 $H+2P-K$ 格。每次移动 $S$ 格，能完整移动 $\\lfloor(H+2P-K)/S\\rfloor$ 次；再加上尚未移动时的第一个窗口，就得到输出边长。',
 
       { t: 'h2', text: '2. 读图步骤', id: 'steps' },
       { t: 'fig', src: 'assets/figures/ex2026_q1d_cnn.png', caption: '2026 practice Q1d / 2025 practice Q5 原图：从下到上 7、5、4、5 个圆。图上的"…"表示中间的连线没画全，不是没有那些边。题目要求不算 bias。', w: 460 },
@@ -56,18 +56,18 @@ Total (excluding biases): $3+20+20=$ **43**.`,
       {
         t: 'table', head: ['层', '计算', '输出', '参数'], rows: [
           ['输入', '', '$32\\times32\\times1$', '0'],
-          ['Conv：6 个 $5\\times5$ filter，stride 1，无 padding', '$(32-5)/1+1=28$（高、宽一样）；权重 $C_{out}C_{in}K^2=6\\cdot1\\cdot5^2=6\\times25=150$（$C_{in}=1$ 是输入 $32\\times32\\times1$ 的最后那个 1；RGB 就是 $6\\times3\\times25=450$），bias 6', '$28\\times28\\times6$', '150（+6）'],
+          ['Conv（卷积层）：6 个 $5\\times5$ filter，stride 1，无 padding', '$(32-5)/1+1=28$（高、宽一样）；权重 $C_{out}C_{in}K^2=6\\cdot1\\cdot5^2=6\\times25=150$（$C_{in}=1$ 是输入 $32\\times32\\times1$ 的最后那个 1；RGB 就是 $6\\times3\\times25=450$），bias 6', '$28\\times28\\times6$', '150（+6）'],
         ],
       },
       '来源：L13 p17。如果再接一个 $2\\times2$、stride 2 的 max pooling：$\\lfloor(28-2)/2\\rfloor+1=13+1=14$，宽同样是 14，通道不变 ⇒ 输出 $14\\times14\\times6$；pooling 只取最大值，没有要学的数，参数 0（WS08 LeNet 例子里的 $28\\to14$ 同理）。',
       {
         t: 'deep', title: '展开详解：为什么 CNN 参数少、为什么要 pooling', hint: '简答题角度',
         blocks: [
-          '**和全连接对比。** 7 个输入接 5 个隐藏单元：全连接要 $7\\times5=35$ 个权重；locally connected（每个单元只看 3 个输入，但不共享）要 15 个；卷积（共享）只要 3 个。图像上差距更大：$32\\times32$ 输入接 $28\\times28\\times6$ 的全连接层要 $1024\\times4704\\approx4.8$ 百万个权重，卷积只要 150 个。',
+          '**和全连接对比。** 7 个输入接 5 个隐藏单元：全连接要 $7\\times5=35$ 个权重；locally connected（每个单元只看 3 个输入，但不共享）要 15 个；卷积（共享）只要 3 个。图像上差距更大：沿用上例的单通道输入，把所有数排成一列（拉平），共有 $32\\times32\\times1=1024$ 个输入单元；输出共有 $28\\times28\\times6=4704$ 个单元。若两边全连接，就要 $1024\\times4704\\approx4.8$ 百万个权重；上例卷积只要 150 个。',
           {
             t: 'ul', items: [
-              '**Weight sharing（权重共享）/ translation equivariance（平移等变）**：同一个 pattern（比如一条边）出现在图像任何位置，都由同一个 filter 检测，不需要在每个位置重新学（L13 p4–p6）；图案平移，特征图跟着平移（stride 1、忽略边界）。平移**不变**要靠后面的 pooling，而且只是有限的。',
-              '**Max pooling**：把 $m\\times m$ 区域换成最大值，降低分辨率、减少后面全连接层的参数，并带来有限的平移不变性（p22–p24）。没有参数；反向传播只把梯度传给取到最大值的那个位置（sub-gradient，p23）。',
+              '**Weight sharing（权重共享）/ translation equivariance（平移等变）**：同一个 pattern（比如一条边）出现在图像任何位置，都由同一个 filter 检测，不需要在每个位置重新学（L13 p4–p6）；特征图是同一个 filter 在各位置算出的输出排成的网格。图案平移，特征图跟着平移，这叫平移等变（stride 1、忽略边界）。平移**不变**则指图案移动后输出仍不变；后面的 pooling 可对部分小范围移动产生这种效果，但不能保证任意平移都不改变输出。',
+              '**Max pooling**：设池化窗口的边长为 $m$，把每个 $m\\times m$ 区域换成其中的最大值，降低分辨率、减少后面全连接层的参数，并带来有限的平移不变性（p22–p24）。没有参数；反向传播是从输出往回计算梯度（损失对各层数值的变化率）的过程。这里把后一层传来的梯度交给窗口中取得最大值的位置，其他位置得到 0；sub-gradient（次梯度）是最大值运算在不可导处可采用的梯度替代（p23）。',
               '**多通道**：每个 filter 覆盖输入的全部 $C_{in}$ 个通道，所以权重是 $C_{in}\\cdot K^2$（p18）；有 $C_{out}$ 个 filter 就有 $C_{out}$ 个输出通道（p17）。',
             ],
           },
@@ -78,7 +78,7 @@ Total (excluding biases): $3+20+20=$ **43**.`,
         ],
       },
 
-      { t: 'h2', text: '5. Worksheet 8 全解：CNN 与 logistic regression', id: 'ws8' },
+      { t: 'h2', text: '5. Worksheet 8 全解：CNN 与 logistic regression（逻辑回归）', id: 'ws8' },
       'Worksheet 8 原题：在 CIFAR-10（$32\\times32$ 彩色图，10 类）上分别数 logistic regression 和下面这个 CNN 的参数（含 bias）。卷积 stride 1、无 padding；max pooling 是 $2\\times2$、stride 2，没有参数。worksheet 把尺寸写成"通道 × 高 × 宽"（如 $3\\times32\\times32$），本页按"高 × 宽 × 通道"写，数字一样。',
       {
         t: 'table', head: ['层', '输出', '参数（含 bias）', '不含 bias'], rows: [
@@ -87,13 +87,13 @@ Total (excluding biases): $3+20+20=$ **43**.`,
           ['Max pooling', '$14\\times14\\times8$', '0', '0'],
           ['Conv II：16 个 $5\\times5$', '$10\\times10\\times16$（$14-5+1=10$）', '$16\\times(5\\cdot5\\cdot8)+16=3216$', '3200'],
           ['Max pooling', '$5\\times5\\times16$，拉平成 $400$', '0', '0'],
-          ['Dense I：$400\\to256$', '256', '$400\\times256+256=102656$', '102400'],
+          ['Dense I（全连接层 I）：$400\\to256$', '256', '$400\\times256+256=102656$', '102400'],
           ['Dense II：$256\\to10$', '10', '$256\\times10+10=2570$', '2560'],
           ['CNN 合计', '', '**109050**', '108760'],
           ['Logistic regression：拉平 $3072\\to10$', '10', '$3072\\times10+10=30730$', '30720'],
         ],
       },
-      'Logistic regression 把 $32\\times32\\times3=3072$ 个像素拉平，每类一个权重向量（多类 softmax，见 [c15](#/c15)）。CNN 的参数约是它的 3.5 倍，但 94% 在 Dense I；两个卷积层合起来只有 $608+3216=3824$ 个，这就是权重共享。题目没说 bias 时写含 bias 的数，并注明不含 bias 的值。',
+      'Logistic regression 把 $32\\times32\\times3=3072$ 个像素拉平，每类一个权重向量（多类 softmax：把每类得分转换为总和等于 1 的类别概率，见 [c15](#/c15)）。CNN 的参数约是它的 3.5 倍，但 94% 在 Dense I；两个卷积层合起来只有 $608+3216=3824$ 个，这就是权重共享。题目没说 bias 时写含 bias 的数，并注明不含 bias 的值。',
 
       { t: 'h2', text: '6. 方法：尺寸、反推 stride、感受野', id: 'size-rf' },
       T`前面几节数的是参数。同一张网络图还常这样问：每层输出多大、缺的 stride 是多少、能不能用几层小 filter 代替一层大 filter。公式与 [c38](#/c38)、[c39](#/c39) 一致：$n$ 是输入边长，$p$ 是每边补零的圈数（padding），$k$ 是 filter（或 pooling 窗口）的边长，$s$ 是 stride。`,
@@ -101,15 +101,15 @@ Total (excluding biases): $3+20+20=$ **43**.`,
         t: 'steps', items: [
           T`**逐层算边长。** 每层都用 $\lfloor(n+2p-k)/s\rfloor+1$（即第 1 节表里的 $\lfloor(H+2P-K)/S\rfloor+1$），高、宽各算一次。除不尽就向下取整：最后剩下的几列不够放一个窗口，直接丢掉。通道数：卷积层等于 filter 个数，pooling 层不变。`,
           T`**反推未知量（如 stride）。** 把已知数代进去，得到 $\lfloor(n+2p-k)/s\rfloor=\text{输出边长}-1$，再试 $s=1,2,3,\dots$，向下取整后对得上的就是答案。`,
-          T`**每层参数。** 卷积层 $C_{out}\cdot C_{in}\cdot k^2$（另加 $C_{out}$ 个 bias），pooling 层 0。全连接层先把上一层拉平成 $H\times W\times C$ 个数，再乘输出单元数。`,
-          T`**感受野（receptive field）。** 感受野是一个单元能"看到"的输入范围（L13 p26）。几层 stride 1 的卷积叠起来，宽度分别是 $k_1,\dots,k_L$，最上层一个单元的感受野宽度是 $1+\sum_i(k_i-1)$。全部同宽 $k$ 时，就是 c39 的 $1+L(k-1)$。`,
-          T`**用小 filter 代替大 filter。** 要保持一个 $K\times K$ 卷积的感受野，选 $L\ge2$ 层，边长 $k_1,\dots,k_L$ 满足 $\sum_i(k_i-1)=K-1$。如果每层都是 $C$ 个通道进、$C$ 个 filter 出，权重数（不含 bias）是 $C^2\sum_ik_i^2$，比原来的 $C^2K^2$ 少。例如两层 $5\times5$ 代替 $9\times9$：$25+25=50<81$。每层 stride 1、padding $(k_i-1)/2$，输出边长就不变。`,
+          T`**每层参数。** 卷积层 $C_{out}\cdot C_{in}\cdot k^2$（另加 $C_{out}$ 个 bias），pooling 层 0。全连接层先把上一层拉平成 $H\times W\times C$ 个数（这里 $H$、$W$、$C$ 分别是上一层输出的高、宽、通道数），再乘输出单元数。`,
+          T`**感受野（receptive field）。** 感受野是一个单元能"看到"的输入范围（L13 p26）。设共叠 $L$ 层卷积，每层 stride 都是 1；$i$ 是层号，第 $i$ 层的 filter 宽度记为 $k_i$。从一个输入位置开始，感受野宽度是 1。每加一层，其窗口会合并上一层连续 $k_i$ 个位置的感受野；因为相邻位置在原输入上只错开 1 格，合并后的宽度就增加 $k_i-1$。所以最上层的感受野宽度是 $1+\sum_{i=1}^{L}(k_i-1)$，其中求和表示把第 1 到第 $L$ 层的增加量全部相加。例如两层宽 3 的卷积得到 $1+(3-1)+(3-1)=5$。全部同宽 $k$ 时，就是 $1+L(k-1)$。`,
+          T`**用小 filter 代替大 filter。** 要保持一个 $K\times K$ 卷积的感受野，选 $L\ge2$ 层，边长 $k_1,\dots,k_L$ 满足 $\sum_i(k_i-1)=K-1$。如果每层都是 $C$ 个通道进、$C$ 个 filter 出，第 $i$ 层就有 $C\times C\times k_i^2=C^2k_i^2$ 个权重。各层相加，得到 $C^2\sum_i k_i^2$（不含 bias），再与原来一层的 $C^2K^2$ 比较。例如两层 $5\times5$ 代替 $9\times9$：$5^2+5^2=25+25=50<81=9^2$，所以权重更少。若 $k_i$ 为奇数，每层取 stride 1、padding $(k_i-1)/2$，代入尺寸公式可得 $n+2\cdot(k_i-1)/2-k_i+1=n$，所以每层输出边长都不变。`,
         ],
       },
       { t: 'slide', src: 'L13/p26', caption: '左图两层宽 3 的卷积叠起来，$g_3$ 看到 $x_1$–$x_5$ 共 5 个输入：$1+2+2=5$。' },
 
       { t: 'h2', text: '7. 真题全解：尺寸、stride、卷积手算、感受野', id: 'past-more' },
-      { t: 'note', md: '这一节的 5 道题都只在学生笔记（Travis）里找到，**图来自学生笔记，未与原卷核对**；网络结构图在这里改画成表格。笔记里的学生答案有几处算错（例如 2020 Q5 的总参数），下面的答案全部重新算过。2022 S1 Q5（$3\\times3$ 图、$2\\times2$ filter、global max pooling，写函数并反传）放在 [T10](#/T10)。' },
+      { t: 'note', md: '这一节的 5 道题都只在学生笔记（Travis）里找到，**图来自学生笔记，未与原卷核对**；网络结构图在这里改画成表格。笔记里的学生答案有几处算错（例如 2020 Q5 的总参数），下面的答案全部重新算过。2022 S1 Q5（$3\\times3$ 图、$2\\times2$ filter、global max pooling（全局最大池化：每个通道在整张特征图上只取一个最大值），写函数并反传）放在 [T10](#/T10)。' },
       {
         t: 'past', src: '2020 Q5(a)(b)(c)（据学生笔记）', topic: 'L13 p17, p23, p26',
         q: T`Assume that you train a convolutional neural network (CNN) on a GPU. The size of each input image is 64x64x3 (3 channels). The figure shows the settings of the layers in the CNN. There are four layers: two convolutional layers (conv1 and conv2), with a max-pooling layer between them. The output feature map of conv2 is flattened into a vector, which is then fed to a fully-connected layer (FC) with 10 output units.
@@ -121,7 +121,7 @@ Note: the padding size is the number of rows/columns on each side of the input. 
 (b) How many parameters are in each of the four layers (exclude the bias) in the CNN? Show your working.
 
 (c) How to replace conv2 to keep the same size of receptive field of conv2 with fewer parameters? Write three different replacements.`,
-        qzh: T`在 GPU 上训练一个 CNN，每张输入图是 $64\times64\times3$（3 通道）。网络有四层：两个卷积层 conv1、conv2，中间夹一个 max pooling 层；conv2 的输出拉平成向量，送进有 10 个输出单元的全连接层（FC）。padding 是输入每一边补的行/列数，例如 $5\times5$ 补 1 后变成 $7\times7$。(a) 写出 Layer 1、2、3 输出特征图的尺寸（宽 × 高 × 通道）。(b) 四层各有多少参数（不含 bias）？写出过程。(c) 怎样替换 conv2，使感受野不变而参数更少？写出三种不同的替换。`,
+        qzh: T`在 GPU（图形处理器，这里仅指训练所用的硬件）上训练一个 CNN，每张输入图是 $64\times64\times3$（3 通道）。网络有四层：两个卷积层 conv1、conv2，中间夹一个 max pooling 层；conv2 的输出拉平成向量，送进有 10 个输出单元的全连接层（FC）。padding 是输入每一边补的行/列数，例如 $5\times5$ 补 1 后变成 $7\times7$。(a) 写出 Layer 1、2、3 输出特征图的尺寸（宽 × 高 × 通道）。(b) 四层各有多少参数（不含 bias）？写出过程。(c) 怎样替换 conv2，使感受野不变而参数更少？写出三种不同的替换。`,
         blocks: [{
           t: 'table', cls: 'compact', head: ['层', '类型', '设置（原图改画）'], rows: [
             ['输入', '图像', '$64\\times64\\times3$'],
@@ -227,7 +227,7 @@ Note: the padding size is the number of rows/columns on each side of the input. 
         sol: [
           T`这个年份标签有冲突：2021 S1 正式卷的 Q6 是模型选择简答，不是这道题，所以只当作"某年的 CNN 题"。`,
           T`(a) 每个 filter 覆盖全部 3 个输入通道：$11\times11\times3=363$ 个权重，加 1 个 bias 是 364；共 32 个 filter：$32\times364=11648$。题目没说去掉 bias，所以写 11648，并注明不含 bias 是 $32\times363=11616$。`,
-          T`(b) 感受野 11 要求 $\sum_i(k_i-1)=10$。题目的例子 $3\times3+9\times9$：$2+8=10$。只用奇数边长（常用，padding 能两边对称）时，每个 $k_i-1$ 都是偶数，问题就变成把 $10/2=5$ 拆成至少两个正整数之和。除去例子，正好还有 5 种：`,
+          T`(b) 感受野 11 要求 $\sum_i(k_i-1)=10$。题目的例子 $3\times3+9\times9$：$2+8=10$。下面只列边长至少为 3 的奇数 filter；$1\times1$ 不扩大感受野，不计入这份组合清单。令 $r_i=(k_i-1)/2$，则每个 $r_i$ 都是正整数，条件变为 $\sum_i r_i=10/2=5$。先把 5 拆成至少两个正整数之和，再用 $k_i=2r_i+1$ 转回 filter 边长。例如 $5=3+2$ 对应边长 $7$ 和 $5$。组合不计顺序；除去题目给的例子，正好还有 5 种：`,
           {
             t: 'table', head: ['堆叠（顺序无关）', '$\\sum(k_i-1)$', '每对通道的权重 $\\sum k_i^2$（原来 $11^2=121$）'], rows: [
               [T`$9\times9$ + $3\times3$（题目给的例子）`, '$8+2=10$', '90'],
@@ -239,20 +239,20 @@ Note: the padding size is the number of rows/columns on each side of the input. 
             ],
           },
           {
-            t: 'note', md: T`**"参数更少"有个前提。** $\sum k_i^2<121$ 比较的是每一对（输入通道，输出通道）上的权重，默认堆叠的各层输入、输出通道数相同。本题第一层的输入只有 3 个通道；如果中间层都用 32 个通道，$3\times3$（3→32）加 $9\times9$（32→32）共 $3\cdot9\cdot32+32\cdot81\cdot32=83808$ 个权重，反而比 11616 多。所以卷面写：中间层都只用 3 个通道、最后一层才输出 32 个（stride 1、无 padding，输入输出尺寸不变），最小的 filter 放在最后一层。五种依次是 $49\cdot9+25\cdot96=2841$、$1386$、$1314$、$1251$、$1188$ 个权重，都少于 11616。`,
+            t: 'note', md: T`**"参数更少"有个前提。** $\sum k_i^2<121$ 比较的是每一对（输入通道，输出通道）上的权重，默认堆叠的各层输入、输出通道数相同。本题第一层的输入只有 3 个通道；如果中间层都用 32 个通道，$3\times3$（3→32）加 $9\times9$（32→32）共 $3\cdot9\cdot32+32\cdot81\cdot32=83808$ 个权重，反而比 11616 多。所以卷面写：中间层都只用 3 个通道、最后一层才输出 32 个通道（各层 stride 1、无 padding；整组替换的输入、输出尺寸与原来的单层卷积一致：边长从 224 变成 $224-11+1=214$，并不是每个小卷积都保持边长不变），中间层都是 3 通道进、3 通道出，所以宽 $k$ 的一层有 $3\times3\times k^2=9k^2$ 个权重；最后一层是 3 通道进、32 通道出，有 $3\times32\times k^2=96k^2$ 个权重。最后一层的乘数更大，所以把最小的 filter 放在那里。按上表除去例子后的五种顺序，权重数分别为：(1) $9\cdot49+96\cdot25=2841$；(2) $9(49+9)+96\cdot9=1386$；(3) $9(25+25)+96\cdot9=1314$；(4) $9(25+9+9)+96\cdot9=1251$；(5) $9(9+9+9+9)+96\cdot9=1188$。这些都不含 bias，且都少于原来的 11616 个权重。`,
           },
           {
             t: 'exam', md: T`(a) Parameters $=C_{out}\,(C_{in}k^2+1)=32\times(3\times11\times11+1)=32\times364=11648$ ($11616$ weights plus $32$ biases).
 
-(b) Stacked stride-1 convolutions with sizes $k_1,\dots,k_L$ have a receptive field of $1+\sum_i(k_i-1)$, so we need $\sum_i(k_i-1)=10$. Five stackings (besides $3\times3$ + $9\times9$): (1) $7\times7$ + $5\times5$; (2) $7\times7$ + $3\times3$ + $3\times3$; (3) $5\times5$ + $5\times5$ + $3\times3$; (4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$; (5) five $3\times3$ layers. To use fewer parameters, keep 3 channels in every intermediate layer and output 32 channels only in the last layer (stride 1, no padding, so input and output shapes are unchanged), with the smallest kernel last: the stacks then have 2841, 1386, 1314, 1251 and 1188 weights respectively, all fewer than the original 11616.`,
+(b) Stacked stride-1 convolutions with sizes $k_1,\dots,k_L$ have a receptive field of $1+\sum_i(k_i-1)$, so we need $\sum_i(k_i-1)=10$. Five stackings (besides $3\times3$ + $9\times9$): (1) $7\times7$ + $5\times5$; (2) $7\times7$ + $3\times3$ + $3\times3$; (3) $5\times5$ + $5\times5$ + $3\times3$; (4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$; (5) five $3\times3$ layers. To use fewer parameters, keep 3 channels in every intermediate layer and output 32 channels only in the last layer (stride 1, no padding; the entire stack has the same input and output shapes as the original convolution: $224\times224\times3$ in and $214\times214\times32$ out, although each small convolution shrinks the spatial size), with the smallest kernel last: the stacks then have 2841, 1386, 1314, 1251 and 1188 weights respectively, all fewer than the original 11616.`,
           },
         ],
-        azh: T`(a) 参数 $=C_{out}\,(C_{in}k^2+1)=32\times(3\times11\times11+1)=32\times364=11648$（$11616$ 个权重加 $32$ 个 bias）。(b) 边长为 $k_1,\dots,k_L$ 的 stride 1 卷积叠起来，感受野是 $1+\sum_i(k_i-1)$，所以需要 $\sum_i(k_i-1)=10$。除 $3\times3$ + $9\times9$ 外的五种：(1) $7\times7$ + $5\times5$；(2) $7\times7$ + $3\times3$ + $3\times3$；(3) $5\times5$ + $5\times5$ + $3\times3$；(4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$；(5) 五层 $3\times3$。要让参数更少：中间层都只用 3 个通道，只有最后一层输出 32 个通道（stride 1、无 padding，输入输出尺寸不变），最小的 filter 放最后。五种依次有 2841、1386、1314、1251、1188 个权重，都少于原来的 11616。`,
+        azh: T`(a) 参数 $=C_{out}\,(C_{in}k^2+1)=32\times(3\times11\times11+1)=32\times364=11648$（$11616$ 个权重加 $32$ 个 bias）。(b) 边长为 $k_1,\dots,k_L$ 的 stride 1 卷积叠起来，感受野是 $1+\sum_i(k_i-1)$，所以需要 $\sum_i(k_i-1)=10$。除 $3\times3$ + $9\times9$ 外的五种：(1) $7\times7$ + $5\times5$；(2) $7\times7$ + $3\times3$ + $3\times3$；(3) $5\times5$ + $5\times5$ + $3\times3$；(4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$；(5) 五层 $3\times3$。要让参数更少：中间层都只用 3 个通道，只有最后一层输出 32 个通道（各层 stride 1、无 padding；整组替换与原卷积具有相同的输入、输出尺寸：输入 $224\times224\times3$，输出 $214\times214\times32$；各小卷积本身仍会缩小边长），最小的 filter 放最后。五种依次有 2841、1386、1314、1251、1188 个权重，都少于原来的 11616。`,
       },
       {
         t: 'past', src: '2020 Q4(a)（据学生笔记；年份按同题 (b) 的图名推断）', marks: 4, topic: 'L13 p11–p14',
         q: 'Assume that in the following figure (a) is an image patch and (b) is a kernel that is used to perform convolution (stride = 2, no padding) on the patch. Show the output feature map after convolution.',
-        qzh: '下图 (a) 是一块图像 patch，(b) 是 kernel，用它对 patch 做卷积（stride 2，无 padding）。写出卷积后的输出特征图。',
+        qzh: '下图 (a) 是图像的一小块区域（image patch），(b) 是卷积核（kernel，也就是前文的 filter），用它对 patch 做卷积（stride 2，无 padding）。写出卷积后的输出特征图。',
         blocks: [{ t: 'math', tex: T`\text{(a)}\ \begin{bmatrix}1&0&1&0\\0&1&1&0\\0&0&0&1\\0&0&1&0\end{bmatrix}\qquad\text{(b)}\ \begin{bmatrix}1&0\\0&1\end{bmatrix}` }],
         sol: [
           T`输出边长 $\lfloor(4-2)/2\rfloor+1=2$，所以是 $2\times2$。stride 2 时窗口互不重叠，正好把 patch 切成 4 块 $2\times2$。卷积就是窗口和 kernel 逐元素相乘再求和（L13 p12、p14）。这个 kernel 只有左上、右下两格是 1，所以每块的结果 = 该块左上格 + 右下格。`,
@@ -274,12 +274,12 @@ Note: the padding size is the number of rows/columns on each side of the input. 
       {
         t: 'past', src: '2020 Q4(b)（据学生笔记）', marks: 6, topic: 'L13 p11–p15',
         q: T`Assume that (a) and (b) in the following figure are two image patches. Now consider a $3\times3$ binary weight matrix (each element of the matrix is either 0 or 1) that is used as the kernel to perform convolution (stride = 1, no padding) on the two image patches. Assume that after convolution, the output feature maps are $K_a$ and $K_b$. What kernel can make the difference between $K_a$ and $K_b$ most significant (sum of all elements of $|K_a-K_b|$ is maximum)? List two such kernels.`,
-        qzh: T`下图 (a)、(b) 是两块图像 patch。用一个 $3\times3$ 的二值权重矩阵（每个元素是 0 或 1）作 kernel，分别对两块 patch 做卷积（stride 1，无 padding），输出特征图记为 $K_a$、$K_b$。什么样的 kernel 能让两者差别最大（$|K_a-K_b|$ 所有元素之和最大）？写出两个这样的 kernel。`,
+        qzh: T`下图 (a)、(b) 是两块图像 patch。用一个 $3\times3$ 的二值权重矩阵（每个元素是 0 或 1）作 kernel，分别对两块 patch 做卷积（stride 1，无 padding），输出特征图记为 $K_a$、$K_b$。什么样的 kernel 能让两者差别最大（$|K_a-K_b|$ 表示两张特征图逐格相减后取绝对值：负数去掉负号，非负数不变；再把这些结果相加，希望总和最大）？写出两个这样的 kernel。`,
         blocks: [{ t: 'math', tex: T`\text{(a)}\ \begin{bmatrix}0&1&0\\1&1&1\\0&1&0\end{bmatrix}\qquad\text{(b)}\ \begin{bmatrix}1&0&1\\0&1&0\\1&0&1\end{bmatrix}` }],
         sol: [
           {
             t: 'steps', items: [
-              T`**输出只有一个数。** $3\times3$ kernel 放在 $3\times3$ patch 上、无 padding，输出边长 $3-3+1=1$。所以 $K_a=\sum_{ij}w_{ij}a_{ij}$，$K_b=\sum_{ij}w_{ij}b_{ij}$。`,
+              T`**输出只有一个数。** $3\times3$ kernel 放在 $3\times3$ patch 上、无 padding，输出边长 $3-3+1=1$。记 $i$ 为行号、$j$ 为列号，两者都从 1 到 3；$a_{ij}$、$b_{ij}$ 分别是图 (a)、(b) 第 $i$ 行第 $j$ 列的数，$w_{ij}$ 是 kernel 同一位置的权重。所以 $K_a=\sum_{ij}w_{ij}a_{ij}$，$K_b=\sum_{ij}w_{ij}b_{ij}$；这里 $\sum_{ij}$ 表示把全部 9 个格子的乘积相加。`,
               T`**相减。** $K_a-K_b=\sum_{ij}w_{ij}(a_{ij}-b_{ij})$，其中 $a-b=\begin{bmatrix}-1&1&-1\\1&0&1\\-1&1&-1\end{bmatrix}$：四条边的中点是 $+1$，四个角是 $-1$，中心是 0。`,
               T`**挑格子。** $w_{ij}$ 只能取 0 或 1，等于"挑一些格子，把它们的 $a-b$ 加起来"。正负混着挑会互相抵消，所以绝对值最大的做法是只挑 $+1$ 的四格（和为 4）或只挑 $-1$ 的四格（和为 $-4$）；中心是 0，挑不挑都行。最大值是 4，正好有 4 个 kernel 达到（已穷举全部 $2^9=512$ 个 kernel 核对）。`,
             ],
