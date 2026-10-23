@@ -1011,6 +1011,7 @@
       T`目标：选 $\delta$ 使 risk 最小。**但不能直接做**——risk 是对真实分布 $\theta$ 求期望，而 $\theta$ 未知（L02 p18 "Can't directly! Why?"）。`,
       T`**Empirical Risk Minimisation (ERM)**：用训练数据的平均损失近似 risk：`,
       { t: 'math', tex: T`\hat R(\delta)=\frac1n\sum_{i=1}^n l\big(\delta(X_i),Y_i\big)` },
+      { t: 'graph', nodes: { q: [40, 60], nd: [180, 60], l1: [300, 60], R: [440, 60], tr: [40, 210], l2: [180, 210], avg: [300, 210], Rh: [450, 210] }, edges: 'q>nd=真实分布 nd>l1 l1>R=求期望 tr>l2 l2>avg=求平均 avg>Rh', labels: { q: 'θ', nd: '(X,Y)', l1: 'l', R: 'R', tr: '训练集', l2: 'l', avg: '平均', Rh: 'R̂' }, notes: { q: '真实分布', R: '算不出', Rh: '能算（ERM）' }, cls: { R: 'removed' }, w: 440, caption: '上排：真实风险要对「真实分布抽出的所有可能新数据」求期望，而真实分布未知，所以这条链走到头是虚线、算不出来。下排：把期望换成训练集上的平均，就是经验风险，每一步都能算；ERM 就是让下排最后那个数最小。' },
     ],
     why: [
       T`几乎所有 ML 的训练目标都是 ERM（有时加正则项）：`,
@@ -1228,6 +1229,7 @@
       { t: 'viz', id: 'gauss-posterior', opts: { data: [1] } },
       { t: 'h3', text: '④ 只要一个数时：后验均值或 MAP（L02 p25）' },
       T`**点估计**（L02 p25）：Bayesian 更愿意保留整个后验，但必须给一个数时：**posterior mean** $E[\theta\mid X]$，或 **MAP**（maximum a posteriori，后验众数）$\hat\theta_{\text{MAP}}=\argmax_\theta P(\theta\mid X)$。`,
+      { t: 'slide', src: 'L02/p25', caption: 'L02 p25：蓝线是整条后验分布 P(θ|X)，虚线标出的 θ_MAP 是曲线的最高点；后验均值是整条曲线按概率加权的「重心」。曲线不对称时重心就不在峰上，所以 MAP ≠ 后验均值。这张图右边拖着长尾，重心在峰的右边；本页 Beta(9,5) 的例子正好反过来，左边尾巴更长，所以均值 0.643 在峰 0.667 的左边。' },
       { t: 'h3', text: '⑤ MAP 和 MLE 的关系（L02 p26）' },
       { t: 'math', tex: T`\hat\theta_{\text{MAP}}=\argmax_\theta P(\theta\mid X=x)=\argmax_\theta\frac{P(X=x\mid\theta)P(\theta)}{P(X=x)}=\argmax_\theta P(X=x\mid\theta)\,P(\theta)` },
       T`取 log：$\argmax_\theta\big[\underbrace{\log P(X\mid\theta)}_{\text{MLE 的目标}}+\underbrace{\log P(\theta)}_{\text{先验 = 正则项}}\big]$。若 $P(\theta)\propto1$，第二项是常数 ⇒ $\hat\theta_{\text{MAP}}=\hat\theta_{\text{MLE}}$。`,
@@ -1415,6 +1417,7 @@
         T`**[[Generative|Generative model]]（生成式）**：建模完整的 **joint** $P(X,Y)$，通常写成 $P(Y)P(X\mid Y)$。预测时选使 $P(\bx,y)$ 最大的 $y$（L19 p3）。`,
         T`**[[Discriminative|Discriminative model]]（判别式）**：只建模 **conditional** $P(Y\mid X)$（或直接学一个决策函数 $y=f(\bx)$）。`,
       ] },
+      { t: 'graph', nodes: { gy: [45, 75], gx: [205, 75], dx: [45, 220], dy: [205, 220] }, edges: 'gy>gx=P(x|y) dx>dy=P(y|x)', labels: { gy: 'y', gx: 'x', dx: 'x', dy: 'y' }, notes: { gx: '要学 P(y) 和 P(x|y)', dy: '只学 P(y|x)' }, cls: { gy: 'given', dy: 'given' }, w: 380, caption: '上排生成式（naive Bayes）：先学「每个类占多少、每一类的特征长什么样」，箭头从类 y 指向特征 x，所以能反过来造数据。下排判别式（logistic、SVM）：箭头从特征 x 直接指向类别 y，只学这一步，不管 x 本身怎么产生。两条路最后都能算 P(y|x)，区别是上排多学了 x 的分布。' },
       T`L02 p29–p30 都强调：**两种分类在频率学派和 Bayesian 里都存在**。`,
     ],
     why: [

@@ -96,7 +96,7 @@
           row('Bayesian score 的定义', T`\mathrm{score}(i|pa_i;D)=\log\int P(\theta)\prod_{t=1}^TP(x_{ti}\mid x_{t,pa_i};\theta)\,d\theta`, 'L23 p23'),
           row('Dirichlet 先验（CPT 每列一个）', T`P(\theta)=\prod_{j=1}^{q_i}\dfrac{\Gamma(\alpha_{ij})}{\prod_k\Gamma(\alpha_{ijk})}\prod_{k=1}^{r_i}\theta_{ijk}^{\alpha_{ijk}-1},\ \ \alpha_{ij}=\sum_k\alpha_{ijk}`, 'L23 p26'),
           row('Dirichlet 超参数（均匀）', T`\alpha_{ijk}=\dfrac{\alpha}{r_iq_i},\ \ \alpha_{ij}=\dfrac{\alpha}{q_i}\ \ (\alpha=\text{equivalent sample size})`, 'L23 p27'),
-          row('Bayesian score 闭式（考试会给，认识即可）', T`\mathrm{score}(i|pa_i;D)=\sum_{j=1}^{q_i}\Big[\log\dfrac{\Gamma(\alpha_{ij})}{\Gamma(\alpha_{ij}+\hat n_{ij})}+\sum_{k=1}^{r_i}\log\dfrac{\Gamma(\alpha_{ijk}+\hat n_{ijk})}{\Gamma(\alpha_{ijk})}\Big],\ \ \hat n_{ij}=\sum_k\hat n_{ijk},\ \Gamma(m)=(m-1)!`, 'L23 p28'),
+          row('Bayesian score 闭式（可能给、不保证：Ed 只说部分复杂公式会给；会认符号、能代入计数即可）', T`\mathrm{score}(i|pa_i;D)=\sum_{j=1}^{q_i}\Big[\log\dfrac{\Gamma(\alpha_{ij})}{\Gamma(\alpha_{ij}+\hat n_{ij})}+\sum_{k=1}^{r_i}\log\dfrac{\Gamma(\alpha_{ijk}+\hat n_{ijk})}{\Gamma(\alpha_{ijk})}\Big],\ \ \hat n_{ij}=\sum_k\hat n_{ijk},\ \Gamma(m)=(m-1)!`, 'L23 p28'),
           row('MRF 对数似然（充分统计量）', T`l(D;\theta)=\sum_{(i,j)\in E}\sum_{x_i,x_j}\hat n(x_i,x_j)\,\theta_{ij}(x_i,x_j)-T\log Z(\theta)`, 'L24 p6'),
           row('树的对数似然（熵 + 互信息）', T`l(D;\hat\theta)=T\Big[-\sum_{i=1}^n\hat H(X_i)+\sum_{(i,j)\in E}\hat I(X_i;X_j)\Big],\ \ \hat H(X_i)=-\sum_{x_i}\hat P_i(x_i)\log\hat P_i(x_i)`, 'L24 p14'),
         ],

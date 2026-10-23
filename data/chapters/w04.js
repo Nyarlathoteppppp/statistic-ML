@@ -74,11 +74,14 @@
       T`**Growth function（增长函数）**（L07 p18）：`,
       { t: 'math', tex: T`S_\mathcal F(n)=\sup_{|\mathcal X|=n}|\mathcal F(\mathcal X)|\le2^n,\qquad\text{有限类时还有 }S_\mathcal F(n)\le|\mathcal F|` },
       T`**为什么 stump 是 $2n$？** 一个方向：阈值从最左移到最右，有 $n+1$ 个位置（$n$ 个点之间只有 $n-1$ 个间隙，再加“比所有点都小”和“比所有点都大”两个端点），产生"左边全 −、右边全 +"的 $n+1$ 种模式；另一个方向也是 $n+1$ 种。两组里"全 −"和"全 +"各重复一次，所以 $2(n+1)-2=2n$（L07 p16、p19）。`,
+      { t: 'slide', src: 'L07/p16', caption: T`左表、右表各 6 列，合起来正好 $2n=12$ 种 dichotomy：左表是阈值向右移动时「前面全是 −、后面全是 +」的台阶模式，右表是反方向；蓝框那一列只是其中一种（L07 p16）。` },
+      T`换个角度看：阈值从最左挪到最右，标签只会从左往右一个接一个地由 − 翻成 +，一共翻 $n$ 次，所以一个方向只有 $n+1$ 种（翻 0 次、1 次、…、$n$ 次）。反方向同样 $n+1$ 种，去掉「全 +」「全 −」各重复一次，就是 $2n$——**分类器有无穷多个，dichotomy 却只有 $2n$ 个**。`,
       { t: 'h3', text: '⑤ 用 growth function 代替 $|\\mathcal F|$ 的泛化界（L07 p20）' },
       T`c21 的惩罚项里是 $\log|\mathcal F|$，分类器无穷多时它是无穷大。growth function 数的是"$n$ 个点上**实际能出现**几种标签"，永远有限，所以拿它替换 $|\mathcal F|$。证明不考，考试直接代入下面的式子。注意式子里是 $S_\mathcal F(2n)$ 而不是 $S_\mathcal F(n)$——$2n$、前面的 8 和 $4/\delta$ 都是证明过程中放宽出来的常数，不用自己推。`,
       T`对 $n$ 个 i.i.d. 样本、0-1 loss，以至少 $1-\delta$ 的概率（对 ERM 选出的 $\hat f_D$）：`,
       { t: 'math', tex: T`R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{8\,\frac{\log S_\mathcal F(2n)+\log(4/\delta)}{n}}` },
       T`和有限类的界同形状：$\log|\mathcal F|$ 换成 $\log S_\mathcal F(2n)$，常数变大（8 乘整个分数）。**关键**：如果 $S_\mathcal F(n)=2^n$（指数增长），$S_\mathcal F(2n)=2^{2n}$，所以 $\log S_\mathcal F(2n)=2n\log2$，$\frac{\log S_\mathcal F(2n)}{n}=2\log2$，不随 $n$ 下降——界永远不会变小，学不到东西（L07 p20）。所以需要 growth function 是**多项式**增长的——这正是 VC 维（c23–c24）保证的。`,
+      T`代入 $n=1000$ 看一眼差别：若 $S(n)=2^n$，则 $\log S(2n)=2000\ln2\approx1386$，惩罚 $\approx\sqrt{8\times(1386+4)/1000}\approx3.3$；而风险本身最多是 1，这个界等于什么也没说。换成 stump（$S(n)=2n$）：$\log S(2n)=\ln4000\approx8.3$，惩罚 $\approx\sqrt{8\times(8.3+4)/1000}\approx0.32$。差别全在分子：一个随 $n$ 线性增长，一个只随 $\log n$ 慢慢长。`,
     ],
     why: [
       T`growth function 是从"有限类"走向"VC 维"（c23，往年每年必考的 T1 计算题）的桥梁。[T1](#/T01) 题目里给的那张 0/1 表就是 dichotomy 表：每一行是一个分类器在一组点上的 0/1 标签，也就是一个 dichotomy（完整的表和做法见 [c23](#/c23)）。`,
@@ -199,6 +202,8 @@
         T`**$\mathbb R^d$ 中的线性分类器**：VC = $d+1$（L07 p33）。`,
       ] },
       { t: 'video', id: 'vc-shatter' },
+      { t: 'slide', src: 'L07/p27', caption: T`4 点摆成正方形时只剩两种「对角同色」的标签（左图两个黄点在对角，右图两个黄点在另一条对角），两图都画不出直线。这就是直线做不到的 XOR dichotomy，所以 $S(4)=14<16$（L07 p27）。` },
+      T`**为什么直线一定切不出 XOR？** 直线看的是 $\bw'\bx+b$ 的符号，而它是 $\bx$ 的线性函数：正方形的对角两点坐标之和相等（$\bx_1+\bx_3=\bx_2+\bx_4$），所以 $f(\bx_1)+f(\bx_3)$ 必然等于 $f(\bx_2)+f(\bx_4)$。可是「对角同色」要求一边是 $+1+1=2$、另一边是 $-1-1=-2$，两个和不可能相等——这就是矛盾。所以凸四边形这 4 点一定做不到；4 点的另一种摆法见下面「4 点的第二种失败方式」。`,
       { t: 'h3', text: '③ 再练一个：轴对齐矩形，VC = 4（Worksheet 5 Ex2）' },
       T`**矩形分类器**：$f_{abcd}(\bx)=+1$ 当且仅当 $a\le x_1\le b$ 且 $c\le x_2\le d$，即点落在一个边与坐标轴平行的矩形里，否则 $-1$。结论 VC = 4。证明和上面"直线 VC = 3"一样分两步。`,
       T`**VC ≥ 4（存在 4 个点）**：把 4 个点摆成菱形：最左、最右、最上、最下各一个。任给一种标注，取所有 $+$ 点的 bounding box（外接框：包住这些点的最小轴对齐矩形，边界也算在框内）。为什么这个框碰不到任何 $-$ 点？菱形的 4 个点各自在一个方向上最极端（最左、最右、最上、最下）：某个点若是 $-$，它在那个方向上就不是最极端的了，框住 $+$ 点的矩形在那个方向只伸到某个 $+$ 点为止，所以它被留在框外。全是 $-$ 时把矩形放到远处（框里没有点）。16 种标注都做得到。不是任意 4 点都行：正方形的 4 个角就不行，对角两点标 $+$ 时，框住它们的矩形就是整个正方形。`,
@@ -219,6 +224,7 @@
     ],
     intuition: [
       T`**"存在"不是"所有"。** 共线的 3 个点不能被直线 shatter（只有 6 种：做不到中间点和两边点异号的 $+-+$ 和 $-+-$，L07 p26），但这**不影响** VC ≥ 3——只要**有一组** 3 个点能被 shatter 就行（p25 的不共线三角形）。这是最常见的误解（L07 p23–p28 反复强调）。`,
+      T`**4 点的第二种失败方式：一个点在三角形里。** 若 $x_4$ 落在 $x_1,x_2,x_3$ 围成的三角形内部，把外面 3 个标 $+$、$x_4$ 标 $-$，直线也做不到——因为一条直线若把 3 个顶点都放在同一侧，它们围成的整个三角形（凸包 convex hull）也在同一侧，$x_4$ 不可能单独跑到另一侧。所以证明"任 4 点都不能被 shatter"要分两种情况：凸四边形（缺 XOR）和点在三角形内（缺"内点异号"）。`,
       T`**VC 维 = 模型的"自由度"。** 直线在平面上有 3 个参数（$w_1,w_2,b$），VC 维正好是 3；$\mathbb R^d$ 中 $d+1$ 个参数，VC = $d+1$。（不是所有模型都这么巧，但这是好的直觉。）`,
       { t: 'think', q: '一张 dichotomy 表有 10 行（全不相同）。VC 维最多可能是多少？为什么？', a: T`$\lfloor\log_2 10\rfloor=3$。要 shatter $k$ 个点至少需要 $2^k$ 个不同的行（限制到这 $k$ 列后），$2^4=16>10$，所以 $k\le3$。这是做 T1 题的第一步"上界"。` },
       { t: 'story', title: 'VC 这两个字母', md: 'VC 是 Vapnik 和 Chervonenkis 两人姓氏的首字母。他们在 1968 年的短文和 1971 年的论文里提出了这个概念，用来回答"经验风险什么时候会一致地收敛到真实风险"。几十年后它成为统计学习理论的基石。' },
@@ -366,6 +372,7 @@
       { t: 'math', tex: T`R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{8\,\frac{\mathrm{VC}(\mathcal F)\log(2n+1)+\log(4/\delta)}{n}}` },
       { t: 'slide', src: 'L07/p31', caption: '老师的原页：结构和有限类的界一样（训练误差 + 根号惩罚），只是 $\\log|\\mathcal F|$ 换成了 $\\mathrm{VC}(\\mathcal F)\\log(2n+1)$；最下面一行就是 Sauer–Shelah 给的那一步替换。' },
       T`（推导：把 Sauer–Shelah 的 $\log S(2n)\le\mathrm{VC}\log(2n+1)$ 代入 c22 的 growth-function 界。）对 $\mathbb R^d$ 的线性分类器，惩罚项（根号那一整项，不是 bias）是 $O\big(\sqrt{\mathrm{VC}\log n/n}\big)$（p33）：样本越多它越小。`,
+      T`**样本量每乘 4，惩罚大约减半**：取 VC $=3$、$\delta=0.05$，$n=1000$ 时惩罚 $\approx0.47$，$n=4000$ 约 $0.25$，$n=16000$ 约 $0.13$。原因是惩罚 $\propto\sqrt{\log n/n}$，而 $\log n$ 长得极慢（$n$ 乘 4，$\log n$ 只多约 9%），真正起作用的是分母 $\sqrt n$。所以想让界变紧，最有效的办法是**加数据**，不是纠结 VC 维那一两个数。`,
     ],
     why: [
       T`这一章完成了 L06–L07 的故事：**有限 VC 维 ⇒ growth function 多项式 ⇒ 惩罚项随 $n$ 趋于 0 ⇒ ERM 能泛化**。L07 p34：有限 VC 维 ⇔ **PAC learnability（PAC 可学）**。这也给出了“为什么 SVM（support vector machine，支持向量机，第 25 章）要最大化 margin（间隔）”的理论动机之一（复杂度控制）。`,
@@ -493,6 +500,8 @@
     ],
     math: [
       { t: 'h3', text: '点到超平面的距离（L08 p14–p16）' },
+      { t: 'slide', src: 'L08/p15', caption: T`$\bx$ 是任取的一个点，$\bx_p$ 是它在绿色边界上的投影；带箭头的 $\boldsymbol r=\bx_p-\bx$ 垂直于边界（图上有直角符号），它的长度就是要算的距离。另一段 $\bw$ 是边界的法向量。` },
+      T`看图记三件事：① $\boldsymbol r$ 与 $\bw$ 平行（都垂直于边界），所以 $\bx_p=\bx+\|\boldsymbol r\|\frac{\bw}{\|\bw\|}$；② $\bx_p$ 在边界上，所以 $\bw'\bx_p+b=0$；③ 把 ① 代进 ② 就解出 $\|\boldsymbol r\|$。下面三步就是这三件事的代数版本。`,
       { t: 'steps', items: [
         T`设 $\bx_p$ 是 $\bx$ 在边界上的投影，$\boldsymbol r=\bx_p-\bx$ 垂直于边界，所以 $\boldsymbol r\parallel\bw$：$\bx_p=\bx+\|\boldsymbol r\|\frac{\bw}{\|\bw\|}$（$\boldsymbol r$ 与 $\bw$ 平行：方向相同时取 $+$，相反取 $-$；下面先取 $+$，它对应点在负侧、$\boldsymbol r$ 指向 $\bw$ 方向的情形）。`,
         T`$\bx_p$ 在边界上：$0=\bw'\bx_p+b=\bw'\bx+\|\boldsymbol r\|\frac{\bw'\bw}{\|\bw\|}+b=\bw'\bx+\|\boldsymbol r\|\,\|\bw\|+b$（用 $\bw'\bw=\|\bw\|^2$）。`,
@@ -630,6 +639,8 @@
         T`最大化 $\frac1{\|\bw\|}$ ⇔ 最小化 $\|\bw\|$ ⇔ 最小化 $\frac12\|\bw\|^2$（单调变换，后者光滑好算，L08 p21）。`,
       ] },
       { t: 'math', tex: T`\textbf{Hard-margin SVM:}\quad\argmin_{\bw,b}\ \frac12\|\bw\|^2\quad\text{s.t.}\quad y_i(\bw'\bx_i+b)\ge1,\ \ i=1,\dots,n` },
+      { t: 'slide', src: 'L08/p21', caption: T`绿色实线是决策边界，两条绿色虚线是 $y_i(\bw'\bx_i+b)=1$ 的位置；两段箭头都标着 $1/\|\bw\|$，落在虚线上的点（红圈、蓝方块）就是支持向量。` },
+      T`这张图就是本章的全部内容：canonical scaling 之后最近的点正好落在虚线上，于是 margin $=1/\|\bw\|$，「让最近点尽量远」就等于「让 $\|\bw\|$ 尽量小」。注意两条虚线之间的总宽度是 $2/\|\bw\|$，本课说的 margin 只是其中一侧的那一段。`,
       T`**Hard margin** 的意思：所有训练点都必须在 margin 之外、并且在正确的一侧（L08 p21）。$b$ 不出现在目标里，通过约束间接被优化。`,
     ],
     why: [
@@ -637,6 +648,7 @@
     ],
     intuition: [
       T`**为什么能"规定"最近点是 1？** 因为缩放 $(\bw,b)$ 不改变分类器。就像量身高可以用米也可以用厘米——选一个方便的单位。规定之后，"让最近点离得远"就变成"让 $\|\bw\|$ 小"。`,
+      T`用数字走一遍：c25 那个例子 $\bw=(1,1),b=-3$ 里，最近的两点 $(1,1)$、$(2,2)$ 都有 $y(\bw'\bx+b)=1$，所以它已经是 canonical，margin $=1/\|\bw\|=1/\sqrt2\approx0.707$，正好等于它们的真实距离。若某组参数的最小值是 2，就把 $(\bw,b)$ 整体除以 2：边界一点没变，最近点的 functional margin 变成 1，而 $1/\|\bw\|$ 自动等于最近点的真实距离。所以「规定最小值 = 1」不是新假设，只是换了一把刻度尺。`,
       T`**SVM = 正则化 ERM**（L08 p24–p27）：对比 ridge $\sum(y_i-\bw'\bx_i)^2+\lambda\|\bw\|^2$。SVM 的 $\frac12\|\bw\|^2$ 就是正则项；约束相当于一个损失：满足 $y_i(\bw'\bx_i+b)\ge1$ 损失为 0，否则为 **∞**（不允许）。注意：分对但离边界太近（$<1/\|\bw\|$）也是 ∞——"太近也不行"。`,
       { t: 'think', q: '（2021 Q2）硬间隔 SVM 里支持向量"margin 为 1"，可它们离边界的欧氏距离明显不是 1，为什么？', a: T`"1"是 **functional margin** $y_i(\bw'\bx_i+b)=1$，不是距离。真正的欧氏距离是 $1/\|\bw\|$。因为 $(\bw,b)$ 可以任意正缩放，SVM 用 canonical scaling 把最近点的 functional margin 固定为 1，几何距离由 $\|\bw\|$ 决定。` },
       { t: 'story', title: 'SVM 的诞生', md: '"最大间隔超平面"的想法最早见于 Vapnik 和 Lerner、Chervonenkis 在 1960 年代的工作（"generalized portrait"，广义肖像法）。1992 年 Boser、Guyon 和 Vapnik 把它和 kernel trick 结合（第 29 章），1995 年 Cortes 和 Vapnik 提出 soft margin（第 27 章），SVM 随后成为 2000 年代最流行的分类器之一。' },
@@ -765,6 +777,7 @@
       { t: 'slide', src: 'L08/p30', caption: 'Soft margin：橙色线段 = 每个违规点的 slack $\\xi_i$（进了 margin 或越过边界的距离）。' },
       T`**$C$ 的作用**：$C$ 大 → 违规很贵 → 尽量不违规 → margin 窄（接近 hard margin，可能过拟合）；$C$ 小 → 违规便宜 → margin 宽、容忍更多违规（更强正则，可能欠拟合）。和 $\lambda$ 的方向相反。`,
       T`下面用简写：得分 $f(\bx)=\bw'\bx+b$，于是 $y_i f(\bx_i)$ 就是 c26 的函数间隔（functional margin）；0-1 loss 只看对错——分对罚 0、分错罚 1，不管离边界多远。`,
+      T`**$\xi_i$ 的单位不是米**：$\xi_i=1-y_i(\bw'\bx_i+b)$，它数的是「差了几个函数间隔单位」，真正进了 margin 多少距离要再除以 $\|\bw\|$，即 $\xi_i/\|\bw\|$。举例：$\|\bw\|=2$ 时 $\xi_i=0.4$ 的点只进了 margin $0.4/2=0.2$。判断「分对 / 分错」只看 $\xi_i$ 和 1 谁大，与 $\|\bw\|$ 无关。`,
       { t: 'think', q: 'hinge loss 和 0-1 loss 比，对"分对但离边界很近（$y f=0.5$）"的点怎么处理？对"分得很对（$yf=3$）"呢？', a: 'hinge 对 $yf=0.5$ 罚 0.5（0-1 loss 不罚）——它要求的不只是分对，还要有 margin。对 $yf=3$ 两者都是 0。对分错的点，hinge 按错的程度线性罚，0-1 loss 只罚 1。' },
       { t: 'story', title: 'Support-vector networks', md: 'Soft margin 来自 Corinna Cortes 和 Vladimir Vapnik 1995 年的论文 "Support-Vector Networks"。它让 SVM 能处理有噪声、不可分的真实数据，是 SVM 在实践中成功的关键一步。' },
     ],

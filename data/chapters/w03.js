@@ -461,6 +461,7 @@
    * ===================================================================== */
   add({
     id: 'c19', week: 'W3', lec: 'L05', pages: 'L05 p29–p40', star: 3,
+    notExam: 'bias–variance 分解的**证明**不考：L05 讲者原话 "I\'m gonna give you a proof sketch of this, but that\'s outside the scope of the subject"。要会的是分解的结论和手算。',
     keyEn: [
       T`Squared loss at a test point: $\mathbb E[(Y-\hat f)^2]=(\mathbb E[Y]-\mathbb E[\hat f])^2+\mathrm{Var}[\hat f]+\mathrm{Var}[Y]$, i.e. $\text{bias}^2+\text{variance}+\text{irreducible error}$, averaged over training sets and label noise.`,
       T`Bias: how far the average prediction over training sets is from $\mathbb E[Y]$; variance: how much the prediction changes with the training set; $\mathrm{Var}[Y]$ is noise no model can remove.`,
