@@ -625,4 +625,123 @@
     }
     build();
   });
+  // c40 · architecture figures redrawn from L14 p8–p14: folded vs unfolded RNN, three application structures, BPTT, LSTM cell
+  let rnnArchId = 0;
+  SML.viz.register('rnn-arch', function (el) {
+    const ui = shell(el, 'RNN 架构图（课件 L14 p8–p14）');
+    const id = 'ra' + (++rnnArchId);
+    const R = 22;
+    // ---- tiny SVG string builders (classes come from svg.graph in css/viz.css) ----
+    const N = (x, y, label, cls) => '<g class="node ' + (cls || '') + '"><circle cx="' + x + '" cy="' + y + '" r="' + R + '"/><text x="' + x + '" y="' + y + '">' + label + '</text></g>';
+    function E(a, b, opt) {
+      opt = opt || {};
+      const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), ra = opt.ra == null ? R : opt.ra, rb = (opt.rb == null ? R : opt.rb) + 3;
+      const x1 = a[0] + dx / len * ra, y1 = a[1] + dy / len * ra, x2 = b[0] - dx / len * rb, y2 = b[1] - dy / len * rb;
+      let s = '<line class="edge ' + (opt.cls || '') + '" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" marker-end="url(#' + id + (opt.red ? 'r' : 'k') + ')"/>';
+      if (opt.label) {
+        const mx = (x1 + x2) / 2 + (opt.lx || 0), my = (y1 + y2) / 2 + (opt.ly == null ? -10 : opt.ly);
+        s += '<text class="edge-label ' + (opt.red ? 'r' : '') + '" x="' + mx.toFixed(1) + '" y="' + my.toFixed(1) + '">' + opt.label + '</text>';
+      }
+      return s;
+    }
+    const Pth = (d, red, cls) => '<path class="edge ' + (cls || '') + '" d="' + d + '" marker-end="url(#' + id + (red ? 'r' : 'k') + ')"/>';
+    const T = (x, y, s, cls) => '<text class="lbl ' + (cls || '') + '" x="' + x + '" y="' + y + '">' + s + '</text>';
+    const svg = (w, h, body) => '<svg class="graph rnn" viewBox="0 0 ' + w + ' ' + h + '" role="img"><defs>' +
+      '<marker id="' + id + 'k" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker>' +
+      '<marker id="' + id + 'r" class="red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker>' +
+      '</defs>' + body + '</svg>';
+    const s = (t) => 'h⁽' + t + '⁾', xs = (t) => 'x⁽' + t + '⁾';
+
+    const tabs = [
+      { name: '① 折叠 / 展开', draw: () => {
+        const ch = [[260, 90], [350, 90], [450, 90], [550, 90], [640, 90]], ins = [[350, 190], [450, 190], [550, 190]];
+        let b = N(60, 190, 'x') + N(60, 90, 'h') + E([60, 190], [60, 90], { label: 'U', lx: -14, ly: 0 }) +
+          Pth('M78,76 C140,30 140,150 80,105') + T(140, 92, 'W', 'w') +
+          '<line class="edge" x1="170" y1="140" x2="225" y2="140" marker-end="url(#' + id + 'k)"/>' + T(197, 128, '展开 unfold', 'mid');
+        b += N(ch[0][0], ch[0][1], '…', 'removed') + N(ch[4][0], ch[4][1], '…', 'removed');
+        [s('t−1'), s('t'), s('t+1')].forEach((l, i) => { b += N(ch[i + 1][0], ch[i + 1][1], l) + N(ins[i][0], ins[i][1], xs(['t−1', 't', 't+1'][i])) + E(ins[i], ch[i + 1], { label: 'U', lx: -12, ly: 0 }); });
+        for (let i = 0; i < 4; i++) b += E(ch[i], ch[i + 1], { label: 'W' });
+        b += T(450, 236, '每一步都用同一组 U、W（参数共享）；展开后的深度 = 序列长度', 'mid');
+        return svg(680, 250, b);
+      }, md: '左边是**折叠**画法：一个 RNN 单元，自环箭头 $W$ 表示"把上一步的 $\\mathbf h$ 喂回来"。右边是**展开（unfold）**：序列多长就复制多少份，每一步用的都是**同一组** $U$、$W$。\n\n所以展开后是一个**深度 = 序列长度**的深网络，这就是 2021 Q1 "In what respect is it deep?" 的答案。公式 $\\mathbf h^{(t)}=\\tanh(\\mathbf b+W\\mathbf h^{(t-1)}+U\\mathbf x^{(t)})$：$U$ 管这一步的输入，$W$ 管上一步传来的记忆。' },
+      { name: '② 序列分类', draw: () => {
+        const hx = [80, 190, 300, 410], H = 200, X = 290;
+        let b = '';
+        ['⁽¹⁾', '⁽²⁾', '', '⁽ᵀ⁾'].forEach((sup, i) => {
+          const dash = i === 2;
+          b += N(hx[i], H, dash ? '…' : 'h' + sup, dash ? 'removed' : '') + N(hx[i], X, dash ? '…' : 'x' + sup, dash ? 'removed' : '') + E([hx[i], X], [hx[i], H], { label: 'U', lx: -12, ly: 0 });
+          if (i) b += E([hx[i - 1], H], [hx[i], H], { label: 'W' });
+        });
+        b += N(410, 110, 'o⁽ᵀ⁾') + E([410, 200], [410, 110], { label: 'V', lx: -12, ly: 0 }) + N(300, 110, 'y⁽ᵀ⁾', 'given') + N(355, 30, 'L⁽ᵀ⁾') +
+          E([410, 110], [355, 30]) + E([300, 110], [355, 30]);
+        b += T(470, 34, '损失 L（比较 o 和 y）') + T(470, 114, '输出层 o，真标签 y（灰）') + T(470, 204, '隐藏层 h') + T(470, 294, '输入 x（一个个 token）');
+        return svg(680, 320, b);
+      }, md: '**整个序列只要一个标签**（例如一条影评是正面还是负面）。读完全部 token 后，只把**最后一个**隐藏状态 $\\mathbf h^{(T)}$ 接到输出层 $\\mathbf o^{(T)}=\\mathbf d+V\\mathbf h^{(T)}$，再和真标签 $y^{(T)}$ 比较得到损失 $L^{(T)}$。中间各步没有输出，它们的作用是把信息一路传给 $\\mathbf h^{(T)}$。' },
+      { name: '③ 序列标注', draw: () => {
+        const hx = [90, 230, 370];
+        let b = N(500, 200, '…', 'removed') + E([370, 200], [500, 200], { label: 'W' });
+        ['t−1', 't', 't+1'].forEach((t, i) => {
+          const x = hx[i];
+          b += N(x, 200, s(t)) + N(x, 290, xs(t)) + E([x, 290], [x, 200], { label: 'U', lx: -12, ly: 0 }) +
+            N(x, 115, 'o⁽' + t + '⁾') + E([x, 200], [x, 115], { label: 'V', lx: -12, ly: 0 }) +
+            N(x, 35, 'L⁽' + t + '⁾') + E([x, 115], [x, 35]) + N(x + 66, 35, 'y⁽' + t + '⁾', 'given') + E([x + 66, 35], [x, 35]);
+          if (i) b += E([hx[i - 1], 200], [x, 200], { label: 'W' });
+        });
+        b += T(560, 40, '每一步都有损失') + T(560, 120, '每一步都有输出') + T(560, 296, '输入 x');
+        return svg(680, 320, b);
+      }, md: '**每个 token 都要一个标签**（例如给每个词标词性）。**每一步**都有输出 $\\mathbf o^{(t)}=\\mathbf d+V\\mathbf h^{(t)}$，$\\hat{\\mathbf y}^{(t)}=\\text{softmax}(\\mathbf o^{(t)})$，和这一步的真标签 $y^{(t)}$（灰色）比较得到 $L^{(t)}$；总损失是各步损失之和。参数 $\\mathbf b,W,U,\\mathbf d,V$ 在所有位置共享（课件 L14 p12 就是这张图）。' },
+      { name: '④ Encoder–decoder', draw: () => {
+        const ex = [160, 270, 380], C = [520, 170];
+        let b = T(95, 74, '编码器', 'end') + T(95, 284, '解码器', 'end');
+        ex.forEach((x, i) => {
+          b += N(x, 70, 'h') + N(x, 150, xs(i + 1)) + E([x, 150], [x, 70]);
+          if (i) b += E([ex[i - 1], 70], [x, 70]);
+          b += N(x, 280, 'h', 'hl') + N(x, 370, 'y⁽' + (i + 1) + '⁾') + E([x, 280], [x, 370]) + E(C, [x, 280], { cls: 'moral' });
+          if (i) b += E([ex[i - 1], 280], [x, 280]) + E([ex[i - 1], 370], [x, 280], { cls: 'thin' });
+        });
+        b += N(C[0], C[1], 'C', 'given') + E([380, 70], C) + T(550, 174, '← context：整句的摘要');
+        return svg(700, 400, b);
+      }, md: '**输入和输出长度可以不同**（例如英译法）。**编码器** RNN 把整个输入句读完，把信息压成一个 context $C$（最后的隐藏状态）；**解码器** RNN 每一步都看 $C$（橙色虚线）和**上一步生成的词**（斜线），一个接一个地生成输出 $y^{(1)},y^{(2)},\\dots$。课件的说法：解码器像一个 tagger，在"重新生成"下一个词。' },
+      { name: '⑤ BPTT', draw: () => {
+        const hx = [90, 220, 350, 480];
+        let b = '';
+        ['⁽¹⁾', '⁽²⁾', '', '⁽ᵀ⁾'].forEach((sup, i) => {
+          const dash = i === 2, x = hx[i];
+          b += N(x, 150, dash ? '…' : 'h' + sup, dash ? 'removed' : '') + N(x, 250, dash ? '…' : 'x' + sup, dash ? 'removed' : '') + E([x, 250], [x, 150], { label: 'U', lx: -12, ly: 0 });
+          if (!dash) b += N(x, 50, 'L' + sup) + E([x, 150], [x, 50]) + Pth('M' + (x + 14) + ',' + 70 + ' L' + (x + 14) + ',' + 125, true, 'back');
+          if (i) {
+            b += E([hx[i - 1], 150], [x, 150], { label: 'W' });
+            b += Pth('M' + (x - 12) + ',178 Q' + ((x + hx[i - 1]) / 2) + ',215 ' + (hx[i - 1] + 12) + ',178', true, 'back');
+            b += '<text class="edge-label r" x="' + ((x + hx[i - 1]) / 2) + '" y="206">×W</text>';
+          }
+        });
+        b += T(540, 54, '每一步的损失') + T(540, 70, '都往回传（红）') + T(540, 154, '往回一步乘一次 W') + T(285, 290, '从 h⁽ᵀ⁾ 回到 h⁽¹⁾：乘 T−1 次 ⇒ Wᵀ⁻¹', 'mid r');
+        return svg(680, 305, b);
+      }, md: '训练就是把 [c34](#/c34) 的反向传播用在**展开后**的网络上，叫 **BPTT（backpropagation through time）**：每一步的损失 $L^{(t)}$ 的梯度都沿红色箭头往回传，一直传到序列开头。\n\n**为什么会消失 / 爆炸**：按 c34 的规则 1，往回穿过一条边就要乘这条边的倍数，也就是 $W$（再乘 $\\tanh$ 的斜率）。从 $\\mathbf h^{(T)}$ 回到 $\\mathbf h^{(1)}$ 要乘 $T-1$ 次，线性 RNN 里就是 $\\partial\\mathbf h^{(T)}/\\partial\\mathbf h^{(1)}=W^{T-1}$。$W$ 的最大特征值小于 1 时越乘越小（梯度消失），大于 1 时越乘越大（梯度爆炸）。所以普通 RNN 学不到相隔 10 步以上的依赖。' },
+      { name: '⑥ LSTM', draw: () => {
+        const g = [120, 370], ig = [250, 370], fg = [380, 370], og = [510, 370], m1 = [120, 280], st = [120, 190], m2 = [260, 190], m3 = [120, 95];
+        let b = N(g[0], g[1], 'tanh', 'given') + N(ig[0], ig[1], 'σ', 'given') + N(fg[0], fg[1], 'σ', 'given') + N(og[0], og[1], 'σ', 'given') +
+          N(m1[0], m1[1], '×') + N(st[0], st[1], '+', 'hl') + N(m2[0], m2[1], '×') + N(m3[0], m3[1], '×');
+        b += E(g, m1) + E(ig, m1) + E(m1, st) + E(m2, st) + E(fg, m2) + E(st, m3) +
+          Pth('M' + (st[0] + 10) + ',' + (st[1] - 20) + ' C' + (st[0] + 30) + ',120 ' + (m2[0] - 10) + ',120 ' + m2[0] + ',' + (m2[1] - 25), true, 'path') +
+          Pth('M' + og[0] + ',' + (og[1] - 22) + ' C' + og[0] + ',200 330,95 ' + (m3[0] + 25) + ',' + m3[1]) +
+          '<line class="edge" x1="' + m3[0] + '" y1="' + (m3[1] - 22) + '" x2="' + m3[0] + '" y2="28" marker-end="url(#' + id + 'k)"/>';
+        b += T(135, 26, '输出 h⁽ᵗ⁾') + T(190, 116, '复制自环（下一步再用）', 'r') + T(95, 194, '状态', 'end') +
+          T(120, 412, '新内容', 'mid') + T(250, 412, '输入门', 'mid') + T(380, 412, '遗忘门', 'mid') + T(510, 412, '输出门', 'mid') +
+          T(555, 280, '灰色 4 个单元') + T(555, 296, '都看 x⁽ᵗ⁾ 和 h⁽ᵗ⁻¹⁾') + T(555, 322, 'σ 输出 0～1') + T(555, 338, '= 门开多大');
+        return svg(700, 425, b);
+      }, md: '灰色的 4 个单元都以 $\\mathbf x^{(t)}$ 和 $\\mathbf h^{(t-1)}$ 为输入：一个用 tanh 产生**新内容**，三个用 sigmoid 当**门**，输出 0 到 1 之间的数，像阀门一样决定放多少过去。\n\n- **输入门 × 新内容**：加进状态。\n- **遗忘门 × 旧状态**：也加进状态。这就是红色的"复制自环"：旧状态不乘 $W$、不过 tanh，只乘一个接近 1 的门。\n- **输出门 × 状态**：得到这一步的输出 $\\mathbf h^{(t)}$。\n\n所以 新状态 = 遗忘门 ⊙ 旧状态 + 输入门 ⊙ 新内容。梯度沿状态这条路往回传时，每步只乘遗忘门（接近 1），不会像 ⑤ 那样每步乘 $W$ 而迅速变小，能保持 100+ 步（普通 RNN 约 5–10 步）。\n\n> 考试写：LSTM adds a self-loop on the state that copies the previous state, scaled by a sigmoid forget gate, so the gradient along this path is not repeatedly multiplied by $W$ and does not vanish.' },
+    ];
+    let cur = 0;
+    const buttons = tabs.map((t, i) => btn(t.name, () => { cur = i; draw(); }));
+    ui.tools.append(...buttons);
+    const fig = node('div', 'rnn-fig');
+    ui.body.appendChild(fig);
+    function draw() {
+      buttons.forEach((b, i) => { b.className = i === cur ? 'btn primary' : 'btn'; });
+      fig.innerHTML = tabs[cur].draw();
+      ui.out.innerHTML = md(tabs[cur].md);
+    }
+    draw();
+  });
 })(window);

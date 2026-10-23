@@ -221,3 +221,13 @@ svg.graph .edge.hl { stroke: var(--accent); stroke-width: 3; }
 .video-step-say p { margin: 0 0 .3rem; }
 .video-step-say p:last-child { margin-bottom: 0; }
 .video-steps li:not(.on) .video-step-say { opacity: .78; }
+
+/* c40 RNN architecture figures (js/viz/w07.js rnn-arch) */
+svg.graph.rnn { max-width: 680px; max-height: none; }
+svg.graph.rnn .node text { font-size: 13px; }
+svg.graph marker.red path { fill: var(--bad); }
+svg.graph .edge.back { stroke: var(--bad); stroke-width: 2.2; stroke-dasharray: 6 4; }
+svg.graph .edge.thin { stroke-width: 1.1; }
+svg.graph .edge-label.r { fill: var(--bad); }
+svg.graph .lbl { fill: var(--muted); font: 500 12.5px var(--body); dominant-baseline: central; }
+svg.graph .lbl.mid { text-anchor: middle; } svg.graph .lbl.end { text-anchor: end; } svg.graph .lbl.r { fill: var(--bad); } svg.graph .lbl.w { fill: var(--ink-2); font-weight: 600; }

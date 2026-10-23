@@ -354,6 +354,8 @@
     what: [
       T`**序列输入的问题**（L14 p4–p6）：全连接网络要固定长度（只能补"空词"），同一短语出现在不同位置要重学；1D CNN（L14 称为 **time delay neural network（时延神经网络）**）用 1D filter 沿时间共享参数，但感受野有限：单层只看 filter 宽度那么远；堆叠能扩大，但固定结构的感受野总是有限的（$L$ 层宽 $k$ 时为 $1+L(k-1)$，c39）。`,
       T`**RNN**（L14 p7）：根据输入序列动态构建的网络。从左到右处理 $\bx^{(1)},\bx^{(2)},\dots$，每步 $\mathbf h^{(t)}=f(\mathbf h^{(t-1)},\bx^{(t)})$；$\mathbf h^{(t)}$ 编码了到 $t$ 为止的全部输入。**展开（unfold）** 后是一条链，**深度 = 序列长度**，各层**共享参数**（L14 p8）。`,
+      T`**架构图**：下面把课件 L14 p8–p14 的图都重画了一遍（记号和本页一致），点上面的标签切换：折叠 / 展开、三种应用结构、BPTT 的梯度怎么往回传、LSTM 单元。`,
+      { t: 'viz', id: 'rnn-arch' },
       T`**先把向量收成一个数，走两步。** 设 $h^{(0)}=0$，$h^{(t)}=\tanh(w\,h^{(t-1)}+u\,x^{(t)})$，$w=0.5$，$u=1$，输入序列 $(1,\ 0)$。第 1 步：$h^{(1)}=\tanh(0.5\times0+1\times1)=\tanh(1)\approx0.76$；第 2 步**用同一组** $w,u$：$h^{(2)}=\tanh(0.5\times0.76+0)\approx0.36$——输入已经是 0 了，$h$ 里还"记得"第一步的 1。下面只是把 $wh+ux$ 写成矩阵，并加上 bias 和输出层：`,
       T`**参数化**（L14 p12，tagging RNN）：`,
       { t: 'math', tex: T`\mathbf a^{(t)}=\mathbf b+W\mathbf h^{(t-1)}+U\bx^{(t)},\quad\mathbf h^{(t)}=\tanh(\mathbf a^{(t)}),\quad\mathbf o^{(t)}=\mathbf d+V\mathbf h^{(t)},\quad\hat{\by}^{(t)}=\mathrm{softmax}(\mathbf o^{(t)})` },
