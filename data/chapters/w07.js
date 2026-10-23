@@ -24,12 +24,12 @@
     ],
     examQ: [
       { src: '2026 practice Q1d / 2025 practice Q5', q: T`How many parameters does the following convolutional neural network have (exclude the bias)? (Figure on the [T3](#/T03) page: 7 inputs → 1D convolutional layer of 5 units, each seeing 3 inputs → fully connected 4 → fully connected 5.)`,
-        a: T`$3+5\cdot4+4\cdot5=43$. The convolutional layer uses one width-3 filter shared across all positions, so it has 3 weights (not $5\times3$); the fully connected layers have $5\times4=20$ and $4\times5=20$.`,
+        a: T`$3+5\cdot4+4\cdot5=43$. The 1D convolutional layer has a single width-3 filter: its 5 units are the 5 positions where that one filter stops (7 inputs, width 3, stride 1 give $7-3+1=5$), and all positions share the same 3 weights, so the layer has 3 weights (not $5\times3$); the fully connected layers have $5\times4=20$ and $4\times5=20$.`,
         qzh: T`下面这个卷积神经网络（convolutional neural network）有多少个参数（不计偏置 bias）？（图见 [T3](#/T03) 页：7 个输入 → 一维卷积层 1D convolutional layer，5 个单元，每个单元看 3 个输入 → 全连接层 fully connected，4 个单元 → 全连接层，5 个单元。）`,
-        azh: T`$3+5\cdot4+4\cdot5=43$。卷积层（convolutional layer）只用一个宽度为 3 的滤波器（filter），在所有位置共享，所以只有 3 个权重（不是 $5\times3$）；两个全连接层（fully connected layers）分别有 $5\times4=20$ 和 $4\times5=20$ 个权重。` },
+        azh: T`$3+5\cdot4+4\cdot5=43$。卷积层（convolutional layer）只有一个宽度为 3 的滤波器（filter）——5 个单元是这一个 filter 在 7 个输入上滑出的 5 个位置（$7-3+1=5$），所有位置共享同一套权重，所以只有 3 个权重（不是 $5\times3$）；两个全连接层（fully connected layers）分别有 $5\times4=20$ 和 $4\times5=20$ 个权重。` },
     ],
     title: '卷积、filter、参数计数', en: 'Convolution, filters, feature maps, counting CNN parameters',
-    summary: '把图像拉平喂给全连接网络，既丢了空间结构、参数又爆炸。**CNN（卷积神经网络）** 用一个小的 **filter（滤波器 / 卷积核）** 在输入上滑动，每个位置做"逐元素相乘再求和"，**同一个 filter 在所有位置共享参数**。参数计数（T3）是往年必考计算题：卷积层**不按输出位置重复计数**——标准 2D 卷积的权重数为 $C_{out}C_{in}K^2$（含 bias 再加 $C_{out}$）；真题那种一维、单通道、单 filter 的卷积层只有 3 个权重。',
+    summary: '把图像拉平喂给全连接网络，既丢了空间结构、参数又爆炸。**CNN（卷积神经网络）** 用一个小的 **filter（滤波器 / 卷积核）** 在输入上滑动，每个位置做"逐元素相乘再求和"，**同一个 filter 在所有位置共享参数**。参数计数（T3）是往年必考计算题：卷积层**不按输出位置重复计数**——标准 2D 卷积的权重数为 $C_{out}C_{in}K^2$（$C_{out}$ 个 filter，每个 filter 在 $C_{in}$ 个输入通道上各有一套 $K\\times K$ 权重；含 bias 再加 $C_{out}$）；真题那种一维、单通道、单 filter 的卷积层只有 3 个权重。',
     prereq: ['c33'],
     symbols: [
       [T`$\mathbf a*\mathbf w$`, T`卷积（星号 * 不是乘法）`],
@@ -60,7 +60,7 @@
       T`**下标怎么读**：$\delta$ 从 $-c$ 走到 $c$，$a_{i+\delta}$ 就是以 $a_i$ 为中心的 $2c+1$ 个邻居。filter 的下标从 1 开始，所以写成 $w_{\delta+c+1}$：$\delta=-c$ 对应 $w_1$，$\delta=c$ 对应 $w_{2c+1}$。例：宽 3（$c=1$）时 $b_i=a_{i-1}w_1+a_iw_2+a_{i+1}w_3$。2D 同理，行、列各走一遍。`,
       T`（数学上的卷积要先把 filter **左右翻转**再滑动；深度学习里的"卷积"不翻转，严格说叫 **cross-correlation（互相关）**。filter 本来就是学出来的，翻不翻转只是参数的排列顺序不同，效果一样。考试按课件公式算即可。）`,
       T`**Feature map（特征图 / response map）**（L13 p16）：一个 filter 滑过整张图得到的输出图，显示"这个图案在哪里出现"。多个 filter 识别多种图案，输出就有多个 **channel（通道）**。`,
-      T`**超参数**（L13 p17）：filter 大小、filter 个数（输出深度）、**stride（步长）**（每次滑多远）、**zero padding（补零）**。filter 里的数值是**学出来的参数**。`,
+      T`**超参数**（L13 p17）：filter 大小、filter 个数（也叫输出深度 depth，就是输出通道数 $C_{out}$）、**stride（步长）**（每次滑多远）、**zero padding（补零）**。filter 里的数值是**学出来的参数**。`,
       T`**多通道**（L13 p18）：RGB 输入有 3 个通道；一个 filter 在 3 个通道上各有一套权重，三个通道的结果**逐元素相加**成一个输出通道。`,
       T`**数参数**（本章标题、T3 题型）：权重共享的直接后果是参数个数**不随图像大小变化**——一个 filter 在所有位置用同一套权重，所以**不能按输出格子重复计数**。标准 2D 卷积：$C_{\text{out}}$ 个 filter，每个在 $C_{\text{in}}$ 个输入通道上各有 $K\times K$ 个数，共 $C_{\text{out}}C_{\text{in}}K^2$ 个权重，每个 filter 再加 1 个 bias。真题那种一维、单通道、一个宽 3 的 filter，权重只有 3 个。`,
     ],
@@ -92,7 +92,7 @@
         ['1D 卷积（2026 卷那种），宽 $k$，1 个 filter', '$k$', '1'],
         ['2D 卷积，$C_{out}$ 个 $K\\times K$ filter，输入 $C_{in}$ 通道', '$C_{out}\\cdot C_{in}\\cdot K^2$', '$C_{out}$'],
         ['全连接 $n_{in}\\to n_{out}$', '$n_{in}\\cdot n_{out}$', '$n_{out}$'],
-        ['Max pooling', '0', '0'],
+        ['Max pooling（最大池化：每个小块只留最大值）', '0', '0'],
       ] },
       T`2D 那行的意思：每个 filter 是 $K\times K$，而且要同时盖住输入的全部 $C_{in}$ 个通道，所以一个 filter 有 $C_{in}\cdot K^2$ 个权重；一共 $C_{out}$ 个 filter，再乘 $C_{out}$。每个 filter 配 1 个 bias。`,
       T`**对比**（还是上面的例子）：不用卷积、直接全连接的话，输入 $32\times32=1024$ 个数，输出 $28\times28\times6=4704$ 个数，两两相连要 $1024\times4704\approx4.8$ 百万个权重。卷积只要 6 个 filter × 每个 $5\times5=25$ 个权重 $=150$ 个（再加 6 个 bias），因为同一个 filter 在图上每个位置都**共用**同一组权重。`,
@@ -162,7 +162,7 @@
     quiz: [
       {
         type: 'num', q: T`（平时小测原题）We want to create a model for a binary classification problem with $10\times10$ input grayscale (single-channel) images. We use a CNN with: a convolutional layer with two filters, each $3\times3$, stride 1, no padding; a max-pooling layer over $4\times4$ patches, stride 1, no padding; a fully-connected layer with 3 neurons (ReLU); an output layer with one node (sigmoid). None of the learnable layers includes bias terms. How many parameters does this model have?`,
-        qzh: T`二分类，输入是 $10\times10$ 的单通道灰度图。网络：卷积层 2 个 $3\times3$ filter、步长 1、不补零；max-pooling 窗口 $4\times4$、步长 1、不补零；全连接层 3 个神经元（ReLU）；输出层 1 个节点（sigmoid）。所有层都没有 bias。这个模型一共多少个参数？`,
+        qzh: T`二分类，输入是 $10\times10$ 的单通道灰度图。网络：卷积层 2 个 $3\times3$ filter、步长 1、不补零；max-pooling 窗口 $4\times4$、步长 1、不补零；全连接层 3 个神经元（激活函数 ReLU，无参数）；输出层 1 个节点（激活函数 sigmoid，无参数）。所有层都没有 bias。这个模型一共多少个参数？`,
         answer: 171,
         explain: T`一层一层数。卷积层：输入单通道，每个 filter 有 $3\times3\times1=9$ 个权重，2 个 filter 共 $18$；输出边长 $(10-3)/1+1=8$，即 $8\times8\times2$。Max-pooling 没有参数；边长 $(8-4)/1+1=5$，输出 $5\times5\times2=50$ 个数，展平后是全连接层的 50 个输入。全连接层：3 个神经元各连 50 个输入，$50\times3=150$。输出层：1 个节点连 3 个，$3$。**合计 $18+150+3=171$**。常见错误：给 pooling 算参数，或把卷积按输出位置重复计数（$8\times8\times2\times9$）。`,
       },
@@ -193,7 +193,7 @@
       T`ResNet 残差块：输出 = 学到的变换 + 输入本身，梯度能沿这条直通路传回前面的层，152 层也能训练。迁移学习（transfer learning）：先在大数据集上预训练，再在目标任务上微调（fine-tune）。`,
     ],
     title: 'Pooling 与 CNN 架构', en: 'Max pooling, translation invariance, receptive fields, ResNet',
-    summary: '**Max pooling（最大池化）** 把每个 $m\\times m$ 小块换成它的最大值：降低分辨率、减少后面的参数、带来一定的平移不变性；它没有参数，反向传播只把梯度传给那个最大值。CNN 的典型结构：卷积 → pooling → 卷积 → pooling → 全连接 → 输出。堆叠卷积层让 **receptive field（感受野）** 越来越大；**ResNet（残差网络）** 的残差连接让很深的网络能训练。',
+    summary: '**Max pooling（最大池化）** 把每个 $m\\times m$ 小块换成它的最大值：降低分辨率、减少后面的参数、带来一定的平移不变性；它没有参数，反向传播只把梯度传给那个最大值。**CNN**（convolutional neural network，卷积神经网络，见 [c38](#/c38)）的典型结构：卷积 → pooling → 卷积 → pooling → 全连接 → 输出。堆叠卷积层让 **receptive field（感受野）** 越来越大；**ResNet（残差网络）** 的残差连接让很深的网络能训练。',
     prereq: ['c34', 'c38'],
     symbols: [
       [T`$m\times m$`, T`pooling 窗口大小`],
@@ -219,7 +219,7 @@
       T`**训练时怎么求导？** max pooling **不是处处可导**：最大值唯一时就是普通导数，几个输入并列最大时有拐点。统一用 **sub-gradient（次梯度）**：最大值唯一时，$\frac{\partial v}{\partial u_{ij}}=1$（$u_{ij}$ 就是那个最大值），其余为 0。若有**并列**最大值（如 $\{7,-1,3,7\}$），挑其中一个（通常是前向时记录的那个）给 1、其余给 0。前向时记下哪个位置最大，反向时只把梯度传给它。（课件 p23 写"$u_{ij}=v$ 时为 1"，并列时会给多个位置都是 1，严格说不是合法的次梯度。）`,
       T`pooling 让图变小，但后面的层还要认出比一个小窗口**更大**的图案（整张脸，而不只是一只眼睛）。一个单元能"看到"原始输入的多大范围，决定了它能认多大的东西：`,
       T`**Receptive field（感受野）**（L13 p26）：一个单元"看到"的输入范围。层层堆叠卷积，感受野越来越大，可以识别越来越大的图案（层次化特征：边 → 形状 → 物体）。`,
-      T`感受野变大要靠把卷积层**叠深**，但层一多，反向传播的梯度连乘会消失（c33），训练反而更难。**ResNet（残差网络）**（L13 p28）的办法是 **residual connection（残差连接）**：每一块输出 $F(\bx)+\bx$——输入有一条直通路加回输出，梯度也能沿这条路直接传回去，152 层的网络也能优化。`,
+      T`感受野变大要靠把卷积层**叠深**，但层一多，反向传播的梯度连乘会消失（c33），训练反而更难。**ResNet（残差网络）**（L13 p28）的办法是 **residual connection（残差连接）**：每一块输出 $F(\bx)+\bx$（$\bx$ 是这一块的输入向量，$F$ 是这一块要学的变换）——输入有一条直通路加回输出，梯度也能沿这条路直接传回去，152 层的网络也能优化。`,
       T`另一件相关但不同的事：目标任务的数据往往太少，不够从头训练这么深的网络。常见做法是先在大数据集上 **pretraining（预训练）**，再在小的目标任务上 **fine-tuning（微调）**——这叫 **transfer learning（迁移学习）**。`,
     ],
     why: [
@@ -233,7 +233,7 @@
     ],
     math: [
       { t: 'h3', text: '输出尺寸' },
-      T`$m\times m$、stride $m$、无 padding 的 pooling：输出宽 $=\lfloor(n-m)/m\rfloor+1=\lfloor n/m\rfloor$，$m$ 整除 $n$ 时就是 $n/m$。例：$2\times2$ pooling 把 $28\times28\times6$ 变成 $14\times14\times6$（通道数不变，参数 0）；宽 5 则变成 $\lfloor5/2\rfloor=2$。`,
+      T`$m\times m$、stride $m$、无 padding 的 pooling：设输入宽为 $n$，则输出宽 $=\lfloor(n-m)/m\rfloor+1$。化简：$\lfloor(n-m)/m\rfloor+1=\lfloor(n-m)/m+1\rfloor=\lfloor(n-m+m)/m\rfloor=\lfloor n/m\rfloor$（整数 1 可以搬进取整号里），所以 $m$ 整除 $n$ 时输出正好是 $n/m$。例：$2\times2$ pooling（stride 2）把 $28\times28\times6$ 变成 $14\times14\times6$（通道数不变，参数 0）；输入宽 5（$n=5$，$m=2$）时变成 $\lfloor5/2\rfloor=2$。`,
       { t: 'h3', text: '感受野（L13 p26）' },
       T`$L$ 层宽 $k$、stride 1 的卷积叠起来，最上层一个单元的感受野宽度 $=1+L(k-1)$（推导见上面的思考题）。例：3 层 $3\times3$ ⇒ $1+3\times2=7$。`,
       { t: 'h3', text: '平移不变性的来源（L13 p24–p25）' },
@@ -255,7 +255,7 @@
     example: [
       { t: 'h3', text: 'Pooling 手算' },
       T`$4\times4$ 输入 $\begin{bmatrix}1&3&2&0\\4&2&1&5\\0&1&3&2\\2&6&1&1\end{bmatrix}$，$2\times2$ 窗口、stride 2：`,
-      { t: 'table', cls: 'compact', head: ['窗口', 'max', 'average'], rows: [['左上 $\\{1,3,4,2\\}$', '4', '2.5'], ['右上 $\\{2,0,1,5\\}$', '5', '2'], ['左下 $\\{0,1,2,6\\}$', '6', '2.25'], ['右下 $\\{3,2,1,1\\}$', '3', '1.75']] },
+      { t: 'table', cls: 'compact', head: ['窗口', 'max（最大池化）', 'average（平均池化：取窗口平均值）'], rows: [['左上 $\\{1,3,4,2\\}$', '4', '2.5'], ['右上 $\\{2,0,1,5\\}$', '5', '2'], ['左下 $\\{0,1,2,6\\}$', '6', '2.25'], ['右下 $\\{3,2,1,1\\}$', '3', '1.75']] },
       T`Workshop 8 slide p6 的例子：$\begin{bmatrix}3&2&0&0\\0&7&1&3\\5&2&3&0\\0&9&2&3\end{bmatrix}$，$2\times2$、stride 2 ⇒ max $\begin{bmatrix}7&3\\9&3\end{bmatrix}$，average $\begin{bmatrix}3&1\\4&2\end{bmatrix}$（slide 只画出第一格 7 和 3）。slide 的说法：max 保留最强的特征，average 起平滑作用，选哪个要看数据和网络。`,
       { t: 'fade', title: '分步练习：pooling 与感受野', plan: ['划分窗口（stride = 窗口大小）', '每个窗口取 max（或平均）', '记录最大值位置（反向传播用）', T`感受野 $1+L(k-1)$`], items: [
         { md: '上面的 4×4 例子。', steps: [

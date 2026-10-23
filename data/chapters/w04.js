@@ -24,7 +24,7 @@
     ],
     examQ: [
       { src: '2022 S1 Q1(h)', q: T`A model family $\mathcal F$'s growth function $S_\mathcal F(m)$ could potentially be $2^m$, growing exponentially larger with increasing sample size $m$. Why would this be bad news for the PAC bound with growth function for $\mathcal F$?`,
-        a: T`The bound is $R[\hat f]\le\hat R[\hat f]+\sqrt{8\,\frac{\log S_\mathcal F(2m)+\log(4/\delta)}{m}}$. If $S_\mathcal F(m)=2^m$, then $\frac{\log S_\mathcal F(2m)}{m}=2\log2$ is a constant, so the penalty never shrinks as $m$ grows (it stays above $\sqrt{16\log2}>1$): the bound is vacuous. $\mathcal F$ shatters sets of every size (infinite VC dimension), so it can fit any labelling and a low training error guarantees nothing about the true risk.`,
+        a: T`The bound is $R[\hat f]\le\hat R[\hat f]+\sqrt{8\,\frac{\log S_\mathcal F(2m)+\log(4/\delta)}{m}}$. If $S_\mathcal F(m)=2^m$, then $S_\mathcal F(2m)=2^{2m}$ and $\log S_\mathcal F(2m)=2m\log2$, so $\frac{\log S_\mathcal F(2m)}{m}=2\log2$ is a constant, so the penalty never shrinks as $m$ grows (it stays above $\sqrt{16\log2}>1$): the bound is vacuous. $\mathcal F$ shatters sets of every size (infinite VC dimension), so it can fit any labelling and a low training error guarantees nothing about the true risk.`,
         qzh: T`某个模型族 $\mathcal F$ 的增长函数（growth function）$S_\mathcal F(m)$ 可能等于 $2^m$，随样本量 $m$ 指数增长。为什么这对用增长函数表示的 PAC 界（PAC bound）是坏消息？`,
         azh: T`界为 $R[\hat f]\le\hat R[\hat f]+\sqrt{8\,\frac{\log S_\mathcal F(2m)+\log(4/\delta)}{m}}$。若 $S_\mathcal F(m)=2^m$，则 $\frac{\log S_\mathcal F(2m)}{m}=2\log2$ 是常数，惩罚项不随 $m$ 增大而缩小（一直大于 $\sqrt{16\log2}>1$），这个界没有任何用处（vacuous）。$\mathcal F$ 对每个大小都能打散（shatter）某个点集（VC 维无穷），能拟合任意标签，所以训练误差低也保证不了真实风险低。` },
     ],
@@ -54,7 +54,7 @@
     notExam: 'Growth-function 定理的证明不在范围内（L07 p20–p21），只需会读、会代入。',
     what: [
       { t: 'h3', text: '① 问题：分类器有无穷多个时怎么办（L07 p8–p9）' },
-      T`**问题**（L07 p8–p9）：$f(\bx)=\sgn(w_1x_1+w_2x_2)$，$w$ 取所有实数——分类器有无穷多个，$\log|\mathcal F|=\infty$，c21 的界没用了。但 L07 的关键观察：**在给定的 $n$ 个点上，分类器再多，能产生的标签组合也有限**（最多 $2^n$）。`,
+      T`**问题**（L07 p8–p9）：$f(\bx)=\sgn(w_1x_1+w_2x_2)$，权重 $w_1,w_2$（即向量 $\bw$）取所有实数——分类器有无穷多个，$\log|\mathcal F|=\infty$，c21 的界没用了。但 L07 的关键观察：**在给定的 $n$ 个点上，分类器再多，能产生的标签组合也有限**（最多 $2^n$）。`,
       { t: 'h3', text: '② 最简单的无限类：decision stump（L07 p11）' },
       T`两个实数权重的线性分类器，"能分出几种标签"不好手算。先拿一个最简单的无限类练手：只看**一个**数 $x$ 和一个阈值，阈值左边一类、右边另一类（方向也可以反过来）。阈值可以是任意实数，所以分类器有无穷多个；但下面会看到，在排好序的点上，阈值落在同一对相邻点之间，给出的标签就完全一样。`,
       T`**Decision stump（决策树桩）**（L07 p11–p15）：只用一个连续特征 $x$ 和一个阈值 $\beta$ 的分类器，两个方向：`,
@@ -64,8 +64,8 @@
       T`6 个样本 $(x,y)$：$(0,+1),(4,-1),(-2,+1),(1,+1),(-3,-1),(2,-1)$。`,
       { t: 'steps', items: [
         T`**排序**：$-3(-),\ -2(+),\ 0(+),\ 1(+),\ 2(-),\ 4(-)$。`,
-        T`**候选阈值** = 相邻中点：$-2.5,\ -1,\ 0.5,\ 1.5,\ 3$。`,
-        T`**两个方向都数错误**：$\sgn(x-\beta)$ 的错误数 $2,3,4,5,4$；$\sgn(\beta-x)$ 的错误数 $4,3,2,1,2$。`,
+        T`**候选阈值** = 相邻中点：$-2.5,\ -1,\ 0.5,\ 1.5,\ 3$。注意 6 个点之间只有 5 个间隙，再加上“在所有点左边”和“在所有点右边”两个端点，才是正文说的 $n+1=7$ 个阈值位置；两个端点对应“全 $+$”和“全 $-$”两个常数分类器，在本题里它们的错误数不会比某个中点更小，所以这里只列 5 个中点。`,
+        T`**两个方向都数错误**（按上面 5 个阈值的顺序）：$\sgn(x-\beta)$ 把 $\beta$ 左边的点判成 −、右边的点判成 +，所以错误数 = 左边 $+$ 点的个数 + 右边 $-$ 点的个数。例：$\beta=-2.5$ 时左边只有 $-3$（标签 −，判对），右边 5 个点里 $2$ 和 $4$ 的标签是 −（被判成 +，错 2 个），共错 2 个。全部数完：$\sgn(x-\beta)$ 的错误数 $2,3,4,5,4$；$\sgn(\beta-x)$（左边判 +、右边判 −）的错误数 $4,3,2,1,2$。`,
         T`**最佳**：$f(x)=\sgn(1.5-x)$，只错 1 个（$x=-3$ 被判 $+1$）。`,
       ] },
       { t: 'h3', text: '④ 关键观察：分类器无限，"行为"有限（L07 p16–p18）' },
@@ -73,15 +73,15 @@
       T`**Dichotomy（二分）**（L07 p17）：一个分类器在 $\mathcal X=\{x_1,\dots,x_n\}$ 上给出的标签向量 $(f(x_1),\dots,f(x_n))\in\{-1,+1\}^n$。$\mathcal F(\mathcal X)$ = 所有**不同**的 dichotomy。`,
       T`**Growth function（增长函数）**（L07 p18）：`,
       { t: 'math', tex: T`S_\mathcal F(n)=\sup_{|\mathcal X|=n}|\mathcal F(\mathcal X)|\le2^n,\qquad\text{有限类时还有 }S_\mathcal F(n)\le|\mathcal F|` },
-      T`**为什么 stump 是 $2n$？** 一个方向：阈值从最左移到最右，有 $n+1$ 个位置，产生"左边全 −、右边全 +"的 $n+1$ 种模式；另一个方向也是 $n+1$ 种。两组里"全 −"和"全 +"各重复一次，所以 $2(n+1)-2=2n$（L07 p16、p19）。`,
+      T`**为什么 stump 是 $2n$？** 一个方向：阈值从最左移到最右，有 $n+1$ 个位置（$n$ 个点之间只有 $n-1$ 个间隙，再加“比所有点都小”和“比所有点都大”两个端点），产生"左边全 −、右边全 +"的 $n+1$ 种模式；另一个方向也是 $n+1$ 种。两组里"全 −"和"全 +"各重复一次，所以 $2(n+1)-2=2n$（L07 p16、p19）。`,
       { t: 'h3', text: '⑤ 用 growth function 代替 $|\\mathcal F|$ 的泛化界（L07 p20）' },
       T`c21 的惩罚项里是 $\log|\mathcal F|$，分类器无穷多时它是无穷大。growth function 数的是"$n$ 个点上**实际能出现**几种标签"，永远有限，所以拿它替换 $|\mathcal F|$。证明不考，考试直接代入下面的式子。注意式子里是 $S_\mathcal F(2n)$ 而不是 $S_\mathcal F(n)$——$2n$、前面的 8 和 $4/\delta$ 都是证明过程中放宽出来的常数，不用自己推。`,
       T`对 $n$ 个 i.i.d. 样本、0-1 loss，以至少 $1-\delta$ 的概率（对 ERM 选出的 $\hat f_D$）：`,
       { t: 'math', tex: T`R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{8\,\frac{\log S_\mathcal F(2n)+\log(4/\delta)}{n}}` },
-      T`和有限类的界同形状：$\log|\mathcal F|$ 换成 $\log S_\mathcal F(2n)$，常数变大（8 乘整个分数）。**关键**：如果 $S_\mathcal F(n)=2^n$（指数增长），$\frac{\log S(2n)}{n}=2\log2$ 不随 $n$ 下降——界永远不会变小，学不到东西（L07 p20）。所以需要 growth function 是**多项式**增长的——这正是 VC 维（c23–c24）保证的。`,
+      T`和有限类的界同形状：$\log|\mathcal F|$ 换成 $\log S_\mathcal F(2n)$，常数变大（8 乘整个分数）。**关键**：如果 $S_\mathcal F(n)=2^n$（指数增长），$S_\mathcal F(2n)=2^{2n}$，所以 $\log S_\mathcal F(2n)=2n\log2$，$\frac{\log S_\mathcal F(2n)}{n}=2\log2$，不随 $n$ 下降——界永远不会变小，学不到东西（L07 p20）。所以需要 growth function 是**多项式**增长的——这正是 VC 维（c23–c24）保证的。`,
     ],
     why: [
-      T`growth function 是从"有限类"走向"VC 维"（c23，往年每年必考的 T1 计算题）的桥梁。dichotomy 表就是 T1 题目给的那张 0/1 表——每一行是一个 dichotomy。`,
+      T`growth function 是从"有限类"走向"VC 维"（c23，往年每年必考的 T1 计算题）的桥梁。[T1](#/T01) 题目里给的那张 0/1 表就是 dichotomy 表：每一行是一个分类器在一组点上的 0/1 标签，也就是一个 dichotomy（完整的表和做法见 [c23](#/c23)）。`,
     ],
     intuition: [
       { t: 'think', q: T`3 个点排成一行，stump 能产生全部 $2^3=8$ 种标签吗？缺哪几种？`, a: T`$S(3)=6<8$，缺 $(+1,-1,+1)$ 和 $(-1,+1,-1)$——"中间和两边不同"的交替模式，一个阈值切不出来（L07 p24）。` },
@@ -141,7 +141,7 @@
     ],
     quiz: [
       { type: 'num', q: 'Decision stumps 的 $S(7)=?$', answer: 14, explain: T`要算的是 7 个点上 decision stump（决策树桩）最多能给出几种不同的标签组合。把 7 个点从小到大排好，阈值本质上只有"落在哪两个相邻点之间"这 $7+1=8$ 个位置（含最左、最右）；一个方向给 8 种模式，两个方向共 $2\times8=16$ 种。但"全 $+$"和"全 $-$"两个方向都做得出来，各被算了两次，要减 2：$16-2=14$。**这就是 $S(n)=2n=2\times7=14$**，远小于 $2^7=128$，别把 $2^n$ 当成答案。` },
-      { type: 'num', q: 'L07 的 6 个样本里，$\\sgn(x-0.5)$ 错几个？', answer: 4, explain: 'p13 表：阈值 0.5 时错 4 个。' },
+      { type: 'num', q: 'L07 的 6 个样本里，$\\sgn(x-0.5)$ 错几个？', answer: 4, explain: '用上面 6 个样本自己数：排序后是 $-3,-2,0,1,2,4$，阈值 $0.5$ 落在 $0$ 和 $1$ 之间。$\\sgn(x-0.5)$ 把左边（$-3,-2,0$）判成 −、右边（$1,2,4$）判成 +：左边标签为 $+$ 的 $-2,0$ 被错判成 −（2 个），右边标签为 $-$ 的 $2,4$ 被错判成 +（2 个），共 4 个。' },
       { type: 'mc', q: '为什么 $S_\\mathcal F(n)\\le2^n$ 对任何类都成立？', options: ['因为 $\\mathcal F$ 有限', '因为 $n$ 个二元标签最多 $2^n$ 种组合', '因为 Hoeffding', '因为分类器是线性的'], answer: 1, explain: 'L07 p17–p18。' },
       { type: 'show', q: '（英文）Define a dichotomy and the growth function.', answer: T`A dichotomy is the vector of labels $(f(x_1),\dots,f(x_n))\in\{-1,+1\}^n$ that a classifier $f$ assigns to a set of $n$ points. The growth function $S_{\mathcal F}(n)$ is the maximum, over all sets of $n$ points, of the number of distinct dichotomies that classifiers in $\mathcal F$ can produce; it is at most $2^n$.`, qzh: '给出二分（dichotomy）和增长函数（growth function）的定义。', azh: T`二分（dichotomy）是分类器 $f$ 给一组 $n$ 个点分配的标签向量 $(f(x_1),\dots,f(x_n))\in\{-1,+1\}^n$。增长函数（growth function）$S_{\mathcal F}(n)$ 是：在所有 $n$ 点集合中取最大值的、$\mathcal F$ 中分类器能产生的不同二分的个数；它至多为 $2^n$。` },
     ],
@@ -201,8 +201,8 @@
       { t: 'video', id: 'vc-shatter' },
       { t: 'h3', text: '③ 再练一个：轴对齐矩形，VC = 4（Worksheet 5 Ex2）' },
       T`**矩形分类器**：$f_{abcd}(\bx)=+1$ 当且仅当 $a\le x_1\le b$ 且 $c\le x_2\le d$，即点落在一个边与坐标轴平行的矩形里，否则 $-1$。结论 VC = 4。证明和上面"直线 VC = 3"一样分两步。`,
-      T`**VC ≥ 4（存在 4 个点）**：把 4 个点摆成菱形：最左、最右、最上、最下各一个。任给一种标注，取所有 $+$ 点的 bounding box（外接框：包住这些点的最小轴对齐矩形），稍微放大一点。每个点都在自己的方向上"突出"，所以这个框碰不到任何 $-$ 点；全是 $-$ 时把矩形放到远处。16 种标注都做得到。不是任意 4 点都行：正方形的 4 个角就不行，对角两点标 $+$ 时，框住它们的矩形就是整个正方形。`,
-      T`**VC < 5（任何 5 个点都不行）**：在 5 个点里取最左、最右、最上、最下的点（最多 4 个）标 $+$，剩下的点里任取一个标 $-$。包含这几个极值点的矩形一定包含它们的外接框，而这个框就是全部 5 个点的外接框，所以也包含那个 $-$ 点。这种标注做不到，任何 5 个点都不能被 shatter。英文答案见 [T13](#/T13/predicted)。`,
+      T`**VC ≥ 4（存在 4 个点）**：把 4 个点摆成菱形：最左、最右、最上、最下各一个。任给一种标注，取所有 $+$ 点的 bounding box（外接框：包住这些点的最小轴对齐矩形，边界也算在框内）。为什么这个框碰不到任何 $-$ 点？菱形的 4 个点各自在一个方向上最极端（最左、最右、最上、最下）：某个点若是 $-$，它在那个方向上就不是最极端的了，框住 $+$ 点的矩形在那个方向只伸到某个 $+$ 点为止，所以它被留在框外。全是 $-$ 时把矩形放到远处（框里没有点）。16 种标注都做得到。不是任意 4 点都行：正方形的 4 个角就不行，对角两点标 $+$ 时，框住它们的矩形就是整个正方形。`,
+      T`**VC < 5（任何 5 个点都不行）**：在 5 个点里取最左、最右、最上、最下的点（最多 4 个）标 $+$，再把至少一个剩下的点标 $-$（其余的点随便标）。包含这几个极值点的矩形一定包含它们的外接框，而这个框就是全部 5 个点的外接框，所以也包含那个 $-$ 点。这种标注做不到，任何 5 个点都不能被 shatter。英文答案见 [T13](#/T13/predicted)。`,
       { t: 'html', html: '<div class="graph-row">' +
         '<figure class="graph-fig"><svg class="graph" viewBox="0 0 200 200" role="img" aria-label="菱形四点，一个矩形框住左、上两个正类点">' +
         '<rect class="edge fill" x="27" y="27" width="86" height="86" rx="3"/>' +
@@ -347,6 +347,7 @@
       [T`$\binom ni$`, T`组合数"$n$ 选 $i$"$=\frac{n!}{i!(n-i)!}$`],
       [T`$O(\cdot)$`, T`数量级（忽略常数）`],
       [T`$\delta$`, T`失败概率`],
+      [T`$n$`, T`训练样本数（下面的界是对 $n$ 个 i.i.d. 样本说的）`],
     ],
     goals: [
       '写出 Sauer–Shelah 上界并代数验证（如 stumps）',
@@ -357,17 +358,17 @@
     notExam: 'Sauer–Shelah 的证明、growth-function 定理的证明都不在范围内（L07 p20、p30）。p34 提到的 fat shattering、PAC-Bayes、Rademacher complexity 只是"其他理论框架"的名字，**完全不考**，看到不用紧张。',
     what: [
       { t: 'h3', text: '① 问题：有了 VC 维，泛化界怎么用它（L07 p30–p31）' },
-      T`c22 的泛化界里要的是 growth function $S_\mathcal F(2n)$，而 c23 算出来的是 VC 维 $d$。**Sauer–Shelah 引理**把两者连起来：VC 维有限时，$S_\mathcal F(n)$ 最多按 $n^d$ 增长（多项式），远小于 $2^n$。代进泛化界，惩罚项随 $n$ 增大而变小——VC 维有限的模型类"学得会"。`,
+      T`c22 的泛化界里要的是 growth function $S_\mathcal F(2n)$，而 c23 算出来的是 VC 维（本章记作 $d$）。注意这里的 $d$ 是 VC 维；后面说“$\mathbb R^d$ 的线性分类器”时，那个 $d$ 指的是特征维数，那里的 VC 维是 $d+1$，两者不是同一个数。**Sauer–Shelah 引理**把两者连起来：VC 维有限时，$S_\mathcal F(n)$ 最多按 $n^d$ 增长（多项式），远小于 $2^n$。代进泛化界，惩罚项随 $n$ 增大而变小——VC 维有限的模型类"学得会"。`,
       { t: 'h3', text: '② 两步：Sauer–Shelah 换掉 growth function，代入得到 VC 界（L07 p30–p32）' },
       T`**Sauer–Shelah lemma**（L07 p30）：VC 维有限时，对任意 $n$：`,
       { t: 'math', tex: T`S_\mathcal F(n)\le\sum_{i=0}^{\mathrm{VC}(\mathcal F)}\binom ni\le(n+1)^{\mathrm{VC}(\mathcal F)}\quad\Rightarrow\quad\log S_\mathcal F(n)\le\mathrm{VC}(\mathcal F)\log(n+1)` },
       T`**VC 泛化界**（L07 p31–p32）：以至少 $1-\delta$ 的概率，`,
       { t: 'math', tex: T`R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{8\,\frac{\mathrm{VC}(\mathcal F)\log(2n+1)+\log(4/\delta)}{n}}` },
       { t: 'slide', src: 'L07/p31', caption: '老师的原页：结构和有限类的界一样（训练误差 + 根号惩罚），只是 $\\log|\\mathcal F|$ 换成了 $\\mathrm{VC}(\\mathcal F)\\log(2n+1)$；最下面一行就是 Sauer–Shelah 给的那一步替换。' },
-      T`（推导：把 Sauer–Shelah 的 $\log S(2n)\le\mathrm{VC}\log(2n+1)$ 代入 c22 的 growth-function 界。）对 $\mathbb R^d$ 的线性分类器，偏差是 $O\big(\sqrt{\mathrm{VC}\log n/n}\big)$（p33）。`,
+      T`（推导：把 Sauer–Shelah 的 $\log S(2n)\le\mathrm{VC}\log(2n+1)$ 代入 c22 的 growth-function 界。）对 $\mathbb R^d$ 的线性分类器，惩罚项（根号那一整项，不是 bias）是 $O\big(\sqrt{\mathrm{VC}\log n/n}\big)$（p33）：样本越多它越小。`,
     ],
     why: [
-      T`这一章完成了 L06–L07 的故事：**有限 VC 维 ⇒ growth function 多项式 ⇒ 惩罚项随 $n$ 趋于 0 ⇒ ERM 能泛化**。L07 p34：有限 VC 维 ⇔ **PAC learnability（PAC 可学）**。这也给出了"为什么 SVM 要最大化 margin"的理论动机之一（复杂度控制）。`,
+      T`这一章完成了 L06–L07 的故事：**有限 VC 维 ⇒ growth function 多项式 ⇒ 惩罚项随 $n$ 趋于 0 ⇒ ERM 能泛化**。L07 p34：有限 VC 维 ⇔ **PAC learnability（PAC 可学）**。这也给出了“为什么 SVM（support vector machine，支持向量机，第 25 章）要最大化 margin（间隔）”的理论动机之一（复杂度控制）。`,
     ],
     intuition: [
       T`**从 $2^n$ 到 $n^{\mathrm{VC}}$。** 点数超过 VC 维后，模型就"跟不上"所有标签组合了，能实现的组合数从指数增长掉到多项式增长。多项式的 log 只是 $\mathrm{VC}\cdot\log n$，除以 $n$ 后趋于 0。`,
@@ -381,7 +382,7 @@
       { t: 'h3', text: 'SRM（L07 p32）' },
       T`和 c21 一样：在几个模型类之间，选"经验风险 + VC 惩罚"最小的。简单类：经验风险大、惩罚小；复杂类相反；样本多时惩罚变小，可以承担更复杂的类。`,
       { t: 'h3', text: '三个界放在一起' },
-      { t: 'table', head: ['', '复杂度项', '适用'], rows: [
+      { t: 'table', caption: '三行是三个不同的界，常数不完全一样（$\\log(1/\\delta)$ 对 $\\log(4/\\delta)$、$\\frac{1}{2n}$ 对 $\\frac{8}{n}$），不用自己推，考试按课件给的式子代入。', head: ['', '惩罚项（根号整个式子）', '适用'], rows: [
         ['有限类（L06 p17）', '$\\sqrt{\\frac{\\log|\\mathcal F|+\\log(1/\\delta)}{2n}}$', '$|\\mathcal F|$ 有限'],
         ['Growth function（L07 p20）', '$\\sqrt{8\\frac{\\log S_\\mathcal F(2n)+\\log(4/\\delta)}{n}}$', '任意类'],
         ['VC（L07 p31）', '$\\sqrt{8\\frac{\\mathrm{VC}\\log(2n+1)+\\log(4/\\delta)}{n}}$', 'VC 维有限'],
