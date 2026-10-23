@@ -248,6 +248,7 @@
         T`多项式核要事先选定"加哪些乘积项"。不知道该加什么时，可以用一个**只看两点距离**的核：两点越近值越接近 1，越远越接近 0。它对应的特征有无穷多个，写不出 $\varphi$，但 dual 只需要 $K$，照样能训练（为什么合法见 c30）：`,
         T`**RBF / Gaussian kernel（径向基 / 高斯核）**：$K(\bu,\bv)=\exp(-\gamma\|\bu-\bv\|^2)$，$\gamma>0$。对应的特征空间是**无限维**。`,
       ] },
+      { t: 'viz', id: 'fig-rbf-gamma', opts: { caption: T`同一个 $K=\exp(-\gamma d^2)$ 换三个 $\gamma$：都在 $d=0$ 时等于 1，$\gamma$ 越大掉得越快。$\gamma$ 大 ⇒ 只有很近的点才算「像」⇒ 模型更局部、更容易过拟合。` } },
     ],
     why: [
       T`这是 SVM 最强大的地方，也是 T8 题型的来源：2021 Q15（证明 kernel 合法）、2025 practice Q2（为 XOR 写显式特征映射）、2021 Q3（二次核 SVM 什么时候解 primal 比 dual 好）。L09 p28–p30 还说 kernel 是"模块化"的——学习算法（SVM、ridge、PCA……）和特征映射（kernel）可以分开选。`,
@@ -533,6 +534,7 @@
       T`**更新 = 把边界往分错的点那边推。** 正类点被分到负侧（$s<0$，$y=+1$）：加上 $\eta\bx$，让 $\bw$ 更像这个点，下次它的得分 $\bw'\bx$ 变大（增加 $\eta\|\bx\|^2$）。负类点被分错：减去 $\eta\bx$。`,
       T`**为什么用 $\le0$ 而不是 $<0$？** 初始 $\bw=\mathbf 0$ 时所有点 $s=0$，用严格 $<0$ 永远不会更新（L10 p19、p22 的 "why?"）。Worksheet 5 的 pseudocode 写法不同：先预测 $\hat y$（$s\ge0$ 判 $+1$），$\hat y\ne y$ 才更新。两者只在 $s=0$、$y=+1$ 时不同：pseudocode 判对、不更新，$sy\le0$ 规则要更新。完整例子见 [T11](#/T11)。`,
       { t: 'think', q: 'Perceptron loss 和 SVM 的 hinge loss $\\max(0,1-sy)$ 差在哪？这对结果有什么影响？', a: 'perceptron loss 是 $\\max(0,-sy)$：只要分对（$sy>0$）就满足，哪怕紧贴边界。hinge 要求 $sy\\ge1$（有 margin）。所以 perceptron 只找到**某一条**能分开的线（无穷多条中的一条，L10 p32），SVM 找 margin 最大的那条。' },
+      { t: 'viz', id: 'fig-perceptron-hinge', opts: { caption: T`两条线斜率一样，hinge 只是整体往右挪了 1。蓝色带（$0<z<1$）里的点已经分对，perceptron 不再罚；hinge 还要罚，逼着点离边界至少 1 个函数间隔——这就是 margin 的来源。` } },
       { t: 'story', title: 'Rosenblatt 的感知机', md: 'Frank Rosenblatt 1957–1958 年在康奈尔提出 perceptron，还造了一台专用硬件 Mark I Perceptron 来识别图片。当时的报纸对它寄予厚望；1969 年 Minsky 和 Papert 指出单层感知机连 XOR 都学不会（第 12 章），热潮随之退去。' },
     ],
     math: [

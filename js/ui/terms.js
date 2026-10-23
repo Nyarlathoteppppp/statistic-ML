@@ -64,7 +64,7 @@
   const NO = new Set('KATEX,CODE,BUTTON,A,H1,H2,H3,H4,TEXTAREA,INPUT,SELECT,OPTION,SCRIPT,STYLE,SVG,SUMMARY'.split(','));
   function skipEl(el) {
     for (let e = el; e; e = e.parentElement) {
-      if (NO.has(e.tagName) || (e.classList && (e.classList.contains('katex') || e.classList.contains('exam-phrase') || e.classList.contains('term-pop') || e.classList.contains('solver') || e.classList.contains('chips') || e.classList.contains('ch-nav') || e.classList.contains('page-foot') || e.classList.contains('en-title') || e.classList.contains('outline')))) return true; // the handout has its own Chinese lines
+      if (NO.has(e.tagName.toUpperCase()) || (e.classList && (e.classList.contains('katex') || e.classList.contains('exam-phrase') || e.classList.contains('term-pop') || e.classList.contains('solver') || e.classList.contains('chips') || e.classList.contains('ch-nav') || e.classList.contains('page-foot') || e.classList.contains('en-title') || e.classList.contains('outline')))) return true; // the handout has its own Chinese lines
       if (e.tagName === 'ARTICLE' || e.id === 'main') break;
     }
     return false;

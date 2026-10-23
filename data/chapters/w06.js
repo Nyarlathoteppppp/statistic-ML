@@ -504,6 +504,7 @@
     what: [
       T`**为什么需要**（L12 p18）：DNN 非常灵活、通常**over-parameterised（过参数化）**，参数比样本还多，很容易把训练集背下来。`,
       T`**Early stopping（早停）**：训练时盯着验证集误差，它不再下降（开始上升）就停止，并保留验证误差最低时的那组权重。L12 把它归为 **implicit regularisation（隐式正则化）**：权重从接近 0 的小值开始，早停让它们没机会长大；对 sigmoid/tanh 这类在 0 附近近似线性的激活，网络会被"拉向"一个线性模型。`,
+      { t: 'viz', id: 'fig-early-stop', opts: { caption: T`示意图（课件 L12 p18 只有定义，没有这条曲线）：训练误差一直降，验证误差先降后升。早停就是在验证误差最低的那一轮停下，并用那一轮的权重；灰色区域里继续训练只会过拟合。` } },
       T`早停不改损失函数，只是不让训练跑太久（权重从接近 0 出发，停得早就没机会长得很大）。如果想**直接**惩罚大权重、并且能用 $\lambda$ 调力度，就像 c16 的 ridge 一样在损失上加权重平方和。平方的导数是 $2\lambda w$，所以反传得到的梯度多加这一项：`,
       T`**Weight decay / $L_2$ regularisation（显式正则化）**（L12 p19）：`,
       { t: 'math', tex: T`\min\ L+\lambda\Big(\sum_{i,j}v_{ij}^2+\sum_jw_j^2\Big)\quad\Rightarrow\quad\frac{\partial}{\partial w_j}\text{ 多一项 }2\lambda w_j` },

@@ -9,6 +9,42 @@
   const T = (x, y, s, cls) => '<text class="lbl ' + (cls || '') + '" x="' + x + '" y="' + y + '">' + s + '</text>';
   const Rect = (x, y, w, h, cls) => '<rect class="blk ' + (cls || '') + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="3"/>';
   const Line = (x1, y1, x2, y2, cls, arrow) => '<line class="edge ' + (cls || '') + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"' + (arrow ? ' marker-end="url(#' + arrow + ')"' : '') + '/>';
+  const n1 = (v) => (+v).toFixed(1);
+  const Dot = (x, y, cls, r) => '<circle class="dot ' + (cls || '') + '" cx="' + n1(x) + '" cy="' + n1(y) + '" r="' + (r || 4.5) + '"/>';
+  const Path = (pts, cls) => '<path class="' + cls + '" d="M' + pts.map((q) => n1(q[0]) + ',' + n1(q[1])).join(' L') + '"/>';
+  const Box = (x, y, w, h, cls) => '<rect class="' + cls + '" x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(w) + '" height="' + n1(h) + '"/>';
+
+  /* Plot axes. o = { x, y, w, h, xr: [a, b], yr: [c, d], xt / yt: ticks (value or [value, label]), xl, yl, grid }.
+   * Returns { X, Y, s }: data → SVG coordinates, and the SVG of the frame. The x axis sits at y = 0 when 0 is in range. */
+  function axes(o) {
+    const X = (v) => o.x + (v - o.xr[0]) / (o.xr[1] - o.xr[0]) * o.w;
+    const Y = (v) => o.y + o.h - (v - o.yr[0]) / (o.yr[1] - o.yr[0]) * o.h;
+    const base = o.yr[0] <= 0 && o.yr[1] >= 0 ? Y(0) : o.y + o.h;
+    const left = o.xr[0] <= 0 && o.xr[1] >= 0 && o.yAtZero ? X(0) : o.x;
+    let s = '';
+    (o.xt || []).forEach((t) => {
+      const v = Array.isArray(t) ? t[0] : t, l = Array.isArray(t) ? t[1] : t;
+      if (o.grid) s += Line(n1(X(v)), o.y, n1(X(v)), o.y + o.h, 'grid');
+      s += '<text class="tick" x="' + n1(X(v)) + '" y="' + n1(base + 13) + '">' + l + '</text>';
+    });
+    (o.yt || []).forEach((t) => {
+      const v = Array.isArray(t) ? t[0] : t, l = Array.isArray(t) ? t[1] : t;
+      if (o.grid) s += Line(o.x, n1(Y(v)), o.x + o.w, n1(Y(v)), 'grid');
+      s += '<text class="tick end" x="' + n1(left - 6) + '" y="' + n1(Y(v)) + '">' + l + '</text>';
+    });
+    s += Line(o.x, n1(base), o.x + o.w, n1(base), 'ax') + Line(n1(left), o.y, n1(left), o.y + o.h, 'ax');
+    if (o.xl) s += T(o.x + o.w, base + 30, o.xl, 'end');
+    if (o.yl) s += T(left + 6, o.y - 8, o.yl, '');
+    return { X: X, Y: Y, s: s };
+  }
+  // Sample f on [a, b] into SVG points.
+  const samp = (A, f, a, b, n) => Array.from({ length: (n || 120) + 1 }, (_, i) => { const x = a + (b - a) * i / (n || 120); return [A.X(x), A.Y(f(x))]; });
+  const curve = (A, f, a, b, cls, n) => Path(samp(A, f, a, b, n), 'ln ' + (cls || ''));
+  // Region between f and g (g defaults to 0) on [a, b].
+  function band(A, f, a, b, cls, g) {
+    const top = samp(A, f, a, b), bot = samp(A, g || (() => 0), a, b).reverse();
+    return Path(top.concat(bot), 'fl ' + (cls || '')) .replace('"/>', ' Z"/>');
+  }
 
   // still(w, h, draw) returns a mount function; draw(arrowMarkerId) returns the SVG body.
   function still(w, h, draw) {
@@ -58,6 +94,157 @@
     // legend
     const lg = [['tr', '训练'], ['va', '内层验证（挑 C 用）'], ['te', '外层测试（只打分）']];
     lg.forEach((p, i) => { const x = 50 + i * 190; s += Rect(x, 274, 18, 14, p[0]) + T(x + 24, 281, p[1], ''); });
+    return s;
+  }));
+  /* c48 UCB: solid bar = mean (exploit), light bar = bonus (explore); the top is Q. 2026 practice Q2 numbers. */
+  SML.viz.register('fig-ucb-bars', still(720, 300, function () {
+    const A = axes({ x: 60, y: 30, w: 340, h: 214, xr: [0.4, 3.6], yr: [0, 2.2], yt: [0, 0.5, 1, 1.5, 2], yl: 'Q = 平均 + bonus', grid: true });
+    const arms = [[1, 64, 0.625, 0.375, '1.0'], [2, 16, 0.625, 0.75, '1.375'], [3, 4, 0.5, 1.5, '2.0']];
+    let s = A.s, top = '';
+    arms.forEach((a) => {
+      const cx = A.X(a[0]), w = 64, q = a[2] + a[3];
+      s += Box(cx - w / 2, A.Y(a[2]), w, A.Y(0) - A.Y(a[2]), 'bar c1');
+      s += Box(cx - w / 2, A.Y(q), w, A.Y(a[2]) - A.Y(q), 'bar soft c1');
+      top += T(cx, (A.Y(0) + A.Y(a[2])) / 2, String(a[2]), 'mid inv');
+      top += T(cx, (A.Y(a[2]) + A.Y(q)) / 2, '+' + a[3], 'mid tc c1');
+      top += Dot(cx, A.Y(q), 'c2', 5);
+      if (a[0] < 3) top += T(cx + 10, A.Y(q) - 12, 'Q = ' + a[4], 'tc c2');
+      top += T(cx, A.Y(0) + 14, '臂 ' + a[0], 'mid w') + T(cx, A.Y(0) + 30, 'N = ' + a[1], 'mid');
+    });
+    s += top + '<circle class="ring c2" cx="' + n1(A.X(3)) + '" cy="' + n1(A.Y(2)) + '" r="11"/>';
+    s += T(A.X(3), A.Y(2) - 22, 'Q = 2.0 最高 ⇒ 拉臂 3', 'mid tc c2');
+    const lx = 450;
+    s += Box(lx, 40, 18, 14, 'bar c1') + T(lx + 26, 47, '实心 = 平均奖励（利用）', '');
+    s += Box(lx, 64, 18, 14, 'bar soft c1') + T(lx + 26, 71, '浅色 = bonus √(2 ln t / N)（探索）', '');
+    s += Dot(lx + 9, 95, 'c2', 5) + T(lx + 26, 95, '红点 = 顶端 = Q，比的是它', '');
+    s += T(lx, 140, '臂 1、臂 2 平均一样（0.625），', '') + T(lx, 158, '臂 2 只拉了 16 次 ⇒ bonus 大一倍', '');
+    s += T(lx, 192, '臂 3 平均最低，但只拉过 4 次，', '') + T(lx, 210, '最不确定 ⇒ bonus 1.5，顶端最高', '');
+    s += T(lx, 244, 't = 85，2 ln t ≈ 9', 'w');
+    return s;
+  }));
+
+  /* c27 slack: one axis y·f(x) reads off all cases of ξ = max(0, 1 − y f). */
+  SML.viz.register('fig-slack-zones', still(660, 330, function () {
+    const A = axes({ x: 70, y: 86, w: 540, h: 190, xr: [-1.6, 3.2], yr: [0, 2.8], xt: [-1, 0, 1, 2, 3], yt: [0, 1, 2], xl: 'yᵢ(w′xᵢ + b)', yl: 'ξᵢ' });
+    const z = [[-1.6, 0, 'c2', '分错：ξ > 1', '越过了决策边界'], [0, 1, 'c4', '分对但进了 margin', '0 < ξ < 1'], [1, 3.2, 'c3', '分对且在 margin 外', 'ξ = 0']];
+    let s = '';
+    z.forEach((q) => {
+      s += Box(A.X(q[0]), 14, A.X(q[1]) - A.X(q[0]), 40, 'fl ' + q[2]);
+      s += Box(A.X(q[0]), A.Y(2.8), A.X(q[1]) - A.X(q[0]), A.Y(0) - A.Y(2.8), 'fl faint ' + q[2]);
+      s += T((A.X(q[0]) + A.X(q[1])) / 2, 27, q[3], 'mid w tc ' + q[2]) + T((A.X(q[0]) + A.X(q[1])) / 2, 43, q[4], 'mid tc ' + q[2]);
+    });
+    s += A.s;
+    [0, 1].forEach((v) => { s += Line(n1(A.X(v)), 10, n1(A.X(v)), n1(A.Y(0)), 'dash'); });
+    s += curve(A, (x) => Math.max(0, 1 - x), -1.6, 3.2, 'c5');
+    [[2, 0, 'ξ = 0', 0, -14], [0.6, 0.4, 'ξ = 0.4', 8, -14], [0, 1, 'ξ = 1：正好在决策边界上', 8, -16], [-1, 2, 'ξ = 2', 10, -12]].forEach((d) => {
+      s += Dot(A.X(d[0]), A.Y(d[1]), 'c5') + T(A.X(d[0]) + d[3], A.Y(d[1]) + d[4], d[2], 'w');
+    });
+    s += T(A.X(1) + 6, 68, 'margin 线', '') + T(A.X(0) - 6, 68, '决策边界', 'end');
+    return s;
+  }));
+
+  /* c31 perceptron loss max(0, −sy) vs hinge max(0, 1 − sy): same slope, hinge shifted right by 1. */
+  SML.viz.register('fig-perceptron-hinge', still(620, 300, function () {
+    const A = axes({ x: 60, y: 30, w: 400, h: 220, xr: [-2, 3], yr: [0, 3], xt: [-2, -1, 0, 1, 2, 3], yt: [0, 1, 2, 3], xl: 'z = s·y（s = w′x + b）', yl: 'loss' });
+    let s = Box(A.X(0), A.Y(3), A.X(1) - A.X(0), A.Y(0) - A.Y(3), 'fl c1') + A.s;
+    [0, 1].forEach((v) => { s += Line(n1(A.X(v)), A.Y(3), n1(A.X(v)), n1(A.Y(0)), 'dash'); });
+    s += curve(A, (x) => Math.max(0, -x), -2, 3, 'c1 thick');
+    s += curve(A, (x) => Math.max(0, 1 - x), -2, 3, 'c2');
+    s += T(A.X(0), A.Y(3) - 10, '分对 / 分错', 'mid') + T(A.X(1), A.Y(3) - 10, 'margin 边界', 'mid');
+    s += T((A.X(0) + A.X(1)) / 2, A.Y(2.3), 'perceptron', 'mid tc c1') + T((A.X(0) + A.X(1)) / 2, A.Y(2.3) + 16, '已经是 0', 'mid tc c1');
+    s += T((A.X(0) + A.X(1)) / 2, A.Y(1.6), 'hinge', 'mid tc c2') + T((A.X(0) + A.X(1)) / 2, A.Y(1.6) + 16, '还在罚', 'mid tc c2');
+    const lx = 480;
+    s += Line(lx, 60, lx + 26, 60, 'ln c1 thick') + T(lx + 32, 60, 'perceptron', 'tc c1') + T(lx + 32, 77, 'max(0, −z)', '');
+    s += Line(lx, 110, lx + 26, 110, 'ln c2') + T(lx + 32, 110, 'hinge (SVM)', 'tc c2') + T(lx + 32, 127, 'max(0, 1 − z)', '');
+    s += T(lx, 175, '斜率都是 −1，', 'w') + T(lx, 193, 'hinge 整体右移 1：', 'w') + T(lx, 211, '要求 z ≥ 1 才不罚', '') + T(lx, 229, '多出来的就是 margin', '');
+    return s;
+  }));
+  /* c05 bias vs variance as four targets: blue ring = average estimate, red dots = 8 repeated estimates. */
+  SML.viz.register('fig-bv-dartboard', still(640, 470, function () {
+    const U = [[0.9, 0.2], [-0.6, 0.7], [0.3, -0.9], [-0.8, -0.4], [0.5, 0.6], [-0.2, -0.6], [0.7, -0.3], [-0.5, 0.1]];
+    const cells = [
+      [160, 136, 0, 9, '低 bias + 低 variance', '无偏、抖得少（最好）'],
+      [480, 136, 0, 34, '低 bias + 高 variance', '无偏、但抖得厉害'],
+      [160, 332, 30, 9, '高 bias + 低 variance', '有偏、但抖得少'],
+      [480, 332, 30, 34, '高 bias + 高 variance', '又偏又抖（最差）']];
+    let s = T(320, 16, 'bias 看蓝圈离靶心多远，variance 看红点散得多开', 'mid w');
+    s += '<path class="cross" d="M168,40 h12 M174,34 v12"/>' + T(186, 40, '靶心 = 真值 θ', '');
+    s += Dot(290, 40, 'c2', 3.5) + T(298, 40, '8 次重复抽样的估计值', '');
+    s += '<circle class="ring c1" cx="452" cy="40" r="6"/>' + T(462, 40, '8 个估计的平均', '');
+    cells.forEach((c) => {
+      const cx = c[0], cy = c[1], b = c[2], v = c[3];
+      [68, 51, 34, 17].forEach((r) => { s += '<circle class="target" cx="' + cx + '" cy="' + cy + '" r="' + r + '"/>'; });
+      s += '<path class="cross" d="M' + (cx - 7) + ',' + cy + ' h14 M' + cx + ',' + (cy - 7) + ' v14"/>';
+      const pts = U.map((u) => [cx + b * 0.8 + u[0] * v, cy - b * 0.6 + u[1] * v]);
+      pts.forEach((q) => { s += Dot(q[0], q[1], 'c2', 3.5); });
+      const mx = pts.reduce((a, q) => a + q[0], 0) / 8, my = pts.reduce((a, q) => a + q[1], 0) / 8;
+      s += '<circle class="ring c1" cx="' + n1(mx) + '" cy="' + n1(my) + '" r="6"/>';
+      s += T(cx, cy + 84, c[4], 'mid w') + T(cx, cy + 100, c[5], 'mid');
+    });
+    s += T(160, 450, '左下：有偏，但 MSE = bias² + variance 可能比右上还小', 'mid tc c2');
+    return s;
+  }));
+
+  /* c36 early stopping: training error keeps falling, validation error turns up; keep the weights at its minimum. */
+  SML.viz.register('fig-early-stop', still(640, 300, function (k) {
+    const tr = (x) => 0.15 + 0.75 * Math.exp(-x / 4), va = (x) => tr(x) + 0.08 + 0.0418 * x, xm = 6;
+    const A = axes({ x: 60, y: 40, w: 440, h: 210, xr: [0, 20], yr: [0, 1.2], xt: [0, 5, 10, 15, 20], xl: 'epoch（训练轮数）', yl: 'loss' });
+    let s = Box(A.X(xm), A.Y(1.2), A.X(20) - A.X(xm), A.Y(0) - A.Y(1.2), 'fl shade') + A.s;
+    s += Line(n1(A.X(xm)), n1(A.Y(va(xm))), n1(A.X(xm)), n1(A.Y(0)), 'dash');
+    s += curve(A, tr, 0, 20, 'c1') + curve(A, va, 0, 20, 'c2');
+    s += Dot(A.X(xm), A.Y(va(xm)), 'c2', 6);
+    s += T(A.X(xm), A.Y(va(xm)) - 34, '验证误差最低：停在这里', 'mid tc c2') + T(A.X(xm), A.Y(va(xm)) - 18, '保留这一轮的权重', 'mid');
+    s += T(A.X(13), A.Y(1.12), '继续训练 → 过拟合', 'mid w');
+    s += T(A.X(11), A.Y(va(11)) - 14, 'validation', 'mid tc c2') + T(A.X(11), A.Y(tr(11)) - 14, 'training', 'mid tc c1');
+    s += '<path class="edge" d="M' + n1(A.X(18)) + ',' + n1(A.Y(tr(18)) - 6) + ' L' + n1(A.X(18)) + ',' + n1(A.Y(va(18)) + 8) + '" marker-end="url(#' + k + ')" marker-start="url(#' + k + ')"/>';
+    s += T(A.X(18) - 8, (A.Y(tr(18)) + A.Y(va(18))) / 2, '差距越拉越大', 'end');
+    const lx = 520;
+    s += Line(lx, 70, lx + 24, 70, 'ln c1') + T(lx + 30, 70, 'training error', 'tc c1');
+    s += Line(lx, 94, lx + 24, 94, 'ln c2') + T(lx + 30, 94, 'validation error', 'tc c2');
+    s += T(lx, 140, '训练误差一直降，', '') + T(lx, 158, '看它没用；', '') + T(lx, 182, '要看验证误差', 'w') + T(lx, 200, '什么时候转头向上', 'w');
+    return s;
+  }));
+
+  /* c24 SRM: empirical risk falls, VC penalty rises with class complexity; the bound is U-shaped. */
+  SML.viz.register('fig-srm', still(720, 310, function () {
+    const emp = (x) => 0.1 + 0.8 * Math.exp(-x / 2.2), pen = (x) => 0.035 * Math.pow(x, 1.4), pen2 = (x) => 0.5 * pen(x);
+    const argmin = (f) => { let b = 0, bv = Infinity; for (let x = 0; x <= 10; x += 0.01) { const v = f(x); if (v < bv) { bv = v; b = x; } } return b; };
+    const m1 = argmin((x) => emp(x) + pen(x)), m2 = argmin((x) => emp(x) + pen2(x));
+    const A = axes({ x: 60, y: 30, w: 440, h: 220, xr: [0, 10], yr: [0, 1.2], xt: [[0.6, '简单（VC 小）'], [9.4, '复杂（VC 大）']], yl: '风险（的上界）' });
+    let s = A.s;
+    s += curve(A, pen2, 0, 10, 'c1 dashed') + curve(A, (x) => emp(x) + pen2(x), 0, 10, 'c4 dashed');
+    s += curve(A, emp, 0, 10, 'c5') + curve(A, pen, 0, 10, 'c1') + curve(A, (x) => emp(x) + pen(x), 0, 10, 'c4');
+    s += Line(n1(A.X(m1)), n1(A.Y(emp(m1) + pen(m1))), n1(A.X(m1)), n1(A.Y(0)), 'dash') + Dot(A.X(m1), A.Y(emp(m1) + pen(m1)), 'c4', 5.5);
+    s += Dot(A.X(m2), A.Y(emp(m2) + pen2(m2)), 'c4', 4);
+    s += T(A.X(m1), A.Y(0) + 14, 'SRM 选这里', 'mid tc c4');
+    s += T(A.X(1.1), A.Y(emp(1.1)) - 12, '训练误差', 'tc c5');
+    s += T(A.X(8.6), A.Y(pen(8.6)) + 14, 'VC 惩罚', 'end tc c1');
+    s += T(A.X(8.8), A.Y(emp(8.8) + pen(8.8)) - 12, '两者之和（界）', 'end tc c4');
+    s += T(A.X(9.9), A.Y(pen2(9.9)) + 14, 'n 变大', 'end tc c1');
+    const lx = 520;
+    s += T(lx, 60, '简单类：训练误差大，', '') + T(lx, 78, '惩罚小', '');
+    s += T(lx, 110, '复杂类：训练误差小，', '') + T(lx, 128, '惩罚大', '');
+    s += T(lx, 166, '虚线 = 样本更多（n 大）：', 'w') + T(lx, 184, '惩罚整体变小，和的最低点', '') + T(lx, 202, '右移 ⇒ 承担得起更复杂的类', '');
+    return s;
+  }));
+
+  /* c29 RBF kernel width: K = exp(−γ d²) against distance d for three γ. */
+  SML.viz.register('fig-rbf-gamma', still(700, 290, function () {
+    const A = axes({ x: 60, y: 30, w: 400, h: 200, xr: [0, 4], yr: [0, 1.05], xt: [0, 1, 2, 3, 4], yt: [0, 0.5, 1], xl: 'd = ‖u − v‖（两点距离）', yl: 'K = exp(−γ d²)', grid: true });
+    const G = [[0.1, 'c1', 'γ = 0.1：很宽'], [1, 'c4', 'γ = 1'], [10, 'c2', 'γ = 10：很窄']];
+    let s = A.s + Line(n1(A.X(1)), A.Y(1.05), n1(A.X(1)), n1(A.Y(0)), 'dash');
+    G.forEach((g) => { s += curve(A, (d) => Math.exp(-g[0] * d * d), 0, 4, g[1], 200); });
+    s += Dot(A.X(0), A.Y(1), '', 5);
+    G.forEach((g) => { s += Dot(A.X(1), A.Y(Math.exp(-g[0])), g[1], 4.5); });
+    s += T(A.X(1) + 8, A.Y(Math.exp(-0.1)) - 10, '0.90', 'tc c1') + T(A.X(1) + 8, A.Y(Math.exp(-1)) - 2, '0.37', 'tc c4') + T(A.X(1) + 8, A.Y(0) - 10, '≈ 0', 'tc c2');
+    s += T(A.X(3.1), A.Y(Math.exp(-0.1 * 9.61)) - 12, 'γ = 0.1：很宽', 'tc c1');
+    s += T(A.X(1.6), A.Y(Math.exp(-1 * 2.56)) - 12, 'γ = 1', 'tc c4');
+    s += T(A.X(0.42), A.Y(0.17), 'γ = 10：很窄', 'tc c2');
+    const lx = 480;
+    s += T(lx, 60, 'γ 是「多近才算像」的旋钮', 'w');
+    s += T(lx, 90, 'γ 越大 → 钟形越窄 →', '') + T(lx, 108, '只有很近的点 K 才不为 0', '');
+    s += T(lx, 140, '虚线 d = 1 处读三个 K：', '') + T(lx, 158, '0.90、0.37、0.00005', '');
+    s += T(lx, 192, 'K 只看 γ·d²：c29 例子', '') + T(lx, 210, 'γ = 0.5、d² = 2 ⇒ γd² = 1，', '') + T(lx, 228, '和 γ = 1、d = 1 一样是 0.37', '');
     return s;
   }));
 })(window);

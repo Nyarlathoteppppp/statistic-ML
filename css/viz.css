@@ -239,3 +239,27 @@ svg.graph .blk.tr { fill: var(--accent-soft); stroke: var(--accent); }
 svg.graph .blk.te { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 2; }
 svg.graph .blk.va { fill: var(--good-soft); stroke: var(--good); stroke-width: 2; }
 svg.graph .blk.dim { opacity: .45; }
+svg.graph .c1 { --fc: var(--accent); --fs: var(--accent-soft); }
+svg.graph .c2 { --fc: var(--bad); --fs: var(--bad-soft); }
+svg.graph .c3 { --fc: var(--good); --fs: var(--good-soft); }
+svg.graph .c4 { --fc: var(--warn); --fs: var(--warn-soft); }
+svg.graph .c5 { --fc: var(--exam); --fs: var(--exam-soft); }
+svg.graph .ax { stroke: var(--ink-2); stroke-width: 1.2; }
+svg.graph .grid { stroke: var(--line); stroke-width: .8; }
+svg.graph .dash { stroke: var(--line-2); stroke-width: 1.3; stroke-dasharray: 5 4; }
+svg.graph .tick { fill: var(--muted); font: 500 11px var(--body); text-anchor: middle; dominant-baseline: central; }
+svg.graph .tick.end { text-anchor: end; }
+svg.graph .ln { fill: none; stroke: var(--fc, var(--ink-2)); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+svg.graph .ln.thick { stroke-width: 5; opacity: .55; }
+svg.graph .ln.dashed { stroke-dasharray: 6 4; stroke-width: 1.8; }
+svg.graph .fl { fill: var(--fs, var(--sunk)); stroke: none; }
+svg.graph .fl.faint { opacity: .45; }
+svg.graph .dot { fill: var(--fc, var(--ink-2)); stroke: var(--card); stroke-width: 1.5; }
+svg.graph .ring { fill: none; stroke: var(--fc, var(--ink-2)); stroke-width: 2; }
+svg.graph .bar { fill: var(--fc, var(--ink-2)); stroke: var(--fc, var(--ink-2)); stroke-width: 1.2; }
+svg.graph .bar.soft { fill: var(--fs, var(--sunk)); stroke-dasharray: 4 3; }
+svg.graph .lbl.tc { fill: var(--fc); font-weight: 600; }
+svg.graph .lbl.inv { fill: var(--card); font-weight: 600; }
+svg.graph .cross { stroke: var(--ink); stroke-width: 2; fill: none; }
+svg.graph .target { fill: none; stroke: var(--line-2); stroke-width: 1.2; }
+svg.graph .fl.shade { fill: var(--sunk); }
