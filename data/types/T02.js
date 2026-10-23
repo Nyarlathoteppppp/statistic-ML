@@ -177,7 +177,7 @@ Article and arm features let the regression share information across articles, s
           T`标准 MAB 假设每个臂 $i$ 有一个固定的奖励分布 $P_i$，每轮的奖励从 $P_i$ 独立抽取（L17 p6；UCB 用的 Hoeffding 不等式也要求 i.i.d.，L17 p17）。这里有三处不成立：`,
           {
             t: 'ul', items: [
-              '不同分布（not identically distributed）：同一个标题，体育迷点击率高，别人低；每一轮来的用户不同，奖励的分布跟着变。',
+              '不同分布（not identically distributed）：同一个标题，体育迷点击率高，别人低；而不同时段来的用户人群在变（白天 / 晚上、突发新闻），奖励的分布就跟着变。',
               '随时间变（non-stationary）：新闻会过时，早晚的读者不同，突发新闻会让某类文章突然变热。',
               '不独立（not independent）：同一个用户反复看到同一个标题，后面更不会点；同一时段的用户受同一条热点影响。',
             ],
@@ -185,7 +185,7 @@ Article and arm features let the regression share information across articles, s
           T`上下文的作用：把用户、文章、时间的特征放进 $\bX_i(t)$ 后，只需要假设"给定上下文时奖励独立、均值为 $E[R_i(t)\mid\bX_i(t)]$"。用户之间的差异被上下文解释掉了，所以假设**更现实**；随时间的漂移和重复曝光造成的依赖只能部分缓解（可以把时间、文章新鲜度、"该用户是否看过这个标题"也做成特征）。`,
           {
             t: 'exam', title: 'Exam phrasing · (c)',
-            md: T`Not fully appropriate. The standard bandit assumes each arm's rewards are i.i.d. draws from a fixed distribution $P_i$. Here the click probability of the same headline and picture depends on who is viewing it (users' tastes differ), so rewards are not identically distributed across rounds; it also drifts over time (news goes stale, time-of-day effects, breaking news), and showing the same headline to the same user repeatedly makes rewards dependent.
+            md: T`Not fully appropriate. The standard bandit assumes each arm's rewards are i.i.d. draws from a fixed distribution $P_i$. Here the click probability of the same headline and picture depends on who is viewing it (users' tastes differ) and the mix of viewers changes over time (time of day, breaking news), so rewards are not identically distributed across rounds; it also drifts over time (news goes stale, time-of-day effects, breaking news), and showing the same headline to the same user repeatedly makes rewards dependent.
 Context makes the assumption **more realistic**: conditioning on user, article and time features in $\mathbf X_i(t)$ explains much of this variation, so we only need rewards to be (approximately) independent given the context, with mean $E[R_i(t)\mid\mathbf X_i(t)]$. Remaining drift can be reduced with time and freshness features, but not removed completely.`,
           },
           { t: 'h4', text: '(d) 要收集什么数据（4 分）' },
@@ -194,20 +194,20 @@ Context makes the assumption **more realistic**: conditioning on user, article a
             t: 'ul', items: [
               '收集什么：在一小部分流量上，每一轮从这篇文章的候选组合里**均匀随机**选一个展示；记录这一轮所有臂的上下文向量、实际展示的臂、点没点（以及时间戳）。上下文一定要一起记，否则没法回放 contextual bandit。',
               'replay 怎么用：按时间顺序回放日志，让被评估的 bandit 看同样的上下文、选一个臂；和日志里的臂相同，就把日志里的奖励给它、更新它、计分；不同就跳过这一条。',
-              '为什么必须均匀随机：保留下来的轮次和这个算法真的上线时遇到的情况一样，评估没有偏差。如果日志是某个现有算法选的，它偏爱的臂被记录得多，评估就会偏。',
+              '为什么必须均匀随机：（每轮候选臂个数相同时）保留下来的轮次和这个算法真的上线时遇到的情况一样，评估没有偏差；候选个数不同的文章要分开评估。如果日志是某个现有算法选的，它偏爱的臂被记录得多，评估就会偏。',
               T`为什么高效：一份日志可以回放给任意多个 bandit，不用逐个上线。代价是 $k$ 个臂时平均只有约 $1/k$ 的轮次能对上（例如 3 个标题 × 4 张图 = 12 个臂，只能用约 $1/12\approx8\%$），所以日志要足够大。`,
             ],
           },
           {
             t: 'exam', title: 'Exam phrasing · (d)',
             md: T`Collect a log from a **uniformly random** logging policy on a fraction of the traffic: in each round, show one of the article's headline–picture combinations chosen uniformly at random, and record the context vectors of all arms, the arm displayed and whether it was clicked (with a timestamp).
-Any number of bandit learners can then be evaluated offline on this one log by replay: step through the log and let the learner choose an arm given the logged context; if it matches the logged arm, give it the logged reward, update it and count the round, otherwise skip the round. Because the logged arms are uniformly random, the retained rounds are an unbiased sample of what the learner would face online, and its average reward per retained round estimates its click-through rate, without deploying each learner to real users. With $k$ arms only about $1/k$ of the log is used, so the log must be large.`,
+Any number of bandit learners can then be evaluated offline on this one log by replay: step through the log and let the learner choose an arm given the logged context; if it matches the logged arm, give it the logged reward, update it and count the round, otherwise skip the round. Because the logged arms are uniformly random (with the same number of candidate arms in every round), the retained rounds are an unbiased sample of what the learner would face online, and its average reward per retained round estimates its click-through rate, without deploying each learner to real users. With $k$ arms only about $1/k$ of the log is used, so the log must be large.`,
           },
         ],
         azh: T`(a) 臂：首页上每篇文章的可选（标题, 预览图片）组合；$h$ 个标题、$p$ 张图就有 $h\times p$ 个臂。（也可以标题、图片各用一个 bandit：臂更少，但忽略了标题和图片的搭配效果。）轮：每次有用户打开首页、需要显示这篇文章预览的时候；每一轮学习器观察上下文、选一个臂并显示。奖励：用户点了文章预览为 1，否则为 0；累计奖励正好是管理层用来评价系统的总点击数，所以最大化累计奖励（最小化 regret）就是业务目标。因为用户口味不同，每一轮还要观察每个臂的上下文向量 $\mathbf X_i(t)$，用回归（regression）估计 $E[R_i(t)\mid\mathbf X_i(t)]$，再选回归预测上 UCB 最大的臂（例如 LinUCB）。
 (b) 臂 $i$ 在第 $t$ 轮的上下文向量 $\mathbf X_i(t)$ 拼接以下特征（类别型特征 one-hot 编码，数值特征标准化）：用户特征（状态 state）：订阅状态与类型、地区、设备、时段和星期几；从 TechNews 的点击日志得到该用户在各文章类别（本地、国际、评论、投资…）、各标题风格、各图片类型上的历史点击率；匿名用户只有本次访问的特征。文章特征：类别、主题关键词、作者、发布时长（新鲜度）。臂特征：标题长度、风格（疑问句、数字、引语）、情感和关键词；图片类型（人脸、场景、图表）、颜色等图像特征。交叉特征：例如该用户对这篇文章所属类别的历史点击率。文章和臂的特征让回归能在不同文章之间共享信息，新标题或新图片在被展示很多次之前就能得到合理的估计。
-(c) 不完全合适。标准 bandit 假设每个臂的奖励是从固定分布 $P_i$ 中独立同分布抽取的。这里同一个标题和图片的点击概率取决于谁在看（用户口味不同），所以各轮的奖励不同分布；点击率还会随时间漂移（新闻过时、时段效应、突发新闻）；同一个标题反复展示给同一个用户还会让奖励相互依赖。上下文让这个假设更现实：在 $\mathbf X_i(t)$ 中加入用户、文章和时间特征后，大部分这类差异被解释掉了，只需要假设给定上下文时奖励（近似）独立、均值为 $E[R_i(t)\mid\mathbf X_i(t)]$。剩下的漂移可以用时间和新鲜度特征减弱，但不能完全消除。
-(d) 在一部分流量上用均匀随机的记录策略（logging policy）收集日志：每一轮从这篇文章的标题–图片组合中均匀随机选一个展示，记录所有臂的上下文向量、显示的臂、是否被点击（以及时间戳）。之后任意多个 bandit 学习器都可以用这一份日志通过回放（replay）离线评估：按顺序回放日志，让学习器根据记录的上下文选一个臂；如果和日志里的臂相同，就把记录的奖励给它、更新它并计入这一轮，否则跳过这一轮。因为日志里的臂是均匀随机选的，保留下来的轮次是这个学习器上线时会遇到的情况的无偏样本，它在保留轮次上的平均奖励就估计了它的点击率，不需要把每个学习器部署给真实用户。$k$ 个臂时只能用上大约 $1/k$ 的日志，所以日志必须很大。`,
+(c) 不完全合适。标准 bandit 假设每个臂的奖励是从固定分布 $P_i$ 中独立同分布抽取的。这里同一个标题和图片的点击概率取决于谁在看（用户口味不同），而来看的人群随时段变化，所以各轮的奖励不同分布；点击率还会随时间漂移（新闻过时、时段效应、突发新闻）；同一个标题反复展示给同一个用户还会让奖励相互依赖。上下文让这个假设更现实：在 $\mathbf X_i(t)$ 中加入用户、文章和时间特征后，大部分这类差异被解释掉了，只需要假设给定上下文时奖励（近似）独立、均值为 $E[R_i(t)\mid\mathbf X_i(t)]$。剩下的漂移可以用时间和新鲜度特征减弱，但不能完全消除。
+(d) 在一部分流量上用均匀随机的记录策略（logging policy）收集日志：每一轮从这篇文章的标题–图片组合中均匀随机选一个展示，记录所有臂的上下文向量、显示的臂、是否被点击（以及时间戳）。之后任意多个 bandit 学习器都可以用这一份日志通过回放（replay）离线评估：按顺序回放日志，让学习器根据记录的上下文选一个臂；如果和日志里的臂相同，就把记录的奖励给它、更新它并计入这一轮，否则跳过这一轮。因为日志里的臂是均匀随机选的（每轮候选臂个数相同），保留下来的轮次是这个学习器上线时会遇到的情况的无偏样本，它在保留轮次上的平均奖励就估计了它的点击率，不需要把每个学习器部署给真实用户。$k$ 个臂时只能用上大约 $1/k$ 的日志，所以日志必须很大。`,
       },
       {
         t: 'quiz', items: [
@@ -246,7 +246,7 @@ Any number of bandit learners can then be evaluated offline on this one log by r
           { t: 'math', tex: T`\mu\le\bar R_n+\sqrt{\frac{\log(1/\varepsilon)}{2n}}` },
           '（这里的 $\\varepsilon$ 是"不等式不成立的概率"，不是 ε-greedy 的探索概率；$\\mu$ 是这只臂的真实均值。）令 $n=N_{t-1}(i)$，$\\varepsilon=1/t^4$：$\\log(1/\\varepsilon)=4\\log t$，于是 $\\sqrt{\\frac{4\\log t}{2N}}=\\sqrt{\\frac{2\\log t}{N}}$（$4/2=2$），正好是 UCB 的 bonus。所以 $Q$ 是均值的一个**高概率上界**（upper confidence bound），名字由此而来。',
           { t: 'errata', md: 'L17 p17 同时提到 $\\varepsilon=1/t$（Lai & Robbins）和"take $\\varepsilon=1/t^4$"。和公式里的 2 对应的是 $1/t^4$。' },
-          '把 2 换成可调的 $\\rho>0$（p22）可以控制探索强度，也能处理奖励不在 $[0,1]$ 的情况。',
+          '把 2 换成可调的 $\\rho>0$（p22）可以控制探索强度，也能处理奖励在其他已知有界区间里的情况（按区间宽度调系数）。',
         ],
       },
       {

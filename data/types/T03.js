@@ -12,7 +12,7 @@
       { text: 'L13 p6–p17', href: '#/L13', cls: 'src' }, { text: 'WS08 / WK08', cls: 'src' },
       { text: '2026 practice Q1d', cls: 'hot' }, { text: '2025 practice Q5', cls: 'hot' },
     ],
-    lead: '核心只有一句话：**卷积层的权重是共享的**（weight sharing），一个 filter 不管滑到哪里都用同一组参数。所以卷积层的参数数 = filter 的大小，和输出有多少个单元无关。',
+    lead: '核心只有一句话：**卷积层的权重是共享的**（weight sharing），一个 filter 不管滑到哪里都用同一组参数。所以卷积层的参数不按输出位置重复计：权重数 = filter 个数 × 输入通道数 × filter 大小（含 bias 时每个 filter 再加 1），和输出有多少个单元无关。真题那种一维、单通道、单 filter 的层，权重数就等于 filter 宽度。',
     blocks: [
       { t: 'h2', text: '1. 三条公式', id: 'rules' },
       '符号：1D 里 $n$ 是输入长度、$k$ 是 filter 宽（每次连看几个数）、$s$ 是 stride（窗口每次滑几格，没写就是 1）。2D 里 $H$ 是输入的高（宽用同一个公式）、$K$ 是正方形 filter 的边长、$P$ 是 padding（四周补几圈 0，没写就是 0）、$S$ 是 stride、$C_{in}$ 是输入通道数（黑白 1、RGB 3）、$C_{out}$ 是 filter 个数（= 输出通道数）。bias 是每个 filter / 每个输出单元额外加的一个常数。最终输出写成"高 × 宽 × 通道"，如 $28\\times28\\times6$。',
@@ -103,7 +103,7 @@ Total (excluding biases): $3+20+20=$ **43**.`,
           T`**反推未知量（如 stride）。** 把已知数代进去，得到 $\lfloor(n+2p-k)/s\rfloor=\text{输出边长}-1$，再试 $s=1,2,3,\dots$，向下取整后对得上的就是答案。`,
           T`**每层参数。** 卷积层 $C_{out}\cdot C_{in}\cdot k^2$（另加 $C_{out}$ 个 bias），pooling 层 0。全连接层先把上一层拉平成 $H\times W\times C$ 个数，再乘输出单元数。`,
           T`**感受野（receptive field）。** 感受野是一个单元能"看到"的输入范围（L13 p26）。几层 stride 1 的卷积叠起来，宽度分别是 $k_1,\dots,k_L$，最上层一个单元的感受野宽度是 $1+\sum_i(k_i-1)$。全部同宽 $k$ 时，就是 c39 的 $1+L(k-1)$。`,
-          T`**用小 filter 代替大 filter。** 要保持一个 $K\times K$ 卷积的感受野，选 $L\ge2$ 层，边长 $k_1,\dots,k_L$ 满足 $\sum_i(k_i-1)=K-1$。如果每层都是 $C$ 个通道进、$C$ 个 filter 出，参数是 $C^2\sum_ik_i^2$，比原来的 $C^2K^2$ 少。例如两层 $5\times5$ 代替 $9\times9$：$25+25=50<81$。每层 stride 1、padding $(k_i-1)/2$，输出边长就不变。`,
+          T`**用小 filter 代替大 filter。** 要保持一个 $K\times K$ 卷积的感受野，选 $L\ge2$ 层，边长 $k_1,\dots,k_L$ 满足 $\sum_i(k_i-1)=K-1$。如果每层都是 $C$ 个通道进、$C$ 个 filter 出，权重数（不含 bias）是 $C^2\sum_ik_i^2$，比原来的 $C^2K^2$ 少。例如两层 $5\times5$ 代替 $9\times9$：$25+25=50<81$。每层 stride 1、padding $(k_i-1)/2$，输出边长就不变。`,
         ],
       },
       { t: 'slide', src: 'L13/p26', caption: '左图两层宽 3 的卷积叠起来，$g_3$ 看到 $x_1$–$x_5$ 共 5 个输入：$1+2+2=5$。' },
@@ -239,15 +239,15 @@ Note: the padding size is the number of rows/columns on each side of the input. 
             ],
           },
           {
-            t: 'note', md: T`**"参数更少"有个前提。** $\sum k_i^2<121$ 比较的是每一对（输入通道，输出通道）上的权重，默认堆叠的各层输入、输出通道数相同。本题第一层的输入只有 3 个通道；如果中间层都用 32 个通道，$3\times3$（3→32）加 $9\times9$（32→32）共 $3\cdot9\cdot32+32\cdot81\cdot32=83808$ 个权重，反而比 11616 多。卷面照题意列出 5 种，再加一句假设即可。`,
+            t: 'note', md: T`**"参数更少"有个前提。** $\sum k_i^2<121$ 比较的是每一对（输入通道，输出通道）上的权重，默认堆叠的各层输入、输出通道数相同。本题第一层的输入只有 3 个通道；如果中间层都用 32 个通道，$3\times3$（3→32）加 $9\times9$（32→32）共 $3\cdot9\cdot32+32\cdot81\cdot32=83808$ 个权重，反而比 11616 多。所以卷面写：中间层都只用 3 个通道、最后一层才输出 32 个（stride 1、无 padding，输入输出尺寸不变），最小的 filter 放在最后一层。五种依次是 $49\cdot9+25\cdot96=2841$、$1386$、$1314$、$1251$、$1188$ 个权重，都少于 11616。`,
           },
           {
             t: 'exam', md: T`(a) Parameters $=C_{out}\,(C_{in}k^2+1)=32\times(3\times11\times11+1)=32\times364=11648$ ($11616$ weights plus $32$ biases).
 
-(b) Stacked stride-1 convolutions with sizes $k_1,\dots,k_L$ have a receptive field of $1+\sum_i(k_i-1)$, so we need $\sum_i(k_i-1)=10$. Five stackings (besides $3\times3$ + $9\times9$): (1) $7\times7$ + $5\times5$; (2) $7\times7$ + $3\times3$ + $3\times3$; (3) $5\times5$ + $5\times5$ + $3\times3$; (4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$; (5) five $3\times3$ layers. Assuming every layer keeps the same numbers of input and output channels, the weights per channel pair are $\sum_ik_i^2=74,\,67,\,59,\,52,\,45$, all fewer than $11^2=121$.`,
+(b) Stacked stride-1 convolutions with sizes $k_1,\dots,k_L$ have a receptive field of $1+\sum_i(k_i-1)$, so we need $\sum_i(k_i-1)=10$. Five stackings (besides $3\times3$ + $9\times9$): (1) $7\times7$ + $5\times5$; (2) $7\times7$ + $3\times3$ + $3\times3$; (3) $5\times5$ + $5\times5$ + $3\times3$; (4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$; (5) five $3\times3$ layers. To use fewer parameters, keep 3 channels in every intermediate layer and output 32 channels only in the last layer (stride 1, no padding, so input and output shapes are unchanged), with the smallest kernel last: the stacks then have 2841, 1386, 1314, 1251 and 1188 weights respectively, all fewer than the original 11616.`,
           },
         ],
-        azh: T`(a) 参数 $=C_{out}\,(C_{in}k^2+1)=32\times(3\times11\times11+1)=32\times364=11648$（$11616$ 个权重加 $32$ 个 bias）。(b) 边长为 $k_1,\dots,k_L$ 的 stride 1 卷积叠起来，感受野是 $1+\sum_i(k_i-1)$，所以需要 $\sum_i(k_i-1)=10$。除 $3\times3$ + $9\times9$ 外的五种：(1) $7\times7$ + $5\times5$；(2) $7\times7$ + $3\times3$ + $3\times3$；(3) $5\times5$ + $5\times5$ + $3\times3$；(4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$；(5) 五层 $3\times3$。假设每层输入、输出通道数相同，每对通道上的权重 $\sum_ik_i^2=74,\,67,\,59,\,52,\,45$，都少于 $11^2=121$。`,
+        azh: T`(a) 参数 $=C_{out}\,(C_{in}k^2+1)=32\times(3\times11\times11+1)=32\times364=11648$（$11616$ 个权重加 $32$ 个 bias）。(b) 边长为 $k_1,\dots,k_L$ 的 stride 1 卷积叠起来，感受野是 $1+\sum_i(k_i-1)$，所以需要 $\sum_i(k_i-1)=10$。除 $3\times3$ + $9\times9$ 外的五种：(1) $7\times7$ + $5\times5$；(2) $7\times7$ + $3\times3$ + $3\times3$；(3) $5\times5$ + $5\times5$ + $3\times3$；(4) $5\times5$ + $3\times3$ + $3\times3$ + $3\times3$；(5) 五层 $3\times3$。要让参数更少：中间层都只用 3 个通道，只有最后一层输出 32 个通道（stride 1、无 padding，输入输出尺寸不变），最小的 filter 放最后。五种依次有 2841、1386、1314、1251、1188 个权重，都少于原来的 11616。`,
       },
       {
         t: 'past', src: '2020 Q4(a)（据学生笔记；年份按同题 (b) 的图名推断）', marks: 4, topic: 'L13 p11–p14',

@@ -347,9 +347,9 @@
         qzh: T`就训练目标非凸（non-convex training objectives）的机器学习模型的训练而言，解释为什么在优化器（optimiser）中使用动量（momentum）有助于避免陷在局部最优（local optima）或鞍点（saddle points）。`,
         azh: T`动量维护一个累积过去梯度的速度（velocity）：$\mathbf v^{(t)}=\alpha\mathbf v^{(t-1)}+\eta\nabla L$，$\boldsymbol\theta^{(t)}=\boldsymbol\theta^{(t-1)}-\mathbf v^{(t)}$。在鞍点或浅的局部最优处梯度接近 0，但累积的速度仍会推动参数继续移动，所以参数能穿过平坦区域和小的盆地（basins），不过并不保证一定能逃出去。` },
       { src: '2022 S1 Q1(a)', q: T`The Adagrad optimiser is a variant of stochastic gradient descent with a dynamic learning rate. Explain how the dynamic learning rate operates, and why this is important during optimisation of machine learning models.`,
-        a: T`For each parameter $i$, Adagrad accumulates the squared gradients $g_i^{(t)}=g_i^{(t-1)}+(\nabla L)_i^2$ and steps $\theta_i^{(t)}=\theta_i^{(t-1)}-\frac{\eta}{\sqrt{g_i^{(t)}+\epsilon}}(\nabla L)_i$, so each parameter has its own step size, which shrinks as its gradients accumulate. This matters because one global rate suits no parameter: steep or frequently updated directions take small steps (less oscillation), rarely updated ones (rare features) keep large steps, and $\eta$ needs little tuning; but $g_i$ only grows, so steps can become too small.`,
+        a: T`For each parameter $i$, Adagrad accumulates the squared gradients $g_i^{(t)}=g_i^{(t-1)}+(\nabla L)_i^2$ and steps $\theta_i^{(t)}=\theta_i^{(t-1)}-\frac{\eta}{\sqrt{g_i^{(t)}+\epsilon}}(\nabla L)_i$, so each parameter has its own step size, which shrinks as its gradients accumulate. This matters because a single global rate may not suit all parameters: steep or frequently updated directions take small steps (less oscillation), rarely updated ones (rare features) keep large steps, and $\eta$ needs little tuning; but $g_i$ only grows, so steps can become too small.`,
         qzh: T`Adagrad 优化器是带动态学习率（dynamic learning rate）的随机梯度下降的一种变体。解释这个动态学习率是怎样工作的，以及它为什么对机器学习模型的优化很重要。`,
-        azh: T`Adagrad 对每个参数 $i$ 累加它的梯度平方 $g_i^{(t)}=g_i^{(t-1)}+(\nabla L)_i^2$，并按 $\theta_i^{(t)}=\theta_i^{(t-1)}-\frac{\eta}{\sqrt{g_i^{(t)}+\epsilon}}(\nabla L)_i$ 更新：每个参数有自己的步长，梯度累加得越多，步长越小。重要性：一个全局学习率不可能适合所有参数；坡度陡或经常更新的方向步子变小（减少震荡），很少更新的参数（稀有特征 rare features）保持较大步长，而且 $\eta$ 几乎不用调。缺点：$g_i$ 只增不减，步长可能变得过小。` },
+        azh: T`Adagrad 对每个参数 $i$ 累加它的梯度平方 $g_i^{(t)}=g_i^{(t-1)}+(\nabla L)_i^2$，并按 $\theta_i^{(t)}=\theta_i^{(t-1)}-\frac{\eta}{\sqrt{g_i^{(t)}+\epsilon}}(\nabla L)_i$ 更新：每个参数有自己的步长，梯度累加得越多，步长越小。重要性：同一个全局学习率未必适合所有参数；坡度陡或经常更新的方向步子变小（减少震荡），很少更新的参数（稀有特征 rare features）保持较大步长，而且 $\eta$ 几乎不用调。缺点：$g_i$ 只增不减，步长可能变得过小。` },
     ],
     title: '训练：SGD、momentum、Adagrad、Adam', en: 'Training deep networks: SGD, mini-batches, momentum, Adagrad, Adam',
     summary: '神经网络的损失是**非凸**的，学习率很难调。几个改进：**mini-batch**（折中 SGD 和 GD）、**momentum（动量）**（带惯性冲过小坑、减少震荡）、**Adagrad**（每个参数自适应步长）、**Adam**（动量 + 自适应，默认首选）。',
@@ -368,7 +368,7 @@
       '解释学习率太大 / 太小的后果，以及非凸带来的局部最优、鞍点',
     ],
     types: ['T13'],
-    notExam: 'L12 p15 列出的其他优化器（BFGS、Nesterov、RMSprop、AMSGrad…）只需知道"选择很多"，不考细节。',
+    notExam: 'L12 p15 列出的其他优化器（BFGS、Nesterov、RMSprop、AMSGrad…）课件只列了名字、没讲公式，知道"选择很多"即可。',
     what: [
       T`c34 只回答了"梯度怎么算"。真正更新时还要决定：这一步的梯度用**全部**样本算、用**一个**样本算，还是用**一小批**？三种做法的差别只在这里：`,
       T`**三种梯度下降**（L12 p8–p9）：`,
@@ -384,14 +384,14 @@
       T`第二种：动量让步子有惯性，但所有参数仍共用一个学习率 $\eta$。有的权重梯度一直很大，有的很少动，一个 $\eta$ 顾此失彼。Adagrad 给每个参数**各记一本账** $g_i$（过去梯度平方的累加），过去梯度一直大的参数，以后步子就小：`,
       T`**Adagrad**（L12 p13）：每个参数单独累加梯度平方，步长按它缩小：`,
       { t: 'math', tex: T`g_i^{(t)}=g_i^{(t-1)}+\big[\nabla L(\boldsymbol\theta^{(t-1)})_i\big]^2,\qquad \theta_i^{(t)}=\theta_i^{(t-1)}-\frac{\eta}{\sqrt{g_i^{(t)}+\epsilon}}\,\nabla L(\boldsymbol\theta^{(t-1)})_i` },
-      T`第三种把前两种合起来：动量只记梯度的**方向**，Adagrad 只记梯度的**大小**，而且 Adagrad 的平方和只增不减，后期步子会小到走不动。Adam 两样都用**滑动平均**（旧值乘 $\beta$、新值乘 $1-\beta$，越旧的梯度权重越小）：$\mathbf m$ 记方向，$\mathbf v$ 记大小。`,
+      T`第三种把前两种合起来：动量累积过去的梯度（方向和大小都记），Adagrad 累积梯度的**平方**（只看大小，用来调每个参数的有效学习率），而且 Adagrad 的平方和只增不减，后期步子会小到走不动。Adam 两样都用**滑动平均**（旧值乘 $\beta$、新值乘 $1-\beta$，越旧的梯度权重越小）：$\mathbf m$ 记方向，$\mathbf v$ 记大小。`,
       T`**Adam**（L12 p14）：动量 + 自适应，带偏差校正（逐元素运算）：`,
       { t: 'math', tex: T`\mathbf m^{(t)}=\beta_1\mathbf m^{(t-1)}+(1-\beta_1)\nabla L,\qquad \mathbf v^{(t)}=\beta_2\mathbf v^{(t-1)}+(1-\beta_2)(\nabla L)^2` },
       { t: 'math', tex: T`\hat{\mathbf m}^{(t)}=\frac{\mathbf m^{(t)}}{1-\beta_1^t},\quad \hat{\mathbf v}^{(t)}=\frac{\mathbf v^{(t)}}{1-\beta_2^t},\qquad \boldsymbol\theta^{(t)}=\boldsymbol\theta^{(t-1)}-\frac{\eta}{\sqrt{\hat{\mathbf v}^{(t)}+\epsilon}}\,\hat{\mathbf m}^{(t)}` },
       T`（$\hat{\mathbf m},\hat{\mathbf v}$ 是**偏差校正（bias correction）**后的值：$\mathbf m,\mathbf v$ 从 0 开始累积，前几步偏小，除以 $1-\beta^t$ 补回来。课件 L12 p14 把 $\epsilon$ 放在根号里面（考试按这个写）；很多教材放在根号外面。只有当 $\hat{\mathbf v}$ 远大于 $\epsilon$ 时两者才近似相同；$\hat{\mathbf v}$ 接近 0 时步长会差很多。）`,
     ],
     why: [
-      T`实际训练神经网络几乎都用 mini-batch + Adam（L12 p14："good work-horse"）。考试多考概念对比：SGD vs GD、momentum 的作用、Adam = momentum + adaptive learning rate。`,
+      T`实际训练神经网络通常用 mini-batch，Adam 是很常用的优化器（L12 p14："good work-horse"）。考试多考概念对比：SGD vs GD、momentum 的作用、Adam = momentum + adaptive learning rate。`,
     ],
     intuition: [
       T`**Momentum = 滚下山的球**（L12 p12）：速度 $\mathbf v$ 累积过去的梯度，方向一致的维度越滚越快，来回震荡的维度互相抵消。还能凭惯性冲过小的局部最优。`,
@@ -412,7 +412,7 @@
         parts: [
           { label: 'αv', note: '保留上一步速度的一部分（$\\alpha=0.9$ 时保留 90%）。' },
           { label: 'η∇L', note: '当前梯度的贡献，和普通 SGD 一样。' },
-          { label: '−v', note: '沿速度方向走。梯度方向稳定时，速度会累积到约 $\\eta\\nabla L/(1-\\alpha)$（10 倍）。' },
+          { label: '−v', note: '参数沿 $-\\mathbf v$ 的方向走（$\\theta\\leftarrow\\theta-\\mathbf v$）。梯度方向稳定时，速度会累积到约 $\\eta\\nabla L/(1-\\alpha)$（10 倍）。' },
         ],
       },
     ],
@@ -443,7 +443,7 @@
     ],
     pitfalls: [
       ['SGD 每步用全部数据', '用 1 个样本；全部数据是 batch GD。'],
-      ['Adagrad 的步长会自动变大', '$g_i$ 只增不减，步长只会变小。'],
+      ['Adagrad 的有效学习率会自动变大', '$g_i$ 只增不减，所以有效学习率 $\\eta/\\sqrt{g_i+\\epsilon}$ 只会变小；实际移动量还要乘当前梯度，不一定每步都变小。'],
       ['神经网络损失是凸的', '一般非凸，有局部最优和鞍点（L12 p10）。'],
       ['Momentum 公式里减的是梯度', '减的是速度 $\\mathbf v$（包含了历史梯度）。'],
     ],
@@ -491,12 +491,12 @@
     types: ['T13'],
     what: [
       T`**为什么需要**（L12 p18）：DNN 非常灵活、通常**over-parameterised（过参数化）**，参数比样本还多，很容易把训练集背下来。`,
-      T`**Early stopping（早停）**：训练时盯着验证集误差，它不再下降（开始上升）就停止，用那时的权重。L12 把它归为 **implicit regularisation（隐式正则化）**：权重从接近 0 的小值开始，早停让它们没机会长大；对 sigmoid/tanh 这类在 0 附近近似线性的激活，网络会被"拉向"一个线性模型。`,
+      T`**Early stopping（早停）**：训练时盯着验证集误差，它不再下降（开始上升）就停止，并保留验证误差最低时的那组权重。L12 把它归为 **implicit regularisation（隐式正则化）**：权重从接近 0 的小值开始，早停让它们没机会长大；对 sigmoid/tanh 这类在 0 附近近似线性的激活，网络会被"拉向"一个线性模型。`,
       T`早停不改损失函数，只是不让训练跑太久（权重从接近 0 出发，停得早就没机会长得很大）。如果想**直接**惩罚大权重、并且能用 $\lambda$ 调力度，就像 c16 的 ridge 一样在损失上加权重平方和。平方的导数是 $2\lambda w$，所以反传得到的梯度多加这一项：`,
       T`**Weight decay / $L_2$ regularisation（显式正则化）**（L12 p19）：`,
       { t: 'math', tex: T`\min\ L+\lambda\Big(\sum_{i,j}v_{ij}^2+\sum_jw_j^2\Big)\quad\Rightarrow\quad\frac{\partial}{\partial w_j}\text{ 多一项 }2\lambda w_j` },
       T`权重衰减只管"权重别太大"，不管网络是不是**死靠某几个单元**。单元很多时，少数单元就能把训练集背下来。下面的做法是训练时随机关掉一部分单元，逼剩下的单元也能独立工作：`,
-      T`**Dropout**（L12 p20）：训练时，每次呈现样本都**随机屏蔽**一部分单元（每次的 mask 不同）；测试时不屏蔽，但相应调整权重（保留概率为 $q$ 时把权重乘 $q$，让期望输出一致）。`,
+      T`**Dropout**（L12 p20）：训练时，每次呈现样本都**随机屏蔽**一部分单元（每次的 mask 不同）；测试时不屏蔽，但相应调整权重（保留概率为 $q$ 时，把这些单元通向下一层的权重乘 $q$，让下一层收到的加权输入在期望上和训练时一致）。`,
     ],
     why: [
       T`这是 c16–c19 的正则化思想在深度学习里的版本。简答题常问"dropout 为什么能防止过拟合"、"列举 DNN 的正则化方法"。`,
@@ -686,7 +686,7 @@
     ],
     compare: [
       { t: 'exam', md: T`**2021 Q9 — can an undercomplete autoencoder still learn a useless code?** Yes. A very complex non-linear encoder/decoder can memorise the training set: the encoder assigns an arbitrary code to each training input and the decoder stores the corresponding reconstruction, like a lookup table. Training reconstruction error is then tiny, but the code captures no useful structure and does not generalise. Undercompleteness alone does not prevent this; constraints such as denoising or sparsity are used.` },
-      { t: 'exam', md: T`**Autoencoder vs PCA:** An autoencoder is trained to reconstruct its input through a bottleneck layer, learning a compressed (possibly non-linear) representation without labels. PCA finds orthonormal directions of maximum variance by solving $\Sigma_x\mathbf p=\lambda\mathbf p$ (keeping the top eigenvectors). With linear activations, one hidden layer and squared reconstruction loss, an autoencoder learns essentially the same subspace as PCA, but its weights need not be orthonormal or ordered by variance, and it is trained by gradient descent rather than eigen-decomposition.` },
+      { t: 'exam', md: T`**Autoencoder vs PCA:** An autoencoder is trained to reconstruct its input through a bottleneck layer, learning a compressed (possibly non-linear) representation without labels. PCA finds orthonormal directions of maximum variance by solving $\Sigma_x\mathbf p=\lambda\mathbf p$ (keeping the top eigenvectors). With linear activations, one hidden layer and squared reconstruction loss, an autoencoder trained to the optimum on centred data learns essentially the same subspace as PCA, but its weights need not be orthonormal or ordered by variance, and it is trained by gradient descent rather than eigen-decomposition.` },
     ],
     pitfalls: [
       ['Autoencoder 是监督学习', '它不需要标签（目标就是输入本身），属于无监督学习。'],
@@ -705,7 +705,7 @@
           'Autoencoders always outperform PCA because they can model nonlinear structure.',
         ],
         answer: 1,
-        explain: T`B 对：单隐藏层、线性激活、用平方误差训练的 autoencoder，学到的低维子空间就是 PCA 的主成分子空间（本章"Autoencoder 与 PCA"）。A 错：一旦用了非线性激活，学到的就不再是 PCA 那个线性子空间。C 错：线性 autoencoder 和 PCA 得到同一个**子空间**，但它的基向量不一定互相正交，也不一定就是那几个主成分，所以"同一组正交基"说过头了。D 错："总是更好"不成立：数据少或结构接近线性时，非线性 autoencoder 反而容易过拟合。`,
+        explain: T`B 对：单隐藏层、线性激活、用平方误差训练的 autoencoder，学到的低维子空间就是 PCA 的主成分子空间（本章"Autoencoder 与 PCA"）。A 错：用了非线性激活就不保证和 PCA 一样（它可能学到非线性的表示），所以选项里的 always 不成立。C 错：线性 autoencoder 和 PCA 得到同一个**子空间**，但它的基向量不一定互相正交，也不一定就是那几个主成分，所以"同一组正交基"说过头了。D 错："总是更好"不成立：数据少或结构接近线性时，非线性 autoencoder 反而容易过拟合。`,
       },
       { type: 'num', q: '协方差特征值 6、3、1。保留前两个主成分解释的方差比例？', answer: 0.9, explain: T`PCA 中每个特征值就是数据沿对应主成分方向的方差，所有特征值之和就是总方差。总方差 $6+3+1=10$；前两个主成分取最大的两个特征值，方差 $6+3=9$；比例 $9/10=0.9$，即只保留两维就留下了 90% 的方差。**分母是全部特征值之和**；只写 $6/10$ 是只算了第一个主成分。` },
       { type: 'mc', q: 'PCA 中 $\\mathbf p_1\'\\Sigma_x\\mathbf p_1$ 在最优点等于：', options: ['0', '1', '最大特征值', '迹'], answer: 2, explain: T`最优点由拉格朗日条件给出 $\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1$（$\mathbf p_1$ 是特征向量）。两边左乘 $\mathbf p_1'$：$\mathbf p_1'\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1'\mathbf p_1=\lambda_1\times1=\lambda_1$（用了约束 $\|\mathbf p_1\|=1$）。这个量是沿 $\mathbf p_1$ 的投影方差，要它最大，就取**最大**特征值。误选"1"是把约束 $\mathbf p_1'\mathbf p_1=1$ 当成了答案；"迹"是全部特征值之和，即所有方向的总方差。` },
@@ -732,7 +732,7 @@
     recall: [
       { q: '五种激活函数？', a: 'step、sign、logistic $\\frac1{1+e^{-s}}$、tanh、ReLU $\\max(0,s)$。', ch: 'c33' },
       { q: '为什么需要非线性激活？', a: '线性的复合还是线性，多层等于一层，学不了 XOR。', ch: 'c33' },
-      { q: 'Universal approximation theorem？', a: '激活满足温和条件时，一个有限隐藏层就能任意精度逼近连续函数（只说存在）。', ch: 'c33', qzh: '万能逼近定理（universal approximation theorem）说的是什么？' },
+      { q: 'Universal approximation theorem？', a: '激活满足温和条件时，一个足够宽（但有限）的隐藏层就能以任意精度逼近有界闭区域上的连续函数（只说存在，不保证训练能找到）。', ch: 'c33', qzh: '万能逼近定理（universal approximation theorem）说的是什么？' },
       { q: '数全连接网络参数：3→4→2（含 bias）？', a: '$(3+1)4+(4+1)2=26$。', ch: 'c33' },
       { q: 'Backprop 的四个公式（平方损失 + 恒等输出）？', a: T`$\delta=z-y$；$\partial L/\partial w_j=\delta u_j$；$\varepsilon_j=\delta w_jg'(r_j)$；$\partial L/\partial v_{ij}=\varepsilon_jx_i$。`, ch: 'c34' },
       { q: '（2021 Q13b）$L$ 不直接依赖隐藏层权重，怎么求导？', a: '沿 $v_{ij}\\to r_j\\to u_j\\to s\\to z\\to L$ 用链式法则相乘；先算输出误差 $\\delta$，再往回传复用。', ch: 'c34' },
