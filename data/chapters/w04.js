@@ -493,12 +493,12 @@
     math: [
       { t: 'h3', text: '点到超平面的距离（L08 p14–p16）' },
       { t: 'steps', items: [
-        T`设 $\bx_p$ 是 $\bx$ 在边界上的投影，$\boldsymbol r=\bx_p-\bx$ 垂直于边界，所以 $\boldsymbol r\parallel\bw$：$\bx_p=\bx+\|\boldsymbol r\|\frac{\bw}{\|\bw\|}$（图中这个点在负侧，投影方向与 $\bw$ 同向）。`,
+        T`设 $\bx_p$ 是 $\bx$ 在边界上的投影，$\boldsymbol r=\bx_p-\bx$ 垂直于边界，所以 $\boldsymbol r\parallel\bw$：$\bx_p=\bx+\|\boldsymbol r\|\frac{\bw}{\|\bw\|}$（$\boldsymbol r$ 与 $\bw$ 平行：方向相同时取 $+$，相反取 $-$；下面先取 $+$，它对应点在负侧、$\boldsymbol r$ 指向 $\bw$ 方向的情形）。`,
         T`$\bx_p$ 在边界上：$0=\bw'\bx_p+b=\bw'\bx+\|\boldsymbol r\|\frac{\bw'\bw}{\|\bw\|}+b=\bw'\bx+\|\boldsymbol r\|\,\|\bw\|+b$（用 $\bw'\bw=\|\bw\|^2$）。`,
-        T`解出 $\|\boldsymbol r\|=-\frac{\bw'\bx+b}{\|\bw\|}$；在另一侧符号相反。统一写 $\|\boldsymbol r\|=\pm\frac{\bw'\bx+b}{\|\bw\|}$：点在正侧取 $+$，在负侧取 $-$——下一步用标签 $y_i=\pm1$ 正好替代这个符号。`,
+        T`移项得 $\|\boldsymbol r\|\,\|\bw\|=-(\bw'\bx+b)$，两边除以 $\|\bw\|$ 即解出 $\|\boldsymbol r\|=-\frac{\bw'\bx+b}{\|\bw\|}$（负侧的点 $\bw'\bx+b<0$，右边因此是正数）。另一边符号相反，所以长度可写成 $\|\boldsymbol r\|=\frac{|\bw'\bx+b|}{\|\bw\|}$，带符号的距离则是 $\pm\frac{\bw'\bx+b}{\|\bw\|}$：点在正侧取 $+$，在负侧取 $-$——下一步用标签 $y_i=\pm1$ 正好替代这个符号。`,
       ] },
       { t: 'h3', text: '用标签消掉 ±（L08 p17–p18）' },
-      T`对完美分开的边界，正类 $\bw'\bx_i+b>0$，负类 $<0$，所以`,
+      T`下面记训练点总数为 $n$、训练点编号为 $i=1,\dots,n$。对完美分开的边界，正类 $\bw'\bx_i+b>0$，负类 $<0$，所以`,
       { t: 'math', tex: T`\|\boldsymbol r_i\|=\frac{y_i(\bw'\bx_i+b)}{\|\bw\|},\qquad\text{SVM：}\ \max_{\bw,b}\ \min_{i=1..n}\ \frac{y_i(\bw'\bx_i+b)}{\|\bw\|}` },
       T`"让最近的点尽量远"。这个目标不好直接优化（非凸，而且解不唯一，见 c26），下一章用 canonical scaling 把它变成标准形式。`,
     ],
@@ -532,7 +532,7 @@
         ] },
         { md: T`$\bw=(0,2)$，$b=-2$（直线 $x_2=1$），点 $(0,3)$ $+1$、$(5,2)$ $+1$、$(1,0)$ $-1$。`, steps: [
           { ask: T`$\|\bw\|=?$`, answer: 2, show: '2' },
-          { ask: T`三个点的距离中最小的（margin）= ?`, answer: 1, show: T`$(0,3)$：$f=4$，距离 2；$(5,2)$：$f=2$，距离 1；$(1,0)$：$y f=(-1)(-2)=2$，距离 1。margin = 1，最近点是后两个。` },
+          { ask: T`三个点的距离中最小的（margin）= ?`, answer: 1, show: T`$(0,3)$：得分 $f=\bw'\bx+b=4$（$f$ 就是本章符号表里的 $s$），距离 $4/2=2$；$(5,2)$：$f=2$，距离 1；$(1,0)$：$y f=(-1)(-2)=2$，距离 1。margin = 1，最近点是后两个。` },
         ] },
       ] },
     ],
@@ -593,7 +593,7 @@
       { src: '2016 S2 Q1.10', q: T`What are support vectors?`,
         a: T`The training points that lie exactly on the margin, $y_i(\bw'\bx_i+b)=1$ (for a soft margin, also the points inside the margin or misclassified), i.e. the points with $\lambda_i>0$ in the dual. The solution $\bw=\sum_i\lambda_iy_i\bx_i$ depends only on them: removing or slightly moving any other point does not change the boundary.`,
         qzh: T`什么是支持向量（support vectors）？（相近的预测题见 [T13](#/T13/predicted)。）`,
-        azh: T`恰好落在间隔边界上的训练点，$y_i(\bw'\bx_i+b)=1$（soft margin 时还包括落在间隔内或被分错的点），也就是对偶问题中 $\lambda_i>0$ 的点。解 $\bw=\sum_i\lambda_iy_i\bx_i$ 只由它们决定：删掉或稍微移动其他任何点，边界都不变。` },
+        azh: T`恰好落在间隔边界上的训练点，$y_i(\bw'\bx_i+b)=1$（soft margin 时还包括落在间隔内或被分错的点），也就是对偶问题（dual，c28）中系数 $\lambda_i>0$ 的点；$\lambda_i$ 是对偶问题里每个训练点各有一个、需要解出来的非负系数。解 $\bw=\sum_i\lambda_iy_i\bx_i$（把支持向量按 $\lambda_iy_i$ 加权相加）只由它们决定：删掉或稍微移动其他任何点，边界都不变。` },
       { src: '2017 S2 Q1(d)', q: T`Perceptrons and hard-margin SVMs are both linear classifiers. What is the difference between the two methods?`,
         a: T`The perceptron stops at some separating hyperplane (its loss $\max(0,-sy)$ demands no margin), which depends on the initialisation and the order of the data, so it is not unique. The hard-margin SVM finds the unique separating hyperplane with the maximum margin, $\min\frac12\|\bw\|^2$ s.t. $y_i(\bw'\bx_i+b)\ge1$, which is more robust and tends to generalise better.`,
         qzh: T`感知机（perceptron）和硬间隔 SVM（hard-margin SVM）都是线性分类器（linear classifiers）。两种方法有什么区别？`,
@@ -603,9 +603,11 @@
     summary: '$(\\bw,b)$ 乘任意正数不改变边界，所以固定"最近点的 functional margin = 1"（**canonical scaling**）。于是 margin $=1/\\|\\bw\\|$，最大化 margin ⇔ 最小化 $\\frac12\\|\\bw\\|^2$，约束 $y_i(\\bw\'\\bx_i+b)\\ge1$。等号成立的点是 support vectors。',
     prereq: ['c25'],
     symbols: [
+      [T`$n$`, T`训练点总数；$i=1,\dots,n$ 是训练点的编号`],
       [T`$\alpha>0$`, T`任意正的缩放因子`],
       [T`$\tilde\bw=\alpha\bw$`, T`缩放后的参数（同一条边界）`],
       [T`$l_\infty$`, T`hard-margin 的损失：0 或 ∞`],
+      [T`$\argmin_{\bw,b}$`, T`使后面式子取最小的那组参数（$\argmin$ 给出最小的参数，$\min$ 给出最小值本身）`],
       [T`$\text{s.t.}$`, T`subject to（约束）`],
     ],
     goals: [
@@ -643,8 +645,8 @@
       { t: 'math', tex: T`l_\infty=\begin{cases}0,&1-y_i(\bw'\bx_i+b)\le0\\\infty,&1-y_i(\bw'\bx_i+b)>0\end{cases}` },
       T`于是 hard-margin SVM $=\argmin_{\bw,b}\ \sum_il_\infty+\frac12\|\bw\|^2$：正则项 + 损失。L08 p24 的通用建模套路："选模型 → 选损失 → 最小化训练损失"。`,
       { t: 'h3', text: '手算 canonical 解（一维 / 对称情形）' },
-      T`一维：负类 $x=1$，正类 $x=3$。边界显然在 2。canonical：$3w+b=1$，$1\cdot w+b=-1$ ⇒ $w=1$，$b=-2$。margin $=1/|w|=1$（正好是两点距离的一半）✓。`,
-      T`二维：负类 $(0,0)$，正类 $(2,2)$。只有两个点时，最大 margin 边界是两点连线的**垂直平分线**；法向量 $\bw$ 垂直于边界，也就是**平行于两点的连线**，连线方向是 $(2,2)-(0,0)\propto(1,1)$，所以 $\bw\parallel(1,1)$。设 $\bw=(a,a)$。两个支持向量都满足 $y(\bw'\bx+b)=1$：负类 $(0,0)$：$(-1)\cdot(0+b)=1$ ⇒ $b=-1$；正类 $(2,2)$：$2a+2a+b=4a+b=1$ ⇒ $4a-1=1$ ⇒ $a=0.5$，$\bw=(0.5,0.5)$，$\|\bw\|=\frac{\sqrt2}{2}$，margin $=\sqrt2\approx1.414$ = 两点距离 $2\sqrt2$ 的一半 ✓。`,
+      T`一维：负类 $x=1$，正类 $x=3$。边界显然在 2。canonical 要求支持向量的函数间隔正好是 1，所以每个支持向量列一个方程：正类 $x=3$（$y=+1$）给 $(+1)(3w+b)=1$，即 $3w+b=1$；负类 $x=1$（$y=-1$）给 $(-1)(w+b)=1$，即 $w+b=-1$。两式相减得 $2w=2$，所以 $w=1$，代回得 $b=-2$。margin $=1/|w|=1$（正好是两点距离的一半）✓。`,
+      T`二维：负类 $(0,0)$，正类 $(2,2)$。只有两个点时，最大 margin 边界是两点连线的**垂直平分线**；法向量 $\bw$ 垂直于边界，也就是**平行于两点的连线**，连线方向是 $(2,2)-(0,0)\propto(1,1)$，所以 $\bw\parallel(1,1)$。设 $\bw=(a,a)$。两个支持向量都满足 $y(\bw'\bx+b)=1$：负类 $(0,0)$：$(-1)\cdot(0+b)=1$ ⇒ $b=-1$；正类 $(2,2)$：$2a+2a+b=4a+b=1$ ⇒ $4a-1=1$ ⇒ $a=0.5$，$\bw=(0.5,0.5)$，$\|\bw\|=\sqrt{0.5^2+0.5^2}=\frac{\sqrt2}{2}\approx0.707$，margin $=1/\|\bw\|=\sqrt2\approx1.414$ = 两点距离 $2\sqrt2$ 的一半 ✓。`,
     ],
     fx: [
       {
@@ -724,7 +726,7 @@
       { src: '2020 S2 practice Q2(b)', q: T`How does SVM handle data that is not linearly separable? List two possible strategies.`,
         a: T`(1) Soft margin: add slack variables $\xi_i\ge0$, relax the constraints to $y_i(\bw'\bx_i+b)\ge1-\xi_i$ and add $C\sum_i\xi_i$ to the objective (hinge loss), so some points may lie inside the margin or be misclassified at a cost. (2) Kernel trick: replace dot products by a kernel (e.g. polynomial or RBF), i.e. work in a higher-dimensional feature space where the data become (closer to) linearly separable. The two are often combined.`,
         qzh: T`SVM 如何处理线性不可分（not linearly separable）的数据？列出两种可能的策略。`,
-        azh: T`(1) 软间隔（soft margin）：引入松弛变量（slack variables）$\xi_i\ge0$，把约束放宽为 $y_i(\bw'\bx_i+b)\ge1-\xi_i$，并在目标里加上 $C\sum_i\xi_i$（即 hinge loss），允许一些点落在间隔内甚至被分错，但要付出代价。(2) 核技巧（kernel trick）：把点积换成核函数（如多项式核、RBF 核），相当于在更高维的特征空间里做，数据在那里变得（更接近）线性可分。两者常一起用。` },
+        azh: T`(1) 软间隔（soft margin）：引入松弛变量（slack variables）$\xi_i\ge0$，把约束放宽为 $y_i(\bw'\bx_i+b)\ge1-\xi_i$，并在目标里加上 $C\sum_i\xi_i$（即 hinge loss），允许一些点落在间隔内甚至被分错，但要付出代价。(2) 核技巧（kernel trick）：把点积换成核函数（如多项式核；RBF 核就是 radial basis function，径向基函数核），相当于在更高维的特征空间里做，数据在那里变得（更接近）线性可分。两者常一起用。` },
     ],
     title: 'Soft margin、hinge loss、slack', en: 'Soft-margin SVM, hinge loss, slack variables',
     summary: '真实数据很少完全可分。**Soft-margin SVM** 允许点进入 margin 甚至分错，但按违反程度罚：把 ∞ 损失换成 **hinge loss（合页损失 / 铰链损失）** $\\max(0,1-y_i(\\bw\'\\bx_i+b))$，等价地引入 **slack variables（松弛变量）** $\\xi_i$。$C$ 控制"宽 margin"和"少违规"的权衡。',
@@ -733,6 +735,7 @@
       [T`$\xi_i$`, T`第 $i$ 个点的 slack（松弛量），$\xi_i\ge0$`],
       [T`$C$`, T`惩罚系数：越大越接近 hard margin`],
       [T`$l_h$`, T`hinge loss`],
+      [T`$n$`, T`训练点总数；$i=1,\dots,n$ 是训练点的编号`],
       [T`$\lambda$`, T`正则系数；$C$ 与 $1/\lambda$ 成正比`],
     ],
     goals: [
@@ -760,6 +763,7 @@
       T`**$\xi_i$ 的几种情况**：$\xi_i=0$：在 margin 外（或正好在 margin 线上）、分对；$0<\xi_i<1$：分对了但进了 margin；$\xi_i=1$：正好在决策边界上；$\xi_i>1$：分错了（越过了边界）。下图（L08 p30）里橙色线段的长度就是违规量 $\xi_i=\max(0,1-y_i(\bw'\bx_i+b))$。`,
       { t: 'slide', src: 'L08/p30', caption: 'Soft margin：橙色线段 = 每个违规点的 slack $\\xi_i$（进了 margin 或越过边界的距离）。' },
       T`**$C$ 的作用**：$C$ 大 → 违规很贵 → 尽量不违规 → margin 窄（接近 hard margin，可能过拟合）；$C$ 小 → 违规便宜 → margin 宽、容忍更多违规（更强正则，可能欠拟合）。和 $\lambda$ 的方向相反。`,
+      T`下面用简写：得分 $f(\bx)=\bw'\bx+b$，于是 $y_i f(\bx_i)$ 就是 c26 的函数间隔（functional margin）；0-1 loss 只看对错——分对罚 0、分错罚 1，不管离边界多远。`,
       { t: 'think', q: 'hinge loss 和 0-1 loss 比，对"分对但离边界很近（$y f=0.5$）"的点怎么处理？对"分得很对（$yf=3$）"呢？', a: 'hinge 对 $yf=0.5$ 罚 0.5（0-1 loss 不罚）——它要求的不只是分对，还要有 margin。对 $yf=3$ 两者都是 0。对分错的点，hinge 按错的程度线性罚，0-1 loss 只罚 1。' },
       { t: 'story', title: 'Support-vector networks', md: 'Soft margin 来自 Corinna Cortes 和 Vladimir Vapnik 1995 年的论文 "Support-Vector Networks"。它让 SVM 能处理有噪声、不可分的真实数据，是 SVM 在实践中成功的关键一步。' },
     ],

@@ -295,8 +295,8 @@
     notExam: '自由度 $\\nu$ 的公式和 t 分布的细节只需会代入；考试会给临界值。',
     what: [
       T`**为什么**（L15 p25–p26）：CV 给出的是多次结果的平均，平均差一点不代表算法真的更好。课件的态度："不完美的技术用在不完美的场景，但比较两个方案时很有用"。`,
-      T`**先看课件的数字，再读公式。** 两个算法 9 折的平均错误率 10.1% 和 9.9%，只差 0.2 个百分点；而两边各自的方差是 4.1 和 3.2——这点差距和平时的波动比起来很小。下面的 $x$ 就是"均值差 $\times\sqrt m$"除以"两边方差相加再开方"：$\frac{0.2\times3}{\sqrt{7.3}}\approx0.22$（$0.2=10.1-9.9$，$3=\sqrt9$，$7.3=4.1+3.2$；$2.7^2=7.29$，所以 $\sqrt{7.3}\approx2.70$，$0.6/2.70\approx0.22$）。$x$ 超过查表的临界值才拒绝"两者一样"；$\nu$ 是查表用的自由度，考试会给。`,
-      T`**Two-sample t test**（L15 p27–p28）：零假设 $\mu_1=\mu_2$，备择 $\mu_1>\mu_2$：`,
+      T`**先看课件的数字，再读公式。** **已知**（L15 p29 例 1，题目会给这些数）：两个算法 9 折的平均错误率是 10.1% 和 9.9%，即 $\hat\mu_1=10.1$、$\hat\mu_2=9.9$（公式里直接把 10.1、9.9 当数字代入，差是 $10.1-9.9=0.2$）；两边各自的方差是 $\hat\sigma_1^2=4.1$、$\hat\sigma_2^2=3.2$。这点差距和平时的波动比起来很小。下面的 $x$ 就是"均值差 $\times\sqrt m$"除以"两边方差相加再开方"：$\frac{0.2\times3}{\sqrt{7.3}}\approx0.22$（$0.2=10.1-9.9$，$3=\sqrt9$，$7.3=4.1+3.2$；$2.7^2=7.29$，所以 $\sqrt{7.3}\approx2.70$，$0.6/2.70\approx0.22$）。$x$ 超过查表的临界值才拒绝"两者一样"；$\nu$ 是查表用的自由度，考试会给。`,
+      T`**Two-sample t test**（L15 p27–p28）：零假设 $H_0:\mu_1=\mu_2$，备择 $H_1:\mu_1>\mu_2$（$\mu_j$ 是算法 $j$ 的**真实**平均表现，$\hat\mu_j$ 只是它在 $m$ 次重复上的估计；检验问的是真实均值是否满足 $\mu_1>\mu_2$）：`,
       { t: 'math', tex: T`x=\frac{(\hat\mu_1-\hat\mu_2)\sqrt m}{\sqrt{\hat\sigma_1^2+\hat\sigma_2^2}},\qquad\nu\approx\frac{(\hat\sigma_1^2+\hat\sigma_2^2)^2(m-1)}{\hat\sigma_1^4+\hat\sigma_2^4}` },
       T`（$\nu$ 要取整数。课件公式外面印了取整括号，但两个例子算出 15.8 和 15.2 都取了 16，也就是**向上取整**；照抄成向下取整会得到 15。考试会给 $\nu$ 或临界值。）`,
       T`这是**单侧**检验：备择假设 $H_1:\mu_1>\mu_2$。只有当 $x>x_{1-\alpha,\nu}$（t 分布在 $1-\alpha$ 处的临界值）时才拒绝 $\mu_1=\mu_2$，认为算法 1 的指标确实更大。`,
@@ -314,12 +314,12 @@
     ],
     math: [
       { t: 'h3', text: 'L15 p29–p30 的两个例子（9 折，5% 显著性，临界值 $x_{0.95,16}=1.75$）' },
-      { t: 'table', cls: 'compact', head: ['', '$\\hat\\mu_1,\\hat\\sigma_1^2$', '$\\hat\\mu_2,\\hat\\sigma_2^2$', '$x$', '结论'], rows: [
+      { t: 'table', cls: 'compact', head: ['例子', '算法 1：$\\hat\\mu_1,\\hat\\sigma_1^2$', '算法 2：$\\hat\\mu_2,\\hat\\sigma_2^2$', '统计量 $x$', '结论'], rows: [
         ['例 1', '10.1, 4.1', '9.9, 3.2', '$\\frac{0.2\\times3}{\\sqrt{7.3}}\\approx0.22$', '0.22 ≤ 1.75，不能拒绝'],
         ['例 2', '11.6, 2', '9.9, 3.2', '$\\frac{1.7\\times3}{\\sqrt{5.2}}\\approx\\frac{5.1}{2.28}\\approx2.24$（$1.7=11.6-9.9$，$5.2=2+3.2$）', '2.24 > 1.75，拒绝 ⇒ 算法 1 错误率显著更高'],
       ] },
       T`自由度：例 1 $\nu\approx\frac{(4.1+3.2)^2\times8}{4.1^2+3.2^2}=\frac{426.3}{27.05}\approx15.8$（8 是 $m-1$；分子 $7.3^2=53.29$，乘 8 得 426.3；分母 $16.81+10.24=27.05$）；例 2 $\nu\approx\frac{(2+3.2)^2\times8}{2^2+3.2^2}=\frac{216.3}{14.24}\approx15.2$（$5.2^2\times8=216.3$，$4+10.24=14.24$）。课件两个都取 $\nu=16$，查表 $x_{0.95,16}=1.75$（5% 单侧）。**1.75 只是这道例题的临界值**，考试会另给。`,
-      T`误差条是另一套查表：10% **双侧** = 每边留 5%，所以查 0.95 分位；自由度只用自己的 $m-1=8$（不是 t 检验合并的 $\nu\approx16$），所以临界值是 $x_{0.95,8}\approx1.86$，不是 1.75。半宽 = 标准差 $/\sqrt m\times1.86$：$\sqrt{4.1}\approx2.025$，$2.025/3\times1.86\approx1.26$；$\sqrt{3.2}\approx1.789$，$1.789/3\times1.86\approx1.11$。`,
+      T`误差条是另一套查表（水平也和上面不同：t 检验用 5% 单侧，课件这个误差条例子改用 10% **双侧**，这个水平题目会给）：10% 双侧 = 每边留 5%，所以查 $1-0.05=0.95$ 分位；自由度只用自己的 $m-1=8$（不是 t 检验合并的 $\nu\approx16$），所以临界值是 $x_{0.95,8}\approx1.86$，不是 1.75。半宽 = 标准差 $/\sqrt m\times1.86$：$\sqrt{4.1}\approx2.025$，$2.025/3\times1.86\approx1.26$；$\sqrt{3.2}\approx1.789$，$1.789/3\times1.86\approx1.11$。`,
       T`误差条（L15 p31，$m=9$，10% 双侧，$x_{0.95,8}\approx1.86$）：例 1 算法 1 半宽 $\frac{\sqrt{4.1}}{3}\times1.86\approx1.26$，算法 2 半宽 $\frac{\sqrt{3.2}}{3}\times1.86\approx1.11$，区间 $10.1\pm1.26$ 与 $9.9\pm1.11$ 大幅重叠。`,
     ],
     fx: [
@@ -334,7 +334,7 @@
     ],
     example: [
       { t: 'fade', title: '分步练习：t 检验与 error bar', plan: [T`t 检验算 $x=\frac{(\hat\mu_1-\hat\mu_2)\sqrt m}{\sqrt{\hat\sigma_1^2+\hat\sigma_2^2}}$；误差条算半宽 $\frac{\hat\sigma}{\sqrt m}x_{1-\alpha/2,m-1}$`, '与临界值比较', '下结论（拒绝 / 不能拒绝 / 写出区间）'], items: [
-        { md: 'L15 p29 例 1。', steps: [{ md: '$x\\approx0.22$' }, { md: '0.22 ≤ 1.75' }, { md: '不能拒绝 $\\mu_1=\\mu_2$' }] },
+        { md: T`L15 p29 例 1（已知）：$\hat\mu_1=10.1,\hat\sigma_1^2=4.1$；$\hat\mu_2=9.9,\hat\sigma_2^2=3.2$；$m=9$；题目给的临界值 $x_{0.95,16}=1.75$。`, steps: [{ md: T`$x=\frac{(10.1-9.9)\sqrt9}{\sqrt{4.1+3.2}}=\frac{0.2\times3}{2.70}\approx0.22$` }, { md: '0.22 ≤ 1.75' }, { md: '不能拒绝 $\\mu_1=\\mu_2$' }] },
         { md: T`L15 p30 例 2：$\hat\mu_1=11.6,\hat\sigma_1^2=2$；$\hat\mu_2=9.9,\hat\sigma_2^2=3.2$；$m=9$。`, steps: [
           { ask: T`$x=?$`, answer: 2.236, tol: 0.01, show: T`$1.7\times3/\sqrt{5.2}\approx2.24$`, sg: 1 },
           { ask: '临界值 1.75，拒绝吗？（是 1 / 否 0）', answer: 1, show: '2.24 > 1.75，拒绝' },
@@ -371,7 +371,7 @@
       T`Potential-function（势函数）proof: each learner mistake cuts the total weight by a constant factor, $W\le n(3/4)^M$, while the best expert keeps $W\ge(1/2)^m$; take logs.`,
     ],
     keyZh: [
-      T`在线学习（online learning）每轮：先看 $n$ 个专家（expert）的预测，自己预测，再看真实结果。结果可以由对手故意挑（不假设 i.i.d.），拿我们的错误数 $M$ 和最好专家的 $m$ 比。`,
+      T`在线学习（online learning）每轮：先看 $n$ 个专家（expert）的预测，自己预测，再看真实结果。结果可以由对手故意挑（不假设 i.i.d.，即 independent and identically distributed、独立同分布：各轮结果互不影响、来自同一个固定分布），拿我们的错误数 $M$ 和最好专家的 $m$ 比。`,
       T`多数投票（majority vote）的前提是有一个从不出错的专家：跟存活专家的多数票走，错的专家全删掉。学习者每错一次，存活专家至少减半，所以最多错 $\log_2n$ 次。`,
       T`减半算法（halving）用于没有完美专家时：加权投票，错的专家权重减半而不删除（全删可能把最好的也删了）。界里多了最好专家的错误数 $m$，系数约 2.41。`,
       T`势函数（potential function）证明：学习者每错一次，总权重至多剩 3/4；而总权重至少是最好专家的权重 $(1/2)^m$。两头夹住，取 log 解出 $M$。`,
@@ -386,7 +386,7 @@
       [T`$M$`, T`学习者（我们的算法）的总错误数`],
       [T`$m$`, T`最好的专家的错误数`],
       [T`$w_i$, $W=\sum_iw_i$`, T`专家权重、总权重（potential function）`],
-      [T`$1[E_i=y]$`, T`专家 $i$ 预测 $y$ 时为 1`],
+      [T`$1[E_i=y]$`, T`指示函数（indicator）：专家 $i$ 当天的预测等于 $y$ 时取 1，否则取 0。注意 $E_i$ 在这里读作「专家 $i$ 当天的预测标签」，$E_i=y$ 就是「专家 $i$ 猜 $y$」`],
     ],
     goals: [
       '描述 online learning 的设定，以及它和 batch learning 的区别（L16 p7、p13）',
@@ -404,27 +404,27 @@
         T`每天预测 $\argmax_{y}\sum_{i\in E}1[E_i=y]$（存活专家的多数票）。`,
         T`看结果后，把预测错的专家从 $E$ 中删掉。`,
       ] },
-      T`4 个专家，$E_3$ 从不出错。第 1 天预测 $(E_1,E_2,E_3,E_4)=(+,+,-,+)$，真实 $-$：多数票 $+$ ⇒ 学习者错。删掉 $E_1,E_2,E_4$ ⇒ $E=\{3\}$，以后只跟 $E_3$，永不再错。$M=1\le\log_24=2$ ✓。`,
+      T`4 个专家，$E_3$ 从不出错。第 1 天四个专家的预测依次是 $E_1=+,\ E_2=+,\ E_3=-,\ E_4=+$（$E_i$ 读作「专家 $i$ 这一天的预测」），真实 $-$：多数票 $+$ ⇒ 学习者错。删掉 $E_1,E_2,E_4$ ⇒ $E=\{3\}$，以后只跟 $E_3$，永不再错。$M=1\le\log_24=2$ ✓。`,
       { t: 'math', tex: T`M\le\log_2n` },
-      T`**Potential function（势函数）证明法**（注意：这里的"势函数"是证明里用的一个量，和 W10–W11 图模型里的 potential function 同名不同义）：找一个量，每次学习者犯错它就大幅减少，但它又有下界。majority 里这个量是存活专家数 $|E|$：学习者错 ⇒ 多数派错 ⇒ 至少一半专家被删 ⇒ $|E|$ 至少减半；又因为完美专家永远存活，$|E|\ge1$。所以最多减半 $\log_2n$ 次（L16 p6）。`,
+      T`**Potential function（势函数）证明法**（注意：这里的"势函数"是证明里用的一个量，和 W10–W11 图模型里的 potential function 同名不同义）：找一个量，每次学习者犯错它就大幅减少，但它又有下界。majority 里这个量是存活专家数 $|E|$：学习者跟的是得票**最多**的标签，而结果只有两个标签，所以得票最多的那一边至少占存活专家的一半；学习者错 ⇒ 猜这个标签的专家全错、全被删 ⇒ $|E|$ 至少减半；又因为完美专家永远存活，$|E|\ge1$。所以最多减半 $\log_2n$ 次（L16 p6）。`,
       T`犯 $M$ 次错后 $|E|\le n/2^M$；完美专家存活 ⇒ $1\le|E|$。所以 $1\le n/2^M$ ⇒ $2^M\le n$ ⇒ $M\le\log_2n$。`,
       { t: 'h3', text: '③ 没有完美专家：halving（L16 p9–p12）' },
       T`上面的界靠一个很强的假设：**至少有一个专家从不犯错**，所以错的人可以直接删掉。现实里最好的专家也会犯错——一直删下去，最后会删光、没人可跟。改进办法：**不删除，只降权**。`,
       T`**Halving algorithm**（L16 p11）——没有完美专家时：所有 $w_i=1$；按**加权**多数预测 $\argmax_y\sum_iw_i1[E_i=y]$；预测错的专家 $w_i\leftarrow w_i/2$（降权，不删除）。`,
-      T`**先走一天**：3 个专家权重 $(1,1,1)$，预测 $(+,+,-)$，真实 $-$。加权投票 $+$ 得 2、$-$ 得 1，学习者猜 $+$，错了；两个错的专家减半，权重变成 $(0.5,0.5,1)$，总权重从 3 掉到 2。一般地，学习者每错一次，**至少一半**的总权重站在错的一边、被减半，所以总权重最多剩 $3/4$。由此得到（推导在下面）：`,
+      T`**先走一天**：3 个专家权重 $(1,1,1)$，预测 $(+,+,-)$，真实 $-$。加权投票 $+$ 得 2、$-$ 得 1，学习者猜 $+$，错了；两个错的专家减半，权重变成 $(0.5,0.5,1)$，总权重从 3 掉到 2。一般地，学习者每错一次，**至少一半**的总权重站在错的一边、被减半。设错的权重至少是 $W/2$：这部分每个都乘 $1/2$，于是总权重至少少掉 $\frac W2\times\frac12=\frac W4$，对的一边不变，所以新总权重 $W'\le W-\frac W4=\frac34W$。由此得到（推导在下面）：`,
       { t: 'math', tex: T`M\le\frac{m+\log_2n}{\log_2(4/3)}\approx2.41\,(m+\log_2n)` },
       T`**Halving**：势函数换成总权重 $W$。学习者错 ⇒ 至少一半的权重站在错误一边 ⇒ 这些权重减半 ⇒ $W$ 至少减少 1/4：$W\le n(3/4)^M$。最好的专家错了 $m$ 次，权重 $(1/2)^m\le W$。两边夹起来取 log 就得到界（L16 p12）。`,
-      { t: 'math', tex: T`\Big(\frac12\Big)^m=w_{\text{best}}\le W\le n\Big(\frac34\Big)^M\ \Rightarrow\ -m\le\log_2n+M\log_2\frac34\ \Rightarrow\ M\le\frac{m+\log_2n}{\log_2(4/3)}` },
+      { t: 'math', tex: T`\Big(\frac12\Big)^m=w_{\text{best}}\le W\le n\Big(\frac34\Big)^M\ \Rightarrow\ -m\le\log_2n+M\log_2\frac34\ \Rightarrow\ M\Big(-\log_2\frac34\Big)\le m+\log_2n\ \Rightarrow\ M\log_2\frac43\le m+\log_2n\ \Rightarrow\ M\le\frac{m+\log_2n}{\log_2(4/3)}` },
       T`$1/\log_2(4/3)\approx2.41$。**不完美的代价**（L16 p13）：完美时 $M=O(\log n)$，不完美时 $M=O(m+\log n)$。`,
       { t: 'h3', text: '④ 回头看：这和以前的学习有什么不同（L16 p7、p13）' },
-      T`现在可以对比了。前面几周（W3–W4 的泛化界）假设数据是 i.i.d. 抽出来的；这里不做任何假设，真实结果甚至可以由"对手"故意挑。目标也不一样：不再是"真实风险小"，而是"学习者的错误数 $M$ 不比最好专家的错误数 $m$ 多太多"，即 $M-m$ 小：`,
+      T`现在可以对比了。前面几周（W3–W4 的泛化界，见 [c21](#/c21)、[c24](#/c24)）假设数据是 i.i.d. 抽出来的；这里不做任何假设，真实结果甚至可以由"对手"故意挑。目标也不一样：不再是"真实风险小"，而是"学习者的错误数 $M$ 不比最好专家的错误数 $m$ 多太多"，即 $M-m$ 小：`,
       { t: 'table', cls: 'compact', head: ['', 'Batch learning（批量学习：一次拿到全部训练数据）', 'Online learning（在线学习：逐轮预测、逐轮得到反馈）'], rows: [
         ['损失的假设', 'i.i.d.（Hoeffding 等）', '对抗性 / 任意'],
         ['目标', '估计误差小（用 VC 维界定）', '$M-m$ 小（用专家数界定）'],
       ] },
     ],
     why: [
-      T`这是另一种学习框架：不假设数据 i.i.d.，最坏情况（对抗）下也有保证。它的思想（乘性权重更新）在 boosting、博弈论、优化里到处出现，也直接通向下一周的 bandits。T12 的界代数题来源于此。`,
+      T`这是另一种学习框架：不假设数据 i.i.d.，最坏情况（对抗）下也有保证。它的思想（乘性权重更新）在 boosting、博弈论、优化里到处出现，也直接通向下一周的 bandits（c47）。考试题型 [T12](#/T12) 的界代数题（给 $n$、$m$、$\varepsilon$ 算上界）就来源于此。`,
     ],
     intuition: [
       { t: 'think', q: '为什么 halving 不直接删掉犯错的专家？', a: '没有完美专家时，最好的专家也会犯错；删掉就可能把它也删了，最后无人可用。降权保留了"偶尔犯错但总体最好"的专家。' },
@@ -461,7 +461,7 @@
       ] },
     ],
     viz: [
-      { id: 'experts-sim', how: '4 个专家 10 天的预测表和真实结果。三种算法：Majority vote（错者淘汰）、Halving（错者权重减半）、Weighted Majority（错者乘 $\\beta=1-\\varepsilon$）。逐天执行：显示每个专家的权重、加权投票、学习者的预测、对错和累计错误数，以及 L16 的错误上界。',
+      { id: 'experts-sim', how: '4 个专家 10 天的预测表和真实结果。三种算法：Majority vote（错者淘汰）、Halving（错者权重减半）、Weighted Majority（错的专家权重乘 $\\beta=1-\\varepsilon$；$\\beta$ 是保留比例、$\\varepsilon$ 是降权幅度，$\\varepsilon=0.5$ 就是 halving 的减半，详见 c46）。逐天执行：显示每个专家的权重、加权投票、学习者的预测、对错和累计错误数，以及 L16 的错误上界。',
         try: '① 用"一个 expert 完美"的预设跑 Majority vote：完美专家始终存活，学习者错误数不超过 $\\log_2 4=2$。② 换成"没有完美 expert"的预设：Majority vote 的前提（有完美专家）不成立了——这次运行里第 2 次犯错后专家池就空了，之后算法无法预测（$\\log_2n$ 界在这个 10 天的例子里碰巧没被突破，但已经没有保证）。改用 Halving，比较学习者错误数 $M$ 和最好专家的 $m$，看读数里的 $(m+\\log_2 n)/\\log_2(4/3)$ 界。' },
     ],
     compare: [
@@ -502,7 +502,7 @@
       T`加权多数（weighted majority）把"减半"换成乘 $(1-\varepsilon)$。$\varepsilon$ 越小，$m$ 前的系数越接近 2，但 $\ln n/\varepsilon$ 那项越大；$\varepsilon$ 大则相反，要权衡。`,
       T`对手论证（adversarial argument）说明确定性算法的系数 2 改不了：两个专家永远意见相反，对手每轮都让学习者错（$M=T$），而较好的专家最多错一半，于是 $M\ge2m$。`,
       T`随机化专家（probabilistic experts）：按权重比例随机挑一个专家跟，损失可以是 0 到 1 的小数，每个专家都按自己的损失降权。期望损失界里 $L^*$ 的系数降到 $1+\varepsilon$。`,
-      T`遗憾（regret）= 学习者总损失减去事后最好专家的总损失。Worksheet 9 里 regret 是 2；定理的界 13.2 比"10 轮最多损失 10"还大，轮数少时这个界没有提供信息（vacuous）。`,
+      T`遗憾（regret）= 学习者总损失减去事后最好专家的总损失。Worksheet 9（每周习题课的工作单，题目见下面的「Worksheet 9 手算题」）里 regret 是 2；定理的界 13.2 比"10 轮最多损失 10"还大，轮数少时这个界没有提供信息（vacuous）。`,
     ],
     title: 'Weighted majority、probabilistic experts', en: 'Weighted majority (1−ε) and probabilistic experts',
     summary: '把 halving 的"减半"推广成"乘 $1-\\varepsilon$"：$M\\le2(1+\\varepsilon)m+\\frac{2\\ln n}{\\varepsilon}$，对 $m$ 的系数接近 2（确定性算法不可能更好）。再随机化：按权重概率选一个专家跟，损失在 $[0,1]$，期望总损失 $L\\le\\frac{\\ln n}{\\varepsilon}+(1+\\varepsilon)L^*$——系数接近 1。',
@@ -516,7 +516,7 @@
       [T`$\ln$`, T`自然对数（本章的 log 都是 $\log_e$；c45 的 majority / halving 用 $\log_2$）`],
       [T`$w_i,\ W=\sum_iw_i$`, T`专家 $i$ 的权重、所有专家的总权重`],
       [T`$t,\ T$`, T`第 $t$ 轮、总轮数`],
-      [T`$n$`, T`专家个数`],
+      [T`$M$, $m$, $n$`, T`$M$ 是学习者（我们的算法）的总错误数，$m$ 是最好专家的错误数（同 c45）；$n$ 是专家个数`],
     ],
     goals: [
       '写出 weighted majority 的更新和错误界，解释 $\\varepsilon$ 的权衡',
@@ -530,7 +530,7 @@
       T`**Weighted majority with $1-\varepsilon$**（L16 p17）：和 halving 一样，但错的专家 $w_i\leftarrow(1-\varepsilon)w_i$。`,
       T`走一天：3 个专家权重都是 1，$\varepsilon=0.5$，预测 $(+,+,-)$，真实 $-$。加权投票 $+$ 得 2、$-$ 得 1 ⇒ 学习者预测 $+$，错了；两个错的专家乘 $0.5$ ⇒ 权重 $(0.5,0.5,1)$。（$\varepsilon=0.5$ 就是 c45 的 halving。）`,
       { t: 'h3', text: '② 错误界（L16 p18）' },
-      T`界的形状和 halving 一样：最好专家的错误数乘一个系数，再加上专家个数的对数。来历也一样：学习者每错一次，至少一半的权重乘上 $(1-\varepsilon)$，总权重乘的因子不超过 $\frac12+\frac12(1-\varepsilon)=1-\frac\varepsilon2$；最好的专家错 $m$ 次后还剩 $(1-\varepsilon)^m$。两边夹起来、取对数，就是：`,
+      T`界的形状和 halving 一样：最好专家的错误数乘一个系数，再加上专家个数的对数。来历也一样：学习者每错一次，至少一半的权重乘上 $(1-\varepsilon)$：错的那些权重加起来至少是 $W/2$，每个都乘 $(1-\varepsilon)$，所以总权重至少减少 $\varepsilon\cdot\frac W2$，即 $W'\le W-\frac{\varepsilon W}{2}=W\big(1-\frac\varepsilon2\big)$（换个写法：错的一半乘 $(1-\varepsilon)$、对的一半不变，因子 $=\frac12+\frac12(1-\varepsilon)=1-\frac\varepsilon2$）；最好的专家错 $m$ 次后还剩 $(1-\varepsilon)^m$。两边夹起来、取对数，就是：`,
       { t: 'math', tex: T`M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}` },
       T`**$\varepsilon$ 的权衡**：$\varepsilon$ 小 ⇒ 降权温和，$m$ 的系数接近 2，但要更多轮才能把坏专家压下去，$\frac{\ln n}{\varepsilon}$ 项变大；$\varepsilon$ 大则相反。`,
       { t: 'h3', text: '③ 为什么系数 2 改不了：对手论证（L16 p19–p20）' },
@@ -547,7 +547,7 @@
       T`随机化打破了"对手总能让多数派犯错"的局面，对最好专家损失的系数从 2 降到 $1+\varepsilon$。这个"乘性权重 + 随机选择"正是下一周 bandits（只能看到所选专家的奖励）的出发点（L16 p27）。`,
     ],
     intuition: [
-      { t: 'think', q: 'Weighted majority 的界相比 halving，对 $m$ 的依赖改进在哪？（L16 p18 的问题）', a: T`看 $m$ 前面的系数：halving 是 $2.4$（整条界是 $2.4(m+\log_2n)$），weighted majority 是 $2(1+\varepsilon)$，$\varepsilon$ 小时接近 $2$。更新规则上，halving 就是 $\varepsilon=1/2$（错的专家乘 $1-0.5=1/2$）；但两条界是两种证法：把 $\varepsilon=0.5$ 代进 weighted majority 得 $3m+4\ln n$；把底数统一，$4\ln n\approx2.77\log_2n$，两项都比 halving 那条 $\approx2.41(m+\log_2n)$ 大，所以更松。"接近 $2m$"说的是 $\varepsilon$ 很小的时候。` },
+      { t: 'think', q: 'Weighted majority 的界相比 halving，对 $m$ 的依赖改进在哪？（L16 p18 的问题）', a: T`看 $m$ 前面的系数：halving 是 $2.4$（整条界是 $2.4(m+\log_2n)$），weighted majority 是 $2(1+\varepsilon)$，$\varepsilon$ 小时接近 $2$。更新规则上，halving 就是 $\varepsilon=1/2$（错的专家乘 $1-0.5=1/2$）；但两条界是两种证法：把 $\varepsilon=0.5$ 代进 weighted majority 得 $3m+4\ln n$；把底数统一（$\ln n=\log_2n\cdot\ln2\approx0.693\log_2n$，因为 $1/\ln2\approx1.443$），$4\ln n\approx4\times0.693\log_2n\approx2.77\log_2n$，两项都比 halving 那条 $\approx2.41(m+\log_2n)$ 大，所以更松。"接近 $2m$"说的是 $\varepsilon$ 很小的时候。` },
       { t: 'story', title: '乘性权重无处不在', md: 'Freund 和 Schapire 1997 年的 Hedge 算法就是本章的 probabilistic experts，它也是 AdaBoost 的理论基础。Arora、Hazan、Kale 2012 年的综述把 multiplicative weights（乘性权重）更新称为一种"元算法"，在博弈论、线性规划、在线学习里反复出现。（L16 p26 的应用列表来自 Kale 2007 年的博士论文。）' },
     ],
     math: [
@@ -558,7 +558,7 @@
         T`取 ln：$m\ln(1-\varepsilon)\le\ln n+M\ln(1-\varepsilon/2)$；左边用 $\ln(1-\varepsilon)\ge-\varepsilon-\varepsilon^2$ 换成 $-m(\varepsilon+\varepsilon^2)$；右边用 $\ln(1-x)<-x$（取 $x=\varepsilon/2$）换成 $-M\varepsilon/2$。得到 $-m(\varepsilon+\varepsilon^2)\le\ln n-M\varepsilon/2$，移项 $M\varepsilon/2\le\ln n+m(\varepsilon+\varepsilon^2)$，两边乘 $2/\varepsilon$ 就是 $M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}$。`,
       ] },
       { t: 'h3', text: 'Probabilistic experts 的证明思路（L16 p24–p25）' },
-      T`第 $t$ 轮期望损失 $L_t=\sum_iw_i\ell_i/W$；$W(t+1)\le W(t)(1-\varepsilon L_t)$；$W(T)\le n\prod_t(1-\varepsilon L_t)$，又 $W(T)\ge(1-\varepsilon)^{L^*}$。取 ln 化简得界。`,
+      T`第 $t$ 轮期望损失 $L_t=\sum_iw_i\ell_i/W$；$W(t+1)\le W(t)(1-\varepsilon L_t)$；$W(T)\le n\prod_t(1-\varepsilon L_t)$，又 $W(T)\ge(1-\varepsilon)^{L^*}$。两边取 $\ln$：$L^*\ln(1-\varepsilon)\le\ln n+\sum_t\ln(1-\varepsilon L_t)$；左边用 $-\ln(1-\varepsilon)\le\varepsilon+\varepsilon^2$（注意 $\ln(1-\varepsilon)<0$，所以 $L^*\ln(1-\varepsilon)\ge-L^*(\varepsilon+\varepsilon^2)$），右边用 $\ln(1-x)\le-x$ 得 $\sum_t\ln(1-\varepsilon L_t)\le-\varepsilon L$；合并起来 $-L^*(\varepsilon+\varepsilon^2)\le\ln n-\varepsilon L$，移项即 $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$。`,
     ],
     fx: [
       {
@@ -620,7 +620,7 @@
           T`The bound is minimised (for $\epsilon>0$) at $\epsilon=\sqrt{\frac{\ln n}{m}}$; this gives $\epsilon\gtrsim1.75$. This choice balances the two terms $2(1+\epsilon)m$ and $\frac{2\ln n}{\epsilon}$.`,
         ],
         answer: 3,
-        explain: T`界里有两项在拉扯：$2(1+\epsilon)m$ 随 $\epsilon$ 变大而变大，$\frac{2\ln n}{\epsilon}$ 随 $\epsilon$ 变大而变小，所以 $\epsilon$ 太大太小都不好（排除前两项；第二项还说反了，$\epsilon\to0$ 时 $\frac{2\ln n}{\epsilon}\to\infty$）。求最小值：对 $\epsilon$ 求导令其为 0，$2m-\frac{2\ln n}{\epsilon^2}=0$，得 **$\epsilon=\sqrt{\ln n/m}$**。代入 $n=10^4$、$m=3$：$\ln10^4=4\ln10\approx9.21$，$9.21/3\approx3.07$，开方 $\approx1.75$。第三个选项忘了开方，3.07 只是根号里面的数。（这题只是求这个式子在 $\epsilon>0$ 上的最小值；课件的证明只对 $\epsilon\le0.5$ 成立，所以 1.75 不能当成实际可用的学习率。）`,
+        explain: T`界里有两项在拉扯：$2(1+\epsilon)m$ 随 $\epsilon$ 变大而变大，$\frac{2\ln n}{\epsilon}$ 随 $\epsilon$ 变大而变小，所以 $\epsilon$ 太大太小都不好（排除前两项；第二项还说反了，$\epsilon\to0$ 时 $\frac{2\ln n}{\epsilon}\to\infty$）。求最小值：对 $\epsilon$ 求导令其为 0，$2m-\frac{2\ln n}{\epsilon^2}=0$，得 **$\epsilon=\sqrt{\ln n/m}$**。代入 $n=10^4$、$m=3$：$\ln10^4=4\ln10\approx9.21$，$9.21/3\approx3.07$，开方 $\approx1.75$。第三个选项忘了开方，3.07 只是根号里面的数。（题干里的 $\epsilon$ 就是正文的 $\varepsilon$，两种写法是同一个量。这题只是求这个式子在 $\epsilon>0$ 上的最小值；课件的证明只对 $\epsilon\le0.5$ 成立，所以 1.75 不能当成实际可用的学习率。）`,
       },
       { type: 'num', q: 'Weighted majority：$m=5$，$\\ln n=2$，$\\varepsilon=0.5$。上界？', answer: 23, explain: T`把数代进 weighted majority（加权多数）的错误界 $M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}$。第一项用最好专家的错误数 $m=5$：$2\times(1+0.5)\times5=2\times1.5\times5=15$。第二项用专家个数，题目直接给了 $\ln n=2$：$2\times2/0.5=4/0.5=8$。上界 $15+8=23$，即学习者最多错 23 次。注意界里是自然对数 $\ln$，不要换成 $\log_2$。` },
       { type: 'num', q: 'Probabilistic experts：$\\ln n=1$，$\\varepsilon=0.25$，$L^*=8$。上界？', answer: 14, explain: T`probabilistic experts（随机化专家）的期望总损失界是 $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$。题目给 $\ln n=1$、$\varepsilon=0.25$、最好专家的总损失 $L^*=8$。第一项 $1/0.25=4$；第二项 $(1+0.25)\times8=1.25\times8=10$；上界 $4+10=14$。和 weighted majority 比，$L^*$ 前的系数是 $1+\varepsilon$ 而不是 $2(1+\varepsilon)$，第一项也没有 2：随机选专家让对手无法预判你。` },
