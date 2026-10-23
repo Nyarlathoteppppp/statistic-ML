@@ -114,6 +114,7 @@
       T`p9 补一句：The matching is achieved only for parameters (edges) included in the model (graph)。只有图里有边的那些变量对才有参数、才有这个方程；**没有边的变量对，模型的预测计数一般和数据对不上**（下面数值例子里 $x_1,x_3$ 就是这样）。`,
       T`p7 还注明最优参数 not unique（不唯一）。讲者解释：最大值本身是唯一的，但可以有多组 $\theta$ 达到同一个最大值（"there can be multiple sets of theta that … give us the same maximum"）。例如：把一条边的四个 $\theta$ 都加同一个常数 $c$，每个组合的分子都乘 $e^c$，$Z$ 也乘 $e^c$，概率一点不变。`,
       T`**怎么真的解出来？** 讲者：和 BN 不同，这里没有闭式解（"this doesn't directly give us a closed form solution"），因为模型的概率通过 $Z$ 依赖参数；一般的 MRF 要用迭代优化（梯度上升）——每一步 $\theta_{kl}(x'_k,x'_l)\leftarrow\theta_{kl}(x'_k,x'_l)+\eta\,[\hat n(x'_k,x'_l)-T\,P(x'_k,x'_l;\theta)]$（$\eta>0$ 是步长，即 learning rate），模型预测少了就调高、多了就调低。每一次迭代都要用当前参数算 $P(x'_k,x'_l;\theta)$，这是一次推断（W11 的 [c56](#/c56)–[c58](#/c58)），反复推断很费计算（讲者："it's a hard problem"）。这就是 p4 说"学习需要推断"的具体原因。`,
+      { t: 'graph', nodes: { th: [60, 40], inf: [250, 40], cmp: [250, 180], upd: [60, 180] }, edges: 'th>inf inf>cmp=×T cmp>upd=梯度 upd>th=更新', labels: { th: 'θ', inf: 'P', cmp: '差', upd: 'θ′' }, notes: { inf: '推断', cmp: '数据−预测', upd: '调参数' }, w: 400, caption: '一次梯度上升迭代走一圈：当前参数 θ → 推断出模型给每种取值组合的概率 P → 乘样本数 T 变成预测计数 → 与数据计数相减得到梯度 → 沿梯度更新参数，回到第一步。停下时每条边的数据计数 = 模型预测计数，就是 moment matching；每绕一圈都要重新推断，这就是学 MRF 参数贵的原因。' },
       { t: 'h3', text: '⑦ 特殊情况：树（L24 p10–p12）' },
       T`p10：如果图是一棵**树**，参数可以直接从局部统计量（计数）读出来，MRF 也一样。先看课件的图：同一个形状，左边是 BN（有向树），右边是 MRF（无向树）。`,
       { t: 'graphs', r: 16, items: [
@@ -336,6 +337,7 @@
       T`**用 c63 的 8 条数据核对这个公式**。三个变量都是 4 个 0、4 个 1：$\hat H=-(\frac12\ln\frac12+\frac12\ln\frac12)=\ln2=0.6931$。互信息 $\hat I(X_1;X_2)$：四格 $\hat P_{12}=(\frac38,\frac18,\frac18,\frac38)$，独立时每格应为 $\frac12\times\frac12=\frac14$，比值 $\frac{3/8}{1/4}=1.5$ 或 $\frac{1/8}{1/4}=0.5$：`,
       { t: 'math', tex: T`\begin{aligned}\hat I(X_1;X_2)&=2\times\tfrac38\ln1.5+2\times\tfrac18\ln0.5\\&=0.75\times0.4055+0.25\times(-0.6931)=0.3041-0.1733=0.1308\end{aligned}` },
       T`$\hat I(X_2;X_3)$ 相同（计数一样）$=0.1308$；$\hat I(X_1;X_3)$：四格都是 $\frac28=\frac14$，比值全是 1，$=0$。链 $x_1$—$x_2$—$x_3$ 的对数似然 $=8\times[-3\times0.6931+0.1308+0.1308]=8\times(-2.0794+0.2616)=8\times(-1.8178)=-14.54$——和 c63 第 6 步直接算的 $-14.5425$ 一样 ✓。如果改用树 $x_1$—$x_3$—$x_2$，边权 $0+0.1308$，似然更低：这份数据最好的树就是原来那条链。`,
+      T`**$\hat I=0.1308$ 到底多大？** 每个变量都是公平硬币，$\hat H(X_2)=\ln2=0.693$，这是"完全不知道 $x_1$ 时"猜 $x_2$ 的不确定性；知道 $x_1$ 之后降到 $0.693-0.131=0.562$（即 $H(X_2\mid X_1)$），也就是减少了约 19%。所以互信息就是"这条边能帮我们省下多少不确定性"：两个独立变量的 $\hat I=0$，一点也省不掉，这条边对建模没用，BIC 会把它砍掉。`,
       { t: 'deep', title: 'p14 公式的推导：从树分解式到熵 + 互信息（讲者不推导）', blocks: [
         T`讲者对熵那一项说"I will omit the details here"，对互信息那一项说"we won't derive fully"。下面是推导思路。把 c63 的树 MLE $P(\mathbf x)=\prod_i\hat P_i(x_i)\prod_{(i,j)\in E}\frac{\hat P_{ij}(x_i,x_j)}{\hat P_i(x_i)\hat P_j(x_j)}$ 代入 $l=\sum_t\log P(\mathbf x_t)$，log 把乘积拆成和：`,
         { t: 'math', tex: T`l=\sum_i\underbrace{\sum_t\log\hat P_i(x_{ti})}_{(1)}+\sum_{(i,j)\in E}\underbrace{\sum_t\log\frac{\hat P_{ij}(x_{ti},x_{tj})}{\hat P_i(x_{ti})\hat P_j(x_{tj})}}_{(2)}` },

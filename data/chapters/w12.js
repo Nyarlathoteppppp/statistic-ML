@@ -299,6 +299,8 @@
         T`**Structure search（结构搜索）**：在所有候选图里找分最高的 $\hat G$。`,
       ] },
       T`p13 把三件事串成一条流水线：数据 → 估参数、再加复杂度惩罚 → 得到一个**可分解（decomposable）**的打分函数 $\mathrm{score}(G;D)=\sum_{i=1}^n\mathrm{score}(i\mid pa_i;D)$ → 在无环图里找 $\arg\max_G\mathrm{score}(G;D)$。讲者："this is a two-fold problem"——既要学参数，也要学结构。本章讲前两件（p14–p22）；c62 讲另一种打分（Bayesian score）和第三件（搜索）。`,
+      { t: 'slide', src: 'L23/p13', caption: '课件 p13 的整条流水线：左边是完整数据（complete data）的矩阵 D；中间箭头写 parameter estimation + complexity penalty；右边得到 score(G;D) = Σ score(i|pa_i,D)，标注为 decomposable scoring function；再经 structure search，落到最下面的 arg max 那张无环图（highest scoring acyclic graph，图里画的是一个基因网络）。' },
+      T`看图注意两处：打分函数在流水线的中间，它同时用到了数据（拟合项）和复杂度惩罚；最后的箭头强调的是 **acyclic**——$\arg\max$ 只在无环图里取，这就是 c62 说的全局约束，也是 BN 结构学习难的原因。`,
       { t: 'h3', text: '② CPT 的记号：$r_i$、父节点配置 $j$、$\\theta_{ijk}$（L23 p15–p16）' },
       T`图给定时，联合分布按图分解（p15，同 c53）：`,
       { t: 'math', tex: T`P(x_1,\dots,x_n;\theta)=\prod_{i=1}^nP(x_i\mid x_{pa_i};\theta)` },
@@ -322,6 +324,8 @@
       { t: 'h3', text: '③ 条件对数似然：每行贡献一个 log，再按 $(j,k)$ 合并（L23 p17）' },
       T`估 $x_1$ 的 CPT，只需要 $x_1$ 和它的父节点这几列（p17 用红框框出 $x_1$ 和 $(x_2,x_3)$）。假设各行独立同分布（i.i.d.），数据的似然是每行概率的乘积，取 log 变成求和（p15："log of product of probabilities = sum of log of probabilities"）。这就是**条件对数似然（conditional log-likelihood）**：`,
       { t: 'math', tex: T`l(1|2,3;\theta)=\sum_{t=1}^T\log P(x_{t1}\mid x_{t2},x_{t3};\theta)=\sum_{k=1}^{r_1}\sum_{j=1}^{q_1}\hat n_{1jk}\log\theta_{1jk}` },
+      { t: 'slide', src: 'L23/p17', caption: '课件 p17：红框框住 x₁ 列和它的父节点 x₂、x₃ 两列，其余列与这张 CPT 无关；其中两行左侧标着它的 k、j；第 2、5 行涂蓝，因为两行的 (x₂,x₃)=(2,2)、x₁=1 相同，在 l 里合成一项 2 log θ₁₄₁；右下角淡红框就是计数 n̂1jk（同一格出现的行数）。' },
+      T`看图时先注意两点：课件把"这一行的 $(j,k)$"直接标在行左边；蓝色标出的第 2、5 行落在同一格 $(j,k)=(4,1)$，所以它们在 $l$ 里只算一项 $2\log\theta_{141}$。`,
       T`第一个等号是一行一行地加。第 $t$ 行的父节点配置是某个 $j$、$x_1$ 的值是某个 $k$，它贡献的就是 CPT 里那一格的 $\log\theta_{1jk}$。例如第 1 行 $x_1=2$、$(x_2,x_3)=(2,1)$，即 $k=2,j=2$，贡献 $\log\theta_{122}$（p17 的标注"$k=2,j=2$"）。`,
       T`第二个等号把相同的项合并：同一个 $(j,k)$ 组合会出现好几次。**$\hat n_{1jk}$ 就是"父节点配置 $(x_2,x_3)=j$ 后面跟着 $x_1=k$"的行数**（"how many times parent configuration $(x_2,x_3)=j$ is followed by $x_1=k$"）。课件的例子：第 2 行和第 5 行都是 $(x_2,x_3)=(2,2)$（$j=4$）、$x_1=1$（$k=1$），所以 $\log\theta_{141}+\log\theta_{141}=2\log\theta_{141}$，$\hat n_{141}=2$。`,
       { t: 'h3', text: '④ MLE ＝ 每一列里数频率（L23 p18）' },
@@ -338,6 +342,7 @@
       { t: 'h3', text: '⑤ 能不能用似然来挑父节点？不能（L23 p19）' },
       T`参数会估了，自然想到：给 $x_1$ 试不同的父节点集合，每种都算出最大的条件对数似然 $l(1|\cdots;\hat\theta)$，哪个大就选哪个。p19 明确说不行："We cannot use the conditional log-likelihood $l(1|2,3;\hat\theta)$ directly to guide which (or how many) parents we should use for predicting $x_1$."`,
       T`**原因：多加一个父节点，最大似然只会变大或不变。** 父节点越多，数据被切成越细的小组，每组各估一列参数；可调的参数更多，在训练数据上总能拟合得至少一样好（讲者："a more flexible model can achieve a higher maximum likelihood"）。照这样选，永远会选出父节点最多、边最多的图——过拟合（c18；讲者把它比作神经网络参数太多）。例 2 用课件的数据算给你看：$x_1$ 的父节点从 $\varnothing$ 加到 $\{x_2\}$ 再到 $\{x_2,x_3\}$，$l$ 从 $-3.82$ 升到 $-2.77$ 再升到 $0$。`,
+      T`**"似然最高"有时只是把训练数据背下来。** 例 1 里父节点取 $\{x_2,x_3\}$ 时 $l=0$：6 行每行都被预测成概率 1，模型等于把这 6 行抄了一遍。换一行新数据，若它的父节点配置在训练集里没出现过（例如 $j=3$，即 $(x_2,x_3)=(1,2)$），这一列根本没有估计（0/0）；配置出现过时模型也只给 0 或 1，猜错一次这一行的概率就成了 0。所以训练集上的 $l$ 不能当作"好"的证据——BIC 的惩罚就是在替"换一批数据还准不准"收费。`,
       { t: 'h3', text: '⑥ BIC：似然减去复杂度惩罚（L23 p20）' },
       T`办法是保留似然（还是要拟合得好），但按参数个数扣分。课件用最常见的 **BIC（Bayesian information criterion）** score：`,
       { t: 'math', tex: T`\mathrm{score}(1|2,3;D)=l(1|2,3;\hat\theta)-\frac{(r_1-1)q_1}{2}\log(T)` },
@@ -574,6 +579,7 @@
       T`先验是 Dirichlet，似然是多项分布（multinomial），两者**共轭（conjugate）**（c51 里 Beta–Binomial 的多维版），所以积分有闭式解：`,
       { t: 'math', tex: T`\mathrm{score}(1|2,3;D)=\sum_{j=1}^{q_1}\left[\log\frac{\Gamma(\alpha_{1j})}{\Gamma(\alpha_{1j}+\hat n_{1j})}+\sum_{k=1}^{r_1}\log\frac{\Gamma(\alpha_{1jk}+\hat n_{1jk})}{\Gamma(\alpha_{1jk})}\right]` },
       T`怎么用：对每个父节点配置 $j$，先用这一列的伪计数总和 $\alpha_{1j}$ 和这一列的真实行数 $\hat n_{1j}=\sum_k\hat n_{1jk}$ 算第一项；再对这一列的每个格子，用 $\alpha_{1jk}$ 和计数 $\hat n_{1jk}$ 算第二项；所有列加起来。$\hat n_{1jk}$ 就是 c61 数出来的计数。数据里没出现过的配置（$\hat n_{1j}=0$）两项都是 $\log1=0$，不影响分数。讲者："I won't derive how this came about … you also don't need to know how to derive it"——推导放在下面的折叠框里。`,
+      T`**积分到底在做什么：一个数字。** 取一个二元变量、没有父节点、equivalent sample size $\alpha=2$（每格伪计数 1，就是 $\mathrm{Beta}(1,1)$）。只看到一行数据 $x_1=1$：最大似然把概率定成 1，$l=0$，看起来完美；Bayesian score 只有 $\ln\frac{\Gamma(2)}{\Gamma(3)}+\ln\frac{\Gamma(2)}{\Gamma(1)}=\ln\frac12=-0.693$，因为它要在所有可能的概率值上按先验平均，先为"参数还很不确定"付钱。数据多了，似然项随 $T$ 增长，这类代价就相对越轻。`,
       { t: 'fold', title: '闭式解的推导（L23 p28）', blocks: [
         { t: 'steps', items: [
           T`准则 1 让先验按列相乘，似然也按列分组（c61：$\prod_t P(x_{t1}\mid\cdot)=\prod_j\prod_k\theta_{1jk}^{\hat n_{1jk}}$），所以积分拆成每一列各自的积分之积，取 log 后变成按 $j$ 求和。`,
