@@ -263,3 +263,6 @@ svg.graph .lbl.inv { fill: var(--card); font-weight: 600; }
 svg.graph .cross { stroke: var(--ink); stroke-width: 2; fill: none; }
 svg.graph .target { fill: none; stroke: var(--line-2); stroke-width: 1.2; }
 svg.graph .fl.shade { fill: var(--sunk); }
+svg.graph .ln.thin { stroke-width: 1.2; stroke-dasharray: 4 3; }
+svg.graph.fig .lbl, svg.graph.fig .tick { paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+svg.graph.fig .lbl.inv { stroke: none; }

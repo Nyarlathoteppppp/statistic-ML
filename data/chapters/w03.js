@@ -281,6 +281,7 @@
         ['100', '0.246', '**0**'],
       ] },
       T`lasso 在 $\lambda\ge56$（$=2\bx'\by$）时恰好为 0；ridge 永远只是变小。`,
+      { t: 'viz', id: 'fig-ridge-lasso-path', opts: { caption: T`把上表画成曲线：横轴是 $\lambda$，纵轴是学到的 $w$。ridge（蓝）是一条越来越平的曲线，永远碰不到 0；lasso（红）的分子是 $28-\lambda/2$，在 $\lambda=56$ 处减到 0，之后一直是 0——这就是 lasso 能做特征选择的原因。` } },
       { t: 'fade', title: '分步练习：一维 lasso（软阈值）', plan: [T`算 $\bx'\bx$、$\bx'\by$`, T`软阈值：$\max(|\bx'\by|-\lambda/2,0)$`, T`除以 $\bx'\bx$（带上符号）`], items: [
         { md: T`$\bx'\bx=14$，$\bx'\by=28$，$\lambda=14$。`, steps: [
           { md: '已给出' },

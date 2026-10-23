@@ -62,6 +62,7 @@
       T`**Cumulative regret（累积遗憾）**（L17 p6）：`,
       { t: 'math', tex: T`\text{Regret}(T)=\mu^*T-\sum_{t=1}^TE\big[R_{i_t}(t)\big],\qquad\mu^*=\max_i\mu_i` },
       T`$\mu^*T$ 是"事后诸葛亮"（一开始就知道哪个臂最好、每轮都拉它）的期望总奖励；减去我们实际的期望总奖励。目标：**regret 越小越好**。`,
+      { t: 'viz', id: 'fig-regret-gap', opts: { caption: T`每个臂的奖励是一个分布，竖线是它的均值 $\mu_i$。差臂和最好臂的均值之差就是 gap；每拉一次差臂就亏一个 gap，所以 regret $=\sum_i N_i\times\text{gap}_i$。数字就是下面分步练习的例子。` } },
       { t: 'h3', text: '④ 最简单的策略：greedy（L17 p7）' },
       T`**Greedy（贪心）**（L17 p7）：拉过的臂，用到目前为止的**平均奖励**当估计；**还没拉过**的臂没有平均可算，先填一个初始值 $Q_0$（自己设的超参数，不是数据算的，下一节专门讲它）。每轮拉估计最高的那个。下面的 $s$ 是遍历过去各轮的编号，从 1 到 $t-1$；$i_s$ 是第 $s$ 轮所拉臂的编号。$\argmax_i$ 返回让估计值最大的臂编号，而不是那个最大的估计值；$\in$ 表示从这些并列最优的编号中选一个：`,
       { t: 'math', tex: T`Q_{t-1}(i)=\begin{cases}\dfrac{\sum_{s=1}^{t-1}R_i(s)\,1[i_s=i]}{\sum_{s=1}^{t-1}1[i_s=i]},&\text{臂 }i\text{ 拉过}\\[1em]Q_0,&\text{没拉过}\end{cases}\qquad i_t\in\argmax_{1\le i\le k}Q_{t-1}(i)` },

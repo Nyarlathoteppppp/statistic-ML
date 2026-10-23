@@ -521,6 +521,7 @@
       T`梯度变成 0 就停下。停下的地方是不是**全局**最低点？不一定——山谷可能不止一个。但如果函数是"碗形"的，任何一个谷底都是全局最低。"碗形"的准确说法叫 **convex（凸）**：`,
       { t: 'math', tex: T`f\big(t\mathbf a+(1-t)\mathbf b\big)\le t\,f(\mathbf a)+(1-t)\,f(\mathbf b)\qquad\forall\mathbf a,\mathbf b,\ t\in[0,1]` },
       T`几何意义：图像上任意两点连线**在图像上方**（碗形）。严格不等号（$\mathbf a\ne\mathbf b$，$t\in(0,1)$）叫 **strictly convex**。`,
+      { t: 'viz', id: 'fig-convex', opts: { caption: T`左：碗形的凸函数，任取两点连弦，弦总在曲线上方，只有一个最低点。右：两个谷中间有个峰，两谷底之间的弦从峰下面穿过，所以不是凸函数；梯度下降从右边出发可能停在局部最小（课件 L04 p11）。` } },
       { t: 'ul', items: [
         T`等价判别：一元 $f''\ge0$；多元 Hessian $\nabla^2f\succeq0$（PSD，c04！）。`,
         T`**凸 ⇒ 任何局部最小都是全局最小**（任何驻点都是全局最小）。`,

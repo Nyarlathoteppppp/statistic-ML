@@ -247,4 +247,89 @@
     s += T(lx, 192, 'K 只看 γ·d²：c29 例子', '') + T(lx, 210, 'γ = 0.5、d² = 2 ⇒ γd² = 1，', '') + T(lx, 228, '和 γ = 1、d = 1 一样是 0.37', '');
     return s;
   }));
+  /* c13 convexity: chord above the curve (convex) vs chord dipping under a hump (non-convex). */
+  SML.viz.register('fig-convex', still(660, 290, function () {
+    const A = axes({ x: 40, y: 50, w: 250, h: 180, xr: [-2, 2], yr: [-0.3, 4.2] });
+    const f = (x) => x * x, a = -1.5, b = 1;
+    let s = T(165, 16, '凸：碗形', 'mid w tc c3') + A.s + curve(A, f, -2, 2, 'c3');
+    s += Line(n1(A.X(a)), n1(A.Y(f(a))), n1(A.X(b)), n1(A.Y(f(b))), 'ln c4 dashed');
+    s += Dot(A.X(a), A.Y(f(a)), 'c4') + Dot(A.X(b), A.Y(f(b)), 'c4') + T(A.X(a) - 8, A.Y(f(a)), 'a', 'end') + T(A.X(b) + 8, A.Y(f(b)), 'b', '');
+    s += T(A.X(-0.25), A.Y(2.35), '弦在曲线上方', 'mid tc c4');
+    s += Dot(A.X(0), A.Y(0), 'c3', 5) + T(A.X(0), A.Y(0) + 14, '唯一的最低点 = 全局最小', 'mid');
+    const B = axes({ x: 380, y: 50, w: 250, h: 180, xr: [-1.7, 1.7], yr: [-0.8, 3.4] });
+    const g = (x) => x ** 4 - 2 * x * x + 0.4 * x + 1, p = -1.05, q = 0.95;
+    s += T(505, 16, '非凸：有两个谷', 'mid w tc c2') + B.s + curve(B, g, -1.7, 1.7, 'c2');
+    s += Line(n1(B.X(p)), n1(B.Y(g(p))), n1(B.X(q)), n1(B.Y(g(q))), 'ln c4 dashed');
+    s += Dot(B.X(p), B.Y(g(p)), 'c4') + Dot(B.X(q), B.Y(g(q)), 'c4');
+    s += T(B.X(0.05), B.Y(1.55), '弦跑到曲线下方', 'mid tc c4') + T(B.X(0.05), B.Y(1.55) + 16, '⇒ 不是凸函数', 'mid tc c4');
+    s += T(B.X(p), B.Y(g(p)) + 16, '全局最小', 'mid') + T(B.X(q) - 2, B.Y(g(q)) + 18, '局部最小', '') + T(B.X(q) - 2, B.Y(g(q)) + 34, 'GD 可能卡这', '');
+    return s;
+  }));
+
+  /* c28 one-dimensional KKT: minimise (x − 3)² subject to x ≤ 1. */
+  SML.viz.register('fig-kkt-1d', still(730, 300, function () {
+    const f = (x) => (x - 3) * (x - 3);
+    const A = axes({ x: 50, y: 30, w: 420, h: 220, xr: [-0.3, 4], yr: [0, 11], xt: [0, 1, 2, 3, 4], yt: [0, 4, 8], xl: 'x', yl: 'f(x) = (x − 3)²' });
+    let s = Box(A.X(-0.3), A.Y(11), A.X(1) - A.X(-0.3), A.Y(0) - A.Y(11), 'fl faint c3') + Box(A.X(1), A.Y(11), A.X(4) - A.X(1), A.Y(0) - A.Y(11), 'fl faint c2');
+    s += T(A.X(0.35), A.Y(10.3), '可行：x ≤ 1', 'mid tc c3') + T(A.X(2.5), A.Y(10.3), '不可行：x > 1', 'mid tc c2');
+    s += A.s + Line(n1(A.X(1)), A.Y(11), n1(A.X(1)), n1(A.Y(0)), 'dash');
+    s += curve(A, f, -0.3, 4, 'c1');
+    s += Line(n1(A.X(0.45)), n1(A.Y(4 + 4 * 0.55)), n1(A.X(1.5)), n1(A.Y(4 - 4 * 0.5)), 'ln c2');
+    s += Dot(A.X(1), A.Y(4), 'c1', 6) + T(A.X(1) - 10, A.Y(4) + 4, '最优 x* = 1', 'end w');
+    s += T(A.X(1.1), A.Y(1.5), '切线斜率', 'tc c2') + T(A.X(1.1), A.Y(1.5) + 16, 'f′(1) = −4', 'tc c2');
+    s += '<path class="cross" d="M' + n1(A.X(3) - 6) + ',' + n1(A.Y(0) - 6) + ' l12,12 m0,-12 l-12,12"/>';
+    s += T(A.X(3), A.Y(3.4), '无约束最低点 x = 3', 'mid') + T(A.X(3), A.Y(3.4) + 17, '但违反 x ≤ 1', 'mid');
+    const lx = 490;
+    s += T(lx, 50, '边界把解挡在 x = 1：', 'w');
+    s += T(lx, 72, '这里 f 还想往右下滑（斜率 −4），', '') + T(lx, 90, '约束用力 λ 把它推回来。', '');
+    s += T(lx, 124, 'L = f + λ(x − 1) 的导数为 0：', 'w') + T(lx, 146, 'f′(1) + λ = −4 + λ = 0', '') + T(lx, 164, '⇒ λ* = 4，正好抵消斜率', 'tc c2');
+    s += T(lx, 198, '如果最低点本来就合法，', '') + T(lx, 216, '约束不用出力：λ = 0', '') + T(lx, 234, '（这就是互补松弛）', '');
+    return s;
+  }));
+
+  /* c47 regret by arm: each pull of arm i loses gap_i = μ* − μ_i. Numbers from the chapter's worked example. */
+  SML.viz.register('fig-regret-gap', still(700, 300, function (k) {
+    const arms = [[0.2, 2, 'c2'], [0.5, 3, 'c4'], [0.7, 5, 'c3']], sd = 0.07;
+    const A = axes({ x: 40, y: 50, w: 420, h: 190, xr: [0, 1], yr: [0, 6.6], xt: [0, 0.2, 0.5, 0.7, 1], xl: '一次拉臂得到的奖励', yl: '' });
+    let s = A.s;
+    arms.forEach((a, i) => {
+      const pdf = (x) => Math.exp(-0.5 * ((x - a[0]) / sd) ** 2) / (sd * Math.sqrt(2 * Math.PI));
+      s += band(A, pdf, Math.max(0, a[0] - 0.3), Math.min(1, a[0] + 0.3), 'faint ' + a[2]) + curve(A, pdf, Math.max(0, a[0] - 0.3), Math.min(1, a[0] + 0.3), a[2]);
+      s += Line(n1(A.X(a[0])), n1(A.Y(0)), n1(A.X(a[0])), n1(A.Y(5.9)), 'ln thin ' + a[2]);
+      s += i === 2 ? T(A.X(a[0]) - 4, A.Y(6.25), '臂 3：μ* = 0.7（最好）', 'tc ' + a[2]) : T(A.X(a[0]), A.Y(6.25), '臂 ' + (i + 1) + '：μ = ' + a[0], 'mid tc ' + a[2]);
+    });
+    const yg = [3.6, 2.3];
+    [[0.2, 0.5, '0.5'], [0.5, 0.2, '0.2']].forEach((g, i) => {
+      const y = A.Y(yg[i]);
+      s += Line(n1(A.X(g[0]) + 3), n1(y), n1(A.X(0.7) - 3), n1(y), 'edge', k) + T((A.X(g[0]) + A.X(0.7)) / 2, y - 10, 'gap = ' + g[2], 'mid w');
+    });
+    const lx = 490;
+    s += T(lx, 46, '拉一次臂 i，就比「每次都拉', '') + T(lx, 64, '最好臂」少赚 gapᵢ = μ* − μᵢ', 'w');
+    s += T(lx, 104, '例：三个臂拉了 2、3、5 次', '');
+    s += T(lx, 128, '臂 1：2 × 0.5 = 1.0', 'tc c2') + T(lx, 148, '臂 2：3 × 0.2 = 0.6', 'tc c4') + T(lx, 168, '臂 3：5 × 0 = 0', 'tc c3');
+    s += T(lx, 196, 'regret = Σ Nᵢ × gapᵢ = 1.6', 'w');
+    s += T(lx, 226, '差得越远的臂，每拉一次', '') + T(lx, 244, '亏得越多；拉最好臂不亏', '');
+    return s;
+  }));
+
+  /* c17 regularisation path for one weight (x′x = 14, x′y = 28): ridge only shrinks, lasso hits exactly 0 at λ = 56. */
+  SML.viz.register('fig-ridge-lasso-path', still(700, 290, function () {
+    const r = (l) => 28 / (14 + l), la = (l) => Math.max(28 - l / 2, 0) / 14;
+    const A = axes({ x: 50, y: 30, w: 420, h: 210, xr: [0, 100], yr: [0, 2.2], xt: [0, 14, 56, 100], yt: [0, 0.5, 1, 1.5, 2], xl: 'λ（正则化强度）', yl: '学到的 w', grid: true });
+    let s = A.s + curve(A, r, 0, 100, 'c1') + curve(A, la, 0, 100, 'c2', 400);
+    [[0, 2, 2], [14, 1, 1.5], [56, 0.4, 0], [100, 0.246, 0]].forEach((q) => {
+      s += Dot(A.X(q[0]), A.Y(q[1]), 'c1') + Dot(A.X(q[0]), A.Y(q[2]), 'c2');
+    });
+    s += T(A.X(14) + 8, A.Y(1) + 12, '1', 'tc c1') + T(A.X(14) + 8, A.Y(1.5) - 10, '1.5', 'tc c2');
+    s += T(A.X(56), A.Y(0.4) - 12, '0.4', 'mid tc c1') + T(A.X(100) - 4, A.Y(0.246) - 12, '0.246', 'end tc c1');
+    s += T(A.X(56) + 6, A.Y(0) - 12, 'λ = 56：lasso 恰好 = 0', 'tc c2');
+    s += T(A.X(80), A.Y(0.62), 'ridge：越来越小，但永远不到 0', 'mid tc c1');
+    s += T(A.X(36), A.Y(1.2), 'lasso：分子减掉 λ/2，减到 0 就停', 'tc c2');
+    const lx = 490;
+    s += T(lx, 50, '正文例子：x′x = 14，x′y = 28', 'w');
+    s += T(lx, 76, 'ridge  w = 28 / (14 + λ)', 'tc c1') + T(lx, 96, '→ 只是除以更大的数', '');
+    s += T(lx, 124, 'lasso  w = max(28 − λ/2, 0) / 14', 'tc c2') + T(lx, 144, '→ 减成 0 后就一直是 0', '');
+    s += T(lx, 184, '一维规律：|x′y| ≤ λ/2 时', '') + T(lx, 202, 'lasso 的 w 恰好为 0', 'w') + T(lx, 220, '（特征被扔掉 = 稀疏）', '');
+    return s;
+  }));
 })(window);
