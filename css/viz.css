@@ -266,3 +266,10 @@ svg.graph .fl.shade { fill: var(--sunk); }
 svg.graph .ln.thin { stroke-width: 1.2; stroke-dasharray: 4 3; }
 svg.graph.fig .lbl, svg.graph.fig .tick { paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
 svg.graph.fig .lbl.inv { stroke: none; }
+svg.graph .frame { fill: none; stroke: var(--line-2); stroke-width: 1; }
+svg.graph .frame.best { stroke: var(--good); stroke-width: 2.2; }
+svg.graph .node-box { fill: var(--card); stroke: var(--ink-2); stroke-width: 1.3; rx: 6; }
+svg.graph .node-box.hot { stroke: var(--bad); stroke-width: 2; }
+svg.graph .edge.red { stroke: var(--bad); stroke-width: 2.4; }
+svg.graph .edge.dashed { stroke-dasharray: 5 4; }
+svg.graph .pick { fill: none; stroke: var(--bad); stroke-width: 1.8; rx: 4; }

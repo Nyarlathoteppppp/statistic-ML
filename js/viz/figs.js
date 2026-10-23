@@ -332,4 +332,131 @@
     s += T(lx, 184, '一维规律：|x′y| ≤ λ/2 时', '') + T(lx, 202, 'lasso 的 w 恰好为 0', 'w') + T(lx, 220, '（特征被扔掉 = 稀疏）', '');
     return s;
   }));
+  /* c20 the 8 fixed classifiers of L06 on the 4-point example, one small panel each (sgn(0) = −1). */
+  SML.viz.register('fig-classifiers8', still(700, 430, function () {
+    const pts = [[1, 2, 1], [2, -1, 1], [-1, 1, -1], [-2, -1, -1]], L = 2.6, size = 130;
+    const rules = [[[1, 0], 'sgn(x₁)'], [[0, 1], 'sgn(x₂)'], [[1, 1], 'sgn(x₁+x₂)'], [[1, -1], 'sgn(x₁−x₂)'],
+      [[-1, 0], 'sgn(−x₁)'], [[0, -1], 'sgn(−x₂)'], [[-1, -1], 'sgn(−x₁−x₂)'], [[-1, 1], 'sgn(−x₁+x₂)']];
+    // the half of the square [−L, L]² where w·x > 0 (Sutherland–Hodgman against one line)
+    function half(w) {
+      const sq = [[-L, -L], [L, -L], [L, L], [-L, L]], out = [], d = (q) => w[0] * q[0] + w[1] * q[1];
+      sq.forEach((a, i) => {
+        const b = sq[(i + 1) % 4], da = d(a), db = d(b);
+        if (da >= 0) out.push(a);
+        if ((da >= 0) !== (db >= 0)) { const t = da / (da - db); out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]); }
+      });
+      return out;
+    }
+    let s = '';
+    rules.forEach((r, k) => {
+      const ox = 30 + (k % 4) * 168, oy = 34 + Math.floor(k / 4) * 196;
+      const X = (v) => ox + (v + L) / (2 * L) * size, Y = (v) => oy + (L - v) / (2 * L) * size;
+      const wrong = pts.filter((q) => (r[0][0] * q[0] + r[0][1] * q[1] > 0 ? 1 : -1) !== q[2]).length;
+      s += Box(ox, oy, size, size, 'frame' + (wrong === 0 ? ' best' : ''));
+      s += Path(half(r[0]).map((q) => [X(q[0]), Y(q[1])]), 'fl c1').replace('"/>', ' Z"/>');
+      s += Line(X(-L), n1(Y(0)), X(L), n1(Y(0)), 'grid') + Line(n1(X(0)), Y(L), n1(X(0)), Y(-L), 'grid');
+      const w = r[0], e = w[1] === 0 ? [[0, -L], [0, L]] : w[0] === 0 ? [[-L, 0], [L, 0]] : [[-L, L * w[0] / w[1]], [L, -L * w[0] / w[1]]];
+      s += Line(n1(X(e[0][0])), n1(Y(e[0][1])), n1(X(e[1][0])), n1(Y(e[1][1])), 'ln ' + (wrong === 0 ? 'c3' : ''));
+      pts.forEach((q) => {
+        const pred = w[0] * q[0] + w[1] * q[1] > 0 ? 1 : -1;
+        s += q[2] > 0 ? Dot(X(q[0]), Y(q[1]), 'c1', 5) : Box(X(q[0]) - 4.5, Y(q[1]) - 4.5, 9, 9, 'bar c2');
+        if (pred !== q[2]) s += '<circle class="ring c4" cx="' + n1(X(q[0])) + '" cy="' + n1(Y(q[1])) + '" r="10"/>';
+      });
+      s += T(ox + size / 2, oy - 12, r[1], 'mid w');
+      s += T(ox + size / 2, oy + size + 14, '错 ' + wrong + ' 个' + (wrong === 0 ? '：ERM 可选' : ''), 'mid' + (wrong === 0 ? ' tc c3' : ''));
+    });
+    s += Dot(40, 418, 'c1', 5) + T(50, 418, '标签 +1', '') + Box(115.5, 413.5, 9, 9, 'bar c2') + T(130, 418, '标签 −1', '');
+    s += Box(196, 412, 16, 12, 'fl c1') + T(218, 418, '判成 +1 的一侧', '');
+    s += '<circle class="ring c4" cx="330" cy="418" r="8"/>' + T(342, 418, '判错的点', '');
+    s += T(420, 418, '上下两行同一条线、方向相反', '');
+    return s;
+  }));
+
+  /* c10 the RSS bowl seen through two slices: RSS(a, b*) and RSS(a*, b) are parabolas with flat bottoms. */
+  SML.viz.register('fig-rss-slices', still(700, 290, function () {
+    const W = [[85, 85], [80, 90], [83, 86], [70, 96], [68, 80], [65, 70], [64, 65], [72, 95], [69, 70], [75, 80]];
+    const a0 = 25.2992, b0 = 0.7716, rss = (a, b) => W.reduce((t, q) => t + (q[1] - a - b * q[0]) ** 2, 0), r0 = rss(a0, b0);
+    const A = axes({ x: 60, y: 40, w: 240, h: 190, xr: [17, 34], yr: [560, 1500], xt: [20, [25.3, '25.3'], 30], yt: [700, 1000, 1300], xl: '截距 a', yl: 'RSS' });
+    const B = axes({ x: 420, y: 40, w: 240, h: 190, xr: [0.65, 0.89], yr: [560, 1500], xt: [0.7, [0.7716, '0.77'], 0.85], yt: [700, 1000, 1300], xl: '斜率 b', yl: 'RSS' });
+    let s = A.s + B.s;
+    s += T(180, 16, '固定 b = 0.77，只动 a', 'mid w') + T(540, 16, '固定 a = 25.3，只动 b', 'mid w');
+    s += curve(A, (a) => rss(a, b0), 17, 34, 'c1') + curve(B, (b) => rss(a0, b), 0.65, 0.89, 'c1');
+    s += Line(n1(A.X(22)), n1(A.Y(r0)), n1(A.X(28.6)), n1(A.Y(r0)), 'ln c2') + Dot(A.X(a0), A.Y(r0), 'c2', 5);
+    s += Line(n1(B.X(0.735)), n1(B.Y(r0)), n1(B.X(0.808)), n1(B.Y(r0)), 'ln c2') + Dot(B.X(b0), B.Y(r0), 'c2', 5);
+    s += T(A.X(a0), A.Y(r0) + 22, '碗底：∂RSS/∂a = 0', 'mid tc c2') + T(B.X(b0), B.Y(r0) + 22, '碗底：∂RSS/∂b = 0', 'mid tc c2');
+    s += T(A.X(a0), A.Y(1420), '最小 RSS ≈ 744.7', 'mid') + T(B.X(b0), B.Y(1420), '同一个最低点', 'mid');
+    return s;
+  }));
+
+  /* c49 MAB → contextual bandit → RL: each step adds one thing. */
+  SML.viz.register('fig-bandit-ladder', still(720, 245, function (k) {
+    const bx = (x, y, w, t, cls) => Box(x, y, w, 30, 'node-box ' + (cls || '')) + T(x + w / 2, y + 15, t, 'mid w');
+    const ar = (x1, y1, x2, y2, cls) => Line(n1(x1), n1(y1), n1(x2), n1(y2), 'edge ' + (cls || ''), k);
+    let s = '';
+    // ① MAB
+    s += T(110, 18, '① 多臂老虎机 MAB', 'mid w');
+    s += bx(30, 80, 70, '选一个臂') + ar(100, 95, 140, 95) + bx(142, 80, 66, '奖励 r');
+    s += T(110, 150, '没有状态：', 'mid') + T(110, 168, '每一轮的情况都一样', 'mid');
+    s += T(110, 212, '学：每个臂的平均奖励', 'mid tc c1');
+    // ② contextual bandit
+    const o = 245;
+    s += T(o + 110, 18, '② 上下文老虎机', 'mid w');
+    s += bx(o, 80, 64, '上下文 x') + ar(o + 64, 95, o + 84, 95) + bx(o + 86, 80, 56, '选臂') + ar(o + 142, 95, o + 162, 95) + bx(o + 164, 80, 56, '奖励 r');
+    s += ar(o + 32, 44, o + 32, 78, 'dashed') + T(o + 40, 52, '下一轮的 x 自己来，', '') + T(o + 40, 68, '和你选哪个臂无关', '');
+    s += T(o + 110, 150, '多了上下文：', 'mid') + T(o + 110, 168, '奖励随用户、网页变', 'mid');
+    s += T(o + 110, 212, '学：从上下文回归奖励', 'mid tc c1');
+    // ③ RL
+    const q = 490;
+    s += T(q + 115, 18, '③ 强化学习 RL', 'mid w');
+    s += bx(q, 80, 64, '状态 s') + ar(q + 64, 95, q + 84, 95) + bx(q + 86, 80, 56, '动作') + ar(q + 142, 95, q + 162, 95) + bx(q + 164, 80, 56, '奖励 r');
+    s += ar(q + 114, 110, q + 114, 128, 'red') + bx(q + 70, 130, 88, '下一个状态', 'hot');
+    s += T(q + 66, 145, '由动作决定 →', 'end tc c2');
+    s += T(q + 115, 186, '动作会改变以后的状态', 'mid');
+    s += T(q + 115, 212, '学：value function，', 'mid tc c1') + T(q + 115, 230, '要把奖励往未来展开', 'mid tc c1');
+    return s;
+  }));
+
+  /* c50 Workshop 11 (seed 1, 8 points, σ = 0.1, γ = 10): posterior mean ± 2 predictive sd for degree 1, 2, 9. */
+  SML.viz.register('fig-evidence-fits', still(720, 320, function (k) {
+    const X = [0.417022, 0.720324, 0.000114, 0.302333, 0.146756, 0.092339, 0.18626, 0.345561];
+    const Y = [0.120968, 0.012561, 1.423909, 0.119241, 0.655811, 0.806002, 0.638374, -0.086757];
+    const sigma = 0.1, gamma = 10;
+    function inv(M) { // Gauss–Jordan with partial pivoting
+      const n = M.length, A = M.map((r, i) => r.concat(Array.from({ length: n }, (_, j) => +(i === j))));
+      for (let c = 0; c < n; c++) {
+        let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+        [A[c], A[p]] = [A[p], A[c]];
+        const d = A[c][c]; for (let j = 0; j < 2 * n; j++) A[c][j] /= d;
+        for (let r = 0; r < n; r++) if (r !== c) { const f = A[r][c]; for (let j = 0; j < 2 * n; j++) A[r][j] -= f * A[c][j]; }
+      }
+      return A.map((r) => r.slice(n));
+    }
+    function fit(deg) {
+      const phi = (x) => Array.from({ length: deg + 1 }, (_, j) => Math.pow(x, j)), P = X.map(phi), m = deg + 1;
+      const G = Array.from({ length: m }, (_, i) => Array.from({ length: m }, (_, j) => P.reduce((t, r) => t + r[i] * r[j], 0) + (i === j ? (sigma / gamma) ** 2 : 0)));
+      const V = inv(G).map((r) => r.map((v) => v * sigma * sigma));
+      const py = Array.from({ length: m }, (_, i) => P.reduce((t, r, n) => t + r[i] * Y[n], 0));
+      const w = V.map((r) => r.reduce((t, v, j) => t + v * py[j], 0) / (sigma * sigma));
+      const mean = (x) => phi(x).reduce((t, v, j) => t + v * w[j], 0);
+      const sd = (x) => { const f = phi(x); return Math.sqrt(sigma * sigma + f.reduce((t, a, i) => t + a * V[i].reduce((u, b, j) => u + b * f[j], 0), 0)); };
+      return { mean: mean, sd: sd };
+    }
+    const panels = [[1, '1 次多项式', '0.614', '−29.40', ''], [2, '2 次多项式', '0.083', '−5.75', 'ev'], [9, '9 次多项式', '0.071', '−7.21', 'rss']];
+    let s = T(360, 16, '训练 RSS 最小 ≠ 最好：选 evidence 最大的', 'mid w');
+    panels.forEach((pn, i) => {
+      const ox = 30 + i * 235, id = k + 'clip' + i;
+      const A = axes({ x: ox, y: 40, w: 200, h: 180, xr: [0, 1], yr: [-1, 2.5], xt: [0, 0.5, 1], yt: i === 0 ? [0, 1, 2] : [] });
+      const F = fit(pn[0]);
+      s += '<clipPath id="' + id + '"><rect x="' + ox + '" y="40" width="200" height="180"/></clipPath>';
+      s += '<g clip-path="url(#' + id + ')">' + band(A, (x) => F.mean(x) + 2 * F.sd(x), 0, 1, 'c3', (x) => F.mean(x) - 2 * F.sd(x));
+      s += curve(A, (x) => 5 * (x - 0.5) ** 2, 0, 1, 'dashed') + curve(A, F.mean, 0, 1, 'c3', 300) + '</g>';
+      s += A.s;
+      X.forEach((x, n) => { s += Dot(A.X(x), A.Y(Y[n]), 'c1', 4); });
+      s += T(ox + 100, 236, pn[1], 'mid w');
+      s += T(ox + 100, 258, '训练 RSS ' + pn[2], 'mid' + (pn[4] === 'rss' ? ' tc c2' : '')) + T(ox + 100, 278, 'log evidence ' + pn[3], 'mid' + (pn[4] === 'ev' ? ' tc c2' : ''));
+      if (pn[4] === 'ev') s += Box(ox + 26, 268, 148, 20, 'pick') + T(ox + 100, 302, '最大 ⇒ 选它', 'mid tc c2');
+      if (pn[4] === 'rss') s += T(ox + 100, 302, 'RSS 最小，但没点的地方乱冲、带子爆宽', 'mid tc c2');
+    });
+    return s;
+  }));
 })(window);
