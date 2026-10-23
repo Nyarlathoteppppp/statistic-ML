@@ -285,3 +285,5 @@ svg.graph .cell.pool { stroke: var(--exam); }
 svg.graph .cell.masked { fill: var(--line); }
 svg.graph .winb { stroke: var(--warn); stroke-width: 2; stroke-dasharray: 4 3; }
 svg.graph .node-box.hot2 { stroke: var(--accent); stroke-width: 2.2; }
+svg.graph .dot.mute { fill: var(--line-2); stroke: none; }
+svg.graph .ln.thin2 { stroke-width: 1.6; opacity: .7; }

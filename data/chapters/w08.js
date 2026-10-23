@@ -441,6 +441,7 @@
     ],
     math: [
       T`**两个界怎么来的，一句话**：都是"势函数"论证——找一个量，每次学习者犯错它就按比例缩小，但它又有下界。majority 里是存活专家数（每错一次至少减半，最少剩 1 个）；halving 里是总权重（每错一次至少剩 3/4，最少是最好专家的 $(1/2)^m$）。夹出来取 log 就是界。`,
+      { t: 'viz', id: 'fig-halving-bound', opts: { caption: T`把证明画出来（$n=8$、$m=3$）：蓝线是总权重的上界，每错一次至少降到 3/4；红线是下界，最好的专家只错 3 次，权重至少剩 $(1/2)^3$。上界一路下滑，迟早撞上下界，交点横坐标 $\approx14.5$ 就是错误次数的上限。` } },
     ],
     fx: [
       {
@@ -542,6 +543,7 @@
       T`界的形状和 halving 一样：最好专家的错误数乘一个系数，再加上专家个数的对数。来历也一样：学习者每错一次，至少一半的权重乘上 $(1-\varepsilon)$：错的那些权重加起来至少是 $W/2$，每个都乘 $(1-\varepsilon)$，所以总权重至少减少 $\varepsilon\cdot\frac W2$，即 $W'\le W-\frac{\varepsilon W}{2}=W\big(1-\frac\varepsilon2\big)$（换个写法：错的一半乘 $(1-\varepsilon)$、对的一半不变，因子 $=\frac12+\frac12(1-\varepsilon)=1-\frac\varepsilon2$）；最好的专家错 $m$ 次后还剩 $(1-\varepsilon)^m$。两边夹起来、取对数，就是：`,
       { t: 'math', tex: T`M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}` },
       T`**$\varepsilon$ 的权衡**：$\varepsilon$ 小 ⇒ 降权温和，$m$ 的系数接近 2，但要更多轮才能把坏专家压下去，$\frac{\ln n}{\varepsilon}$ 项变大；$\varepsilon$ 大则相反。`,
+      { t: 'viz', id: 'fig-wm-epsilon', opts: { caption: T`$n=10^4$、$m=3$ 时界的两项：蓝线（$m$ 项）随 $\varepsilon$ 变大而变大，红线（$\ln n$ 项）随 $\varepsilon$ 变大而变小，黑线是两者之和。课件的证明只覆盖 $\varepsilon\le0.5$（绿色）；在这一段里黑线一路下降。` } },
       { t: 'h3', text: '③ 为什么系数 2 改不了：对手论证（L16 p19–p20）' },
       T`**Lower bound（下界）**（L16 p19）：为什么确定性算法对 $m$ 的系数 2 改不了？**adversarial argument（对手论证）**：假想一个专门和你作对、能看到你算法的"对手"来决定每天的真实结果。取 2 个永远意见相反的专家（一个说 $+$，另一个说 $-$）。确定性算法的预测对手能提前算出来，于是对手每天都把真实结果设成**和学习者相反**——学习者天天错，$T$ 天错 $M=T$ 次。两个专家每天恰好一对一错，错误总数是 $T$，较好的那个最多错 $m\le T/2$ 次。所以 $M\ge2m$。课件用"$E_1$ 奇数天对、$E_2$ 偶数天对"来演示这个结论：系数 2 不能再改进（$2(1+\varepsilon)$ 已经很接近）。`,
       { t: 'h3', text: '④ 随机化：probabilistic experts（L16 p21–p23）' },

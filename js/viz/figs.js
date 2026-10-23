@@ -15,12 +15,12 @@
   const Path = (pts, cls) => '<path class="' + cls + '" d="M' + pts.map((q) => n1(q[0]) + ',' + n1(q[1])).join(' L') + '"/>';
   const Box = (x, y, w, h, cls) => '<rect class="' + cls + '" x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(w) + '" height="' + n1(h) + '"/>';
 
-  /* Plot axes. o = { x, y, w, h, xr: [a, b], yr: [c, d], xt / yt: ticks (value or [value, label]), xl, yl, grid }.
-   * Returns { X, Y, s }: data → SVG coordinates, and the SVG of the frame. The x axis sits at y = 0 when 0 is in range. */
+  /* Plot axes. o = { x, y, w, h, xr: [a, b], yr: [c, d], xt / yt: ticks (value or [value, label]), xl, yl, grid, bottom }.
+   * Returns { X, Y, s }: data → SVG coordinates, and the SVG of the frame. The x axis sits at y = 0 when 0 is in range, unless bottom. */
   function axes(o) {
     const X = (v) => o.x + (v - o.xr[0]) / (o.xr[1] - o.xr[0]) * o.w;
     const Y = (v) => o.y + o.h - (v - o.yr[0]) / (o.yr[1] - o.yr[0]) * o.h;
-    const base = o.yr[0] <= 0 && o.yr[1] >= 0 ? Y(0) : o.y + o.h;
+    const base = !o.bottom && o.yr[0] <= 0 && o.yr[1] >= 0 ? Y(0) : o.y + o.h;
     const left = o.xr[0] <= 0 && o.xr[1] >= 0 && o.yAtZero ? X(0) : o.x;
     let s = '';
     (o.xt || []).forEach((t) => {
@@ -584,6 +584,111 @@
     inp.forEach((t, j) => { s += T(ox + j * c + (c - 2) / 2, oy - 12, t, 'mid'); });
     s += T(ox + 100, oy + 4 * c + 16, '行 = 正在预测的位置，列 = 被看的位置', 'mid');
     s += T(ox + 100, oy + 4 * c + 36, '第 2 行：得分 (1, 2, −∞, −∞)', 'mid') + T(ox + 100, oy + 4 * c + 54, '⇒ 权重 (0.269, 0.731, 0, 0)', 'mid');
+    return s;
+  }));
+  /* c37 "almost PCA": a linear autoencoder spans the PCA subspace but its basis need not be orthogonal or ordered. */
+  SML.viz.register('fig-almost-pca', still(700, 316, function (k) {
+    const pts = [];
+    for (let i = 0; i < 30; i++) { const t = Math.sin(i * 12.9898) * 43758.5453, u = (t - Math.floor(t)) * 2 - 1, v = Math.sin(i * 78.233) * 1.1; pts.push([u * 1.7 + v * 0.25, u * 1.7 - v * 0.25]); }
+    let s = '';
+    [[30, 'PCA', 'c3'], [380, '线性 autoencoder 学到的基', 'c4']].forEach((pn, j) => {
+      const A = axes({ x: pn[0], y: 40, w: 290, h: 200, xr: [-2.6, 2.6], yr: [-1.8, 1.8], yAtZero: true });
+      s += T(pn[0] + 145, 20, pn[1], 'mid w tc ' + pn[2]) + A.s;
+      pts.forEach((q) => { s += Dot(A.X(q[0]), A.Y(q[1]), 'mute', 3); });
+      const O = [A.X(0), A.Y(0)];
+      const vecs = j === 0 ? [[1.6, 1.6, 'p₁（方差大）'], [-0.55, 0.55, 'p₂']] : [[1.9, 0.9, 'w₁'], [0.75, 1.45, 'w₂']];
+      vecs.forEach((v) => {
+        const sc = j === 0 ? 0.62 : 1;
+        const e = [A.X(v[0] * sc), A.Y(v[1] * sc)];
+        s += Line(n1(O[0]), n1(O[1]), n1(e[0]), n1(e[1]), 'edge ' + pn[2] + 'w', k) + T(e[0] + 6, e[1] - 8, v[2], 'tc ' + pn[2]);
+      });
+      s += T(pn[0] + 145, 262, j === 0 ? '两个方向互相垂直，按方差从大到小排' : '同一个平面（子空间），但两个方向', 'mid');
+      s += T(pn[0] + 145, 280, j === 0 ? '（标准正交基）' : '不必垂直、也不按方差排序', 'mid');
+    });
+    s += T(350, 306, '两幅图画的都是同一个平面：数据前 2 个主成分张成的子空间', 'mid w');
+    return s;
+  }));
+
+  /* c51 credible interval (q random, interval fixed) vs confidence interval (q fixed, intervals random). */
+  SML.viz.register('fig-credible-confidence', still(720, 318, function () {
+    const lb = (a, b) => { let t = 0; for (let x = 0.0005; x < 1; x += 0.001) t += Math.pow(x, a - 1) * Math.pow(1 - x, b - 1) * 0.001; return t; }, Z = lb(9, 5);
+    const pdf = (x) => Math.pow(x, 8) * Math.pow(1 - x, 4) / Z, lo = 0.39, hi = 0.86;
+    const A = axes({ x: 30, y: 50, w: 300, h: 170, xr: [0, 1], yr: [0, 3.4], xt: [0, [lo, '0.39'], [hi, '0.86'], 1], xl: 'q' });
+    let s = T(180, 16, 'Credible interval（Bayesian）', 'mid w') + T(180, 34, 'q 是随机的，区间固定', 'mid');
+    s += band(A, pdf, 0, lo, 'shade') + band(A, pdf, hi, 1, 'shade') + band(A, pdf, lo, hi, 'c1') + A.s + curve(A, pdf, 0, 1, 'c1');
+    s += T(A.X(0.2), A.Y(0.45), '2.5%', 'mid') + T(A.X(0.94), A.Y(0.45), '2.5%', 'mid') + T(A.X(0.64), A.Y(1.1), '95%', 'mid w tc c1');
+    s += T(180, 260, '后验 Beta(9, 5)：q 落在 [0.39, 0.86]', 'mid') + T(180, 278, '里的概率是 0.95', 'mid');
+    const ox = 390, q0 = 0.7, X = (v) => ox + v * 300;
+    s += T(ox + 150, 16, 'Confidence interval（频率学派）', 'mid w') + T(ox + 150, 34, 'q 是固定的未知数，随机的是区间', 'mid');
+    const iv = [[0.52, 0.83], [0.61, 0.9], [0.48, 0.79], [0.58, 0.88], [0.73, 0.97], [0.55, 0.86], [0.6, 0.91], [0.5, 0.81], [0.63, 0.93], [0.45, 0.76], [0.57, 0.87], [0.62, 0.92], [0.36, 0.66], [0.54, 0.84], [0.59, 0.89], [0.49, 0.8]];
+    iv.forEach((r, i) => {
+      const y = 64 + i * 9.4, hit = r[0] <= q0 && q0 <= r[1];
+      s += Line(n1(X(r[0])), n1(y), n1(X(r[1])), n1(y), 'ln ' + (hit ? 'c1 thin2' : 'c2'));
+    });
+    s += Line(n1(X(q0)), 58, n1(X(q0)), 214, 'ln dashed') + T(X(q0), 50, '真值 q = 0.7（固定但未知）', 'mid');
+    s += Line(ox, 214, ox + 300, 214, 'ax') + T(ox, 228, '0', 'mid') + T(ox + 300, 228, '1', 'mid');
+    s += T(ox + 150, 258, '每份数据算出一条区间，约 95% 的区间盖住真值', 'mid');
+    s += T(ox + 150, 278, '红色的两条没盖住；对手里的某一条，', 'mid tc c2') + T(ox + 150, 296, '不能说「q 有 95% 的概率在里面」', 'mid tc c2');
+    return s;
+  }));
+
+  /* c45 halving proof as two bounds on log₂ W (n = 8 experts, best one makes m = 3 mistakes). */
+  SML.viz.register('fig-halving-bound', still(700, 300, function () {
+    const Mx = 6 / Math.log2(4 / 3);
+    const A = axes({ x: 60, y: 30, w: 420, h: 220, xr: [0, 20], yr: [-6, 4], xt: [0, 5, 10, [Mx, '14.5'], 20], yt: [-6, -3, 0, 3], xl: '学习者已犯的错 M', yl: 'log₂ W（总权重）', bottom: true, grid: true });
+    let s = Box(A.X(Mx), A.Y(4), A.X(20) - A.X(Mx), A.Y(-6) - A.Y(4), 'fl faint c2') + A.s;
+    s += curve(A, (M) => 3 - Math.log2(4 / 3) * M, 0, 20, 'c1') + curve(A, () => -3, 0, 20, 'c2 dashed');
+    s += Line(n1(A.X(Mx)), A.Y(4), n1(A.X(Mx)), A.Y(-6), 'dash') + Dot(A.X(Mx), A.Y(-3), '', 5);
+    s += T(A.X(1), A.Y(3.2), '上界：每错一次，总权重至少剩 3/4', 'tc c1');
+    s += T(A.X(0.5), A.Y(-3) + 16, '下界：最好的专家只错 m = 3 次，自己的权重 (1/2)³ 还在', 'tc c2');
+    s += T(A.X(17.2), A.Y(2.4), '上界已低于下界：', 'mid tc c2') + T(A.X(17.2), A.Y(2.4) + 18, '不可能', 'mid tc c2');
+    const lx = 500;
+    s += T(lx, 50, 'n = 8 个专家，log₂ 8 = 3', 'w');
+    s += T(lx, 80, '蓝线一路下滑，红线压不下去，', '') + T(lx, 98, '两线交点就是 M 的上限：', '');
+    s += T(lx, 128, 'M ≤ (m + log₂ n) / log₂(4/3)', 'w') + T(lx, 148, '   = 6 / 0.415 ≈ 14.5', '');
+    s += T(lx, 188, '错误次数要是更多，', '') + T(lx, 206, '两条界就互相矛盾了', '');
+    return s;
+  }));
+
+  /* c46 weighted majority bound 2(1+ε)m + 2 ln n / ε for n = 10⁴, m = 3; the proof only covers ε ≤ 0.5. */
+  SML.viz.register('fig-wm-epsilon', still(700, 300, function () {
+    const m = 3, L = 2 * Math.log(1e4), a = (e) => 2 * (1 + e) * m, b = (e) => L / e;
+    const A = axes({ x: 60, y: 30, w: 420, h: 220, xr: [0, 2], yr: [0, 200], xt: [0, 0.5, 1, 1.5, 2], yt: [0, 50, 100, 150, 200], xl: 'ε', yl: '错误次数上界 M' });
+    let s = Box(A.X(0), A.Y(200), A.X(0.5) - A.X(0), A.Y(0) - A.Y(200), 'fl faint c3') + A.s;
+    s += curve(A, a, 0.05, 2, 'c1') + curve(A, b, 0.093, 2, 'c2') + curve(A, (e) => a(e) + b(e), 0.096, 2, 'heavy');
+    s += Dot(A.X(0.1), A.Y(a(0.1) + b(0.1)), '', 4.5) + T(A.X(0.1) + 8, A.Y(a(0.1) + b(0.1)), 'ε = 0.1：≈ 191', '');
+    s += Dot(A.X(0.5), A.Y(a(0.5) + b(0.5)), '', 4.5) + T(A.X(0.5) + 8, A.Y(a(0.5) + b(0.5)) - 12, 'ε = 0.5：≈ 46', '');
+    const em = Math.sqrt(L / (2 * m));
+    s += Line(n1(A.X(em)), A.Y(200), n1(A.X(em)), A.Y(0), 'dash') + T(A.X(em), A.Y(185), '纯代数最小点 ε ≈ 1.75', 'mid') + T(A.X(em), A.Y(185) + 16, '（≈ 27，超出证明范围）', 'mid');
+    s += T(A.X(0.25), A.Y(120), '证明成立', 'mid tc c3') + T(A.X(0.25), A.Y(120) + 16, 'ε ≤ 0.5', 'mid tc c3');
+    const lx = 500;
+    s += T(lx, 44, 'n = 10⁴ 个专家，', 'w') + T(lx, 62, '最好的专家错 m = 3 次', 'w');
+    s += Line(lx, 92, lx + 22, 92, 'ln c1') + T(lx + 28, 92, 'm 项 2(1+ε)m', 'tc c1');
+    s += Line(lx, 114, lx + 22, 114, 'ln c2') + T(lx + 28, 114, 'ln n 项 2 ln n / ε', 'tc c2');
+    s += Line(lx, 136, lx + 22, 136, 'ln heavy') + T(lx + 28, 136, '两项之和 = 界', 'w');
+    s += T(lx, 172, 'ε 小：m 的系数接近 2，但压', '') + T(lx, 190, '下坏专家要更多轮（红线高）', '') + T(lx, 214, '在绿色区间里黑线一路下降', '');
+    return s;
+  }));
+
+  /* c61 Example 2: maximised log-likelihood l never drops as parents are added; BIC subtracts the penalty. */
+  SML.viz.register('fig-bic-parents', still(700, 290, function () {
+    const cand = [['∅', -3.819, -4.715], ['{x₂}', -2.773, -4.564], ['{x₃}', -2.773, -5.46], ['{x₂, x₃}', 0, -5.375]];
+    const A = axes({ x: 60, y: 30, w: 400, h: 210, xr: [0.4, 4.6], yr: [-6.3, 0.4], yt: [-6, -5, -4, -3, -2, -1, 0], yl: '分数（越大越好）', bottom: true, grid: true });
+    let s = A.s;
+    cand.forEach((c, i) => {
+      const x = A.X(i + 1);
+      s += Line(n1(x), n1(A.Y(c[1])), n1(x), n1(A.Y(c[2])), 'ln c2 thin');
+      s += Dot(x, A.Y(c[1]), 'c1', 5.5) + Dot(x, A.Y(c[2]), 'c2', i === 1 ? 7 : 5);
+      s += T(x + 10, A.Y(c[1]), c[1] === 0 ? '0' : c[1].toFixed(3).replace('-', '−'), 'tc c1') + T(x + (i === 1 ? 14 : 10), A.Y(c[2]), c[2].toFixed(3).replace('-', '−'), 'tc c2');
+      s += T(x, A.Y(-6.3) + 16, c[0], 'mid w');
+    });
+    s += '<circle class="ring c2" cx="' + n1(A.X(2)) + '" cy="' + n1(A.Y(-4.564)) + '" r="12"/>';
+    s += T(A.X(2), A.Y(-4.564) + 24, 'BIC 最高：选 {x₂}', 'mid tc c2');
+    const lx = 490;
+    s += Dot(lx + 6, 50, 'c1', 5) + T(lx + 16, 50, '蓝点 = 对数似然 l', 'tc c1') + T(lx + 16, 68, '只看拟合，加父节点只升不降', '');
+    s += Dot(lx + 6, 100, 'c2', 5) + T(lx + 16, 100, '红点 = BIC = l − 惩罚', 'tc c2') + T(lx + 16, 118, '竖线 = 惩罚（每个参数 0.896）', '');
+    s += T(lx, 160, '只看蓝点会选 {x₂, x₃}（l = 0）；', '') + T(lx, 178, '扣掉惩罚后 {x₂} 最高', '');
+    s += T(lx, 214, '横轴是 x₁ 的候选父节点集合', '');
     return s;
   }));
 })(window);
