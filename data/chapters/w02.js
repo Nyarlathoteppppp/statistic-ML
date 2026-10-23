@@ -225,6 +225,7 @@
     intuition: [
       T`**为什么 Gaussian 噪声 ⇔ 平方误差？** Gaussian 密度里有 $\exp(-\text{误差}^2/(2\sigma^2))$。取 log 后 exp 消失，只剩 $-\text{误差}^2/(2\sigma^2)$。所以"让数据最可能" = "让误差平方和最小"。`,
       T`**$\mathbf X'\mathbf X\bw=\mathbf X'\by$ 的直觉**：最优时残差 $\by-\mathbf X\bw$ 和每一列特征都**正交**（$\mathbf X'(\by-\mathbf X\bw)=\mathbf 0$）——残差里已经没有任何能被特征解释的成分了。`,
+      { t: 'viz', id: 'fig-ls-projection', opts: { caption: T`最小二乘的几何：在「特征能给出的所有预测」里找离 $\by$ 最近的 $\hat\by=\mathbf X\bw$。最近的那个点处残差和这条线垂直，写成式子就是 $\mathbf X'(\by-\mathbf X\bw)=\mathbf 0$，也就是正规方程。` } },
       { t: 'think', q: '如果两个特征完全一样（比如同一个温度用摄氏和"摄氏×1"各记一次），$\\mathbf X\'\\mathbf X$ 还可逆吗？最小二乘解会怎样？', a: T`不可逆：两列相同 ⇒ 列线性相关 ⇒ $\mathbf X'\mathbf X$ 有零特征值（c04）。此时有**无穷多个**解（$w_1+w_2$ 固定，各自随便分），闭式解失效。c16 的 ridge 加 $\lambda\mathbf I$ 修好这个问题。` },
       { t: 'story', title: '"regression" 这个词', md: 'Francis Galton 在 19 世纪 80 年代研究父母和子女身高时发现：特别高的父母，孩子平均没那么高；特别矮的父母，孩子平均没那么矮——"regression towards mediocrity"（向平均回归）。"regression" 这个名字就这么留了下来，尽管今天它泛指"预测连续值"。' },
     ],

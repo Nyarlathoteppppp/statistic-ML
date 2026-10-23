@@ -244,7 +244,7 @@ svg.graph .c2 { --fc: var(--bad); --fs: var(--bad-soft); }
 svg.graph .c3 { --fc: var(--good); --fs: var(--good-soft); }
 svg.graph .c4 { --fc: var(--warn); --fs: var(--warn-soft); }
 svg.graph .c5 { --fc: var(--exam); --fs: var(--exam-soft); }
-svg.graph .ax { stroke: var(--ink-2); stroke-width: 1.2; }
+svg.graph .ax { stroke: var(--ink-2); stroke-width: 1.2; fill: none; }
 svg.graph .grid { stroke: var(--line); stroke-width: .8; }
 svg.graph .dash { stroke: var(--line-2); stroke-width: 1.3; stroke-dasharray: 5 4; }
 svg.graph .tick { fill: var(--muted); font: 500 11px var(--body); text-anchor: middle; dominant-baseline: central; }
@@ -273,3 +273,15 @@ svg.graph .node-box.hot { stroke: var(--bad); stroke-width: 2; }
 svg.graph .edge.red { stroke: var(--bad); stroke-width: 2.4; }
 svg.graph .edge.dashed { stroke-dasharray: 5 4; }
 svg.graph .pick { fill: none; stroke: var(--bad); stroke-width: 1.8; rx: 4; }
+svg.graph .edge.c1w { stroke: var(--accent); stroke-width: 2.2; }
+svg.graph .edge.c2w { stroke: var(--bad); stroke-width: 2.2; }
+svg.graph .edge.c3w { stroke: var(--good); stroke-width: 2.2; }
+svg.graph .edge.c4w { stroke: var(--warn); stroke-width: 2.2; }
+svg.graph .ln.heavy { stroke-width: 3.4; }
+svg.graph .cell { fill: var(--card); stroke: var(--line-2); stroke-width: 1; }
+svg.graph .cell.zero { fill: var(--sunk); }
+svg.graph .cell.hot { fill: var(--bad-soft); stroke: var(--bad); stroke-width: 1.6; }
+svg.graph .cell.pool { stroke: var(--exam); }
+svg.graph .cell.masked { fill: var(--line); }
+svg.graph .winb { stroke: var(--warn); stroke-width: 2; stroke-dasharray: 4 3; }
+svg.graph .node-box.hot2 { stroke: var(--accent); stroke-width: 2.2; }

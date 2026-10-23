@@ -6,7 +6,8 @@
   let uid = 0;
 
   // ---- tiny SVG string builders ----
-  const T = (x, y, s, cls) => '<text class="lbl ' + (cls || '') + '" x="' + x + '" y="' + y + '">' + s + '</text>';
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const T = (x, y, s, cls) => '<text class="lbl ' + (cls || '') + '" x="' + x + '" y="' + y + '">' + esc(s) + '</text>';
   const Rect = (x, y, w, h, cls) => '<rect class="blk ' + (cls || '') + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="3"/>';
   const Line = (x1, y1, x2, y2, cls, arrow) => '<line class="edge ' + (cls || '') + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"' + (arrow ? ' marker-end="url(#' + arrow + ')"' : '') + '/>';
   const n1 = (v) => (+v).toFixed(1);
@@ -457,6 +458,132 @@
       if (pn[4] === 'ev') s += Box(ox + 26, 268, 148, 20, 'pick') + T(ox + 100, 302, '最大 ⇒ 选它', 'mid tc c2');
       if (pn[4] === 'rss') s += T(ox + 100, 302, 'RSS 最小，但没点的地方乱冲、带子爆宽', 'mid tc c2');
     });
+    return s;
+  }));
+  /* c03 distance from a point to the line w′x + b = 0 with w = (1, 1), b = −2. */
+  SML.viz.register('fig-hyperplane-dist', still(720, 320, function (k) {
+    const A = axes({ x: 40, y: 20, w: 300, h: 280, xr: [-0.5, 4], yr: [-0.5, 3.7], yAtZero: true });
+    const P = [3, 2.5], Q = [1.25, 0.75], N = [0.3, 0.4], u = Math.SQRT1_2;
+    let s = A.s + Line(n1(A.X(-0.5)), n1(A.Y(2.5)), n1(A.X(2.5)), n1(A.Y(-0.5)), 'ln c3');
+    s += T(A.X(2.55), A.Y(-0.25), 'x₁ + x₂ − 2 = 0', 'tc c3');
+    s += Line(n1(A.X(P[0])), n1(A.Y(P[1])), n1(A.X(Q[0])), n1(A.Y(Q[1])), 'ln c2 dashed');
+    // right-angle mark at Q
+    const m = 0.16, a1 = [Q[0] + m * u, Q[1] + m * u], a2 = [Q[0] + m * u - m * u, Q[1] + m * u + m * u], a3 = [Q[0] - m * u, Q[1] + m * u];
+    s += Path([a1, a2, a3].map((q) => [A.X(q[0]), A.Y(q[1])]), 'ax');
+    s += Line(n1(A.X(0.3)), n1(A.Y(1.7)), n1(A.X(0.95)), n1(A.Y(2.35)), 'edge c4w', k) + T(A.X(0.95) - 6, A.Y(2.35) - 12, '法向量 w = (1, 1)', 'mid tc c4');
+    s += Dot(A.X(P[0]), A.Y(P[1]), 'c2', 6) + T(A.X(P[0]) + 10, A.Y(P[1]) - 6, 'x = (3, 2.5)', 'tc c2');
+    s += Dot(A.X(Q[0]), A.Y(Q[1]), '', 4) + T(A.X(Q[0]) + 10, A.Y(Q[1]) + 12, '垂足', '');
+    s += T(A.X(2.55), A.Y(1.35), '距离 2.47', 'tc c2');
+    s += Dot(A.X(N[0]), A.Y(N[1]), 'c1', 6) + T(A.X(N[0]) + 10, A.Y(N[1]) + 2, '(0.3, 0.4)', 'tc c1');
+    s += T(A.X(3.1), A.Y(3.35), '正侧：w′x + b > 0', 'mid tc c2') + T(A.X(0.55), A.Y(-0.25), '负侧', 'mid tc c1');
+    const lx = 370;
+    s += T(lx, 34, '① 代入：w′x + b = 3 + 2.5 − 2 = 3.5', '');
+    s += T(lx, 56, '② 除以 ‖w‖ = √2：3.5 / 1.414 ≈ 2.47', '');
+    s += T(lx, 78, '③ 符号 > 0 ⇒ 在 w 指向的一侧', '');
+    s += T(lx, 112, '蓝点：0.3 + 0.4 − 2 = −1.3 < 0', 'tc c1') + T(lx, 130, '⇒ 负侧，距离 1.3 / √2 ≈ 0.92', 'tc c1');
+    s += T(lx, 172, '为什么一定要除以 ‖w‖？', 'w');
+    s += T(lx, 194, '(2w, 2b) 是同一条线：2x₁ + 2x₂ − 4 = 0', '');
+    s += T(lx, 214, '代入 x 得 7，翻了一倍；', '') + T(lx, 234, '但 ‖2w‖ = 2√2 也翻了一倍 ⇒ 7 / 2.83 ≈ 2.47', '');
+    s += T(lx, 260, '只有除过 ‖w‖ 的才是真正的距离', 'w');
+    return s;
+  }));
+
+  /* c11 least squares as projection, drawn for n = 2 samples and 1 feature (so y is a 2-D vector, X's column a line). */
+  SML.viz.register('fig-ls-projection', still(700, 290, function (k) {
+    const A = axes({ x: 30, y: 20, w: 330, h: 250, xr: [-0.4, 3.4], yr: [-0.5, 2.6] });
+    const O = [0, 0], y = [2, 2.2], yh = [2.4, 0.6], P = (q) => [A.X(q[0]), A.Y(q[1])];
+    let s = Line(n1(A.X(-0.4)), n1(A.Y(-0.1)), n1(A.X(3.4)), n1(A.Y(0.85)), 'ln c3');
+    s += T(A.X(-0.3), A.Y(-0.08) + 20, 'X 的列：特征能给出的所有预测', 'tc c3');
+    s += Line(n1(P(O)[0]), n1(P(O)[1]), n1(P(y)[0]), n1(P(y)[1]), 'edge c1w', k) + T(P(y)[0] - 8, P(y)[1] - 8, 'y（真实值）', 'end tc c1');
+    s += Line(n1(P(O)[0]), n1(P(O)[1]), n1(P(yh)[0]), n1(P(yh)[1]), 'edge c3w', k) + T(P(yh)[0] + 6, P(yh)[1] + 16, 'ŷ = Xw（预测）', 'tc c3');
+    s += Line(n1(P(yh)[0]), n1(P(yh)[1]), n1(P(y)[0]), n1(P(y)[1]), 'ln c2 dashed') + T((P(yh)[0] + P(y)[0]) / 2 + 10, (P(yh)[1] + P(y)[1]) / 2, 'r = y − ŷ（残差）', 'tc c2');
+    const d = 0.2, ux = 2 / Math.hypot(2, 0.5), uy = 0.5 / Math.hypot(2, 0.5), vx = -uy, vy = ux;
+    s += Path([[yh[0] - d * ux, yh[1] - d * uy], [yh[0] - d * ux + d * vx, yh[1] - d * uy + d * vy], [yh[0] + d * vx, yh[1] + d * vy]].map(P), 'ax');
+    s += Dot(P(O)[0], P(O)[1], '', 4) + T(P(O)[0] - 6, P(O)[1] - 10, 'O', 'end');
+    const lx = 390;
+    s += T(lx, 40, '最小二乘 = 在绿线上找离 y 最近的点', 'w');
+    s += T(lx, 64, '最近 ⇔ 残差 r 和绿线垂直（直角）', '');
+    s += T(lx, 98, '垂直写成式子：X′r = 0', 'tc c2');
+    s += T(lx, 120, '⇒ X′(y − Xw) = 0', '') + T(lx, 142, '⇒ X′Xw = X′y（正规方程）', 'w');
+    s += T(lx, 184, 'r 是特征怎么组合都解释不了的部分，', '') + T(lx, 204, '已经没有能再被特征吃掉的成分', '');
+    s += T(lx, 244, '（画的是 2 个样本、1 个特征：', '') + T(lx, 262, ' y 是 2 维向量，X 的列是一条线）', '');
+    return s;
+  }));
+
+  /* c39 convolution is equivariant; max pooling (width 2, stride 2) is only partly invariant. */
+  SML.viz.register('fig-equivariance', still(720, 330, function (k) {
+    const cell = 30;
+    const row = (x, y, vals, hot, cls) => vals.map((v, i) => Box(x + i * cell, y, cell - 2, cell - 2, 'cell' + (v === 0 ? ' zero' : '') + (hot && hot(i, v) ? ' hot' : '') + (cls ? ' ' + cls : '')) + T(x + i * cell + (cell - 2) / 2, y + (cell - 2) / 2, String(v), 'mid' + (v ? ' w' : ''))).join('');
+    const maxOf = (v) => (i, x) => x === Math.max.apply(null, v) && x > 0;
+    let s = T(210, 16, '卷积：平移等变（equivariance）', 'mid w');
+    const x1 = [0, 0, 0, 5, 0, 0, 0, 0], f1 = [0, 5, 10, 5, 0, 0], x2 = [0, 0, 0, 0, 5, 0, 0, 0], f2 = [0, 0, 5, 10, 5, 0];
+    s += T(82, 52, '输入', 'end') + row(90, 38, x1, maxOf(x1)) + T(112, 100, '卷积 [1,2,1]', 'end') + row(120, 86, f1, maxOf(f1));
+    s += T(82, 168, '右移一格', 'end tc c4') + row(90, 154, x2, maxOf(x2)) + T(112, 216, '特征图', 'end') + row(120, 202, f2, maxOf(f2));
+    s += T(210, 252, '图案右移 1 格 ⇒ 特征图也整体右移 1 格', 'mid w');
+    s += T(210, 272, '形状完全一样：同一个 filter 在哪儿都一样地响应', 'mid');
+    const ox = 400, win = (y) => [0, 2, 4, 6].map((i) => Line(ox + i * cell - 1, y - 4, ox + i * cell - 1, y + cell + 2, 'winb')).join('');
+    s += T(560, 16, '+ max pooling（窗口 2、步长 2）：只是部分不变', 'mid w');
+    const cases = [[[0, 0, 5, 0, 0, 0], [0, 5, 0], '原来'], [[0, 0, 0, 5, 0, 0], [0, 5, 0], '窗口内挪动 ⇒ 输出不变 ✓'], [[0, 0, 0, 0, 5, 0], [0, 0, 5], '跨过窗口边界 ⇒ 输出变了 ✗']];
+    cases.forEach((c, i) => {
+      const y = 44 + i * 84;
+      s += row(ox, y, c[0], maxOf(c[0])) + win(y);
+      s += Line(ox + 186, y + 14, ox + 206, y + 14, 'edge', k);
+      s += row(ox + 212, y, c[1], maxOf(c[1]), 'pool');
+      s += T(ox + 90, y + cell + 14, c[2], 'mid ' + (i === 2 ? 'tc c2' : i === 1 ? 'tc c3' : ''));
+    });
+    s += T(560, 300, '橙线 = 窗口边界；右边 3 格是每个窗口的最大值', 'mid');
+    return s;
+  }));
+
+  /* c30 representer theorem: the prediction is a weighted sum of kernel bumps centred on training points. */
+  SML.viz.register('fig-representer', still(700, 290, function () {
+    const xs = [[-1.5, 2], [0, -1], [1.5, 1.5]], g = 1 / (2 * 0.6 * 0.6);
+    const K = (x, c) => Math.exp(-g * (x - c) * (x - c)), f = (x) => xs.reduce((t, q) => t + q[1] * K(x, q[0]), 0);
+    const A = axes({ x: 50, y: 30, w: 420, h: 220, xr: [-3, 3], yr: [-1.4, 2.4], xt: [-3, -1.5, 0, 1.5, 3], yt: [-1, 0, 1, 2], xl: 'x' });
+    let s = A.s;
+    xs.forEach((q) => { s += Line(n1(A.X(q[0])), A.Y(2.4), n1(A.X(q[0])), A.Y(-1.4), 'dash'); });
+    const cl = ['c1', 'c2', 'c4'];
+    xs.forEach((q, i) => { s += curve(A, (x) => q[1] * K(x, q[0]), -3, 3, cl[i] + ' dashed'); });
+    s += curve(A, f, -3, 3, 'c5 heavy', 300);
+    xs.forEach((q, i) => { s += T(A.X(q[0]), A.Y(q[1]) + (q[1] > 0 ? -12 : 14), 'αᵢyᵢ = ' + (q[1] > 0 ? '+' : '') + q[1], 'mid tc ' + cl[i]); });
+    s += T(A.X(-2.9), A.Y(-1.1), 'f(x) = Σ αᵢyᵢ K(x, xᵢ)', 'tc c5');
+    const lx = 490;
+    s += T(lx, 50, '竖虚线 = 3 个训练点的位置；', '') + T(lx, 72, '彩色虚线：每个训练点上一个', '') + T(lx, 90, 'kernel 小山包，按 αᵢyᵢ 缩放', '') + T(lx, 108, '（负的就倒过来）', '');
+    s += T(lx, 138, '紫色粗线：把它们逐点相加，', 'tc c5') + T(lx, 156, '就是学到的预测函数', 'tc c5');
+    s += T(lx, 190, '离所有训练点都远的地方，', '') + T(lx, 208, '山包都没贡献 ⇒ 接近 0', '');
+    s += T(lx, 240, '只要存训练点和 α，', 'w') + T(lx, 258, '不用写出特征 φ', 'w');
+    return s;
+  }));
+
+  /* c41 teacher forcing (inputs = target shifted right) and the causal mask on a 4 × 4 score matrix. */
+  SML.viz.register('fig-teacher-forcing', still(720, 340, function (k) {
+    const inp = ['<start>', 'How', 'are', 'you'], tgt = ['How', 'are', 'you', '</s>'], w = 64;
+    let s = T(180, 16, 'teacher forcing：正确答案右移一位当输入', 'mid w');
+    inp.forEach((t, i) => {
+      const x = 52 + i * (w + 8);
+      s += Box(x, 150, w, 30, 'node-box' + (i === 0 ? ' hot2' : '')) + T(x + w / 2, 165, t, 'mid w');
+      s += Line(x + w / 2, 148, x + w / 2, 92, 'edge', k);
+      s += Box(x, 60, w, 30, 'node-box') + T(x + w / 2, 75, tgt[i], 'mid w tc c3');
+    });
+    s += T(44, 165, '输入', 'end') + T(44, 75, '目标', 'end');
+    s += T(180, 120, '每一列：预测下一个词（4 列同时算）', 'mid');
+    s += T(180, 210, '<start> 那格没有真实词，只表示「开始」', 'mid tc c1');
+    s += T(180, 232, '目标就是输入左移一位，最后补 </s>', 'mid');
+    const ox = 450, oy = 70, c = 50;
+    s += T(ox + 100, 16, 'causal mask：不许看后面的词', 'mid w');
+    const sc = [[0], [0.269, 0.731], [], []];
+    for (let r = 0; r < 4; r++) {
+      s += T(ox - 8, oy + r * c + c / 2, inp[r], 'end');
+      for (let j = 0; j < 4; j++) {
+        const masked = j > r;
+        s += Box(ox + j * c, oy + r * c, c - 2, c - 2, 'cell' + (masked ? ' masked' : '')) ;
+        const v = masked ? '−∞→0' : r === 1 ? String(sc[1][j]) : r === 0 ? '1' : '';
+        if (v) s += T(ox + j * c + (c - 2) / 2, oy + r * c + (c - 2) / 2, v, 'mid' + (r === 1 && j === 1 ? ' tc c2' : ''));
+      }
+    }
+    inp.forEach((t, j) => { s += T(ox + j * c + (c - 2) / 2, oy - 12, t, 'mid'); });
+    s += T(ox + 100, oy + 4 * c + 16, '行 = 正在预测的位置，列 = 被看的位置', 'mid');
+    s += T(ox + 100, oy + 4 * c + 36, '第 2 行：得分 (1, 2, −∞, −∞)', 'mid') + T(ox + 100, oy + 4 * c + 54, '⇒ 权重 (0.269, 0.731, 0, 0)', 'mid');
     return s;
   }));
 })(window);

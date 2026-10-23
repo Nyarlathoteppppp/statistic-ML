@@ -392,6 +392,7 @@
       T`前三节回答"什么函数能当 kernel"。还有一个反方向的问题：SVM 能把点积换成 kernel，别的方法（ridge、logistic regression……）也能吗？`,
       T`**Representer theorem（表示定理）**（L09 p29）：形如"经验风险 + $g(\|f\|)$（单调递增）"的最小化问题（$f$ 在核 $K$ 对应的函数空间 RKHS（reproducing kernel Hilbert space，再生核希尔伯特空间）里找，$\|f\|$ 是这个空间的范数），最优解总能写成 $f^*(\bx)=\sum_{i=1}^n\alpha_iK(\bx,\bx_i)$。意义：这类方法都能 kernel 化——ridge regression、logistic regression、PCA（主成分分析，第 37 章）、CCA（典型相关分析）、LDA（线性判别分析）……（p30，后两个不用知道细节）。这里 $\|f\|$ 是**函数**的"大小"（复杂度），和向量范数是类比关系。`,
       T`**说人话**：不管用什么损失，学出来的预测函数都只是"**在每个训练点上放一个 kernel 小山包，再加权求和**"——你已经见过一次：c28 的 SVM 解 $\bw^*=\sum_i\lambda_iy_i\bx_i$，预测 $\sum_i\lambda_iy_i\,\bx_i'\bx$ 就是 $\alpha_i=\lambda_iy_i$、线性核的特例。所以只要一个方法的解能写成这种形式，就能把点积换成任意 kernel。`,
+      { t: 'viz', id: 'fig-representer', opts: { caption: T`示意（三个训练点和系数是随手取的）：每个训练点 $\bx_i$ 上放一个 kernel 小山包 $K(\bx,\bx_i)$，按 $\alpha_iy_i$ 缩放（负的倒过来），逐点加起来就是预测函数。所以学到的模型完全由「训练点 + kernel + 系数」决定。` } },
     ],
     why: [
       T`**T8 证明题**（2021 Q15，12 分）：给定两个合法 kernel，证明组合后的函数也合法。还有"判断某个函数是不是合法 kernel"这类判断题。方法固定，本章给模板。`,

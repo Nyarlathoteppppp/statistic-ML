@@ -249,6 +249,7 @@
         T`Max pooling：只保留窗口最大值、丢掉它在窗口内的位置 ⇒ 图案在窗口内挪动时输出**不变**。这叫 **invariance（不变）**：输出不随输入变。但跨窗口的移动仍会改变输出，所以只是"一定程度"的不变。`,
         T`L13 p25：卷积本身也是一种正则化——对应的局部配置共享权重，而全连接层每个位置都有独立权重。`,
       ] },
+      { t: 'viz', id: 'fig-equivariance', opts: { caption: T`左：卷积是等变的，输入里的 5 右移一格，特征图里的 5、10、5 也整体右移一格。右：再接 max pooling（窗口 2、步长 2），最大值在窗口内挪动时输出不变，跨过窗口边界就变了——所以只是「一定程度」的平移不变（课件 L13 p24–p25）。` } },
     ],
     fx: [
       {
@@ -545,6 +546,7 @@
         ['每个位置输出', '下一个词的分布，算 cross-entropy', '取 argmax 接到末尾（greedy）'],
         ['causal mask', '要：挡住后面的正确答案', '也用（后面的词本来就还没生成）'],
       ] },
+      { t: 'viz', id: 'fig-teacher-forcing', opts: { caption: T`左：训练时解码器输入是「<start> How are you」，目标是「How are you </s>」，4 个位置同时预测下一个词。右：self-attention 的得分矩阵把对角线以上（未来的位置）设成 $-\infty$，softmax 后权重为 0；第 2 行就是正文的例子 $(1,2,-\infty)\to(0.269,0.731,0)$（Worksheet 9）。` } },
     ],
     why: [
       T`Attention 是 2017 年以后几乎所有大模型（BERT、GPT 等）的核心。考试多为概念题：attention 解决了什么问题（单一上下文瓶颈）、self-attention 是什么、Transformer 为什么比 RNN 快。`,
