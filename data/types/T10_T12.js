@@ -57,6 +57,7 @@
       lead: '考法：解释"为什么 loss 不直接含隐藏层权重也能求导"，并写出 $\\partial L/\\partial w_j$ 的链式法则展开。偶尔会给一个小网络让你代数字。2022 年还考过把一个小 CNN 写成函数，再穿过 max pooling 反传（第 4 节）。',
       blocks: [
         { t: 'h2', text: '1. 记号（L11 p9）', id: 'notation' },
+        T`读表前先说字母：$m$ 是输入特征个数（不算偏置 $x_0$），$p$ 是隐藏单元个数，$i=0,\dots,m$、$j=1,\dots,p$ 是下标。$g$ 是隐藏层的**激活函数**（本页例子用 ReLU：$g(r)=\max(0,r)$），$h$ 是输出层的激活（回归时取恒等），$y$ 是样本的真实目标值；$u_0=1$ 是输出层的偏置输入。`,
         {
           t: 'table', head: ['量', '定义'], rows: [
             ['输入', '$x_0=1$（偏置），$x_1,\\dots,x_m$'], ['隐藏层', '$r_j=\\sum_{i=0}^mx_iv_{ij}$，$u_j=g(r_j)$，$u_0=1$'],
@@ -97,13 +98,13 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
         { t: 'note', md: '这些数字由 `js/core/backprop.js` 计算，并与 L11 p28–p31 的公式逐项核对过。' },
 
         { t: 'h2', text: '4. 真题全解：卷积 + global max pooling 的反传', id: 'cnn-max' },
-        T`2022 S1 Q5（14 分）把 CNN 缩到最小：一个 $2\times2$ filter 在 $3\times3$ 的图上滑，得到 $2\times2$ 的特征图，再取全局最大值（global max pooling）作为输出。前向就是 [T3](#/T03) 的卷积手算；反向要用两件事：max 的次梯度（sub-gradient，[c39](#/c39)，L13 p23）和权重共享（weight sharing）。`,
+        T`2022 S1 Q5（14 分）考的是一个缩到最小的 CNN（卷积神经网络，convolutional neural network）：一个 $2\times2$ 的 filter（滤波器）在 $3\times3$ 的图上滑，得到 $2\times2$ 的特征图，再取全局最大值（global max pooling）作为输出。前向就是 [T3](#/T03) 的卷积手算；反向要用两件事：max 的次梯度（sub-gradient，[c39](#/c39)，L13 p23）和权重共享（weight sharing）。`,
         {
           t: 'steps', items: [
             T`**给参数起名，写出特征图。** filter 的 4 个权重记为 $w_{1,1},w_{1,2},w_{2,1},w_{2,2}$，bias 记为 $b$。特征图每一格 = 对应的 $2\times2$ 输入窗口和 filter 逐元素相乘求和，再加 $b$。`,
             T`**输出取最大值。** $y=\max_{i,j}h_{i,j}$。前向时记下取到最大值的位置 $(i^*,j^*)$。`,
             T`**穿过 max。** 只有赢家满足 $\partial y/\partial h_{i^*,j^*}=1$，其余三格都是 0（并列最大时只挑一个）。所以输出端的梯度 $\delta=\partial L/\partial y$ 只流到 $h_{i^*,j^*}$。`,
-            T`**穿过卷积。** 同一个 $w_{a,c}$ 在 4 个位置都用过，链式法则要把 4 个位置的贡献加起来：$\frac{\partial L}{\partial w_{a,c}}=\sum_{i,j}\frac{\partial L}{\partial h_{i,j}}\,x_{i+a-1,\,j+c-1}$。经过 max 后，只剩赢家那一项。`,
+            T`**穿过卷积。** 同一个 $w_{a,c}$（$a,c\in\{1,2\}$ 是 filter 内的行、列位置）在 4 个位置都用过，链式法则要把 4 个位置的贡献加起来：$\frac{\partial L}{\partial w_{a,c}}=\sum_{i,j}\frac{\partial L}{\partial h_{i,j}}\,x_{i+a-1,\,j+c-1}$。经过 max 后，只剩赢家那一项。`,
           ],
         },
         {
@@ -115,7 +116,7 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
           qzh: T`一个处理 $3\times3$ 图像的简单 CNN：只有一个 $2\times2$ 的 filter，无 padding，stride $1\times1$。之后做 global max pooling，把 filter 的输出（$2\times2$）变成一个输出。1. 这个网络定义的、把输出 $y$ 和输入 $x_{1,1},x_{1,2},\dots,x_{3,3}$ 联系起来的数学函数是什么？需要为模型参数引入新的变量。（6 分）2. 解释输出端的 loss 梯度如何在网络中反向传播，并写出 loss 对模型参数的梯度的数学形式。（8 分）`,
           sol: [
             { t: 'h4', text: '第 1 问：写出函数' },
-            T`输出边长 $3-2+1=2$，所以特征图 $h$ 是 $2\times2$。参数：filter 的 4 个权重 $w_{a,c}$（$a,c\in\{1,2\}$）和一个 bias $b$。题目没说有没有 bias，写上 $b$ 更完整；没有 bias 就令 $b=0$。`,
+            T`输出边长 = 图边长 − filter 边长 + 1（stride 为 1、无 padding）= $3-2+1=2$，所以特征图 $h$ 是 $2\times2$。参数：filter 的 4 个权重 $w_{a,c}$（$a,c\in\{1,2\}$）和一个 bias $b$。题目没说有没有 bias，写上 $b$ 更完整；没有 bias 就令 $b=0$。`,
             {
               t: 'table', head: ['特征图格', '用到的输入窗口', '值'], rows: [
                 [T`$h_{1,1}$`, '第 1–2 行、第 1–2 列', T`$w_{1,1}x_{1,1}+w_{1,2}x_{1,2}+w_{2,1}x_{2,1}+w_{2,2}x_{2,2}+b$`],
@@ -125,20 +126,20 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
               ],
             },
             { t: 'math', tex: T`y=\max\big(h_{1,1},h_{1,2},h_{2,1},h_{2,2}\big)=\max_{i,j\in\{1,2\}}\Big(\sum_{a=1}^{2}\sum_{c=1}^{2}w_{a,c}\,x_{i+a-1,\,j+c-1}+b\Big)` },
-            T`下标的意思：$(i,j)$ 是窗口左上角在图上的位置，$(a,c)$ 是 filter 里的位置，所以 filter 的 $(a,c)$ 格乘的是图上的 $(i+a-1,\ j+c-1)$ 格。这和 L13 p11 的写法一样，都不翻转 kernel。题目没有提激活函数，所以不加；如果 pooling 前有 ReLU 之类的单调激活 $\phi$，赢家位置不变，第 2 问的梯度多乘一个 $\phi'(h_{i^*,j^*})$。`,
+            T`下标的意思：$(i,j)$ 是窗口左上角在图上的位置，$(a,c)$ 是 filter 里的位置，所以 filter 的 $(a,c)$ 格乘的是图上的 $(i+a-1,\ j+c-1)$ 格。这和 L13 p11 的写法一样，都不翻转 kernel（kernel 就是 filter，两种叫法）。题目没有提激活函数，所以不加；如果 pooling 前有 ReLU 之类的单调激活 $\phi$，赢家位置不变，第 2 问的梯度多乘一个 $\phi'(h_{i^*,j^*})$。`,
             { t: 'h4', text: '第 2 问：反向传播' },
-            T`设输出端的 loss 梯度为 $\delta=\partial L/\partial y$。例如平方损失 $L=\frac12(y-t)^2$（$t$ 是目标值）时，$\delta=y-t$。`,
+            T`设输出端的 loss 梯度为 $\delta=\partial L/\partial y$（本节 $y$ 指网络输出，目标值改用 $t$；第 1–3 节的 $y$ 是目标值，那里的 $\delta=\partial L/\partial s$，两者不是同一个量）。例如平方损失 $L=\frac12(y-t)^2$（$t$ 是目标值）时，$\delta=y-t$。`,
             T`**① 穿过 max pooling。** max 不是处处可导，用 sub-gradient：前向时记下赢家 $(i^*,j^*)=\arg\max_{i,j}h_{i,j}$，规定 $\frac{\partial y}{\partial h_{i,j}}=1$ 若 $(i,j)=(i^*,j^*)$，否则为 0。所以 $\frac{\partial L}{\partial h_{i^*,j^*}}=\delta$，另外三格的梯度是 0：没赢的格子稍微变一点，$y$ 不会变。`,
             T`**② 穿过卷积。** $\frac{\partial h_{i,j}}{\partial w_{a,c}}=x_{i+a-1,\,j+c-1}$，$\frac{\partial h_{i,j}}{\partial b}=1$。$w_{a,c}$ 被 4 个位置共享，链式法则把 4 项加起来，其中只有赢家那项不是 0：`,
             { t: 'math', tex: T`\frac{\partial L}{\partial w_{a,c}}=\sum_{i,j}\frac{\partial L}{\partial y}\,\frac{\partial y}{\partial h_{i,j}}\,\frac{\partial h_{i,j}}{\partial w_{a,c}}=\delta\,x_{i^*+a-1,\,j^*+c-1},\qquad \frac{\partial L}{\partial b}=\delta` },
-            T`也就是说，filter 的梯度 = $\delta$ 乘赢家那个 $2\times2$ 输入窗口。梯度下降走一步：$w_{a,c}\leftarrow w_{a,c}-\eta\,\delta\,x_{i^*+a-1,\,j^*+c-1}$。`,
+            T`也就是说，filter 的梯度 = $\delta$ 乘赢家那个 $2\times2$ 输入窗口。梯度下降走一步（$\eta$ 是学习率，即步长）：$w_{a,c}\leftarrow w_{a,c}-\eta\,\delta\,x_{i^*+a-1,\,j^*+c-1}$。`,
             { t: 'h4', text: '代数字核对' },
             T`取 $\mathbf X=\begin{bmatrix}1&2&0\\0&1&3\\2&1&1\end{bmatrix}$，filter $\begin{bmatrix}w_{1,1}&w_{1,2}\\w_{2,1}&w_{2,2}\end{bmatrix}=\begin{bmatrix}1&-1\\0&2\end{bmatrix}$，$b=0$，目标 $t=5$，$L=\frac12(y-t)^2$。`,
             {
               t: 'steps', items: [
                 T`前向：$h_{1,1}=1-2+0+2=1$，$h_{1,2}=2-0+0+6=8$，$h_{2,1}=0-1+0+2=1$，$h_{2,2}=1-3+0+2=0$。所以 $y=8$，赢家是 $(1,2)$。`,
                 T`$L=\frac12(8-5)^2=4.5$，$\delta=y-t=3$。`,
-                T`赢家窗口是第 1–2 行、第 2–3 列：$\begin{bmatrix}2&0\\1&3\end{bmatrix}$。所以 $\partial L/\partial\mathbf W=3\times\begin{bmatrix}2&0\\1&3\end{bmatrix}=\begin{bmatrix}6&0\\3&9\end{bmatrix}$，$\partial L/\partial b=3$。（用数值差分核对过，结果相同。）`,
+                T`赢家窗口是第 1–2 行、第 2–3 列：$\begin{bmatrix}2&0\\1&3\end{bmatrix}$。所以 $\partial L/\partial\mathbf W$（$\mathbf W$ 是 filter 的权重矩阵，即把 $\partial L/\partial w_{a,c}$ 排成表）$=3\times\begin{bmatrix}2&0\\1&3\end{bmatrix}=\begin{bmatrix}6&0\\3&9\end{bmatrix}$，$\partial L/\partial b=3$。（用数值差分核对过，结果相同。）`,
               ],
             },
             { t: 'graph', r: 20, nodes: { h11: [70, 40], h12: [70, 110], h21: [70, 180], h22: [70, 250], y: [280, 145] }, labels: { h11: 'h₁₁', h12: 'h₁₂', h21: 'h₂₁', h22: 'h₂₂', y: 'y' }, notes: { h11: '=1', h12: '=8', h21: '=1', h22: '=0', y: '=8' }, edges: 'h11>y=0 h12>y:path=1 h21>y=0 h22>y=0', w: 360, caption: 'max pooling 的反向：粗红边是前向的赢家 $h_{1,2}$，$\\partial y/\\partial h_{1,2}=1$；其余三条边上是 0，梯度传不过去。' },
@@ -171,27 +172,27 @@ So the gradient of the filter is $\delta$ times the $2\times2$ input patch that 
       title: 'Perceptron 手算更新',
       en: 'Perceptron updates by hand',
       chips: [{ text: 'L10 p13–p39', href: '#/L10', cls: 'src' }, { text: 'WK05', cls: 'src' }, { text: '2016 exam Q7', cls: 'hot' }],
-      lead: '往年卷只考过一次手算（2016 S2 Q7，2 分，见本页最后），worksheet 5 也练过，属于"会了就是送分"的题。规则只有一条：$y\\cdot s\\le0$ 就加上 $\\eta y\\bx$。',
+      lead: '往年卷只考过一次手算（2016 S2 Q7，2 分，见本页最后），worksheet 5 也练过，属于"会了就是送分"的题。规则只有一条：$y\\cdot s\\le0$ 就加上 $\\eta y\\bx$（$s$ 是打分 score，$\\bx$ 是样本特征、最前面补一个 1 当偏置，$\\eta>0$ 是学习率 learning rate，即每次走多远）。',
       blocks: [
         {
           t: 'steps', items: [
             '把偏置写成 $w_0$，输入前面补 $x_0=1$。',
             '对当前样本算 $s=\\bw\'\\bx$，再算 $y\\cdot s$。',
             '$y\\cdot s\\le0$（分错，或者刚好在边界上）⇒ $\\bw\\leftarrow\\bw+\\eta y\\bx$，**包括** $w_0\\leftarrow w_0+\\eta y$。否则不动。',
-            '按顺序处理下一个样本；一个 epoch 没有任何更新就停（数据可分时一定会发生）。',
+            '按顺序处理下一个样本；一个 epoch（把所有样本过一遍）没有任何更新就停（数据可分，即存在一条直线能把两类分开时，一定会发生）。',
           ],
         },
         { t: 'viz', id: 'perceptron-stepper' },
         {
-          t: 'note', md: T`为什么是**加** $\eta y\mathbf x$：分错时损失 $\max(0,-y\mathbf w'\mathbf x)$ 对 $\mathbf w$ 的梯度是 $-y\mathbf x$；梯度下降 $\mathbf w\leftarrow\mathbf w-\eta\cdot(-y\mathbf x)=\mathbf w+\eta y\mathbf x$。`,
+          t: 'note', md: T`为什么是**加** $\eta y\mathbf x$：分错时用 perceptron 损失 $\max(0,-y\mathbf w'\mathbf x)$：分对时它等于 0，分错时等于 $-y\mathbf w'\mathbf x$；$\max(0,z)$ 在 $z>0$ 处导数为 1，而 $-y\mathbf w'\mathbf x$ 对 $\mathbf w$ 求导得 $-y\mathbf x$，所以梯度是 $-y\mathbf x$；梯度下降 $\mathbf w\leftarrow\mathbf w-\eta\cdot(-y\mathbf x)=\mathbf w+\eta y\mathbf x$。`,
         },
         {
           t: 'exam', md: T`Perceptron update: for each training example, compute $s=\mathbf w'\mathbf x$ (with $x_0=1$); if $y\,s\le0$ (misclassified, or exactly on the boundary) we set $\mathbf w\leftarrow\mathbf w+\eta\,y\,\mathbf x$, otherwise $\mathbf w$ is unchanged. This is stochastic gradient descent on the perceptron loss $\max(0,-y\,\mathbf w'\mathbf x)$, whose gradient is $-y\mathbf x$ for misclassified points and $\mathbf 0$ otherwise.`,
         },
         { t: 'h3', text: 'Worksheet 5 Ex3 全解' },
-        T`题目：$\mathbf X$ 的四行 $(1,1,1),(1,1,2),(1,0,0),(1,-1,0)$（第一列是 bias 输入 $x_0=1$），$\mathbf y=(1,1,-1,-1)$，$\eta=0.1$，$\bw$ 从 $\mathbf 0$ 开始，按顺序过样本。题目要求用 **pseudocode 规则**：先预测 $\hat y$（$s\ge0$ 判 $+1$，否则 $-1$），$\hat y\ne y$ 才做 $\bw\leftarrow\bw+\eta y\bx$。`,
+        T`题目：$\mathbf X$ 的四行 $(1,1,1),(1,1,2),(1,0,0),(1,-1,0)$（第一列是 bias 输入 $x_0=1$），$\mathbf y=(1,1,-1,-1)$，$\eta=0.1$，$\bw$ 从 $\mathbf 0$ 开始，按顺序过样本。题目要求用 **pseudocode 规则**（pseudocode = 伪代码）：先预测 $\hat y$（$s\ge0$ 判 $+1$，否则 $-1$），$\hat y\ne y$ 才做 $\bw\leftarrow\bw+\eta y\bx$。`,
         {
-          t: 'table', cls: 'compact', head: ['Epoch', '样本', '$s=\\bw\'\\bx$', '$\\hat y$ / $y$', '更新后 $\\bw$'], rows: [
+          t: 'table', cls: 'compact', head: ['Epoch（第几轮）', '样本 $\\bx$', '$s=\\bw\'\\bx$（打分）', '预测 $\\hat y$ / 真值 $y$（✗ = 预测错）', '更新后 $\\bw$'], rows: [
             ['1', '$(1,1,1)$', '0', '+1 / +1', '不变 $(0,0,0)$'],
             ['1', '$(1,1,2)$', '0', '+1 / +1', '不变'],
             ['1', '$(1,0,0)$', '0', '+1 / −1 ✗', '$(0,0,0)-0.1(1,0,0)=(-0.1,0,0)$'],
@@ -205,7 +206,7 @@ So the gradient of the filter is $\delta$ times the $2\times2$ input patch that 
         },
         T`答案：$\bw=(-0.1,0.1,0.1)$，共 3 次更新，第 3 个 epoch 没有更新，停止。决策规则：$-0.1+0.1x_1+0.1x_2\ge0$，即 $x_1+x_2\ge1$ 判 $+1$。`,
         {
-          t: 'note', title: '两种规则：考试写哪个', md: T`**区别只在 $s=0$。** 本页上面的规则（L10）是 $y\cdot s\le0$ 就更新；pseudocode 在 $s=0$、$y=+1$ 时判对、不更新。同一道题用 $y\cdot s\le0$ 规则：更新发生在 E1 的 $(1,1,1)$、E1 的 $(1,0,0)$、E2 的 $(1,0,0)$，中间的 $\bw$ 不同，最后也是 $(-0.1,0.1,0.1)$。如果把 $s=0$ 判成 $-1$，结果会变成 $(0,0.1,0.1)$。考试时，题目指定了规则就照题目；没指定就用课件的 $y\cdot s\le0$，并在第一行写明约定，例如 "predict $+1$ if $s\ge0$; update when $y\,s\le0$"。`,
+          t: 'note', title: '两种规则：考试写哪个', md: T`**区别只在 $s=0$。** 本页上面的规则（L10）是 $y\cdot s\le0$ 就更新；pseudocode 在 $s=0$、$y=+1$ 时判对、不更新。同一道题改用 $y\cdot s\le0$ 规则（$s=0$ 也算错）：更新发生在第 1 轮（E1 = Epoch 1）的 $(1,1,1)$、第 1 轮的 $(1,0,0)$、第 2 轮的 $(1,0,0)$，$\bw$ 依次变成 $(0.1,0.1,0.1)$、$(0,0.1,0.1)$、$(-0.1,0.1,0.1)$；路径不同，终点和上面一样。如果把 $s=0$ 判成 $-1$，结果会变成 $(0,0.1,0.1)$。考试时，题目指定了规则就照题目；没指定就用课件的 $y\cdot s\le0$，并在第一行写明约定，例如 "predict $+1$ if $s\ge0$; update when $y\,s\le0$"。`,
         },
         { t: 'h3', text: '真题：2016 S2 Q7（唯一考过的 perceptron 手算）' },
         {
@@ -223,7 +224,7 @@ and current weights $\mathbf w=[2,3,4]'$. For simplicity assume that there is no
             },
             T`判断：$s=9\ge0$，预测 $+1$，而 $y=-1$。用课件规则看，$y\cdot s=-9\le0$，分错，要更新。这里 $s\ne0$，所以"$y\cdot s\le0$ 就更新"和"$\hat y\ne y$ 才更新"两种约定结果一样。`,
             T`更新：$\bw\leftarrow\bw+\eta y\bx=\bw-\eta\bx$。取 $\eta=0.1$（和本页例子一样）：$\bw=(2.2,\ 2.7,\ 3.9)$。如果取 $\eta=1$：$\bw=(4,\ 0,\ 3)$。`,
-            T`核对：$\eta=0.1$ 时新的 $s=2.2\cdot(-2)+2.7\cdot3+3.9\cdot1=-4.4+8.1+3.9=7.6$，仍然 $>0$，这个样本还是分错。一次更新只把 $s$ 往正确方向推了 $\eta\|\bx\|^2=0.1\times14=1.4$，不保证一步改对；$\eta=1$ 时 $s=9-14=-5$，已经分对。题目只要求写一步更新。`,
+            T`核对：$\eta=0.1$ 时新的 $s=2.2\cdot(-2)+2.7\cdot3+3.9\cdot1=-4.4+8.1+3.9=7.6$，仍然 $>0$，这个样本还是分错。一次更新把 $\bw$ 变成 $\bw-\eta\bx$，所以 $s$ 减少 $\eta\|\bx\|^2$（$\|\bx\|^2=(-2)^2+3^2+1^2=14$），即 $9-0.1\times14=7.6$，只推了一步，不保证一步改对；$\eta=1$ 时 $s=9-14=-5$，已经分对。题目只要求写一步更新。`,
             {
               t: 'exam', md: T`No bias, so $s=\mathbf w'\mathbf x=2(-2)+3(3)+4(1)=9$. The prediction is $+1$ but $y=-1$ ($y\,s=-9\le0$), so the example is misclassified and the perceptron updates
 $$\mathbf w\leftarrow\mathbf w+\eta\,y\,\mathbf x=\mathbf w-\eta\,\mathbf x=[2+2\eta,\ 3-3\eta,\ 4-\eta]',$$
@@ -242,7 +243,8 @@ where $\eta>0$ is the learning rate (a parameter we introduce). With $\eta=0.1$:
       chips: [{ text: 'L16', href: '#/L16', cls: 'src' }, { text: 'L06 p17', href: '#/L06', cls: 'src' }, { text: 'L07 p31', href: '#/L07', cls: 'src' }],
       lead: '往年卷没直接考计算，但简答可能问"这个界说明了什么"。会代数、会解释每一项就够了。',
       blocks: [
-        '符号：前四行的 $n$ 是**专家个数**，$M$ 是学习者犯错次数，$m$ 是最好专家的犯错次数；第 4 行改用损失（每轮在 $[0,1]$ 内）：$L$ 是学习者的期望总损失，$L^*$ 是最好专家的总损失，$L-L^*$ 叫 regret（遗憾）。后两行的 $n$ 是样本个数（不是专家个数）；$R$ 是真实风险（期望测试误差），$\\hat R$ 是训练误差，$|\\mathcal F|$ 是模型类里有几个模型，界以至少 $1-\\delta$ 的概率成立。',
+        '符号：每一行的「界」（bound）都是**上界**——最坏情况下也不会超过的值。前四行的 $n$ 是**专家个数**，$M$ 是学习者犯错次数，$m$ 是最好专家的犯错次数；第 4 行改用损失（每轮在 $[0,1]$ 内）：$L$ 是学习者的期望总损失，$L^*$ 是最好专家的总损失，$L-L^*$ 叫 regret（遗憾）。后两行的 $n$ 是样本个数（不是专家个数）；$R$ 是真实风险（期望测试误差），$\\hat R$ 是训练误差，$|\\mathcal F|$ 是模型类里有几个模型，界以至少 $1-\\delta$ 的概率成立。表格里的 $\\varepsilon$ 是算法自己的参数（题目会给值，如 0.5）；$\\VC$ 是 VC 维（VC dimension，衡量模型类有多复杂的一个数，见 [T1](#/T01)）。',
+        T`前四行是四个「专家建议」算法：每轮专家先预测，学习者据此预测，事后才看到对错。Majority 假设存在一个**从不出错**的专家，按剩余专家的多数票预测，猜错的专家直接淘汰；Halving 不假设完美专家，按加权多数票预测，猜错的专家权重减半（不淘汰），所以它的界里多出最好专家的错数 $m$；Weighted majority 和 Halving 一样，只是猜错时权重乘 $1-\varepsilon$；Probabilistic experts 每轮按权重随机抽一个专家来用，衡量的是期望损失。`,
         {
           t: 'table', head: ['界', '公式', '每一项说明什么'], rows: [
             ['Majority（完美专家）', '$M\\le\\log_2 n$', '每错一次，存活专家至少减半'],
