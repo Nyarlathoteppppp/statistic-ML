@@ -1207,7 +1207,7 @@
       },
       T`那还要 Bayesian 干什么？两个原因。第一，数据少的时候它更靠谱，而实际问题里"数据少"很常见：参数一多，平均到每个参数头上的数据就少了（神经网络常常参数比样本还多），每个新病人、新用户、新老虎机臂刚开始也只有几条数据。第二，它除了给一个数，还给出"有多不确定"。后验是一整条曲线，标准差就是曲线的宽度：粗略按"均值 ± 2 个标准差"，抛 10 次时真实的 $\theta$ 大致在 0.40 到 0.89 之间（只是猜个大概），抛 10000 次时大致在 0.691 到 0.709 之间（几乎确定）。MLE 两次都只说 0.7，分不出这两种情况。c50 的 Bayesian 线性回归和 c48 的 UCB 用的都是这份"不确定"。`,
       { t: 'h3', text: '② Bayes 公式把它们连起来（L02 p22）' },
-      { t: 'math', tex: T`P(\theta\mid X=x)=\frac{P(X=x\mid\theta)\,P(\theta)}{P(X=x)}=\frac{P(X=x\mid\theta)\,P(\theta)}{\sum_tP(X=x\mid\theta=t)P(\theta=t)}\qquad(\text{L02 p22})` },
+      { t: 'math', tex: T`P(\theta\mid X=x)=\frac{P(X=x\mid\theta)\,P(\theta)}{P(X=x)}=\frac{P(X=x\mid\theta)\,P(\theta)}{\sum_tP(X=x\mid\theta=t)P(\theta=t)}` },
       T`对照上表：分子 = 第 4 列（先验 × 似然），分母 = 第 4 列的总和。连续参数时 $\theta$ 有无穷多个取值，列不出表，分母的求和换成积分 $P(X=x)=\int P(X=x\mid\theta)P(\theta)\,d\theta$。`,
       { t: 'h3', text: '③ 课件例子：Gaussian 先验 + 一个观测（L02 p23–p24）' },
       T`课件的例子里 $\theta$ 可以是任意实数，就是这种列不出表的情况。好在先验和噪声都是 Gaussian（正态）时不用真的去积分：两个钟形相乘还是钟形，把指数**配方**就能读出后验的中心和宽度。看不懂配方可以先记结论：后验是 $\mathcal N(0.5,0.5)$，中心夹在先验中心 0 和数据 1 的正中间。`,

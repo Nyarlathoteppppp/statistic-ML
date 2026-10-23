@@ -274,3 +274,6 @@ ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
   html:has(.outline), body:has(.outline), body:has(.outline) .shell, body:has(.outline) .main, body:has(.outline) .page { background: #fff !important; }
   body:has(.outline) .main, body:has(.outline) .page { max-width: none !important; padding: 0 !important; margin: 0 !important; }
 }
+
+/* lecture-page reference shown inside a sentence (js/ui/md.js): muted, small */
+.lref { color: var(--muted); font-size: .82em; white-space: nowrap; }

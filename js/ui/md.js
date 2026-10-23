@@ -52,6 +52,13 @@
     TERM: TERM, key: termKey,
   };
 
+  /* Lecture-page references ("L13 p17", "L11 p25–p26、p30") only say where a fact came from; the reader never opens the slides.
+     A bracket holding nothing but references is dropped; a reference inside a sentence is shown as a small muted "课件 L13 p17". */
+  const PG = 'p?\\d+(?:\\s*[–-]\\s*p?\\d+)?';
+  const REF = 'L\\d{1,2}\\s*p\\d+(?:\\s*[–-]\\s*p?\\d+)?(?:\\s*[、,，]\\s*(?:L\\d{1,2}\\s*)?' + PG + ')*';
+  const REF_PAREN = new RegExp('\\s*[（(]\\s*(?:课件\\s*)?' + REF + '(?:\\s*[;；]\\s*' + REF + ')*\\s*[）)]', 'g');
+  const REF_TEXT = new RegExp('(?:课件\\s*)?\\b(' + REF + ')', 'g');
+
   function inline(src) {
     if (src == null) return '';
     const holes = [];
@@ -61,6 +68,7 @@
       if (dmath != null) return hold('<span class="math-block">' + tex(dmath, true) + '</span>');
       return hold(tex(imath, false));
     });
+    s = s.replace(REF_PAREN, '').replace(REF_TEXT, (m, ref) => hold('<span class="lref" title="课件出处，只是标明来源，不用去看">课件 ' + esc(ref) + '</span>'));
     s = esc(s)
       .replace(TERM, (m, text, key) => '<button type="button" class="term" data-k="' + esc(termKey(key || text)) + '">' + text + '</button>')
       .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')

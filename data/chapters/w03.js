@@ -514,7 +514,7 @@
         T`**Variance（方差）**：换训练集时预测 $\hat f$ 的波动 $\mathrm{Var}[\hat f]$。`,
         T`**Irreducible error（不可约误差）**：$\mathrm{Var}[Y]$，数据本身的噪声，任何模型都消除不了。下式左边的 $\mathbb E$ **同时**对训练集 $D$ 的随机性（影响 $\hat f$）和测试标签的噪声（影响 $Y$）求平均。`,
       ] },
-      { t: 'math', tex: T`\mathbb E\big[(Y-\hat f)^2\big]=\underbrace{\big(\mathbb E[Y]-\mathbb E[\hat f]\big)^2}_{\text{bias}^2}+\underbrace{\mathrm{Var}[\hat f]}_{\text{variance}}+\underbrace{\mathrm{Var}[Y]}_{\text{irreducible error}}\qquad(\text{L05 p37})` },
+      { t: 'math', tex: T`\mathbb E\big[(Y-\hat f)^2\big]=\underbrace{\big(\mathbb E[Y]-\mathbb E[\hat f]\big)^2}_{\text{bias}^2}+\underbrace{\mathrm{Var}[\hat f]}_{\text{variance}}+\underbrace{\mathrm{Var}[Y]}_{\text{irreducible error}}` },
     ],
     why: [
       T`这是往年简答的高频题（T13 预测："State the bias–variance decomposition and what increases each term"）。它也是理解正则化、模型选择、集成方法（如 bagging 降 variance）的统一框架。`,

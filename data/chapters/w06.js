@@ -226,7 +226,7 @@
       T`**核心想法：导数就是"倍数"。** "$\partial L/\partial u_1=3$"的意思是：$u_1$ 动一点，$L$ 就动 3 倍那么多。反向传播给每个节点算出这样一个数（演示里的红字），只用两条规则：① **前一个节点的红字 = 后一个节点的红字 × 两者之间的倍数**（中间是一条边就乘边上的权重，中间是激活函数就乘它的斜率），所以必须从 $L$ 往回算；② **权重的梯度 = 这条边终点的红字 × 起点的值**。下面的演示按"前向 → 导数是什么 → 反向"一步一停，反向每一步都写了为什么这样乘；最后点"让 r₁ 变成负数"，看 ReLU 怎么把梯度挡成 0。`,
       { t: 'viz', id: 'chain-nudge' },
       T`先只看最外面一层，算一个数。设 $L=\frac12(z-y)^2$、恒等输出 $z=s$，并且先只留一项 $s=u_1w_1$。取 $y=0$、$u_1=2$、$w_1=0.5$，则 $z=1$。$w_1$ 增加一点点，$s$（也就是 $z$）增加 $u_1$ 倍；$z$ 增加一点点，$L$ 增加 $(z-y)$ 倍。两个"局部倍数"相乘：$\partial L/\partial w_1=(z-y)\cdot u_1=1\times2=2$。下面的连乘就是把这种局部导数一路乘下去，从 $L$ 乘到 $w_j$、再乘到更靠前的 $v_{ij}$（课件同样固定平方损失和恒等输出）：`,
-      { t: 'math', tex: T`\frac{\partial L}{\partial w_j}=\frac{\partial L}{\partial z}\frac{\partial z}{\partial s}\frac{\partial s}{\partial w_j},\qquad \frac{\partial L}{\partial v_{ij}}=\frac{\partial L}{\partial z}\frac{\partial z}{\partial s}\frac{\partial s}{\partial u_j}\frac{\partial u_j}{\partial r_j}\frac{\partial r_j}{\partial v_{ij}}\qquad(\text{L11 p27})` },
+      { t: 'math', tex: T`\frac{\partial L}{\partial w_j}=\frac{\partial L}{\partial z}\frac{\partial z}{\partial s}\frac{\partial s}{\partial w_j},\qquad \frac{\partial L}{\partial v_{ij}}=\frac{\partial L}{\partial z}\frac{\partial z}{\partial s}\frac{\partial s}{\partial u_j}\frac{\partial u_j}{\partial r_j}\frac{\partial r_j}{\partial v_{ij}}` },
       { t: 'table', cls: 'compact', head: ['因子', '值', '理由'], rows: [
         ['$\\partial L/\\partial z$', '$z-y$', '$L=\\frac12(z-y)^2$ 求导'],
         ['$\\partial z/\\partial s$', '1', '恒等输出 $z=s$（sigmoid 输出时是 $z(1-z)$）'],

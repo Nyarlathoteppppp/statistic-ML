@@ -76,16 +76,26 @@
     ],
     math: [
       { t: 'h3', text: '输出尺寸' },
+      T`一层卷积（或 pooling）输出多大，只用一条公式。先认识四个字母：`,
+      { t: 'table', cls: 'compact', head: ['字母', '意思', '题目没说时'], rows: [
+        ['$n$', '输入的边长（输入是 $n\\times n$；1D 时就是输入有几个数）', '—'],
+        ['$k$', 'filter（卷积核）的边长', '—'],
+        ['$p$', 'padding：在输入四周各补几圈 0', '0'],
+        ['$s$', 'stride：filter 每次往右（往下）挪几格', '1'],
+      ] },
       { t: 'math', tex: T`\text{output}=\Big\lfloor\frac{n+2p-k}{s}\Big\rfloor+1` },
-      T`L13 p17：$32\times32\times1$ 输入，6 个 $5\times5$ filter，stride 1，无 padding ⇒ $(32-5)/1+1=28$ ⇒ 输出 $28\times28\times6$。`,
+      T`**为什么是这样**：补完 0 后边长变成 $n+2p$。filter 先放在最左边，占掉 $k$ 格，右边还剩 $n+2p-k$ 格可以挪；每次挪 $s$ 格，能挪 $\lfloor(n+2p-k)/s\rfloor$ 次（挪不满一步的不算，所以向下取整）。再加上最开始那个位置，就是 $+1$。`,
+      T`**例子**：输入是 $32\times32$ 的灰度图（1 个通道），用 6 个 $5\times5$ 的 filter，stride 1，不补 0。代入 $n=32$、$k=5$、$p=0$、$s=1$：output $=(32+0-5)/1+1=28$。每个 filter 扫一遍得到一张 $28\times28$ 的图，6 个 filter 就是 6 张，所以输出是 $28\times28\times6$。`,
       { t: 'h3', text: '参数计数（T3 的三条公式）' },
+      T`先认识两个字母：$C_{in}$ 是输入的**通道数**（灰度图 1，彩色图 3，上一层是卷积层时就是上一层 filter 的个数）；$C_{out}$ 是这一层 **filter 的个数**，也就是输出的通道数。$K$ 是 filter 边长，和上面的 $k$ 是同一个东西。`,
       { t: 'table', head: ['层', '权重', 'bias'], rows: [
-        ['1D 卷积，宽 $k$，1 个 filter', '$k$', '1'],
+        ['1D 卷积（2026 卷那种），宽 $k$，1 个 filter', '$k$', '1'],
         ['2D 卷积，$C_{out}$ 个 $K\\times K$ filter，输入 $C_{in}$ 通道', '$C_{out}\\cdot C_{in}\\cdot K^2$', '$C_{out}$'],
         ['全连接 $n_{in}\\to n_{out}$', '$n_{in}\\cdot n_{out}$', '$n_{out}$'],
         ['Max pooling', '0', '0'],
       ] },
-      T`对比：如果把 $32\times32$ 输入和 $28\times28\times6$ 输出**全连接**，需要 $1024\times4704\approx4.8$ 百万个权重；卷积只要 $6\times25=150$ 个。`,
+      T`2D 那行的意思：每个 filter 是 $K\times K$，而且要同时盖住输入的全部 $C_{in}$ 个通道，所以一个 filter 有 $C_{in}\cdot K^2$ 个权重；一共 $C_{out}$ 个 filter，再乘 $C_{out}$。每个 filter 配 1 个 bias。`,
+      T`**对比**（还是上面的例子）：不用卷积、直接全连接的话，输入 $32\times32=1024$ 个数，输出 $28\times28\times6=4704$ 个数，两两相连要 $1024\times4704\approx4.8$ 百万个权重。卷积只要 6 个 filter × 每个 $5\times5=25$ 个权重 $=150$ 个（再加 6 个 bias），因为同一个 filter 在图上每个位置都**共用**同一组权重。`,
     ],
     fx: [
       {
