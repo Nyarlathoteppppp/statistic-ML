@@ -19,7 +19,7 @@
     keyZh: [
       T`卷积层：一个小 filter（滤波器）在输入上滑动，每个位置把对应元素相乘再求和，得到一个输出；所有位置用同一套 filter 权重，这叫权重共享（weight sharing）。`,
       T`参数 = filter 个数 × 输入通道数 × 每个通道上的 $K\times K$，再加每个 filter 一个 bias，与图像大小无关。绝不按输出位置重复计数：真题里单通道、宽 3 的 1D filter 只有 3 个权重。`,
-      T`输出边长用上面的公式（padding 加 $2p$，别漏 +1）；全连接层权重 = 输入数 × 输出数，再加每个输出一个 bias；pooling 层没有参数。`,
+      T`输出边长 $\lfloor(n+2p-k)/s\rfloor+1$（padding 加 $2p$，别漏 +1）；全连接层权重 = 输入数 × 输出数，再加每个输出一个 bias；pooling 层没有参数。`,
       T`把图像拉平喂全连接网络：丢了相邻关系、参数爆炸，同一图案换个位置还得重学。卷积只连局部、到处共享权重，参数少得多，而且平移等变（图案平移，特征图跟着平移）。`,
     ],
     examQ: [
@@ -122,7 +122,7 @@
           { ask: '总参数 = ?', answer: 2416, show: '$16\\times151$' },
         ] },
         { md: T`输入 $64\times64\times3$（RGB），10 个 $3\times3$ filter，$s=2$，$p=1$，含 bias。`, steps: [
-          { ask: '输出宽度 = ?', answer: 32, show: T`公式 $\lfloor(W+2p-F)/s\rfloor+1$：$W=64$，$2p=2\times1=2$，$F=3$，$s=2$。$(64+2-3)/2=63/2=31.5$，向下取整得 31，再加 1 得 32` },
+          { ask: '输出宽度 = ?', answer: 32, show: T`公式 $\lfloor(n+2p-k)/s\rfloor+1$：$n=64$，$2p=2\times1=2$，$k=3$，$s=2$。$(64+2-3)/2=63/2=31.5$，向下取整得 31，再加 1 得 32` },
           { ask: '每个 filter 参数（含 bias）= ?', answer: 28, show: '$9\\times3+1=28$' },
           { ask: '总参数 = ?', answer: 280, show: '$10\\times28$' },
         ] },
@@ -179,7 +179,7 @@
     keyZh: [
       T`最大池化（max pooling）：每个 $m\times m$ 小块只留最大值。宽高变小，后面层的参数也随之变少；通道数不变；它自己没有参数。`,
       T`max 不是处处可导，反向传播用次梯度（sub-gradient）：梯度只传给前向时取到最大值的那个输入，其余为 0；有并列最大值时只挑其中一个。`,
-      T`卷积是平移等变（图案平移，特征图跟着平移）；max pooling 再带来一定的平移不变性，但不保证（最大值跨出窗口时输出会变）。每叠一层宽 $k$ 的卷积，感受野（receptive field）宽度多 $k-1$。`,
+      T`卷积是平移等变（图案平移，特征图跟着平移）；max pooling 再带来一定的平移不变性，但不保证（最大值跨出窗口时输出会变）。每叠一层宽 $k$ 的卷积，感受野（receptive field）宽度多 $k-1$，所以 $L$ 层是 $1+L(k-1)$（别漏了开头的 1）。`,
       T`ResNet 残差块：输出 = 学到的变换 + 输入本身，梯度能沿这条直通路传回前面的层，152 层也能训练。迁移学习（transfer learning）：先在大数据集上预训练，再在目标任务上微调（fine-tune）。`,
     ],
     title: 'Pooling 与 CNN 架构', en: 'Max pooling, translation invariance, receptive fields, ResNet',
@@ -312,9 +312,9 @@
         qzh: T`循环神经网络（recurrent neural network）是一种深度人工神经网络（deep artificial neural network）。它在什么意义上是“深”的？`,
         azh: T`它在时间上是深的（deep in time）：沿输入序列展开（unrolled）后，隐藏状态（hidden state）每个时间步都要经过一次变换，所以展开后网络的深度等于序列长度，并且所有时间步共享同一组权重。梯度必须反向传播穿过所有时间步（随时间反向传播 BPTT），由此导致梯度消失/爆炸（vanishing/exploding gradients）。` },
       { src: '2022 S1 Q1(b)', q: T`Both convolutional networks (CNNs) and recurrent networks (RNNs) can be applied to sequence inputs. Explain the key benefit that RNNs have over CNNs for this type of input.`,
-        a: T`A CNN on a sequence (time delay neural network) has a fixed, finite receptive field set by the filter width and the number of layers, so dependencies longer than that window are missed. An RNN's hidden state $\mathbf h^{(t)}=f(\mathbf h^{(t-1)},\bx^{(t)})$ encodes all inputs up to $t$, so it can capture dependencies of any range, and its shared weights unroll to any sequence length.`,
+        a: T`A CNN on a sequence (time delay neural network) has a fixed, finite receptive field set by the filter width and the number of layers, so dependencies longer than that window are missed. An RNN's hidden state $\mathbf h^{(t)}=f(\mathbf h^{(t-1)},\bx^{(t)})$ encodes all inputs up to $t$, so it can in principle capture dependencies of any range (in practice limited by vanishing gradients), and its shared weights unroll to any sequence length.`,
         qzh: T`卷积网络（CNN）和循环网络（RNN）都可以用于序列输入。说明对这类输入，RNN 相对 CNN 的关键优势。`,
-        azh: T`把 CNN 用在序列上（课件叫时延神经网络 time delay neural network），感受野（receptive field）固定且有限，大小由 filter 宽度和层数决定，超出这个窗口的长距离依赖就抓不到。RNN 的隐藏状态 $\mathbf h^{(t)}=f(\mathbf h^{(t-1)},\bx^{(t)})$ 编码了到 $t$ 为止的全部输入，所以能捕捉任意距离的依赖；而且共享的权重可以展开到任意序列长度。` },
+        azh: T`把 CNN 用在序列上（课件叫时延神经网络 time delay neural network），感受野（receptive field）固定且有限，大小由 filter 宽度和层数决定，超出这个窗口的长距离依赖就抓不到。RNN 的隐藏状态 $\mathbf h^{(t)}=f(\mathbf h^{(t-1)},\bx^{(t)})$ 编码了到 $t$ 为止的全部输入，所以理论上能捕捉任意距离的依赖（实际受梯度消失限制）；而且共享的权重可以展开到任意序列长度。` },
     ],
     title: 'RNN、BPTT、LSTM', en: 'Recurrent neural networks, backpropagation through time, LSTM',
     summary: '序列（句子、音频、股价）长度不固定。**RNN（循环神经网络）** 从左到右逐个读入，每步用**同一组参数**更新隐藏状态 $\\mathbf h^{(t)}=\\tanh(\\mathbf b+W\\mathbf h^{(t-1)}+U\\bx^{(t)})$。展开后是一个深度 = 序列长度的网络（2021 Q1："RNN 在什么意义上是深的？"）。训练用 **BPTT**；长序列会梯度消失 / 爆炸，**LSTM** 用门控的"复制"路径缓解。',
@@ -358,12 +358,12 @@
       T`BPTT 要把梯度从最后一步一路传回第一步，**同一组权重被连乘很多次**。先用一个数看后果：每步乘 $0.5$，传到 10 步之前只剩 $0.5^{10}\approx0.001$（消失）；每步乘 $1.5$，变成 $1.5^{10}\approx58$（爆炸）。下面的矩阵式是同一件事：`,
       T`**vanishing / exploding gradient（梯度消失 / 爆炸）**（L14 p13）：先看最简单的**线性 RNN**（去掉 tanh：$\mathbf h^{(t)}=W\mathbf h^{(t-1)}+U\bx^{(t)}$）。每一步对上一步的导数都是 $W$，链式法则连乘 $T-1$ 次：`,
       { t: 'math', tex: T`\frac{\partial\mathbf h^{(T)}}{\partial\mathbf h^{(1)}}=W^{T-1}\qquad(\text{只对线性 RNN；这是一个矩阵，叫 Jacobian})` },
-      T`看 $W$ 的特征值的**绝对值**：最大的 $|\lambda|$（谱半径 $\rho(W)$）$<1$ ⇒ $W^{T-1}\to0$，梯度**消失**；$>1$ ⇒ 沿那个方向越乘越大，梯度**爆炸**。（标量例：$W=-2$ 虽然"$<1$"，但 $|-2|>1$，$(-2)^{10}=1024$ 照样爆炸。）带 tanh 的 RNN 每步还要乘 tanh 的导数（$\le1$）：$\frac{\partial\mathbf h^{(T)}}{\partial\mathbf h^{(1)}}=J_TJ_{T-1}\cdots J_2$，其中 $J_t=\mathrm{diag}\big(1-(\mathbf h^{(t)})^2\big)W$，通常衰减得更快。课件说普通 RNN 实际只能学到约 5–10 步的依赖（经验数字，不是定理）。`,
+      T`看 $W$ 的特征值的**绝对值**：最大的 $|\lambda|$（谱半径 $\rho(W)$）$<1$ ⇒ $W^{T-1}\to0$，梯度**消失**；$>1$ ⇒ 沿那个方向越乘越大，梯度**爆炸**。（标量例：$W=-2$ 虽然"$<1$"，但 $|-2|>1$，$(-2)^{10}=1024$ 照样爆炸。）带 tanh 的 RNN 每步还要乘 tanh 的导数（$\le1$）：$\frac{\partial\mathbf h^{(T)}}{\partial\mathbf h^{(1)}}=J_TJ_{T-1}\cdots J_2$，其中 $J_t=\mathrm{diag}\big(1-(\mathbf h^{(t)})^2\big)W$（$(\mathbf h^{(t)})^2$ 是逐个分量平方；$\mathrm{diag}(\cdot)$ 把这些数排在对角线上、其余位置为 0，组成对角矩阵），通常衰减得更快。课件说普通 RNN 实际只能学到约 5–10 步的依赖（L14 p14；经验数字，不是定理）。`,
       T`消失的根源是"每步都**乘**一个常常小于 1 的数"。LSTM 的思路：让状态主要靠**加法**往下传——新状态 ≈ 遗忘门 × 旧状态 + 输入门放进来的新内容。遗忘门接近 1 时，旧状态几乎原样加过去，梯度也几乎原样传回来（和 c39 ResNet 的直通路是同一个主意）。`,
       T`**LSTM（long short-term memory）**（L14 p14）：引入一条基于"复制"的状态自环：上一步的状态被 sigmoid **forget gate（遗忘门）** 缩放后直接加到新状态上，梯度大小得以保持；另有 **input gate（输入门）**、**output gate（输出门）**。课件称能处理 100+ 步的依赖（普通 RNN 约 5–10 步；都是经验数字）。`,
     ],
     why: [
-      T`往年 2021 Q1 原题："A recurrent neural network is a type of deep artificial neural network. In what respect is it deep?"。另外 RNN 的梯度消失是 c34–c36 讲过的问题在时间方向上的版本，LSTM 是简答高频。`,
+      T`往年 2021 Q1 原题："A recurrent neural network is a type of deep artificial neural network. In what respect is it deep?"。另外 RNN 的梯度消失是 c33–c34 讲过的问题（深网络里导数连乘）在时间方向上的版本；LSTM 可能出简答。`,
     ],
     intuition: [
       T`**RNN = 一个带记忆的单元反复使用。** 读一个词，更新一次"记忆"$\mathbf h$；下一个词再用同一套规则更新。读完整句，$\mathbf h$ 就是对整句的总结。`,
@@ -485,7 +485,7 @@
     types: ['T13'],
     notExam: 'L14 p19 的图像描述、p21 的 Transformer 细节结构图只需看懂思想；缩放点积 $\\mathbf q\\cdot\\mathbf k/\\sqrt d$ 等公式课件没给出，不要求。',
     what: [
-      { t: 'h3', text: '① 问题：一个上下文向量装不下整句话（L14 p16）' },
+      { t: 'h3', text: '① 问题：一个上下文向量装不下整句话（L14 p17–p18）' },
       T`**瓶颈问题**：encoder–decoder 把整句话压进一个固定的上下文向量 $\mathbf c$（c40），句子一长就装不下。Attention 让解码器每一步都能"回头看"所有编码器状态，按需取用。`,
       { t: 'h3', text: '② Attention：对所有隐藏状态加权平均（L14 p17）' },
       T`三步：给每个位置打分 → 用 softmax 把分数变成权重 → 按权重把隐藏状态加起来。例：三个位置得分 $(1,2,0)$，权重约 $(0.245,0.665,0.090)$，第 2 个位置最受关注（完整手算见下面"数值例子"）。`,
@@ -640,7 +640,7 @@
     exam: [
       ['CNN 参数计数（读图）', '2026 Q1d、2025 Q5', '[T3](#/T03)'],
       ['RNN 为什么是深的', '2021 Q1', '[T13](#/T13)'],
-      ['深度学习概念（pooling、LSTM、attention）', '往年没单独出过；可能出简答', '[T13](#/T13)'],
+      ['深度学习概念（RNN vs CNN、attention、pooling、LSTM）', '2022 S1 Q1(b)(c) 考过 RNN 的优势和 attention；其余可能出简答', '[T13](#/T13)'],
     ],
     quiz: [
       { type: 'num', q: '输入 $32\\times32\\times3$，8 个 $5\\times5$ filter，含 bias。参数？', answer: 608, explain: '每个 filter 在 3 个输入通道上各有 $5\\times5$ 个数：$5\\times5\\times3=75$，再加 1 个 bias 是 76；8 个 filter：$8\\times76=608$。' },

@@ -376,7 +376,7 @@
       T`势函数（potential function）证明：学习者每错一次，总权重至多剩 3/4；而总权重至少是最好专家的权重 $(1/2)^m$。两头夹住，取 log 解出 $M$。`,
     ],
     title: 'Experts：majority、halving', en: 'Learning with expert advice: majority vote and halving',
-    summary: '**Online learning（在线学习）**：每天听 $n$ 个专家的预测，自己做预测，再看真实结果；目标是总错误少。结果可以是**对抗性的**（不假设 i.i.d.）。有完美专家时用 **majority vote**：错一次删掉所有错的专家，$M\\le\\log_2n$。没有完美专家时用 **halving**：错的专家权重减半而不删除，$M\\le2.4(m+\\log_2n)$。',
+    summary: '**Online learning（在线学习）**：每天听 $n$ 个专家的预测，自己做预测，再看真实结果；目标是总错误少。结果可以是**对抗性的**（不假设 i.i.d.）。有完美专家时用 **majority vote**：错一次删掉所有错的专家，$M\\le\\log_2n$。没有完美专家时用 **halving**：错的专家权重减半而不删除，$M\\le\\frac{m+\\log_2n}{\\log_2(4/3)}\\approx2.41(m+\\log_2n)$（课件写作 2.4）。',
     prereq: ['c31'],
     symbols: [
       [T`$E_1..E_n$`, T`$n$ 个专家（$E_i$ 是第 $i$ 个专家；不带下标的 $E$ 是集合，见下行）`],
@@ -523,7 +523,7 @@
       '写出 probabilistic experts 的更新、选择概率和期望损失界',
     ],
     types: ['T12'],
-    notExam: 'L16 p16 的两个不等式工具和 p23–p25 的完整证明了解思路即可；p26 的应用列表不考。',
+    notExam: 'L16 p16 的两个不等式工具和 p24–p25 的证明了解思路即可（p23 的界本身要会）；p26 的应用列表了解即可。',
     what: [
       { t: 'h3', text: '① 把"减半"推广成"乘 $1-\\varepsilon$"（L16 p15–p17）' },
       T`**Weighted majority with $1-\varepsilon$**（L16 p17）：和 halving 一样，但错的专家 $w_i\leftarrow(1-\varepsilon)w_i$。`,
@@ -546,7 +546,7 @@
       T`随机化打破了"对手总能让多数派犯错"的局面，对最好专家损失的系数从 2 降到 $1+\varepsilon$。这个"乘性权重 + 随机选择"正是下一周 bandits（只能看到所选专家的奖励）的出发点（L16 p27）。`,
     ],
     intuition: [
-      { t: 'think', q: 'Weighted majority 的界相比 halving，对 $m$ 的依赖改进在哪？（L16 p18 的问题）', a: T`halving 是 $2.4m$，weighted majority 是 $2(1+\varepsilon)m$，$\varepsilon$ 小时接近 $2m$。更新规则上，halving 就是 $\varepsilon=1/2$（错的专家乘 $1-0.5=1/2$）；但两条界是两种证法：把 $\varepsilon=0.5$ 代进 weighted majority 得 $3m+4\ln n$，比 halving 那条 $\approx2.41(m+\log_2n)$ 更松。"接近 $2m$"说的是 $\varepsilon$ 很小的时候。` },
+      { t: 'think', q: 'Weighted majority 的界相比 halving，对 $m$ 的依赖改进在哪？（L16 p18 的问题）', a: T`看 $m$ 前面的系数：halving 是 $2.4$（整条界是 $2.4(m+\log_2n)$），weighted majority 是 $2(1+\varepsilon)$，$\varepsilon$ 小时接近 $2$。更新规则上，halving 就是 $\varepsilon=1/2$（错的专家乘 $1-0.5=1/2$）；但两条界是两种证法：把 $\varepsilon=0.5$ 代进 weighted majority 得 $3m+4\ln n$；把底数统一，$4\ln n\approx2.77\log_2n$，两项都比 halving 那条 $\approx2.41(m+\log_2n)$ 大，所以更松。"接近 $2m$"说的是 $\varepsilon$ 很小的时候。` },
       { t: 'story', title: '乘性权重无处不在', md: 'Freund 和 Schapire 1997 年的 Hedge 算法就是本章的 probabilistic experts，它也是 AdaBoost 的理论基础。Arora、Hazan、Kale 2012 年的综述把 multiplicative weights（乘性权重）更新称为一种"元算法"，在博弈论、线性规划、在线学习里反复出现。（L16 p26 的应用列表来自 Kale 2007 年的博士论文。）' },
     ],
     math: [
@@ -554,7 +554,7 @@
       { t: 'steps', items: [
         T`学习者错 ⇒ 至少一半权重乘 $(1-\varepsilon)$ ⇒ $W\le n(1-\varepsilon/2)^M$。`,
         T`最好专家 $w=(1-\varepsilon)^m\le W$。`,
-        T`取 ln：$m\ln(1-\varepsilon)\le\ln n+M\ln(1-\varepsilon/2)$；用 $-\varepsilon-\varepsilon^2\le\ln(1-\varepsilon)<-\varepsilon$ 化简，解出 $M$。`,
+        T`取 ln：$m\ln(1-\varepsilon)\le\ln n+M\ln(1-\varepsilon/2)$；左边用 $\ln(1-\varepsilon)\ge-\varepsilon-\varepsilon^2$ 换成 $-m(\varepsilon+\varepsilon^2)$；右边用 $\ln(1-x)<-x$（取 $x=\varepsilon/2$）换成 $-M\varepsilon/2$。得到 $-m(\varepsilon+\varepsilon^2)\le\ln n-M\varepsilon/2$，移项 $M\varepsilon/2\le\ln n+m(\varepsilon+\varepsilon^2)$，两边乘 $2/\varepsilon$ 就是 $M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}$。`,
       ] },
       { t: 'h3', text: 'Probabilistic experts 的证明思路（L16 p24–p25）' },
       T`第 $t$ 轮期望损失 $L_t=\sum_iw_i\ell_i/W$；$W(t+1)\le W(t)(1-\varepsilon L_t)$；$W(T)\le n\prod_t(1-\varepsilon L_t)$，又 $W(T)\ge(1-\varepsilon)^{L^*}$。取 ln 化简得界。`,
@@ -619,7 +619,7 @@
           T`The bound is minimised (for $\epsilon>0$) at $\epsilon=\sqrt{\frac{\ln n}{m}}$; this gives $\epsilon\gtrsim1.75$. This choice balances the two terms $2(1+\epsilon)m$ and $\frac{2\ln n}{\epsilon}$.`,
         ],
         answer: 3,
-        explain: T`界里有两项在拉扯：$2(1+\epsilon)m$ 随 $\epsilon$ 变大而变大，$\frac{2\ln n}{\epsilon}$ 随 $\epsilon$ 变大而变小，所以 $\epsilon$ 太大太小都不好（排除前两项；第二项还说反了，$\epsilon\to0$ 时 $\frac{2\ln n}{\epsilon}\to\infty$）。求最小值：对 $\epsilon$ 求导令其为 0，$2m-\frac{2\ln n}{\epsilon^2}=0$，得 **$\epsilon=\sqrt{\ln n/m}$**。代入 $n=10^4$、$m=3$：$\ln10^4=4\ln10\approx9.21$，$9.21/3\approx3.07$，开方 $\approx1.75$。第三个选项忘了开方，3.07 只是根号里面的数。`,
+        explain: T`界里有两项在拉扯：$2(1+\epsilon)m$ 随 $\epsilon$ 变大而变大，$\frac{2\ln n}{\epsilon}$ 随 $\epsilon$ 变大而变小，所以 $\epsilon$ 太大太小都不好（排除前两项；第二项还说反了，$\epsilon\to0$ 时 $\frac{2\ln n}{\epsilon}\to\infty$）。求最小值：对 $\epsilon$ 求导令其为 0，$2m-\frac{2\ln n}{\epsilon^2}=0$，得 **$\epsilon=\sqrt{\ln n/m}$**。代入 $n=10^4$、$m=3$：$\ln10^4=4\ln10\approx9.21$，$9.21/3\approx3.07$，开方 $\approx1.75$。第三个选项忘了开方，3.07 只是根号里面的数。（这题只是求这个式子在 $\epsilon>0$ 上的最小值；课件的证明只对 $\epsilon\le0.5$ 成立，所以 1.75 不能当成实际可用的学习率。）`,
       },
       { type: 'num', q: 'Weighted majority：$m=5$，$\\ln n=2$，$\\varepsilon=0.5$。上界？', answer: 23, explain: T`把数代进 weighted majority（加权多数）的错误界 $M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}$。第一项用最好专家的错误数 $m=5$：$2\times(1+0.5)\times5=2\times1.5\times5=15$。第二项用专家个数，题目直接给了 $\ln n=2$：$2\times2/0.5=4/0.5=8$。上界 $15+8=23$，即学习者最多错 23 次。注意界里是自然对数 $\ln$，不要换成 $\log_2$。` },
       { type: 'num', q: 'Probabilistic experts：$\\ln n=1$，$\\varepsilon=0.25$，$L^*=8$。上界？', answer: 14, explain: T`probabilistic experts（随机化专家）的期望总损失界是 $L\le\frac{\ln n}{\varepsilon}+(1+\varepsilon)L^*$。题目给 $\ln n=1$、$\varepsilon=0.25$、最好专家的总损失 $L^*=8$。第一项 $1/0.25=4$；第二项 $(1+0.25)\times8=1.25\times8=10$；上界 $4+10=14$。和 weighted majority 比，$L^*$ 前的系数是 $1+\varepsilon$ 而不是 $2(1+\varepsilon)$，第一项也没有 2：随机选专家让对手无法预判你。` },
@@ -673,8 +673,8 @@
       ['$L\\le\\frac{\\ln n}{\\varepsilon}+(1+\\varepsilon)L^*$', 'probabilistic experts', 'L16 p23'],
     ],
     exam: [
-      ['混淆矩阵指标、precision vs recall', 'T13 预测', '[T13](#/T13)'],
-      ['CV / bootstrap / 特征选择陷阱', 'T13 预测', '[T13](#/T13)'],
+      ['混淆矩阵指标、precision vs recall', '可能出简答', '[c42](#/c42)'],
+      ['CV / bootstrap / 特征选择陷阱', 'T13 有特征选择陷阱卡片', '[T13](#/T13/predicted)'],
       ['Experts 错误界代数与解释', 'T12', '[T12](#/T12)'],
     ],
     quiz: [

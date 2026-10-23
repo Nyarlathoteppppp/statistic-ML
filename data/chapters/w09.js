@@ -18,7 +18,7 @@
     ],
     keyZh: [
       T`多臂老虎机（multi-armed bandit）：$k$ 个臂（arm），平均奖励都未知；每轮只拉一个，也只看到它的奖励。experts 每轮能看到所有专家的损失，这是两者的根本区别。`,
-      T`累积遗憾（cumulative regret）= 每轮都拉最好臂的期望总奖励，减去我们实际的期望总奖励；也等于各臂"被拉次数 × 比最优少赚的 gap"之和。难点是探索（exploration）与利用（exploitation）的取舍。`,
+      T`累积遗憾（cumulative regret）= 每轮都拉最好臂的期望总奖励，减去我们实际的期望总奖励；也等于各臂"（期望）被拉次数 × 比最优少赚的 gap"之和。难点是探索（exploration）与利用（exploitation）的取舍。`,
       T`贪心（greedy）总拉目前平均奖励最高的臂，从不探索。$Q_0=-\infty$ 会锁死在第一次拉的臂；$Q_0=+\infty$ 只让每个臂各试一次，之后纯利用。`,
       T`ε-贪心（ε-greedy）：以概率 $1-\varepsilon$ 拉当前最好的臂，以概率 $\varepsilon$ 在全部 $k$ 个臂里均匀随机挑。缺点是探索很盲目，不看每个臂的估计有多可靠。`,
     ],
@@ -71,7 +71,7 @@
         T`**乐观** $Q_0=+\infty$：拉过的臂的平均值 $<+\infty$，没拉过的还是 $+\infty$，所以前 $k$ 轮会**每个臂各拉一次**，之后才开始纯利用。`,
         T`**中间值**：每个臂**最多**被探索一次。乐观初始化只解决"冷启动"，不会持续探索。`,
       ] },
-      T`**Greedy 为什么会卡住？** 一个其实很好的臂，第一次拉恰好运气差（奖励低），平均值就低；greedy 以后再也不拉它，平均值也就**永远没机会被纠正**。L17 p13："pure greedy never explores an arm more than once"。`,
+      T`**Greedy 为什么会卡住？** 一个其实很好的臂，第一次拉恰好运气差（奖励低），平均值就低；只要其他臂的平均一直比它高，greedy 就不会再拉它，平均值也就**永远没机会被纠正**。L17 p13："pure greedy never explores an arm more than once"。`,
       { t: 'h3', text: '⑥ 加一点随机探索：ε-greedy（L17 p10）' },
       T`**ε-greedy（ε-贪心）**（L17 p10）：同样的 $Q$，但`,
       { t: 'math', tex: T`i_t\sim\begin{cases}\argmax_iQ_{t-1}(i)&\text{概率 }1-\varepsilon\\\mathrm{Unif}(\{1,\dots,k\})&\text{概率 }\varepsilon\end{cases}` },
@@ -124,8 +124,8 @@
         ['3', '$(0.4,0.9,\\infty)$', '臂 3', '0.6', '$(0.4,0.9,0.6)$'],
         ['4', '$(0.4,0.9,0.6)$', '臂 2（greedy）', '0.7', '$(0.4,0.8,0.6)$'],
       ] },
-      T`第 4 轮臂 2 的平均变成 $(0.9+0.7)/2=0.8$。之后只要臂 2 的平均不跌破 0.6，greedy 就一直拉它。如果臂 1 的真实均值其实是 0.95（第一次只是运气差），greedy **永远发现不了**。`,
-      { t: 'fade', title: '分步练习：regret 与 ε-greedy', plan: ['找出最优均值 $\\mu^*$', '每个臂的 gap $\\mu^*-\\mu_i$', T`regret $=\sum_i N(i)\times\text{gap}_i$`], items: [
+      T`第 4 轮臂 2 的平均变成 $(0.9+0.7)/2=0.8$。之后只要臂 2 的平均一直高于 0.6，greedy 就一直拉它。如果臂 1 的真实均值其实是 0.95（第一次只是运气差），greedy **永远发现不了**。`,
+      { t: 'fade', title: '分步练习：regret 与 ε-greedy', plan: ['找出最优均值 $\\mu^*$', '每个臂的 gap $\\mu^*-\\mu_i$', T`regret $=\sum_i N(i)\times\text{gap}_i$（题目给被拉次数就直接代；严格定义里是期望次数 $E[N_T(i)]$）`], items: [
         { md: T`3 个臂，$\mu=(0.2,\ 0.5,\ 0.7)$。10 轮里三个臂各被拉了 $(2,3,5)$ 次。期望 regret？`, steps: [
           { md: T`$\mu^*=0.7$` }, { md: T`gap $=(0.5,\ 0.2,\ 0)$` }, { md: T`$2\times0.5+3\times0.2+5\times0=1.6$（等价于 $0.7\times10-(0.4+1.5+3.5)=7-5.4$）` },
         ] },
@@ -157,7 +157,7 @@
         ['$\\varepsilon$-greedy', '以概率 $\\varepsilon$ 均匀随机', '盲目探索；不看估计的可靠程度'],
         ['UCB（c48）', '给拉得少的臂加奖励', '—'],
       ] },
-      { t: 'exam', md: T`**Exploration vs exploitation:** Exploitation plays the arm with the highest estimated mean reward so far; exploration plays other arms to improve their estimates. With bandit feedback only the chosen arm's reward is observed, so without exploration an arm that was unlucky early is never corrected (greedy can lock onto a suboptimal arm), while too much exploration wastes rounds on bad arms. The goal is to minimise cumulative regret $\mu^*T-\sum_tE[R_{i_t}(t)]$.` },
+      { t: 'exam', md: T`**Exploration vs exploitation:** Exploitation plays the arm with the highest estimated mean reward so far; exploration plays other arms to improve their estimates. With bandit feedback only the chosen arm's reward is observed, so without exploration an arm that was unlucky early may never be corrected (greedy can lock onto a suboptimal arm), while too much exploration wastes rounds on bad arms. The goal is to minimise cumulative regret $\mu^*T-\sum_tE[R_{i_t}(t)]$.` },
     ],
     pitfalls: [
       ['Bandit 每轮能看到所有臂的奖励', '只看到所拉臂的奖励（与 experts 的根本区别）。'],
@@ -169,13 +169,13 @@
       { type: 'num', q: '$\\mu=(0.1,0.4,0.9)$，$T=100$ 轮里各被拉 $(10,10,80)$ 次。期望 regret？', answer: 13, explain: '最好的臂均值 $\\mu^*=0.9$。臂 1 每拉一次比最优少 $0.9-0.1=0.8$，臂 2 少 $0.9-0.4=0.5$，臂 3 就是最优、差 0。期望 regret $=10\\times0.8+10\\times0.5+80\\times0=13$。' },
       { type: 'mc', q: 'Greedy、$Q_0=-\\infty$，第 1 轮拉了臂 2。之后：', options: ['每个臂各拉一次', '永远拉臂 2', '随机拉', '轮流拉'], answer: 1, explain: '臂 2 的有限平均值总大于 $-\\infty$（L17 p8）。' },
       { type: 'num', q: 'ε-greedy，$\\varepsilon=0.3$，$k=3$。拉当前最好臂的概率？', answer: 0.8, explain: T`ε-greedy 有两条路拉到当前最好的臂。利用：概率 $1-\varepsilon=1-0.3=0.7$，直接拉它。探索：概率 $\varepsilon=0.3$ 在全部 $k=3$ 个臂里均匀随机挑，挑中它的概率是 $1/3$，贡献 $0.3\times\frac13=0.1$。两条路相加 $0.7+0.1=0.8$。**易漏的是第二条路**：探索时也可能恰好抽到最好的臂，只答 0.7 就错了。` },
-      { type: 'show', q: '（英文）What is the main weakness of ε-greedy that UCB addresses?', answer: T`ε-greedy explores blindly: with probability ε it picks an arm uniformly at random, ignoring how promising or how uncertain each arm is, and when it exploits it ignores how reliable each average is. Optimistic initialisation only helps at the start. UCB directs exploration by adding a bonus that is large for arms pulled few times, so it tries arms that could still be good and stops trying clearly bad, well-estimated arms.`, qzh: 'UCB 解决了 ε-greedy 的什么主要缺点？', azh: 'ε-greedy 的探索是盲目的：它以概率 ε 均匀随机地选一个臂（arm），不考虑每个臂有多大希望、有多不确定；而在利用（exploit）时，它也不考虑每个平均值有多可靠。乐观初始化（optimistic initialisation）只在开始时有帮助。UCB 通过加一个探索奖励（bonus）来引导探索，这个奖励对拉得少的臂很大，所以它会去尝试仍可能很好的臂，并停止尝试那些明显很差、估计已经很准的臂。' },
+      { type: 'show', q: '（英文）What is the main weakness of ε-greedy that UCB addresses?', answer: T`ε-greedy explores blindly: with probability ε it picks an arm uniformly at random, ignoring how promising or how uncertain each arm is, and when it exploits it ignores how reliable each average is. Optimistic initialisation only helps at the start. UCB directs exploration by adding a bonus that is large for arms pulled few times, so it tries arms that could still be good and pulls clearly bad, well-estimated arms less and less often.`, qzh: 'UCB 解决了 ε-greedy 的什么主要缺点？', azh: 'ε-greedy 的探索是盲目的：它以概率 ε 均匀随机地选一个臂（arm），不考虑每个臂有多大希望、有多不确定；而在利用（exploit）时，它也不考虑每个平均值有多可靠。乐观初始化（optimistic initialisation）只在开始时有帮助。UCB 通过加一个探索奖励（bonus）来引导探索，这个奖励对拉得少的臂很大，所以它会去尝试仍可能很好的臂，而那些明显很差、估计已经很准的臂会被拉得越来越少。' },
       {
         type: 'mc', q: T`（平时小测原题）Consider the greedy multi-armed bandit, with initialised $Q_0=-\infty$, running in a setting with bounded rewards on all $k=5$ arms. What's the most number of times an arm $i$ with worst (minimum) expected reward $\mu_i$ could be pulled out of $T=100$ rounds?`,
         qzh: T`greedy 多臂老虎机，初始值 $Q_0=-\infty$，$k=5$ 个臂的奖励都有界。期望奖励最差（$\mu_i$ 最小）的臂 $i$，在 $T=100$ 轮里最多可能被拉几次？`,
         options: [T`1 round`, T`no rounds`, T`100 rounds`, T`96 rounds`],
         answer: 2,
-        explain: T`第 1 轮所有臂的 $Q$ 都是 $-\infty$，并列，greedy 可能正好选中最差的臂 $i$。拉完之后 $Q(i)$ 变成它拿到的奖励（奖励有界，是个有限数），其他 4 个臂还是 $-\infty$。greedy 每轮选 $Q$ 最大的臂，有限数永远大于 $-\infty$，所以之后每轮都继续拉臂 $i$，其他臂一次都不会被试：100 轮全是它。这正是 $Q_0=-\infty$ 的问题：完全不探索。反过来，只要 $Q_0$ 高于所有可能的奖励（$+\infty$，或课件 p13 的 $Q_0=10$），greedy 就会让每个臂先各试一次。96 是把"其他 4 个臂各试一次"当成了必然发生。`,
+        explain: T`第 1 轮所有臂的 $Q$ 都是 $-\infty$，并列，greedy 可能正好选中最差的臂 $i$。拉完之后 $Q(i)$ 变成它拿到的奖励（奖励有界，是个有限数），其他 4 个臂还是 $-\infty$。greedy 每轮选 $Q$ 最大的臂，有限数永远大于 $-\infty$，所以之后每轮都继续拉臂 $i$，其他臂一次都不会被试：100 轮全是它。这正是 $Q_0=-\infty$ 的问题：完全不探索。反过来，只要 $Q_0$ 高于所有可能的奖励（$+\infty$；课件 p13 的模拟用 $Q_0=10$，远高于那里的奖励），greedy 就会让每个臂先各试一次。96 是把"其他 4 个臂各试一次"当成了必然发生。`,
       },
     ],
   });
@@ -194,14 +194,14 @@
     keyZh: [
       T`UCB 值 = 平均奖励 + 探索奖励（bonus），每轮拉值最大的臂。$t$ 是全局的当前轮号（已拉总次数 + 1），所有臂共用；分母的 $N$ 才是这个臂自己被拉的次数。`,
       T`面对不确定性保持乐观（optimism in the face of uncertainty）：拉得少的臂 bonus 大，按"它最好可能有多好"去估；被冷落的臂 $N$ 不变而 $\ln t$ 一直涨，迟早会被再试一次。`,
-      T`两种探索机制：一是没拉过的臂取乐观的初始值 $Q_0$（如 $+\infty$），保证每个臂先试一次；二是 bonus。可调系数 $\rho$ 越大，越爱探索。`,
+      T`两种探索机制：一是没拉过的臂取初始值 $Q_0=+\infty$，保证前 $k$ 轮每个臂各试一次；二是 bonus。可调系数 $\rho$ 越大，越爱探索。`,
       T`bonus 来自 Hoeffding 不等式：把失败概率取成 $\varepsilon=1/t^4$（不是 ε-greedy 的 ε）反解，正好是上面的 bonus。UCB 的 regret 只按 $O(\log t)$ 增长，平均每轮的 regret 趋于 0。`,
     ],
     examQ: [
       { src: '2021 Q17', q: T`Describe two mechanisms used by the Upper Confidence Bound (UCB) multi-armed bandit to explore arms that so far have no demonstrated high rewards. (Given: $Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log(t)/N_{t-1}(i)}$; unobserved arms start with value $Q_0$.)`,
-        a: T`(1) Initialisation: an arm never pulled takes the value $Q_0$; an optimistic $Q_0$ (e.g. $+\infty$) makes every arm be tried before exploitation begins. (2) The exploration bonus $\sqrt{\rho\log t/N_{t-1}(i)}$ is large for rarely pulled arms and grows with $\log t$ while an arm is neglected, so an uncertain arm can have the highest value despite a low mean; larger $\rho$ explores more.`,
+        a: T`(1) Initialisation: an arm never pulled takes the value $Q_0$; setting $Q_0=+\infty$ makes every arm be pulled once before any arm is pulled a second time. (2) The exploration bonus $\sqrt{\rho\log t/N_{t-1}(i)}$ is large for rarely pulled arms and grows with $\log t$ while an arm is neglected, so an uncertain arm can have the highest value despite a low mean; larger $\rho$ explores more.`,
         qzh: T`描述置信上界（Upper Confidence Bound, UCB）多臂老虎机（multi-armed bandit）用来探索那些至今还没有表现出高奖励的臂（arms）的两种机制。（已给出：$Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{\rho\log(t)/N_{t-1}(i)}$；没有被观测过的臂初始值为 $Q_0$。）`,
-        azh: T`(1) 初始化（initialisation）：从未拉过的臂取值 $Q_0$；乐观的（optimistic）$Q_0$（例如 $+\infty$）使每个臂在开始利用（exploitation）之前都会被尝试。(2) 探索奖励（exploration bonus）$\sqrt{\rho\log t/N_{t-1}(i)}$ 对很少被拉的臂很大，而且在一个臂被冷落期间随 $\log t$ 增长，所以一个不确定的臂即使均值低，也可能拥有最高的值；$\rho$ 越大，探索越多。` },
+        azh: T`(1) 初始化（initialisation）：从未拉过的臂取值 $Q_0$；设 $Q_0=+\infty$（乐观，optimistic），保证每个臂都先被拉一次，然后才有臂被拉第二次。(2) 探索奖励（exploration bonus）$\sqrt{\rho\log t/N_{t-1}(i)}$ 对很少被拉的臂很大，而且在一个臂被冷落期间随 $\log t$ 增长，所以一个不确定的臂即使均值低，也可能拥有最高的值；$\rho$ 越大，探索越多。` },
     ],
     title: 'UCB', en: 'Upper confidence bound (UCB): optimism in the face of uncertainty',
     summary: '**UCB（upper confidence bound，置信上界）**：给每个臂的平均奖励加一个**探索奖励（exploration bonus）** $\\sqrt{2\\ln t/N_{t-1}(i)}$，拉值最大的。拉得少的臂 bonus 大，所以会被"乐观地"高估、得到尝试——**optimism in the face of uncertainty（面对不确定时保持乐观）**。bonus 来自 Hoeffding 不等式。**往年必考计算题（T2）**：给每个臂的次数和奖励，算 UCB 值、选下一个臂。',
@@ -228,12 +228,12 @@
     what: [
       { t: 'h3', text: '① 要解决什么：ε-greedy 探索得太盲目（L17 p14–p16）' },
       T`c47 的结尾：ε-greedy 探索时闭着眼随机挑，一个明显很差的臂和一个"还没试够、可能很好"的臂被挑中的机会一样；利用时又不管平均值可不可靠。UCB 的想法叫 **optimism in the face of uncertainty（面对不确定时保持乐观）**：`,
-      T`**乐观 = 把不确定当成机会。** 对一个只拉过几次的臂，我们不确定它的真实均值——可能比看到的好，也可能差。UCB 取"**它最好可能有多好**"（置信区间的上端）。如果连最乐观的估计都不如别的臂，就不拉它；如果乐观估计最高，就去拉——要么它真的好（赚了），要么发现它不好（以后 $N$ 变大、bonus 变小，自然就不拉了）。`,
+      T`**乐观 = 把不确定当成机会。** 对一个只拉过几次的臂，我们不确定它的真实均值——可能比看到的好，也可能差。UCB 取"**它最好可能有多好**"（置信区间的上端）。如果连最乐观的估计都不如别的臂，就不拉它；如果乐观估计最高，就去拉——要么它真的好（赚了），要么发现它不好（以后 $N$ 变大、bonus 变小，就越来越少拉它；但不会永远不拉，因为 $\ln t$ 一直在涨）。`,
       { t: 'h3', text: '② "它最好可能有多好"怎么算：Hoeffding 上界（L17 p17）' },
       T`上一节说的"它最好可能有多好"，就是：真实均值比目前的平均**最多高出多少**，仍然说得通。这个宽度不能凭感觉定，要用一个概率保证——c21 的 Hoeffding 不等式正好就是：奖励在 0 到 1 之间时，样本平均比真实均值低一大截的概率很小。把这个"出错概率"记成 $\varepsilon$（注意：**不是** c47 里 ε-greedy 的探索概率），反解出那一截，就是置信上界比平均高出的部分。`,
       T`c21 的 Hoeffding：$R_1,\dots,R_n$ i.i.d.、取值在 $[0,1]$、均值 $\mu$，则 $\Pr\big[\mu-\overline R_n>x\big]\le e^{-2nx^2}$——样本平均比真实均值低 $x$ 以上的概率很小。把右边这个失败概率记作 $\varepsilon$，即 $\varepsilon=e^{-2nx^2}$。反解 $x$：两边取 $\ln$ 得 $\ln\varepsilon=-2nx^2$，即 $2nx^2=\ln(1/\varepsilon)$，所以 $x=\sqrt{\ln(1/\varepsilon)/(2n)}$。于是：以至少 $1-\varepsilon$ 的概率`,
       { t: 'math', tex: T`\mu\le\overline R_n+\sqrt{\frac{\ln(1/\varepsilon)}{2n}}` },
-      T`把它用在臂 $i$ 上：$n=N_{t-1}(i)$，$\overline R_n=\hat\mu_{t-1}(i)$。右边就是真实均值 $\mu_i$ 的一个**置信上界**。失败概率 $\varepsilon$ 还没定：它越小，上界越宽、越保守。课件让它随轮数变得越来越严（越往后越不允许"也许它其实很好"这种借口）。取 $\varepsilon=1/t^4$（课件 p17；不是唯一选择，只是代进去正好得到考试用的形式）：$1/\varepsilon=t^4$，$\ln(1/\varepsilon)=\ln t^4=4\ln t$，代进去 $\sqrt{4\ln t/(2N)}=\sqrt{2\ln t/N}$——正是 UCB 的 bonus。$\varepsilon$ 随 $t$ 变小，意思是越往后要求越高的置信度。`,
+      T`把它用在臂 $i$ 上：$n=N_{t-1}(i)$，$\overline R_n=\hat\mu_{t-1}(i)$。右边就是真实均值 $\mu_i$ 的一个**置信上界**。失败概率 $\varepsilon$ 还没定：它越小，上界越宽、越保守。课件让它随轮数变得越来越严（越往后越不允许把一个其实很好的臂错判成差的，所以上界放得更宽）。取 $\varepsilon=1/t^4$（课件 p17；不是唯一选择，只是代进去正好得到考试用的形式）：$1/\varepsilon=t^4$，$\ln(1/\varepsilon)=\ln t^4=4\ln t$，代进去 $\sqrt{4\ln t/(2N)}=\sqrt{2\ln t/N}$——正是 UCB 的 bonus。$\varepsilon$ 随 $t$ 变小，意思是越往后要求越高的置信度。`,
       T`（课件还提到 Lai & Robbins '85 用 $\varepsilon=1/t$；那样得到的是 $\sqrt{\ln t/(2N)}$。考试按 p18 的公式 $\sqrt{2\ln t/N}$ 算。）`,
       { t: 'h3', text: '③ UCB 规则（L17 p18）' },
       T`**UCB 规则**（L17 p18）：每一轮，对**每个**臂算`,
@@ -243,7 +243,7 @@
       T`例（2026 practice Q2，也是 Workshop 10 的手算题，官方答案相同）：三个臂拉了 $(64,16,4)$ 次、奖励总和 $(40,10,2)$，下一轮 $t=85$，$2\ln t\approx9$。平均 $(40/64,\ 10/16,\ 2/4)=(0.625,\ 0.625,\ 0.5)$。bonus 是 $\sqrt{2\ln t/N}$——要开方：$\sqrt{9/64}=3/8$，$\sqrt{9/16}=3/4$，$\sqrt{9/4}=3/2$。UCB 值 $0.625+0.375=1$、$0.625+0.75=1.375$、$0.5+1.5=2$ ⇒ 拉臂 3：它平均最低，但只拉过 4 次、最不确定。具体步骤见下面"数学定义"和 [T2](#/T02)。`,
       { t: 'video', id: 'ucb' },
       { t: 'h3', text: '④ 效果：和 ε-greedy 比（L17 p19–p21）' },
-      { t: 'slide', src: 'L17/p21', caption: '平均累计奖励：UCB（红）很快超过两条 ε-greedy 曲线并一直领先。' },
+      { t: 'slide', src: 'L17/p21', caption: '课件轴标签是"平均累计奖励"，实际画的是到这一轮为止平均每轮的奖励：UCB（红）很快超过两条 ε-greedy 曲线并一直领先。' },
       T`**和 ε-greedy 比**：ε-greedy 探索时闭着眼随机选；UCB 的探索是**有方向的**——专挑"可能很好但还不确定"的臂，明显很差、又拉够了的臂几乎不会再碰（L17 p14 的局限都被解决）。`,
       { t: 'h3', text: '⑤ 可调的 ρ、regret 和应用（L17 p22）' },
       T`根号里的 2 来自上面"取 $1/t^4$"这个选择，并不神圣。想自己控制探索多少（或者奖励不在 $[0,1]$ 里），就把它换成一个可调的正系数：`,
@@ -252,7 +252,7 @@
       T`**Regret**（L17 p22）：UCB 的 regret 增长是 $O(\log t)$，平均每轮的 regret $\to0$；在乘一个常数的意义下是最优的。UCB 是 AlphaGo 用的 Monte Carlo tree search（蒙特卡洛树搜索）的基础。`,
       { t: 'h3', text: '⑥ 不上线也能比较：offline evaluation（Workshop 10）' },
       T`④ 里比较 UCB 和 ε-greedy 的曲线是模拟出来的。真实场景（Workshop 10：新闻网站选哪篇文章，被点击奖励为 1，否则为 0）里，把两个 bandit 都上线比较很贵：算法一开始什么都不知道，前期必然给读者推很多没人点的文章。`,
-      T`**Offline / off-policy evaluation（离线评估）** 只用一份历史日志：每一轮的文章是均匀随机选的，并记下点没点。评估一个 bandit 时按顺序回放日志：让它选一个臂；和日志里的臂相同，就把日志里的奖励给它、更新它、计入成绩；不同就跳过这一条，因为没人知道它选的那篇会不会被点。日志是均匀随机的，所以留下来的那些轮，和这个算法真的上线时遇到的情况一样。代价是丢掉大部分日志：10 个臂时平均只有约 1/10 能对上（Workshop 10 用 1 万条日志，只评估了 800 个对上的轮）。成绩看每轮平均奖励，也就是点击率（CTR，click-through rate）。`,
+      T`**Offline / off-policy evaluation（离线评估）** 只用一份历史日志：每一轮的文章是均匀随机选的，并记下点没点。评估一个 bandit 时按顺序回放日志：让它选一个臂；和日志里的臂相同，就把日志里的奖励给它、更新它、计入成绩；不同就跳过这一条，因为没人知道它选的那篇会不会被点。日志是均匀随机的，所以留下来的那些轮，和这个算法真的上线时遇到的情况一样。代价是丢掉大部分日志：10 个臂时平均只有约 1/10 能对上（Workshop 10 有 1 万条日志，平均约 1000 条能对上，示例只取了前 800 个对上的轮来评估）。成绩看每轮平均奖励，也就是点击率（CTR，click-through rate）。`,
     ],
     why: [
       T`**T2 是往年必考计算题**：2026 practice Q2（6 分）原题就是"三个臂、给次数和奖励、算 UCB 值、选臂"；2021 Q17（8 分）问 UCB 的两种探索机制。计算只要一个公式，失分点集中在"$t$ 取多少"和"不用计算器开根号"。完整题型见 [T2](#/T02)。`,
@@ -326,7 +326,7 @@
         ['随机性', '有', '只在平局时随机'],
         ['Regret', '固定 ε 时线性增长', '$O(\\log t)$'],
       ] },
-      { t: 'exam', md: T`**(2021 Q17) Two mechanisms by which UCB explores arms without demonstrated high reward:** (1) Initialisation: an arm that has never been pulled takes the value $Q_0$; with an optimistic $Q_0$ (e.g. $+\infty$, above any attainable value) every arm is tried before exploitation begins. (2) The exploration bonus $\sqrt{\rho\log t/N_{t-1}(i)}$: it is large for arms pulled few times, so an uncertain arm can have the highest index even with a low empirical mean ("optimism in the face of uncertainty"); and since $\log t$ keeps growing while $N_{t-1}(i)$ is fixed for a neglected arm, its bonus increases until it is pulled again. Larger $\rho$ means more exploration.` },
+      { t: 'exam', md: T`**(2021 Q17) Two mechanisms by which UCB explores arms without demonstrated high reward:** (1) Initialisation: an arm that has never been pulled takes the value $Q_0$; with $Q_0=+\infty$, every arm is pulled once before any arm is pulled a second time. (2) The exploration bonus $\sqrt{\rho\log t/N_{t-1}(i)}$: it is large for arms pulled few times, so an uncertain arm can have the highest index even with a low empirical mean ("optimism in the face of uncertainty"); and since $\log t$ keeps growing while $N_{t-1}(i)$ is fixed for a neglected arm, its bonus increases until it is pulled again. Larger $\rho$ means more exploration.` },
     ],
     pitfalls: [
       ['$t$ 用每个臂自己的次数', '$t$ 是全局的当前轮号 $=\\sum_iN+1$，所有臂共用。'],
@@ -337,7 +337,7 @@
     ],
     quiz: [
       { type: 'num', q: '三个臂已拉 $(10,5,5)$ 次，下一轮 $t$ 是多少？', answer: 21, explain: T`UCB 里的 $t$ 是全局的当前轮号，所有臂共用，等于已拉总次数加 1。三个臂的次数相加 $10+5+5=20$，说明已经过了 20 轮，下一轮是第 $20+1=21$ 轮，所以 $t=21$。常见错误：拿某个臂自己的次数（如 10）当 $t$，或**忘了加 1** 答成 20。` },
-      { type: 'num', q: '$\\ln t\\approx2$，某臂 $N=16$，$\\hat\\mu=0.5$。UCB 值？', answer: 1, explain: T`UCB 值 = 平均奖励 + exploration bonus（探索奖励）：$Q=\hat\mu+\sqrt{2\ln t/N}$。题目给 $\hat\mu=0.5$、$\ln t\approx2$、该臂被拉次数 $N=16$。bonus：$2\ln t=2\times2=4$，$4/16=0.25$，开方 $\sqrt{0.25}=0.5$。$Q=0.5+0.5=1$。两个陷阱：忘了根号里的 2（得 $\sqrt{2/16}\approx0.35$），或**忘了开方**（得 $0.5+0.25=0.75$）。` },
+      { type: 'num', q: '$\\ln t\\approx4$，某臂 $N=32$，$\\hat\\mu=0.5$。UCB 值？', answer: 1, explain: T`UCB 值 = 平均奖励 + exploration bonus（探索奖励）：$Q=\hat\mu+\sqrt{2\ln t/N}$。题目给 $\hat\mu=0.5$、$\ln t\approx4$、该臂被拉次数 $N=32$。bonus：$2\ln t=2\times4=8$，$8/32=0.25$，开方 $\sqrt{0.25}=0.5$。$Q=0.5+0.5=1$。两个陷阱：忘了根号里的 2（得 $\sqrt{4/32}\approx0.35$），或**忘了开方**（得 $0.5+0.25=0.75$）。` },
       { type: 'mc', q: '一个臂很久没被拉，它的 UCB bonus 会：', options: ['不变', '慢慢变大', '慢慢变小', '变成 0'], answer: 1, explain: T`bonus 是 $\sqrt{2\ln t/N_{t-1}(i)}$。臂没被拉，它的次数 $N$ 停在原值；而轮号 $t$ 每轮加 1，$\ln t$ 慢慢增大，所以 bonus 慢慢变大，**这个臂迟早会被再试一次**，不会像 greedy 那样被永远放弃。"不变"是最诱人的错项：它只看到 $N$ 不变，忽略了所有臂共用的 $t$ 一直在涨。` },
       { type: 'mc', q: 'UCB bonus 的理论来源是：', options: ['中心极限定理', 'Hoeffding 不等式', 'Bayes 公式', 'VC 维'], answer: 1, explain: T`Hoeffding's inequality（Hoeffding 不等式）说：$n$ 个取值在 $[0,1]$ 的 i.i.d. 奖励，以至少 $1-\varepsilon$ 的概率有 $\mu\le\overline R_n+\sqrt{\ln(1/\varepsilon)/(2n)}$，右边就是真实均值的置信上界。把 $n$ 换成该臂的次数 $N_{t-1}(i)$，并取失败概率 $\varepsilon=1/t^4$：$\ln(1/\varepsilon)=4\ln t$，**$\sqrt{4\ln t/(2N)}=\sqrt{2\ln t/N}$ 正是 UCB 的 bonus**。central limit theorem（中心极限定理）只在样本多时给近似，Hoeffding 对任意 $n$ 都成立，课件用的是后者。L17 p17。` },
       { type: 'mc', q: 'Offline evaluation 回放均匀随机的日志。某一轮 bandit 选的臂和日志里的臂不同，应该：', options: ['把日志里的奖励记给它', '跳过这一条：不更新、不计分', '记奖励 0 并更新', '按日志里的臂更新它'], answer: 1, explain: T`日志只记下了被随机选中的那个臂的奖励；bandit 选了别的臂，它会不会被点击没人知道，所以这一条既不能计分，也不能用来更新，只能跳过。只保留对上的轮：因为日志是均匀随机选的臂，这些轮和算法真的上线时遇到的情况一样，评估是公平的。"记奖励 0"会把"没观测到"当成"没被点击"，系统性地压低成绩；"把日志的奖励记给它"或"按日志的臂更新"等于把别的臂的结果算到它头上。Workshop 10。` },
