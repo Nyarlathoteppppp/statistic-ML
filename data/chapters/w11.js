@@ -44,14 +44,14 @@
       { src: '2016 S2 Q1.2', q: T`What algorithm is used for efficient marginalisation on probabilistic graphical models (PGMs)?`,
         a: T`The (variable) elimination algorithm: push each sum inside the product of factors and sum out one variable at a time, passing the resulting small tables on as messages. On trees this is message passing (belief propagation); on general graphs it is organised by the junction tree algorithm.`,
         qzh: T`在概率图模型（PGM）上做高效的边缘化（marginalisation），用的是什么算法？`,
-        azh: T`（变量）消元算法（variable elimination）：把求和号推进因子的乘积里，一次加掉一个变量，把得到的小表当作消息（message）往下传。在树上就是消息传递（置信传播 belief propagation，c57）；一般的图用联结树（junction tree）算法来组织（c58）。` },
+        azh: T`（变量）消元算法（variable elimination）：把求和号推进因子的乘积里，一次加掉一个变量，把得到的小表当作消息（message）往下传。在树上就是消息传递（[信念传播 belief propagation](#/c57)）；一般的图用[联结树（junction tree）算法](#/c58)来组织。` },
       { src: '2017 S2 Q1(f)', q: T`In a sentence each, describe what probabilistic inference and statistical inference are for.`,
         a: T`Probabilistic inference: with the model fully specified (graph and parameters known), compute probabilities of query variables given observed evidence, e.g. the posterior marginal $P(B=1\mid A=1)$. Statistical inference: use data to estimate the model's unknown parameters (and possibly its structure), e.g. the CPTs by maximum likelihood.`,
         qzh: T`各用一句话说明概率推断（probabilistic inference）和统计推断（statistical inference）是用来做什么的。`,
-        azh: T`概率推断：模型（图和参数）已经完全给定，观测到证据（evidence）后，计算查询变量的概率，例如后验边缘分布 $P(B=1\mid A=1)$（本章 ①）。统计推断：用数据估计模型里未知的参数（也可能包括结构），例如用最大似然估计 CPT（[c61](#/c61)）。2026 的课件不用"statistical inference"这个词，它就是本章 ① 表里的"学习（learning）"。` },
+        azh: T`概率推断：模型（图和参数）已经完全给定，观测到证据（evidence）后，计算查询变量的概率，例如后验边缘分布 $P(B=1\mid A=1)$（本章 ①）。统计推断：用数据估计模型里未知的参数（也可能包括结构），例如用最大似然估计（maximum likelihood estimation，MLE）估计条件概率表（conditional probability table，CPT；列出变量在各组父节点取值下的条件概率），见 [c61](#/c61)。2026 的课件不用"statistical inference"这个词，它就是本章 ① 表里的"学习（learning）"。` },
       { src: '2017 S2 Q11(c)', q: T`(Flu model: $F$ = whether the individual has the flu; $S_i$ = presence of symptom $i$, $i=1\dots I$; $T$ = result of an imperfect clinical test; all binary.) In making a diagnosis, the PGM can be used to compute a distribution over $F$. State the desired distribution, based on an individual attending the doctor with specific symptoms.`,
         a: T`The posterior of $F$ given the observed evidence, $P(F\mid S_1=s_1,\dots,S_I=s_I)$ (also conditioning on $T=t$ if the test was done). It is obtained by inference: sum out the unobserved variables, then normalise over the two values of $F$.`,
-        qzh: T`（流感模型：$F$ = 是否患流感；$S_i$ = 是否有第 $i$ 种症状，$i=1\dots I$；$T$ = 一项不完美的临床检测的结果；都是二值变量。）做诊断时，可以用这个概率图模型算出 $F$ 的一个分布。对一个带着具体症状来看医生的人，写出要算的分布。`,
+        qzh: T`（流感模型：$F$ = 是否患流感；共有 $I$ 种症状，$S_i$ = 是否有第 $i$ 种症状，$i=1\dots I$；$T$ = 一项不完美的临床检测的结果；都是二值变量。实际观察到的症状值记为 $s_i$，即 $S_i=s_i$；若做了检测，检测的观测值记为 $t$，即 $T=t$。）做诊断时，可以用这个概率图模型算出 $F$ 的一个分布。对一个带着具体症状来看医生的人，写出要算的分布。`,
         azh: T`给定观测证据时 $F$ 的后验：$P(F\mid S_1=s_1,\dots,S_I=s_I)$（如果做了检测，再加上条件 $T=t$）。用推断求它：把没观测到的变量求和消掉，再在 $F$ 的两个取值上归一化。` },
     ],
     genesis: T`推断要回答"听到警报后，盗窃的概率是多少"这类问题。最直接的做法是对所有没被问到的变量求和：$n$ 个二元变量要加的项数是 $2^n$ 量级，5 个变量 32 项还能手算，30 个就是十亿项。可联合分布本来就是很多小因子的乘积（c53、c55），每个因子只涉及两三个变量。**把求和号往里推：只出现在一个因子里的变量，先在那个因子里就地加掉**，剩下的是一张小表（一条"消息"），交给邻居接着算。在树上从叶子开始一个一个这样消下去，计算量只随变量个数线性增长。`,
@@ -62,7 +62,7 @@
       [T`$x_i$`, T`第 $i$ 个变量（课件例子：房间温度 $\pm1$；本章手算例子取 0/1）`],
       [T`$\hat x_i$`, T`变量 $x_i$ 的观测值（已经知道的那个值）`],
       [T`$\delta(a,b)$`, T`指示函数：$a=b$ 时为 1，否则 0（c57 也用它加入观测）`],
-      [T`$\psi_{ij}(x_i,x_j)$`, T`边 $i$—$j$ 上的 potential（正数打分），如 $\psi_{12}=\exp(\theta_{12})$`],
+      [T`$\psi_{ij}(x_i,x_j)$`, T`边 $i$—$j$ 上的 potential（正数打分），如 $\psi_{12}=\exp(\theta_{12})$。反向传消息仍用同一张表：$\psi_{ji}(x_j,x_i)=\psi_{ij}(x_i,x_j)$；下标换序时，参数也相应换序，不是新增一张表`],
       [T`$\sum_{x_i}$`, T`对 $x_i$ 的所有取值求和（二元变量就是两项相加）`],
       [T`$m_{i\to j}(x_j)$`, T`从 $i$ 发给 $j$ 的消息：把 $i$ 那一侧的变量都求和掉之后剩下的、只依赖 $x_j$ 的函数（$x_j$ 每个取值一个数）`],
       [T`$N(i)$`, T`节点 $i$ 的邻居集合；$N(i)\setminus j$ = 除了 $j$ 以外的邻居`],
@@ -83,9 +83,9 @@
       { t: 'h3', text: '① 推断是什么（L21 p3–p5）' },
       T`**Inference（推断）= 用已经建好的模型回答问题：知道了一部分变量的值，问其他变量取各个值的概率。** 知道的那部分叫 **evidence（证据 / 观测）**，被问的叫**查询变量（query）**。`,
       { t: 'graph', nodes: { E: [80, 40], B: [260, 40], R: [80, 150], A: [260, 150], L: [170, 255] }, notes: { E: '地震', B: '盗窃', R: '电台报道', A: '警报', L: '下班离开' }, edges: 'E>R E>A B>A R>L A>L', cls: { A: 'given', B: 'q' }, w: 300, caption: 'W10 的 alarm 网络（c53）。灰色 $A$ = 已知（警报响了），红圈 $B$ = 要问的（有没有盗窃）。CPT：$P(E=1)=P(B=1)=0.01$；只要地震或盗窃，警报一定响（$A=1$ 当且仅当 $E=1$ 或 $B=1$）；有地震电台一定报道。' },
-      T`拿 W10 的 alarm 网络举例（c53）：模型已经有了——图和所有 CPT 都定好了。现在你**听到警报响了**（观测 $A=1$），想知道**发生盗窃的概率** $P(B=1\mid A=1)$。这就是一次推断。用 c53 的数字：$P(A=1)=1-0.99\times0.99=0.0199$，而盗窃一定触发警报，所以 $P(B=1\mid A=1)=\frac{P(B=1)}{P(A=1)}=\frac{0.01}{0.0199}\approx0.50$——警报一响，盗窃的概率从 1% 跳到约 50%。如果电台又报道了地震（$E=1$），盗窃的概率又掉回 1%（c54 的 explaining away）。`,
+      T`拿 W10 的 alarm 网络举例（c53）：模型已经有了——图和所有 CPT 都定好了。现在你**听到警报响了**（观测 $A=1$），想知道**发生盗窃的概率** $P(B=1\mid A=1)$。这就是一次推断。已知：地震 $E$ 和盗窃 $B$ 独立，且 $P(E=1)=P(B=1)=0.01$；警报当且仅当地震或盗窃发生时响。因此 $P(E=0)=P(B=0)=1-0.01=0.99$，不响的概率是 $P(A=0)=P(E=0,B=0)=0.99\times0.99$，所以 $P(A=1)=1-0.99\times0.99=0.0199$。又因为盗窃一定触发警报，$P(B=1,A=1)=P(B=1)=0.01$，于是 $P(B=1\mid A=1)=\frac{P(B=1,A=1)}{P(A=1)}=\frac{0.01}{0.0199}\approx0.50$——警报一响，盗窃的概率从 1% 跳到约 50%。如果又确定发生了地震（$E=1$），警报响就已经得到解释，不再额外支持盗窃发生。此时 $P(B=1\mid A=1,E=1)=P(B=1\mid E=1)=P(B=1)=0.01$：已知地震后警报必响，而地震和盗窃原本独立。这叫[解释消除（explaining away）](#/c54)。`,
       { t: 'table', cls: 'compact', head: ['', '做什么', '本课例子'], rows: [
-        ['建模（modelling）', '定变量、画图、选因子的形式', 'L20：alarm 网络、房间温度 MRF'],
+        ['建模（modelling）', '定变量、画图、选因子的形式', 'L20：alarm 网络、房间温度马尔可夫随机场（Markov random field，MRF：用无向图及其因子表示联合分布的模型）'],
         ['学习（learning）', '从数据**估计参数**（CPT、potential）', 'c53 的 MLE 数数（2025 Q4）'],
         ['**推断（inference）**', '参数已知，给定观测**求概率**', '本章和 c57–c59'],
       ] },
@@ -112,7 +112,7 @@
         T`**归一化**：除以总和 $4+7=11$ ⇒ $P(x_3=0\mid x_1=1)=4/11\approx0.36$，$P(x_3=1\mid x_1=1)=7/11\approx0.64$。`,
       ] },
       T`$Z$ 从头到尾没用上：每一行都差同一个因子 $1/Z$，第 3 步除以总和时就约掉了。所以推断时只算打分（写成 $\propto$，"正比于"），最后归一化即可。`,
-      T`**这三步算出来的东西有名字。** 第 2 步把其他变量加掉、只看一个变量自己的分布，叫 **marginal（边缘分布）**——就像在一张大表的"边上"写行和、列和（W1 c02 的 sum rule）。第 1 步先按观测筛选，得到的是看到证据**之后**的分布，叫 **posterior（后验）**。所以推断要算的就是查询变量的 **posterior marginal（后验边缘分布）**。课件 p5 把这三步写成一般公式（查询 $x_k$，观测 $\hat x_i,\hat x_j$）：`,
+      T`**这三步算出来的东西有名字。** 第 2 步把其他变量加掉、只看一个变量自己的分布，叫 **marginal（边缘分布）**——就像在一张大表的"边上"写行和、列和（[c02 的求和法则（sum rule）](#/c02)：把其他变量的各个取值对应的概率加起来）。第 1 步先按观测筛选，得到的是看到证据**之后**的分布，叫 **posterior（后验）**。所以推断要算的就是查询变量的 **posterior marginal（后验边缘分布）**。课件 p5 把这三步写成一般公式（查询 $x_k$，观测 $\hat x_i,\hat x_j$）：`,
       { t: 'math', tex: T`P(x_k,\hat x_i,\hat x_j)=\sum_{\text{除 }x_k\text{ 外所有变量}}\delta(\hat x_i,x_i)\,\delta(\hat x_j,x_j)\,P(x_1,\dots,x_n)` },
       { t: 'math', tex: T`P(x_k\mid\hat x_i,\hat x_j)=\frac{P(x_k,\hat x_i,\hat x_j)}{\sum_{x_k}P(x_k,\hat x_i,\hat x_j)}` },
       T`**对照三步读公式**：$\delta(a,b)$ 是指示函数（$a=b$ 时为 1，否则 0），乘上它，和观测矛盾的行变成 0——第 1 步"划掉"；$\sum$ 对除 $x_k$ 以外的变量求和——第 2 步"加掉"；第二行除以总和——第 3 步"归一化"。链的例子里 $x_k=x_3$，观测是 $\hat x_1=1$。`,
@@ -172,7 +172,7 @@
       T`推断是图模型的"用法"：W10 建好模型（c53–c55），这一周学怎么用它算概率。c57 的 belief propagation、c58 的 junction tree 都是"在树（或团组成的树）上传消息"。往年 2021 Q18(b) 考过写消元的前两步：要写出 $\psi$、$m$ 的形式**和每一步对应的线性代数运算**——被观测的变量不是求和掉，而是**取出对应的那一行**（切片）；没观测的变量求和掉，对两个变量的表来说就是**矩阵乘向量**（见下面的矩阵写法和 c57）。T6 的消元题也建立在"消元 = 一次消掉一个变量"之上。`,
     ],
     intuition: [
-      T`**为什么能省？乘法分配律。** 把 $x_2,x_4$ 暂时当作固定值：$\sum_{x_1}\sum_{x_5}\psi_{12}(x_1,x_2)\,\psi_{45}(x_4,x_5)=\big[\sum_{x_1}\psi_{12}(x_1,x_2)\big]\cdot\big[\sum_{x_5}\psi_{45}(x_4,x_5)\big]$。第一个因子里没有 $x_5$，第二个里没有 $x_1$，所以两个求和可以分开做——就像 $\sum_a\sum_bf(a)g(b)=\big(\sum_af(a)\big)\big(\sum_bg(b)\big)$。左边要算 $2\times2=4$ 个乘积再相加，右边只要两个两项和再乘一次。消元就是系统地"把求和往里推"。（这里只抽出含 $x_1$ 的 $\psi_{12}$ 和含 $x_5$ 的 $\psi_{45}$；$\psi_{23}$、$\psi_{24}$ 里既没有 $x_1$ 也没有 $x_5$，$x_2,x_4$ 固定时它们是常数，提到两个求和外面去了。）`,
+      T`**为什么能省？乘法分配律。** 把 $x_2,x_4$ 暂时当作固定值：$\sum_{x_1}\sum_{x_5}\psi_{12}(x_1,x_2)\,\psi_{45}(x_4,x_5)=\big[\sum_{x_1}\psi_{12}(x_1,x_2)\big]\cdot\big[\sum_{x_5}\psi_{45}(x_4,x_5)\big]$。第一个因子里没有 $x_5$，第二个里没有 $x_1$，所以两个求和可以分开做——换成简写：令 $a,b$ 分别对应这里的 $x_1,x_5$，都取两个值；$f(a)$、$g(b)$ 分别代表只依赖各自变量的那个因子。那么 $\sum_a\sum_b f(a)g(b)=\big(\sum_a f(a)\big)\big(\sum_b g(b)\big)$。左边要算 $2\times2=4$ 个乘积再相加，右边只要两个两项和再乘一次。消元就是系统地"把求和往里推"。（这里只抽出含 $x_1$ 的 $\psi_{12}$ 和含 $x_5$ 的 $\psi_{45}$；$\psi_{23}$、$\psi_{24}$ 里既没有 $x_1$ 也没有 $x_5$，$x_2,x_4$ 固定时它们是常数，提到两个求和外面去了。）`,
       T`**消息 = 一棵子树的总结。** $m_{2\to4}(x_4)$ 回答的是："如果 $x_4$ 取这个值，$x_4$ 上面那一整块（$x_1,x_2,x_3$）一共贡献多少分？"它已经把那一侧所有变量的所有组合都加好了，压缩成 $x_4$ 每个取值一个数。`,
       T`**为什么必须是树？** 树上去掉一个节点就把图分成互不相连的几块，每块各自总结成一条消息，互不干扰。有环的话，同一份信息会沿两条路绕回来被重复计算——c58 的 junction tree 就是来解决这个的。`,
       { t: 'think', q: '5 个二元变量直接求 $P(x_4)$，要把多少种组合加起来？用消息传递，每条消息要算几个数？', a: T`直接求和：$x_4$ 的每个取值下，其余 4 个变量有 $2^4=16$ 种组合。消息传递：每条消息是"$x_j$ 每个取值一个数"，每个数是对发送者两个取值的求和——4 条消息，每条只算 2 个两项和。变量越多，差距越是指数级。` },
@@ -225,7 +225,7 @@
       ] },
     ],
     viz: [
-      { id: 'msg-passing', how: '4 个二元节点，potential $\\psi=2$（两端相同）或 $1$（不同），$X_1$ 另有一个偏向 0 的**单点因子（unary factor：只含一个变量的因子，相当于对 $X_1$ 的先验偏好）** $(0.7,0.3)$。每点一次"下一步"发出一条消息：下方输出区把这条消息的求和逐项展开（精确分数），表格记下得到的向量 $[m(0),m(1)]$；最后一次点击给出各节点的边缘并和暴力枚举核对。可以选链或星形、选 root。',
+      { id: 'msg-passing', how: '4 个二元节点，potential $\\psi=2$（两端相同）或 $1$（不同），$X_1$ 另有一个偏向 0 的**单点因子（unary factor：只含一个变量的因子，相当于对 $X_1$ 的先验偏好）** $(0.7,0.3)$。每点一次"下一步"发出一条消息：下方输出区把这条消息的求和逐项展开（精确分数），表格记下得到的向量 $[m(0),m(1)]$；最后一次点击给出各节点的边缘并和暴力枚举核对。预设 chain 表示链，star 表示星形；root（根节点）是任选的消息汇集点。collect（收集阶段）就是从叶子逐步向根节点传消息。',
         try: '① 选 chain、root = X4：先看 collect 阶段，消息从 X1 一路传到 X4，正是本章的消元。② 注意工具的规则多了单点因子：$m_{i\\to j}(x_j)=\\sum_{x_i}\\phi_i(x_i)\\,\\psi_{ij}(x_i,x_j)\\prod_{k\\in N(i)\\setminus j}m_{k\\to i}(x_i)$，其中 $\\phi_{X1}=(7/10,\\ 3/10)$（按 $X_1=0$、$X_1=1$ 的顺序：$X_1$ 自己偏好取 0），其他节点 $\\phi=1$（乘了也不变，所以正文的消息里没有 $\\phi$）。这个工具的 $\\psi$ 是"两端相同打 2、不同打 1"。第一条消息（也按 $X_2=0,1$ 的顺序）：$X_2=0$ 时，$X_1=0$ 相同贡献 $0.7\\times2$，$X_1=1$ 不同贡献 $0.3\\times1$。合起来：$m_{X1\\to X2}=(0.7\\cdot2+0.3\\cdot1,\\ 0.7\\cdot1+0.3\\cdot2)=(17/10,\\ 13/10)$——先自己算，再点下一步核对。③ 跑完后读 X4 的边缘，和暴力枚举对比。' },
     ],
     compare: [
@@ -262,7 +262,7 @@
     ],
     keyZh: [
       T`加入观测：把含观测变量的因子乘上指示函数 $\delta$（得到 modified factor $\tilde\psi$），即把和观测矛盾的那一行清零；之后照常消元，最后归一化，就是后验边缘。`,
-      T`信念传播（belief propagation）：任选一个 root，先从叶子把消息收到 root（collect），再从 root 发回叶子（distribute）。每条边两个方向各一条，共 $2(n-1)$ 条消息，所有节点的边缘就都有了。`,
+      T`信念传播（belief propagation，简称 BP）：任选一个 root，先从叶子把消息收到 root（collect），再从 root 发回叶子（distribute）。每条边两个方向各一条，共 $2(n-1)$ 条消息，所有节点的边缘就都有了。`,
       T`相邻两点的联合边缘：两点各自从外面收到的消息，乘上两点之间的 potential。这条边上来回的两条消息不乘，否则同一份信息算了两遍。`,
       T`有环的图：用联结树（junction tree）得到精确结果；或者硬在环上跑 loopy belief propagation，结果是近似的，因为消息会绕着环转回来，证据被重复计算。`,
     ],
@@ -270,6 +270,12 @@
     summary: '有观测时，把**含观测变量的因子乘上指示函数** $\\delta(x_i,\\hat x_i)$（得到 modified factor $\\tilde\\psi$），然后照常消元。想要**所有**节点的边缘？不必对每个节点各做一次消元：**belief propagation（信念传播）** 选一个 root，**① 从叶子收消息到 root（collect），② 再从 root 发回叶子（distribute）**——每条边两个方向各一条消息，之后每个节点的边缘 $\\propto$ 收到的所有消息之积（再除以总和归一化）；相邻两点的联合边缘 $\\propto$ 外来消息 × 两点之间的 potential。',
     prereq: ['c56'],
     symbols: [
+      [T`$x_i$`, T`第 $i$ 个节点的变量；房间例子中 $1$ 表示热、$-1$ 表示冷，后面的三节点链改用 0/1`],
+      [T`$\psi_{ij}(x_i,x_j)$`, T`边 $i$—$j$ 的势函数（potential）：给两端变量的每种组合打分的小表，不是归一化概率。反向使用时仍是同一张表：$\psi_{ji}(x_j,x_i)=\psi_{ij}(x_i,x_j)$`],
+      [T`$m_{i\to j}(x_j)$`, T`从节点 $i$ 发给节点 $j$ 的消息：把 $i$ 那一侧的变量加掉后，留下收件变量 $x_j$ 每个取值对应的一个分数`],
+      [T`$\propto$`, T`正比于：右边先给未归一化分数，除以所有取值的分数总和才得到概率`],
+      [T`$Z$`, T`归一化常数：把联合分布中所有变量组合的打分相加`],
+      [T`$\sum_{x_i},\ \prod,\ N(i)\setminus j$`, T`分别表示对 $x_i$ 的所有取值相加、把列出的各项连乘、从节点 $i$ 的邻居集合中排除收件人 $j$`],
       [T`$\hat x_i$`, T`变量 $x_i$ 的观测值`],
       [T`$\delta(a,b)$`, T`指示函数：$a=b$ 时为 1，否则 0`],
       [T`$\tilde\psi_{ij}$`, T`modified factor：$\delta(x_i,\hat x_i)\,\psi_{ij}(x_i,x_j)$`],
@@ -302,7 +308,7 @@
         g(TREE, { edges: 'x1>x2:msg=m₁→₂ x3>x2:msg=m₃→₂ x2>x4:msg=m₂→₄ x5>x4:msg=m₅→₄', cls: { x4: 'hl2' }, caption: '第 1 阶段 collect：消息从叶子流向 root $x_4$（黄）。这一步就是 c56 的消元。' }),
         g(TREE, { edges: 'x2>x1:msg=m₂→₁ x2>x3:msg=m₂→₃ x4>x2:msg=m₄→₂ x4>x5:msg=m₄→₅', cls: { x4: 'hl2' }, caption: '第 2 阶段 distribute：消息从 root 流回叶子。现在每条边两个方向各有一条消息。' }),
       ] },
-      T`视频沿用 c56 那四张打分表：`,
+      T`下面的视频和两阶段数值例子都改回**没有任何观测**的情况，使用原始 $\psi$，不是刚才的 $\tilde\psi$。已知四条边的打分如下：每列的第一个冷热状态对应行内公式的第一个变量，第二个状态对应第二个变量；例如 $\psi_{24}$ 的「热·冷」表示 $x_2$ 热、$x_4$ 冷，打分为 1。`,
       { t: 'table', cls: 'compact', head: ['边（哪两个房间）', '热·热', '热·冷', '冷·热', '冷·冷'], rows: [
         [T`$\psi_{12}(x_1,x_2)$：房间 1–2`, '3', '1', '1', '1'],
         [T`$\psi_{23}(x_2,x_3)$：房间 2–3`, '1', '2', '1', '1'],
@@ -310,7 +316,7 @@
         [T`$\psi_{45}(x_4,x_5)$：房间 4–5`, '3', '1', '1', '2'],
       ] },
       { t: 'video', id: 'bp' },
-      T`**先用 c56 的数字把第二阶段算一遍**（同一棵树、同一组打分表，root $=x_4$，没有观测）。第一阶段就是 c56 算过的四条：$m_{1\to2}=(4,2)$，$m_{3\to2}=(3,2)$，$m_{2\to4}=(52,20)$，$m_{5\to4}=(4,3)$（括号里是（热，冷））。第二阶段从 $x_4$ 往回发，规则不变——**只乘"除了收件人以外"的来信**：`,
+      T`**先用 c56 的数字把第二阶段算一遍**（同一棵树、同一组打分表，root $=x_4$，没有观测）。第一阶段就是 c56 算过的四条：$m_{1\to2}=(4,2)$，$m_{3\to2}=(3,2)$，$m_{2\to4}=(52,20)$，$m_{5\to4}=(4,3)$（括号里是（热，冷））。第二阶段从 $x_4$ 往回发，规则不变——**只乘「除了收件人以外」的来信**。下面消息向量相乘都指按同一取值逐项乘，不是向量内积；例如 $m_{1\to2}\cdot m_{4\to2}=(4\times19,\ 2\times10)=(76,20)$，两个分量仍分别对应热、冷：`,
       { t: 'table', cls: 'compact', head: ['消息', '乘哪些来信', '算（热，冷）', '结果'], rows: [
         [T`$m_{4\to5}$`, T`$m_{2\to4}=(52,20)$`, T`$x_5$ 热：$52\times3+20\times1$；冷：$52\times1+20\times2$`, '(176, 92)'],
         [T`$m_{4\to2}$`, T`$m_{5\to4}=(4,3)$`, T`$x_2$ 热：$4\times4+3\times1$；冷：$4\times1+3\times2$`, '(19, 10)'],
@@ -361,7 +367,7 @@
       T`三个边缘的未归一化总和都是 24 = $Z$——一个很好的自检。相邻两点：$P(x_1,x_2)\propto\psi_{12}(x_1,x_2)\,m_{3\to2}(x_2)=\begin{bmatrix}3\cdot3&1\cdot4\\1\cdot3&2\cdot4\end{bmatrix}=\begin{bmatrix}9&4\\3&8\end{bmatrix}$（打分表：行 = $x_1$ 取 0/1，列 = $x_2$ 取 0/1），总和同样是 24。`,
       { t: 'h3', text: '加入观测 $x_1=1$' },
       T`$\tilde\psi_{12}$ 只保留 $x_1=1$ 那一行 $(1,2)$，另一行变 0。$m_{1\to2}=(1,\ 2)$；$m_{2\to3}(x_3)$：$x_3=0$：$2\times1+1\times2=4$；$x_3=1$：$1\times1+3\times2=7$。所以 $P(x_3=1\mid x_1=1)=7/11\approx0.636$（没有观测时是 $0.542$）。`,
-      T`**线性代数的说法（2021 Q18b 要写这个）**：观测 $x_1=1$ 这一步不是求和，而是**取 $\psi_{12}$ 的第 $x_1=1$ 行** $(1,2)$（切片 / 索引）；接下来消 $x_2$ 是**矩阵乘向量** $\psi_{23}^\top(1,2)^\top=(4,7)^\top$。丢分的典型错误是不管观测、照样把 $x_1$ 的所有取值加起来（那样等于没观测）；先乘指示函数 $\delta$ 再求和，结果和直接取那一行一样。`,
+      T`**线性代数的说法（2021 Q18b 要写这个）**：观测 $x_1=1$ 这一步不是求和，而是**取 $\psi_{12}$ 中对应 $x_1=1$ 的第二行** $(1,2)$（切片 / 索引；第一行对应 $x_1=0$）。接下来消 $x_2$ 是矩阵乘向量。上标 $\top$ 表示转置，即行列对调；$(1,2)^\top$ 就是把这两个数竖着排成列向量。把打分表排成矩阵时，行对应前一个变量取 0、1，列对应后一个变量取 0、1，因此 $\psi_{23}=\begin{bmatrix}2&1\\1&3\end{bmatrix}$。这里它恰好对称，转置后不变，于是 $\psi_{23}^\top\begin{bmatrix}1\\2\end{bmatrix}=\begin{bmatrix}2\times1+1\times2\\1\times1+3\times2\end{bmatrix}=\begin{bmatrix}4\\7\end{bmatrix}$。丢分的典型错误是不管观测、照样把 $x_1$ 的所有取值加起来（那样等于没观测）；先乘指示函数 $\delta$ 再求和，结果和直接取那一行一样。`,
     ],
     fx: [
       {
@@ -443,7 +449,7 @@ $$\begin{aligned}m_{V\to S}(S)=\sum_{V}\psi_{VS}(V,S)\,&m_{R\to V}(V)\,m_{T\to V
       },
     ],
     viz: [
-      { id: 'msg-passing', how: '同 c56 的工具，这次一直点到 distribute 结束：每条边两个方向各一条消息。下方输出区最后给出每个节点的边缘，并和暴力枚举核对。',
+      { id: 'msg-passing', how: '沿用 [c56 的工具](#/c56)，但工具是另一个四节点模型，不是上面的三节点链或五房间树。预设 chain 表示链，star 表示星形。工具表中的 unary factor（单点因子）$\\phi_i(x_i)$ 是只给节点自己打分的一项：$X_1$ 取 0、1 的打分分别为 0.7、0.3，其余节点的单点打分都是 1。因此工具发消息时还要乘发送者的 $\\phi_i(x_i)$，读节点边缘时也要乘该节点自己的 $\\phi_i(x_i)$，再归一化；正文没有单点因子，相当于它们全为 1。这次一直点到 distribute 结束：每条边两个方向各一条消息。下方输出区最后给出每个节点的边缘，并和暴力枚举核对。',
         try: '① chain、root 选 X2：collect 有 3 条消息、distribute 有 3 条。② 换 root 为 X4：消息顺序变了，但最后所有边缘完全一样——root 可以任选。③ 星形图：中心节点的边缘要乘 3 条来信。' },
     ],
     compare: [
@@ -461,7 +467,7 @@ $$\begin{aligned}m_{V\to S}(S)=\sum_{V}\psi_{VS}(V,S)\,&m_{R\to V}(V)\,m_{T\to V
     ],
     pitfalls: [
       ['观测要用一个专门的新算法', '只是把相关因子乘上 $\\delta$，然后照常消元（L21 p24）。'],
-      ['Distribute 时也乘上来自收件人的消息', '不乘：只乘**其他**来信。例：算 $m_{4\\to2}(x_2)$ 只乘 $m_{5\\to4}$，不乘 $m_{2\\to4}$；2 那一侧的作用由 $\\psi_{24}$ 带进来（Ed 上助教的解释）。'],
+      ['Distribute 时也乘上来自收件人的消息', '不乘：只乘**其他**来信。例：算 $m_{4\\to2}(x_2)$ 只乘 $m_{5\\to4}$，不乘 $m_{2\\to4}$；$\\psi_{24}$ 只负责按 $x_2,x_4$ 的组合打分，不代表节点 2 整侧子树的信息；那一侧的信息不应在这条回信中再次传回。'],
       ['相邻两点的边缘要乘上所有 4 条消息', '只乘两点各自的外来信 + 中间的 potential；这条边上的两条消息不乘。'],
       ['Loopy BP 是精确的', '有环时是近似（L21 p36）。'],
       ['Root 选不同，边缘不同', '任意 root 结果都一样。'],

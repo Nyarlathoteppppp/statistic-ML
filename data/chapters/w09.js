@@ -360,7 +360,7 @@
       T`Contextual bandit vs RL: in a contextual bandit the action does not affect the next state; in reinforcement learning the (state, action) pair determines the next state, so future rewards must be considered.`,
     ],
     keyZh: [
-      T`上下文老虎机（contextual bandit）每轮先看到上下文特征向量，奖励随它变，要估的变成"给定上下文的期望奖励"，这是回归（regression）问题；选臂时把探索 bonus 加在回归预测上（得到 UCB），选 UCB 最大的臂。`,
+      T`上下文老虎机（contextual bandit）每轮先看到上下文特征向量，奖励随它变，要估的变成"给定上下文的期望奖励"，这是回归（regression）问题；选臂时把探索奖励（bonus）加在回归预测上，得到 UCB（upper confidence bound，上置信界），选 UCB 最大的臂。`,
       T`区别在动作会不会改变下一个状态：contextual bandit 里下一个状态"自己来"，和动作无关；强化学习（reinforcement learning）里（状态, 动作）决定下一个状态，所以要考虑未来的奖励。`,
     ],
     examQ: [
@@ -379,7 +379,7 @@
       [T`$x_1$`, T`（例子里）上下文特征：用户在体育网页为 1，否则为 0`],
     ],
     goals: [
-      '说出 contextual bandit 比普通 MAB 多了什么（状态 / 上下文），以及奖励估计为什么变成回归（L17 p24–p25）',
+      '说出 contextual bandit 比普通 MAB（= multi-armed bandit，多臂老虎机，就是前两章的普通老虎机）多了什么（状态 / 上下文），以及奖励估计为什么变成回归（L17 p24–p25）',
       '说出 contextual bandit 和 RL 的区别：动作是否影响下一个状态（L17 p26）',
     ],
     types: [],
@@ -391,7 +391,7 @@
       { t: 'math', tex: T`E[R_i(t)]\quad\longrightarrow\quad E[R_i(t)\mid\bX_i(t)]` },
       T`估计条件期望就是一个 **regression（回归）** 问题：普通 MAB 对每个臂只估一个数（平均奖励）；现在要估一个**函数**——输入上下文、输出预期奖励，c10 的线性回归就能用。选臂的原则不变：仍然选 UCB 最大的臂，只是 bonus 现在加在**回归预测**上（构成 UCB），而不是加在简单平均上。`,
       T`再往前一步：如果你选的动作还会**改变下一轮的局面**，问题就不再是 bandit 了。`,
-      T`**和 RL 的关系**（L17 p26）：RL 也是一轮一轮的"状态 → 动作 → 奖励"，但多了一条：**（状态, 动作）决定下一个状态**。contextual bandit 里下一个状态是"自己来的"，和你的动作无关。RL 同样用回归学 value function，但要把预测的奖励**往未来展开（roll out）**——今天的动作会影响明天能拿到什么。例子：下围棋、控制机器人、物流规划。`,
+      T`**和 RL 的关系**（L17 p26）：RL 是 reinforcement learning（强化学习）的缩写，它也是一轮一轮的"状态 → 动作 → 奖励"，但多了一条：**（状态, 动作）决定下一个状态**。contextual bandit 里下一个状态是"自己来的"，和你的动作无关。RL 同样用回归学 value function（价值函数：从当前状态出发、按某个策略能拿到的长期总奖励），但要把预测的奖励**往未来展开（roll out）**——今天的动作会影响明天能拿到什么。例子：下围棋、控制机器人、物流规划。`,
     ],
     why: [
       T`往年没考过计算，可能出概念简答："contextual bandit 和普通 MAB / RL 有什么区别"。把三者的对比表记住即可。`,
@@ -403,7 +403,7 @@
     ],
     math: [
       { t: 'h3', text: '一个小例子：两个广告、一个上下文特征' },
-      T`上下文 $\bX=(1,\ x_1)$：第一个分量恒为 1，是截距（bias）项；$x_1=1$ 表示用户在体育网页，$0$ 表示不在。已经用回归从历史数据学到每个广告的权重：广告 A $\hat\bw_A=(0.3,\ 0.4)$，预测奖励 $\bX'\hat\bw_A=0.3+0.4x_1$（这一撇只是"对应位置相乘再相加"：$1\times0.3+x_1\times0.4$）；广告 B $\hat\bw_B=(0.5,\ -0.2)$，预测 $0.5-0.2x_1$。不确定性 bonus（假设已给出；和 c48 一样，某种情况下试得越少 bonus 越大）：A 是 0.1，B 是 0.3。`,
+      T`上下文 $\bX=(1,\ x_1)$：第一个分量恒为 1，是截距（bias）项；$x_1=1$ 表示用户在体育网页，$0$ 表示不在。已经用回归从历史数据学到每个广告的权重：广告 A $\hat\bw_A=(0.3,\ 0.4)$，预测奖励 $\bX'\hat\bw_A=0.3+0.4x_1$（这一撇只是"对应位置相乘再相加"：$1\times0.3+x_1\times0.4$）；广告 B $\hat\bw_B=(0.5,\ -0.2)$，预测 $0.5-0.2x_1$。不确定性 bonus（题目已给出：和 [c48](#/c48) 的 UCB 一样，在同样情况下这个臂试得越少、我们越不确定，bonus 就越大）：A 是 0.1，B 是 0.3。`,
       { t: 'table', cls: 'compact', head: ['上下文', 'A：预测 + bonus', 'B：预测 + bonus', '选'], rows: [
         ['体育网页 $x_1=1$', '$0.7+0.1=0.8$', '$0.3+0.3=0.6$', 'A'],
         ['其他网页 $x_1=0$', '$0.3+0.1=0.4$', '$0.5+0.3=0.8$', 'B'],
@@ -414,12 +414,12 @@
     example: [
       { t: 'fade', title: '分步练习：带上下文选臂', plan: ['把上下文代进每个臂的回归预测', '加上 bonus', '选最大的'], items: [
         { md: T`上面的例子，体育网页 $x_1=1$。`, steps: [
-          { md: T`A：$0.3+0.4=0.7$；B：$0.5-0.2=0.3$` }, { md: T`A：0.8；B：0.6` }, { md: '选 A' },
+          { md: T`A：$0.3+0.4=0.7$；B：$0.5-0.2=0.3$` }, { md: T`A：$0.7+0.1=0.8$；B：$0.3+0.3=0.6$（0.1 和 0.3 是上一步给的 bonus）` }, { md: '选 A' },
         ] },
         { md: T`同样的模型，但 B 的 bonus 变成 0.6（B 在体育网页上很少被试过）。$x_1=1$。`, steps: [
           { ask: 'B 的预测 = ?', answer: 0.3, show: '$0.5-0.2$', sg: 1 },
           { ask: 'B 的 UCB = ?', answer: 0.9, show: '$0.3+0.6$', sg: 2 },
-          { ask: '选哪个？（A = 1，B = 2）', answer: 2, show: 'B：0.9 > 0.8。不确定性大时值得再试', sg: 3 },
+          { ask: '选哪个？（A = 1，B = 2）', answer: 2, show: 'B：0.9 > 0.8（A 不变：$0.7+0.1=0.8$）。不确定性大时值得再试', sg: 3 },
         ] },
       ] },
     ],
@@ -427,8 +427,8 @@
     compare: [
       { t: 'table', head: ['', 'MAB（c47–c48）', 'Contextual bandit', 'Reinforcement learning'], rows: [
         ['有没有状态 / 上下文', '无', '有', '有'],
-        ['奖励估计', '每个臂一个平均值', '回归：$E[R_i\\mid\\bX_i]$', '回归学 value function'],
-        ['动作影响下一个状态？', '—', '不影响（状态"自己来"）', '影响'],
+        ['奖励估计', '每个臂一个平均值', '回归：$E[R_i\\mid\\bX_i]$（即本页的 $E[R_i(t)\\mid\\bX_i(t)]$，这里省略了轮次 $t$）', '回归学 value function'],
+        ['动作影响下一个状态？', '无状态，这一问不适用（—）', '不影响（状态"自己来"）', '影响'],
         ['要考虑未来吗', '不用', '不用', '要（roll out 未来奖励）'],
         ['例子', 'A/B 测试', '个性化广告、新闻推荐', '围棋、机器人、物流'],
       ] },
@@ -457,8 +457,8 @@
       T`Bayesian model selection: choose the model family with the largest evidence $p(\mathbf y\mid\mathbf X)=\int p(\mathbf y\mid\mathbf X,\mathbf w)p(\mathbf w)\,d\mathbf w$; training RSS keeps falling with complexity, but the evidence penalises unnecessary flexibility (Occam's razor).`,
     ],
     keyZh: [
-      T`MLE / MAP 只给一个点估计（point estimate），不说它有多可靠。Fisher 信息（Fisher information）是负对数似然的弯曲程度：越弯，数据把 $\bw$ 钉得越牢，估计越稳。`,
-      T`Normal 先验 × Normal 似然 = Normal 后验，这叫共轭（conjugate），后验均值 $\bw_N$ 和协方差 $\mathbf V_N$ 有闭式解，会代入就能做题。$\bw_N$ 就是 ridge 的解（$\lambda=\sigma^2/\gamma^2$）。`,
+      T`MLE（maximum likelihood estimate，最大似然估计）/ MAP（maximum a posteriori，最大后验）只给一个点估计（point estimate），不说它有多可靠。Fisher 信息（Fisher information）是负对数似然的弯曲程度：越弯，数据把 $\bw$ 钉得越牢，估计越稳。`,
+      T`Normal 先验 × Normal 似然 = Normal 后验，这叫共轭（conjugate），后验均值 $\bw_N$ 和协方差 $\mathbf V_N$ 有闭式解，会代入就能做题。$\bw_N$ 就是 ridge（岭回归：损失里多一项 $\lambda\bw'\bw$ 惩罚的最小二乘，见 c16）的解，惩罚强度 $\lambda=\sigma^2/\gamma^2$。`,
       T`预测分布（predictive distribution）的方差是两块相加：$\sigma^2$ 是数据噪声，处处一样；第二项是"权重还没定下来"带来的不确定，在数据没约束住的地方（典型是远离数据）大。`,
       T`三种预测：MAP 只用后验众数，方差固定为 $\sigma^2$；Monte Carlo 从后验抽很多个 $\bw$，各自预测再平均；精确 Bayes 对所有 $\bw$ 积分。逐个数据点更新（sequential）和一次看完结果相同。`,
       T`贝叶斯模型选择（Bayesian model selection）：选证据（evidence）最大的模型族。训练 RSS 随复杂度一路下降，evidence 却会给多余的灵活性扣分，这就是奥卡姆剃刀（Occam's razor）。`,
@@ -471,7 +471,7 @@
       { src: '2021 Q10', q: T`Conjugacy between the likelihood and prior is very important when using Bayesian models. However conjugacy is not critical when using the maximum a posteriori (MAP) estimator. Explain why this is the case.`,
         a: T`Conjugacy makes the full posterior (its normalising constant, the evidence, and predictive integrals) available in closed form. MAP only needs the mode, $\hat\theta=\arg\max_\theta[\log p(D\mid\theta)+\log p(\theta)]$; the evidence does not depend on $\theta$, so MAP is just an optimisation problem, which can be solved numerically even when the prior is not conjugate.`,
         qzh: T`使用贝叶斯模型（Bayesian models）时，似然（likelihood）与先验（prior）之间的共轭性（conjugacy）非常重要。但使用最大后验（maximum a posteriori, MAP）估计量时，共轭性并不关键。解释为什么会这样。`,
-        azh: T`共轭性使完整的后验（posterior，包括它的归一化常数即证据 evidence，以及预测积分 predictive integrals）有闭式解（closed form）。MAP 只需要众数（mode），$\hat\theta=\arg\max_\theta[\log p(D\mid\theta)+\log p(\theta)]$；证据不依赖于 $\theta$，所以 MAP 只是一个优化问题（optimisation problem），先验不共轭时也可以用数值方法求解。` },
+        azh: T`共轭性使完整的后验（posterior，包括它的归一化常数即证据 evidence，以及预测积分 predictive integrals）有闭式解（closed form）。MAP 只需要众数（mode），$\hat\theta=\arg\max_\theta[\log p(D\mid\theta)+\log p(\theta)]$（$\theta$ 泛指模型参数，本章里就是 $\bw$；$D$ 指数据集，不是符号表里那个权重维数）；证据不依赖于 $\theta$，所以 MAP 只是一个优化问题（optimisation problem），先验不共轭时也可以用数值方法求解。` },
       { src: '2021 Q11', q: T`For Bayesian linear regression (as presented in class), explain how the posterior variance can vary for different test points. (Given: predictive distribution $y_*\sim\mathrm{Normal}(\mathbf x_*'\mathbf w_N,\ \sigma^2+\mathbf x_*'\mathbf V_N\mathbf x_*)$.)`,
         a: T`The noise term $\sigma^2$ is constant, but $\mathbf x_*'\mathbf V_N\mathbf x_*$ depends on the test point: it is large when $\mathbf x_*$ lies in directions the training data constrain poorly (large posterior covariance), typically far from the data, and small near well-covered regions. So the model is more uncertain where it has seen little data.`,
         qzh: T`对于（课上讲的）贝叶斯线性回归（Bayesian linear regression），解释后验方差（posterior variance）如何随不同的测试点（test points）而变化。（已给出预测分布 predictive distribution：$y_*\sim\mathrm{Normal}(\mathbf x_*'\mathbf w_N,\ \sigma^2+\mathbf x_*'\mathbf V_N\mathbf x_*)$。）`,
@@ -479,15 +479,15 @@
       { src: '2017 S2 Q1(h)', q: T`Describe the process of Bayesian sequential updating, making reference to the prior, likelihood and posterior distributions.`,
         a: T`Start with the prior $p(\mathbf w)$. Each time new data arrive, multiply the current prior by the likelihood of the new data and normalise to get the posterior; that posterior is the prior for the next data: $p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$. With conditionally independent data the result equals the posterior from all data at once, and it narrows as data accumulate.`,
         qzh: T`描述贝叶斯序贯更新（Bayesian sequential updating）的过程，要提到先验（prior）、似然（likelihood）和后验（posterior）分布。`,
-        azh: T`从先验 $p(\mathbf w)$ 出发。每来一批新数据，就用当前的先验乘上新数据的似然，再归一化，得到后验；这个后验就是下一批数据的先验：$p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$。数据条件独立时，结果和一次看完全部数据的后验相同，而且数据越多后验越窄。（数字例子见本章"例子"一节的逐个更新。）` },
+        azh: T`从先验 $p(\mathbf w)$ 出发。每来一批新数据，就用当前的先验乘上新数据的似然，再归一化，得到后验；这个后验就是下一批数据的先验：$p(\mathbf w\mid D,\mathbf z)\propto p(\mathbf z\mid\mathbf w)\,p(\mathbf w\mid D)$（$D$ 是已有的数据，$\mathbf z$ 是新到的一批数据）。数据条件独立时，结果和一次看完全部数据的后验相同，而且数据越多后验越窄。（数字例子见本章"例子"一节的逐个更新。）` },
       { src: '2017 S2 Q5(b)', q: T`The Maximum a Posteriori (MAP) method is sometimes referred to as "poor man's Bayes." Explain how MAP is different to full Bayesian inference, and describe a situation in which the two methods will produce different results.`,
         a: T`MAP keeps only the posterior mode $\hat\theta=\arg\max_\theta p(\theta\mid D)$ and predicts with that one value; full Bayesian inference keeps the whole posterior and averages predictions over it, $p(y_*\mid D)=\int p(y_*\mid\theta)\,p(\theta\mid D)\,d\theta$. They differ when the posterior is broad, e.g. with little data: 2 heads in 2 tosses with a uniform prior gives posterior $\mathrm{Beta}(3,1)$; MAP predicts heads with probability 1, full Bayes $3/4$.`,
         qzh: T`最大后验（MAP）方法有时被称为"穷人的贝叶斯"（poor man's Bayes）。说明 MAP 和完整贝叶斯推断（full Bayesian inference）有什么不同，并描述一个两者会给出不同结果的情形。`,
-        azh: T`MAP 只保留后验的众数（mode）$\hat\theta=\arg\max_\theta p(\theta\mid D)$，用这一个值做预测；完整贝叶斯推断保留整个后验，并在后验上对预测取平均：$p(y_*\mid D)=\int p(y_*\mid\theta)\,p(\theta\mid D)\,d\theta$。后验很宽时（例如数据很少）两者不同：均匀先验下抛硬币 2 次都是正面，后验是 $\mathrm{Beta}(3,1)$，密度 $\propto q^2$，众数在 $q=1$，所以 MAP 预测下一次正面的概率是 1；完整贝叶斯用后验均值 $3/(3+1)=3/4$。（就是 [c51](#/c51) 的日出问题。）` },
+        azh: T`MAP 只保留后验的众数（mode）$\hat\theta=\arg\max_\theta p(\theta\mid D)$，用这一个值做预测；完整贝叶斯推断保留整个后验，并在后验上对预测取平均：$p(y_*\mid D)=\int p(y_*\mid\theta)\,p(\theta\mid D)\,d\theta$。后验很宽时（例如数据很少）两者不同：均匀先验下抛硬币 2 次都是正面，后验是 $\mathrm{Beta}(3,1)$（Beta 分布只取 $[0,1]$ 上的值，均匀先验就是 $\mathrm{Beta}(1,1)$，W10 讲），记正面概率为 $q$，密度 $\propto q^2$，众数在 $q=1$，所以 MAP 预测下一次正面的概率是 1；完整贝叶斯用后验均值 $3/(3+1)=3/4$。（就是 [c51](#/c51) 的日出问题。）` },
       { src: '2016 S2 Q10.3', q: T`(Poisson likelihood with a Gamma prior, so the posterior is again a Gamma.) Explain whether the posterior distribution is more or less informative than the posterior mode; consider in your answer the effect of the number of observed data points.`,
         a: T`The posterior distribution is more informative: the mode is one point of it, while the full posterior also shows the uncertainty (spread, skew) around that point. With few observations the posterior is broad, so the mode alone hides a lot; as the number of observations $n$ grows the posterior concentrates around the mode (variance shrinking roughly like $1/n$), so little is lost and MAP and full Bayes agree.`,
         qzh: T`（Poisson 似然配 Gamma 先验，后验仍是 Gamma。）说明后验分布（posterior distribution）比后验众数（posterior mode）包含的信息更多还是更少；回答时考虑观测数据点个数的影响。`,
-        azh: T`后验分布包含的信息更多：众数只是它上面的一个点，完整的后验还给出这个点周围的不确定性（宽度、偏斜）。观测少时后验很宽，只报众数会丢掉很多信息；观测个数 $n$ 越多，后验越集中在众数附近（方差大约按 $1/n$ 缩小），只用众数几乎不损失什么，MAP 和完整贝叶斯趋于一致。` },
+        azh: T`后验分布包含的信息更多：众数只是它上面的一个点，完整的后验还给出这个点周围的不确定性（宽度、偏斜）。观测少时后验很宽，只报众数会丢掉很多信息；观测个数 $n$（符号表里记作 $N$）越多，后验越集中在众数附近（方差大约按 $1/n$ 缩小），只用众数几乎不损失什么，MAP 和完整贝叶斯趋于一致。` },
       { src: '2016 S2 Q4.3', q: T`Bayesian model selection does not need heldout data. Outline how Bayesian model selection works, and why heldout data is not needed.`,
         a: T`For each candidate model compute the evidence $p(\mathbf y\mid\mathbf X)=\int p(\mathbf y\mid\mathbf X,\mathbf w)\,p(\mathbf w)\,d\mathbf w$ on the training data and choose the largest. Heldout data is not needed because the parameters are averaged over the prior rather than fitted to the data, so the evidence is not optimistically biased like training error: it already penalises unnecessary complexity.`,
         qzh: T`贝叶斯模型选择（Bayesian model selection）不需要留出数据（heldout data）。概述贝叶斯模型选择怎么做，以及为什么不需要留出数据。`,
@@ -537,7 +537,7 @@
       { t: 'h3', text: '③ Bayesian 的回答：保留所有可能的 $\\bw$（L18 p9–p12）' },
       T`**Bayesian 观点**（L18 p9–p11）：不要只挑一个解。把所有可能的 $\bw$ 都留着，按**后验概率**加权——拟合得好的 $\bw$ 概率高。预测时用所有 $\bw$，按概率加权平均。`,
       { t: 'h3', text: '④ 先验 × 似然 = 后验，而且有闭式解（L18 p14–p18）' },
-      T`③ 要把所有权重按后验概率加权——可这个后验写得出来吗？好消息：噪声用正态、权重的先验也用以 0 为中心的正态（离 0 越远越不信，正是 c16 ridge 的想法），乘出来**仍是正态**，有闭式解。先用**一个**权重算个数（无 bias，$\sigma^2=\gamma^2=1$，数据 $x=(1,2)$、$y=(1,3)$）：$\sum x_i^2=5$，$\sum x_iy_i=7$，后验方差 $=1/(5+1)=1/6$，后验均值 $=7/6$（只看数据是 $7/5$，被先验往 0 拉了一点）。下面的 $\mathbf V_N$、$\bw_N$ 就是这两个数在很多个权重时的写法（"例子"一节有完整步骤）：`,
+      T`③ 要把所有权重按后验概率加权——可这个后验写得出来吗？好消息：噪声用正态、权重的先验也用以 0 为中心的正态（离 0 越远越不信，正是 c16 ridge 的想法），乘出来**仍是正态**，有闭式解。先用**一个**权重算个数（无 bias 即没有截距项，$\sigma^2=\gamma^2=1$，数据 $x=(1,2)$、$y=(1,3)$）：$\sum x_i^2=5$，$\sum x_iy_i=7$；分母的 $5$ 是 $\sum x_i^2$，$1$ 是先验那一项 $\sigma^2/\gamma^2=1/1$，所以后验方差 $=1/(5+1)=1/6$，后验均值 $=7/6$（只看数据是 $7/5$，被先验往 0 拉了一点）。下面的 $\mathbf V_N$、$\bw_N$ 就是这两个数在很多个权重时的写法（"例子"一节有完整步骤）：`,
       T`**模型**（L18 p15；Normal = 正态分布，第二个参数是方差）：`,
       { t: 'math', tex: T`y\sim\mathrm{Normal}(\bx'\bw,\ \sigma^2),\qquad\bw\sim\mathrm{Normal}(\mathbf 0,\ \gamma^2\mathbf I_D),\qquad p(\bw\mid\mathbf X,\by)=\frac{p(\by\mid\mathbf X,\bw)\,p(\bw)}{p(\by\mid\mathbf X)}` },
       T`**只要众数（MAP）**：分母 $p(\by\mid\mathbf X)$ 和 $\bw$ 无关，最大化分子就行——这就是 ridge regression（c16），$\lambda=\sigma^2/\gamma^2$。**要归一化的整个后验**：分母是 **marginal likelihood / evidence（边缘似然 / 证据）** $\int p(\by\mid\mathbf X,\bw)p(\bw)\,d\bw$（L18 p16）。这里是共轭，乘出来能直接认出是 Normal，不用真的去积分。`,
@@ -566,14 +566,14 @@
       { t: 'slide', src: 'L18/p25', caption: '左：MLE / MAP 的误差带处处一样宽；右下：Bayesian 的预测带在数据附近窄、在没有数据的地方宽。' },
       T`图里的带子是均值上下各 2 个预测标准差：$\bx_*'\bw_N\pm2\sigma_N(\bx_*)$。正态分布落在 ±2 个标准差内的概率约 95%（精确是 95.4%；±1.96 才是正好 95%），所以这条带子就是 $y_*$ 的 95% **credible interval（可信区间）**；它和频率学派 confidence interval（置信区间）的区别见 c51。Workshop 11 用抽样核对过：在每个测试点上，从后验抽 $\bw$、再加噪声得到的预测值，约 95% 落在该点的区间里，所以近似 Bayes 和精确 Bayes 的图一致。`,
       { t: 'h3', text: '⑧ 次数选几？用 evidence 选模型（Workshop 11）' },
-      T`到这里模型族都是事先定好的。Workshop 11 只有 8 个点（真实函数是二次的），却用 9 次多项式基（c12）：后验和预测带都能算，但次数该选几？训练误差帮不上忙：次数越高模型越灵活，训练 RSS（残差平方和）一路下降。**Bayesian model selection（贝叶斯模型选择）**：对每个候选模型族算 evidence $p(\by\mid\mathbf X)=\int p(\by\mid\mathbf X,\bw)\,p(\bw)\,d\bw$（就是 ④ 里后验的分母），选最大的。它问的是：还没看数据时，这个模型族（连同它的先验）认为"出现这批数据"有多可能。`,
-      { t: 'table', cls: 'compact', head: ['多项式次数', '训练 RSS', 'log evidence'], rows: [
+      T`到这里模型族都是事先定好的。Workshop 11 只有 8 个点（真实函数是二次的），却用 9 次多项式基（c12：把 $1,x,x^2,\dots,x^9$ 当作特征）：后验和预测带都能算，但次数该选几？训练误差帮不上忙：次数越高模型越灵活，训练 RSS（残差平方和）一路下降。**Bayesian model selection（贝叶斯模型选择）**：对每个候选模型族算 evidence $p(\by\mid\mathbf X)=\int p(\by\mid\mathbf X,\bw)\,p(\bw)\,d\bw$（就是 ④ 里后验的分母），选最大的。它问的是：还没看数据时，这个模型族（连同它的先验）认为"出现这批数据"有多可能。`,
+      { t: 'table', cls: 'compact', head: ['多项式次数', '训练 RSS（越小拟合越好）', 'log evidence（对数证据，越大越好）'], rows: [
         ['1', '0.614', '−29.40'],
         ['2', '0.083', '**−5.75**（最大）'],
         ['3', '0.079', '−6.64'],
         ['9', '0.071', '−7.21'],
       ] },
-      T`（Workshop 11 的输出，$\sigma=0.1$，$\gamma=10$；4–10 次时 RSS 和 evidence 都继续缓慢下降。）**RSS 一路下降，evidence 却在 2 次最高**，正好是生成数据的真实次数。3 次和 9 次的 RSS 几乎一样（0.079 和 0.071），evidence 仍偏向 3 次。原因：evidence 是把似然按先验对所有 $\bw$ 平均。灵活的模型能生成很多种数据集，先验概率被分散开，分给眼前这一批的就少；够用的简单模型得分反而高，这就是 Occam's razor（奥卡姆剃刀）。1 次太简单，拟合差，evidence 最低。所以 evidence 只用训练数据就能比较模型族，不需要留验证集（2021 Q6 的另一种答法，见 [T13](#/T13)）。`,
+      T`（Workshop 11 的输出；噪声标准差 $\sigma=0.1$，即方差 $\sigma^2=0.01$；先验标准差 $\gamma=10$，即方差 $\gamma^2=100$；4–10 次时 RSS 和 evidence 都继续缓慢下降。）**RSS 一路下降，evidence 却在 2 次最高**，正好是生成数据的真实次数。3 次和 9 次的 RSS 几乎一样（0.079 和 0.071），evidence 仍偏向 3 次。原因：evidence 是把似然按先验对所有 $\bw$ 平均。灵活的模型能生成很多种数据集，先验概率被分散开，分给眼前这一批的就少；够用的简单模型得分反而高，这就是 Occam's razor（奥卡姆剃刀）。1 次太简单，拟合差，evidence 最低。所以 evidence 只用训练数据就能比较模型族，不需要留验证集（2021 Q6 的另一种答法，见 [T13](#/T13)）。`,
       T`两点提醒。① 预测带只衡量"在这个模型族里"对权重的不确定，前提是 L18 p26 的假设"数据真的来自这个模型"；模型族选错时，带子可能又窄又偏，所以选模型本身也重要。② 这里 $\sigma^2$、$\gamma^2$ 都当已知。Workshop 11 的 bonus 给它们的倒数（精度）各配一个 Gamma 先验（等价于对方差用 L18 p26 的 Inverse Gamma 先验）；sklearn 的 BayesianRidge 从数据里估计它们，所以 $\sigma$ 设错时更稳健。`,
     ],
     why: [
@@ -622,7 +622,7 @@
         T`$w_N=\frac11\times\frac16\times7=7/6\approx1.167$。对比 MLE $7/5=1.4$：被先验往 0 拉了一点（也等于 $\lambda=1$ 的 ridge 解）。`,
         T`在 $x_*=3$ 预测：均值 $3\times7/6=3.5$，方差 $1+3^2\times\frac16=2.5$。在 $x_*=0$：方差只有 $1$（没有权重不确定性的贡献）。离 0 越远，$x_*^2V_N$ 越大。`,
       ] },
-      T`**一个一个看，结果一样（sequential）**：先只看 $(x,y)=(1,1)$：$V_1=1/(1+1)=0.5$，$w_1=0.5\times1=0.5$——后验 $\mathrm{Normal}(0.5,\ 0.5)$（这正是 L18 p18 角落里那道例题：方差 1、先验 $\mathrm{Normal}(0,1)$、观测 $X=1$）。再用它当先验看 $(2,3)$：精度 $1/0.5+2^2/1=6$ ⇒ $V=1/6$；均值 $\frac16(2\times0.5+2\times3)=7/6$（后验均值 $=V\times(\text{先验精度}\times\text{旧均值}+xy/\sigma^2)$：第一个 2 是先验精度 $1/0.5$，乘旧均值 0.5 得 1；第二项是新数据 $x\times y=2\times3=6$；$(1+6)/6=7/6$）。和一次看完完全相同。`,
+      T`**一个一个看，结果一样（sequential）**：先只看 $(x,y)=(1,1)$：$V_1=1/(1+1)=0.5$，$w_1=0.5\times1=0.5$——后验 $\mathrm{Normal}(0.5,\ 0.5)$（这正是 L18 p18 角落里那道例题：方差 1、先验 $\mathrm{Normal}(0,1)$、观测 $X=1$）。再用它当先验看 $(2,3)$（这里的 $V$ 就是 $V_N$）。① 精度相加：$1/0.5+2^2/1=2+4=6$ ⇒ $V=1/6$。② 后验均值 $=V\times(\text{先验精度}\times\text{旧均值}+\frac{1}{\sigma^2}xy)$：先验精度 $1/0.5=2$，乘旧均值 $0.5$ 得 $1$；新数据项 $\frac{1}{1}\times2\times3=6$；所以 $w=\frac16(1+6)=7/6$。和一次看完完全相同。`,
       { t: 'fade', title: '分步练习：一维 Bayesian 线性回归', plan: [T`算 $\sum x_i^2$（即 $\mathbf X'\mathbf X$）和 $\sum x_iy_i$`, T`$V_N=\sigma^2/(\sum x_i^2+\sigma^2/\gamma^2)$`, T`$w_N=\frac1{\sigma^2}V_N\sum x_iy_i$`, T`预测：均值 $x_*w_N$，方差 $\sigma^2+x_*^2V_N$`], items: [
         { md: T`上面的例子：$\sigma^2=\gamma^2=1$，$x=(1,2)$，$y=(1,3)$，$x_*=3$。`, steps: [
           { md: T`$\sum x_i^2=5$，$\sum x_iy_i=7$` }, { md: T`$V_N=1/(5+1)=1/6$` }, { md: T`$w_N=\frac16\times7=7/6$` }, { md: T`均值 $3\times\frac76=3.5$，方差 $1+9\times\frac16=2.5$` },
@@ -641,7 +641,7 @@
       ] },
     ],
     viz: [
-      { id: 'bayes-linreg', how: '模型 $y=w_0+w_1x$。在图上点击就添加一个观测（也可以按按钮从真实直线 $y=0.5+0.8x$ 随机生成）。细线是从后验抽出的 12 条直线，阴影是 ±2 个预测标准差，绿线是后验均值。滑块 $\\alpha$ 是先验**精度** $=1/\\gamma^2$，$\\sigma^2$ 是噪声方差。',
+      { id: 'bayes-linreg', how: '模型 $y=w_0+w_1x$（这里 $w_0$ 是截距、$w_1$ 是斜率；符号表里表示先验均值的粗体 $\\bw_0$ 是另一个量）。在图上点击就添加一个观测（也可以按按钮从真实直线 $y=0.5+0.8x$ 随机生成）。细线是从后验抽出的 12 条直线，阴影是 ±2 个预测标准差，绿线是后验均值。滑块 $\\alpha$ 是先验**精度** $=1/\\gamma^2$，$\\sigma^2$ 是噪声方差。',
         try: '① 一个点都不加：12 条线是从先验抽的，乱七八糟。② 在 $x\\in[-1,1]$ 附近点几个点：线在这里收拢、阴影变窄；看 $x=\\pm3$ 处——阴影还很宽（远离数据 ⇒ $\\bx_*\'\\mathbf V_N\\bx_*$ 大）。③ 持续加点：阴影宽度降到接近 $\\pm2\\sigma$ 就不再变窄（噪声 $\\sigma^2$ 消不掉）。④ 把 $\\alpha$ 调大（先验更紧）：数据少时后验均值明显被拉向水平线 $y=0$。' },
       { id: 'gauss-posterior', opts: { data: [1] }, how: '一维版本：未知均值 $\\theta$、方差 1、先验 $\\mathrm{Normal}(0,1)$、观测 $X=1$——就是 L18 p18 角落里的例题。灰色虚线是先验，橙线是似然，绿线是后验。',
         try: '默认就是 p18 的例子：后验均值 0.5、方差 0.5。再加几个数据点，看后验变尖、往数据的平均靠拢。' },
