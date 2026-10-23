@@ -65,7 +65,7 @@
       ] },
       T`**生成的过程**（L19 p5–p8）：先抛一枚有偏硬币决定类别——$P(y=1)=q$，$P(y=-1)=1-q$（Bernoulli），课件写成一个式子 $P(y;\theta)=q^{\delta(y,1)}(1-q)^{\delta(y,-1)}$（$y=1$ 时第一个指数是 1、第二个是 0，就得到 $q$）；再从这个类别自己的分布里生成特征 $\bx$（如一团 Gaussian 点云，参数 $\mu_{\pm1},\sigma_{\pm1}$）。训练 = 估计 $q$ 和每类的分布参数。`,
       { t: 'slide', src: 'L19/p05', caption: '左：类别的分布 $P(y)$（一枚有偏硬币）；右：每个类别各自的特征分布 $P(\\bx\\mid y)$（两团点云）。' },
-      T`训练一个生成式分类器，要估计"类别硬币"的 $q$ 和每类点云的参数。课件先把分类放一放，专门练那枚决定类别的硬币：c50 用"整条后验"回答过"权重是多少"；这里的 $q$ 只能在 $[0,1]$ 里，同一套"先验 × 似然 = 后验"换成 Beta–Binomial。`,
+      T`训练一个生成式分类器，要估计"类别硬币"的 $q$ 和每类点云的参数。课件先把分类放一放，专门练那枚决定类别的硬币：c50 用"整条后验"回答过"权重是多少"；这里的 $q$ 只能在 $[0,1]$ 里，同一套"后验 ∝ 先验 × 似然"（成正比，还要除以归一化常数）换成 Beta–Binomial。`,
       T`**抛硬币**（L19 p10–p11）：只有一串结果、没有类别标签。抛 $n$ 次、$k$ 次正面，正面概率 $q$：`,
       { t: 'math', tex: T`\text{似然（Binomial）：}\ p(k\mid n,q)=\binom nk q^k(1-q)^{n-k}\qquad\text{先验（Beta）：}\ p(q)=\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}q^{\alpha-1}(1-q)^{\beta-1}` },
       T`Beta 的均值 $E[q]=\frac{\alpha}{\alpha+\beta}$（L19 p12）。$\alpha=\beta=1$ 是 $[0,1]$ 上的均匀分布。不同的 $\alpha,\beta$ 表达对 $q$ 的不同"先入之见"：`,
@@ -219,7 +219,7 @@
       '描述 Laplace approximation 的做法、优点和失败情形（L19 p23）',
     ],
     types: ['T13'],
-    notExam: 'Variational 方法的具体算法、Bernstein–von Mises 定理的证明不要求。',
+    notExam: 'Variational 方法、Bernstein–von Mises 定理课件只列了名字（L19 p22–p23），没有讲具体算法和证明。',
     what: [
       T`**问题**（L19 p20–p21）：logistic regression 的输出本身就是概率，已经带有"预测的不确定性"；但**参数** $\bw$ 的不确定性和回归里一样存在——很多条分界线都和数据相容。Bayesian 做法：给 $\bw$ 先验（常用 Gaussian），求后验。`,
       { t: 'slide', src: 'L19/p20', caption: '左：和数据相容的分界线有很多条（参数不确定）；右：用 MAP 一组参数得到的 $p(y=1\\mid\\bx)$。' },
@@ -231,7 +231,7 @@
         T`**Monte Carlo（蒙特卡洛）**：从后验里抽样，用样本平均近似期望。把推断变成**抽样**。`,
         T`**Variational（变分）**：在一个好算的分布族里（Gaussian、独立 Bernoulli 的乘积……）找"最接近"真实后验 $p$ 的 $q$。把推断变成**优化**。`,
       ] },
-      T`上面两类是大方向，具体算法不考。课件要你能讲清楚的是第三种、最简单的办法：不去算那个算不出来的积分，只在后验的**最高点**附近用一个 Normal 把它"盖住"——Normal 自己的归一化常数是现成的，分母算不出来也能往下做。`,
+      T`上面两类是大方向，课件没讲具体算法。课件要你能讲清楚的是第三种、最简单的办法：不去算那个算不出来的积分，只在后验的**最高点**附近用一个 Normal 把它"盖住"——Normal 自己的归一化常数是现成的，分母算不出来也能往下做。`,
       T`**Laplace approximation**（L19 p23）：假设后验在众数附近**近似是 Normal**：`,
       { t: 'ul', items: [
         T`中心 = 后验的众数，也就是 MAP 估计 $\bw_{\text{MAP}}$（MAP 好算：优化 log 似然 + log 先验即可）。`,
@@ -246,7 +246,7 @@
       T`往年考过的是概念："为什么 Bayesian logistic regression 要近似"、"Laplace 近似是什么、什么时候不好"（T13 题库）。和 c50 的对比最重要：**线性回归 + Normal 先验 = 共轭，有闭式解；logistic + Normal 先验 = 非共轭，必须近似。**`,
     ],
     intuition: [
-      T`**Laplace 近似 = 在山顶贴一个钟形曲线。** 找到后验最高点（众数），量一下山顶有多尖（二阶导数），然后用一个同样位置、同样尖的 Normal 代替整座山。山如果本来就是单峰、对称的，近似很好；如果山有两个峰或一边拖很长的尾巴，钟形曲线就盖不住。`,
+      T`**Laplace 近似 = 在山顶贴一个钟形曲线。** 找到后验最高点（众数），量一下山顶有多尖（二阶导数），然后用一个同样位置、同样尖的 Normal 代替整座山。山顶附近的形状本来就接近钟形（log 后验接近二次函数）时，近似很好；如果山有两个峰或一边拖很长的尾巴，钟形曲线就盖不住。`,
       T`**为什么二阶导数决定宽度？** Normal 的 log 密度是 $-\frac{(w-\mu)^2}{2s^2}+$常数，二阶导数恰好是 $-1/s^2$。所以让近似和真实 log 后验在众数处二阶导数相同，就是令 $-1/s^2=$ 那个二阶导数。`,
       { t: 'think', q: '对 Bayesian **线性**回归做 Laplace 近似，结果会怎样？', a: T`完全精确。线性回归的后验本来就是 Normal（c50），它的 log 密度就是二次函数，在众数处做二阶展开没有任何误差。` },
       { t: 'story', title: 'Laplace 又来了', md: '同一个 Pierre-Simon Laplace：1774 年他在研究"根据观测反推原因的概率"时，用"在最大值附近把积分近似成 Gaussian 积分"的办法处理算不出来的积分——这就是今天的 Laplace approximation，比日出问题（c51）还早 40 年。' },
@@ -258,7 +258,7 @@
         T`**众数**：一阶导 $\frac8q-\frac4{1-q}=0$ ⇒ $q=8/12=2/3$。`,
         T`**二阶导**：$-\frac{8}{q^2}-\frac{4}{(1-q)^2}$，在 $q=2/3$ 处 $=-\frac{8}{4/9}-\frac{4}{1/9}=-18-36=-54$。（$q^2=(2/3)^2=4/9$，$(1-q)^2=(1/3)^2=1/9$；除以分数 = 乘倒数：$8\times\frac94=18$，$4\times9=36$。）`,
         T`**近似**：$\mathrm{Normal}(2/3,\ 1/54)$，标准差 $\approx0.136$。`,
-        T`对比精确的 Beta(9,5)：均值 $0.643$，标准差 $\approx0.124$。中心和宽度都接近但不完全一样——因为 Beta(9,5) 有点偏斜。数据越多，后验越接近 Normal，近似越准。`,
+        T`对比精确的 Beta(9,5)：均值 $9/14\approx0.643$，标准差 $\sqrt{\frac{9\times5}{14^2\times15}}\approx0.124$（Beta$(a,b)$ 的方差是 $\frac{ab}{(a+b)^2(a+b+1)}$，这里只用来核对，不用背）。中心和宽度都接近但不完全一样——因为 Beta(9,5) 有点偏斜。数据越多，后验越接近 Normal，近似越准。`,
       ] },
       T`拖动 $a,b$ 看近似什么时候好、什么时候差：$a,b$ 都大时（数据多）两条曲线几乎重合；$a,b$ 差得多时（偏斜）近似明显不准。`,
       { t: 'viz', id: 'laplace-approx' },
@@ -302,7 +302,7 @@
       { t: 'table', head: ['近似方法', '把推断变成', '特点'], rows: [
         ['Monte Carlo', '抽样', '样本够多就准，但慢'],
         ['Variational', '优化', '在简单分布族里找最接近的'],
-        ['Laplace', '一次优化 + 一个 Hessian', '最快；只适合单峰、近似对称的后验'],
+        ['Laplace', '一次优化 + 一个 Hessian', '通常较快；适合后验接近 Normal 的情况'],
       ] },
       { t: 'exam', md: T`**Why must Bayesian logistic regression be approximated, and what is the Laplace approximation?** There is no known (tractable) conjugate prior for the logistic (Bernoulli–sigmoid) likelihood; with e.g. a Gaussian prior on $\mathbf w$ the posterior is not a standard distribution and the posterior and its normalising constant (evidence) generally have no closed form. It is approximated by Monte Carlo sampling, variational methods, or the Laplace approximation: a Normal centred at the posterior mode $\mathbf w_{\text{MAP}}$ with covariance given by the inverse negative Hessian of the log posterior at the mode. It is fast (one optimisation and one Hessian) but poor when the posterior is multi-modal, skewed or heavy-tailed.` },
     ],
@@ -313,10 +313,10 @@
       ['Laplace 近似对多峰后验也很好', '一个 Normal 只有一个峰，多峰、偏斜、长尾时都差。'],
     ],
     quiz: [
-      { type: 'mc', q: 'Laplace 近似需要的两样东西：', options: ['后验均值和方差', '后验众数和众数处的二阶导数', '先验和似然的积分', '很多后验样本'], answer: 1, explain: T`Laplace approximation（拉普拉斯近似）用一个 Normal 盖住后验：中心放在后验的 mode（众数，即 MAP 估计、曲线最高点），宽度由 log 后验在众数处的二阶导数决定（一维时方差 $=-1/\text{二阶导}$，多维时 $(-H)^{-1}$）。众数只要做一次优化就能找到，不需要归一化常数，所以这个方法快。最容易选错的是"后验均值和方差"：要算它们就得先把后验归一化，而这正是算不出来的那一步；"很多后验样本"是 Monte Carlo 的做法。L19 p23。` },
+      { type: 'mc', q: 'Laplace 近似需要的两样东西：', options: ['后验均值和方差', '后验众数和 log 后验在众数处的二阶导数', '先验和似然的积分', '很多后验样本'], answer: 1, explain: T`Laplace approximation（拉普拉斯近似）用一个 Normal 盖住后验：中心放在后验的 mode（众数，即 MAP 估计、曲线最高点），宽度由 log 后验在众数处的二阶导数决定（一维时方差 $=-1/\text{二阶导}$，多维时 $(-H)^{-1}$）。众数只要做一次优化就能找到，不需要归一化常数，所以这个方法快。最容易选错的是"后验均值和方差"：Laplace 不用它们，它们一般也没有闭式解（精确计算要先归一化后验）；"很多后验样本"是 Monte Carlo 的做法。L19 p23。` },
       { type: 'mc', q: 'Variational 方法把推断变成：', options: ['抽样', '优化', '积分', '计数'], answer: 1, explain: T`Variational method（变分方法）先选一个好算的分布族（如 Gaussian、独立 Bernoulli 的乘积），再在族里找和真实后验 $p$ "最接近"的那个 $q$。"找最接近的"就是调 $q$ 的参数让差距最小，所以是一个优化问题。最容易混的是"抽样"：那是 Monte Carlo（蒙特卡洛）方法，从后验抽样本、用样本平均近似期望。一句话记：Monte Carlo = 抽样，variational = 优化。L19 p22。` },
       { type: 'num', q: '某一维后验的 log 密度在众数处的二阶导数是 $-25$。Laplace 近似的标准差？', answer: 0.2, explain: T`要算的是 Laplace 近似那个 Normal 的标准差。题目给的 $-25$ 是 log 后验在众数处的二阶导数（山顶有多弯）。一维时方差 $=-1/\text{二阶导}=-1/(-25)=1/25=0.04$，标准差 $=\sqrt{0.04}=0.2$。道理：方差为 $s^2$ 的 Normal，log 密度的二阶导恰好是 $-1/s^2$，令它等于 $-25$ 就得到 $s^2=1/25$。陷阱：答成方差 0.04，或漏掉负号得到负的方差。` },
-      { type: 'show', q: '（英文）How do Monte Carlo and variational approximations differ?', answer: T`Monte Carlo methods draw samples from the (unnormalised) posterior and approximate expectations by sample averages — inference becomes sampling; they become exact as the number of samples grows but can be slow. Variational methods choose a tractable family (e.g. Gaussians or a product of independent factors) and optimise the member closest to the posterior — inference becomes optimisation; they are fast but limited by the chosen family.`, qzh: '蒙特卡洛（Monte Carlo）近似和变分（variational）近似有什么区别？', azh: '蒙特卡洛方法从（未归一化的）后验中抽样，用样本平均来近似期望——推断（inference）变成了抽样；随着样本数增加，它会趋于精确，但可能很慢。变分方法选定一个易处理的分布族（tractable family，例如高斯分布，或独立因子的乘积），并优化出该族中最接近后验的成员——推断变成了优化；它很快，但受限于所选的分布族。' },
+      { type: 'show', q: '（英文）How do Monte Carlo and variational approximations differ?', answer: T`Monte Carlo methods draw samples from the posterior (using sampling algorithms that only need the posterior up to its normalising constant) and approximate expectations by sample averages — inference becomes sampling; they become exact as the number of samples grows but can be slow. Variational methods choose a tractable family (e.g. Gaussians or a product of independent factors) and optimise the member closest to the posterior — inference becomes optimisation; they are fast but limited by the chosen family.`, qzh: '蒙特卡洛（Monte Carlo）近似和变分（variational）近似有什么区别？', azh: '蒙特卡洛方法从后验中抽样（抽样算法只需要后验的相对大小，不用先算归一化常数），用样本平均来近似期望——推断（inference）变成了抽样；随着样本数增加，它会趋于精确，但可能很慢。变分方法选定一个易处理的分布族（tractable family，例如高斯分布，或独立因子的乘积），并优化出该族中最接近后验的成员——推断变成了优化；它很快，但受限于所选的分布族。' },
     ],
   });
 
@@ -384,7 +384,7 @@
     types: ['T07', 'T05'],
     what: [
       { t: 'h3', text: '① Bayesian network 是什么（L20 p4）' },
-      T`变量一多，联合分布的表就大得存不下（5 个二元变量 32 行，30 个就十亿行）。**Bayesian network（贝叶斯网络，BN）** 的办法是把"谁直接影响谁"画成一张图，再给每个变量配一张小表。课件的说法：BN = **① 一张图**（说明变量之间怎么关联）**+ ② 一个概率分布**（用数字说明依赖有多强）。用途：诊断推理（看到症状推病因）、医学和计算生物学里的发现、用户建模。`,
+      T`变量一多，联合分布的表就大得存不下（5 个二元变量 32 行，30 个就十亿行）。**Bayesian network（贝叶斯网络，BN）** 的办法是把变量之间的依赖关系（谁以谁为条件）画成一张图，再给每个变量配一张小表。课件的说法：BN = **① 一张图**（说明变量之间怎么关联）**+ ② 一个概率分布**（用数字说明依赖有多强）。用途：诊断推理（看到症状推病因）、医学和计算生物学里的发现、用户建模。`,
       { t: 'h3', text: '② 先看一个例子：两枚硬币和一个报告人（L20 p8–p11）' },
       T`两个人各抛一枚公平硬币（$x_1,x_2\in\{0,1\}$），第三个人报告两枚硬币是否相同（$x_3=1$ 表示"相同"），他 90% 的时候说对。谁直接影响谁？报告人看的是两枚硬币，所以箭头从 $x_1$、$x_2$ 指向 $x_3$；两枚硬币之间没有箭头（互不影响）。`,
       fig(COIN, { edges: 'x1>x3 x2>x3', w: 270, notes: { x1: '硬币 1', x2: '硬币 2', x3: '报告"相同吗"' }, caption: '硬币例子的图：$x_1\\to x_3\\leftarrow x_2$。' }),
@@ -410,7 +410,7 @@
         T`沿箭头**正方向**能走到的都是 **descendants（后代）**：$s_1$ 的后代是 $x_1,s_2,x_2$。`,
       ] },
       { t: 'h3', text: '⑤ 图本身就告诉我们独立性（L20 p12–p13）' },
-      T`不看任何数字，只看图就能说：两枚硬币**互相独立**（$X_1\perp X_2$）；但**知道报告结果以后**，它们就不再独立了（$X_1\perp X_2\mid X_3$ 不成立：报告说"相同"、又知道 $x_1=1$，你几乎能断定 $x_2=1$）。怎么从任意一张图读出这种结论，是下一章 D-separation 的内容（c54）。`,
+      T`只看图就能说：两枚硬币**互相独立**（$X_1\perp X_2$）；再结合"报告 90% 准"这个数字，**知道报告结果以后**，它们就不再独立了（$X_1\perp X_2\mid X_3$ 不成立：报告说"相同"、又知道 $x_1=1$，你几乎能断定 $x_2=1$）。怎么从任意一张图读出这种结论，是下一章 D-separation 的内容（c54）。`,
       { t: 'h3', text: '⑥ 第二个例子：alarm 网络（L20 p14）' },
       T`上一节把"怎么从图读独立性"留给了下一章。这个例子换一个练习目的：硬币的 CPT 是普通小数，alarm 的 CPT 大部分是 0 或 1，表示"地震了电台**一定**报道"这种确定性规则——考试会让你写出这种 CPT，并照着图把联合分布写成"每个节点给定父节点"的乘积。（听到警报后 $L$ 和 $B$ 还独不独立，仍留给 c54。）`,
       fig(ALARM, { edges: ALARM_EDGES, w: 300, caption: '$P(E,B,R,A,L)=P(E)\\,P(B)\\,P(R\\mid E)\\,P(A\\mid E,B)\\,P(L\\mid R,A)$：每个节点一个因子，竖线右边是它的父节点。' }),
@@ -424,7 +424,7 @@
     ],
     intuition: [
       T`**为什么要拆成小表？** 5 个二元变量的完整联合表有 $2^5=32$ 行。BN 只需要每个节点"看自己的父节点"：只按 alarm 网络的图结构计数（不管 p14 那些确定性的 0/1 规则），5 张 CPT 一共 $2+2+4+8+8=24$ 个数，其中自由参数 $1+1+2+4+4=12$ 个（每列和为 1，少一个），而完整联合表要 31 个。变量越多，省得越多——父节点少时是线性增长，而联合表是指数增长。（按图对上：$E$、$B$ 没有父节点，各 2 格；$R$ 的父节点是 $E$，$2\times2=4$ 格；$A$ 的父节点是 $E,B$，$2\times4=8$ 格；$L$ 的父节点是 $R,A$，也是 8 格。）`,
-      T`**箭头 ≈ "直接影响"。** 一个节点只直接依赖它的父节点；和其他变量的关联都要通过图里的路径传过去。没有箭头的地方，就是在声明某种独立性——c54 教怎么从图里读出它们。`,
+      T`**箭头 = 依赖关系**（常常可以理解成"直接影响"，但不一定是因果）。一个节点的小表只以它的父节点为条件；和其他变量的关联都要通过图里的路径传过去。没有箭头的地方，就是在声明某种独立性——c54 教怎么从图里读出它们。`,
       T`上面的 CPT 数字都是题目直接给的。考试也常给一张**完整的数据表**，要你把 CPT 的格子填出来——不用任何优化，只要在"父节点恰好是这个取值"的那些行里数频率：`,
       T`**MLE = 数数。** 数据完整（每一行都观测到所有变量）时，似然按 CPT 拆开，每张表单独估计：$\hat P(x_i=v\mid x_{pa_i}=u)=\dfrac{\#(x_i=v,\ x_{pa_i}=u)}{\#(x_{pa_i}=u)}$——在父节点取值为 $u$ 的那些行里，数 $x_i=v$ 的比例。`,
       { t: 'think', q: '一个节点有 3 个二元父节点，它自己也是二元的。按课件格式它的 CPT 有几行几列？几个自由参数？', a: T`2 行（子节点 0/1）× $2^3=8$ 列（父节点的 8 种组合），共 16 个数；每列和为 1，所以自由参数 8 个。` },
@@ -492,11 +492,11 @@
       { t: 'table', head: ['', '完整联合表', 'Bayesian network'], rows: [
         ['存什么', '每种取值组合一个概率', '每个节点一张 CPT'],
         ['大小（$n$ 个二元变量）', '$2^n$', '$\\sum_i2^{|pa_i|+1}$（父节点少时远小于 $2^n$）'],
-        ['独立性', '看不出来', '从图读出（D-separation）'],
+        ['独立性', '要用数字逐个验证', '图能保证的独立性直接读出（D-separation）'],
         ['MLE', '数每种组合的频率', '每张 CPT 单独数频率'],
       ] },
       { t: 'exam', md: T`**(2025 Q4b) What does maximum likelihood say to do with $n$ complete observations?** Choose the CPT entries that maximise the likelihood of the data. Because the joint factorises as $P(A)P(B)P(C\mid A,B)$, the likelihood $\prod_{i}P(a^{(i)})P(b^{(i)})P(c^{(i)}\mid a^{(i)},b^{(i)})$ splits into one term per table, so each CPT is fitted separately by relative frequencies: $\hat P(A=a)=\#(A=a)/n$, and $\hat P(C=c\mid A=a,B=b)=\#(A=a,B=b,C=c)/\#(A=a,B=b)$.` },
-      T`（山火题的图：远处传感器 $S_1,S_2,S_3$ 和近处传感器 $C_1,C_2$ 都没有父节点，五个箭头都指向警报 $A$。$A=1$ 当且仅当远处至少一个响、近处两个都不响：$(S_1\lor S_2\lor S_3)\land\lnot(C_1\lor C_2)$。$A$ 的父节点有 $2^5=32$ 种取值组合。完整题目和图见 [T7](#/T07)。）`,
+      T`（山火题的图：远处传感器 $S_1,S_2,S_3$ 和近处传感器 $C_1,C_2$ 都没有父节点，五个箭头都指向警报 $A$。$A=1$ 当且仅当远处至少一个响、近处两个都不响：$(S_1\lor S_2\lor S_3)\land\lnot(C_1\lor C_2)$（$\lor$ = 或，$\land$ = 并且，$\lnot$ = 非）。$A$ 的父节点有 $2^5=32$ 种取值组合。完整题目和图见 [T7](#/T07)。）`,
       { t: 'exam', md: T`**(2026 Q6c) If the sensors are always accurate, what can be said about the CPTs?** Accuracy fixes the alert rule, not how often each sensor fires: the five sensor marginals $P(S_1),\dots,P(C_2)$ remain unknown (one free parameter each). Only the CPT of the alert becomes deterministic: for each of its 32 parent configurations, $P(A=1\mid S_1,S_2,S_3,C_1,C_2)=1$ if $(S_1\lor S_2\lor S_3)\land\lnot(C_1\lor C_2)$ and $0$ otherwise, with $P(A=0\mid\cdot)=1-P(A=1\mid\cdot)$, so that table has no free parameters (as for the alarm CPT in L20 p14).` },
     ],
     pitfalls: [
@@ -529,7 +529,7 @@
     keyZh: [
       T`条件独立（conditional independence）：已经知道 $C$ 之后，再知道 $B$ 对猜 $A$ 毫无帮助。它和不加条件的独立 $A\perp B$ 互不蕴含，谁也推不出谁。`,
       T`判断方法（D-separation）：取 $X,Y,S$ 及其所有祖先组成的祖先图（ancestral graph）→ moralize（共同孩子的父母连边）→ 去掉方向 → 删掉 $S$。$X$、$Y$ 不再连通，独立性就成立。`,
-      T`链和分叉：知道中间节点，两端就被隔开、变独立。汇合（collider）正相反：两个本来独立的父节点，观测到共同孩子（或它的后代）后会变相关，叫解释排除（explaining away）。`,
+      T`链和分叉：知道中间节点，两端就被隔开、变独立。汇合（collider）正相反：两个本来独立的父节点，观测到共同孩子（或它的后代）后可能变相关（图不再保证独立），叫解释排除（explaining away）。`,
       T`删完 $S$ 后如果还有路连着 $X$ 和 $Y$，图就不保证独立：写 "does not hold"，并写出那条路径（如 alarm 例子里的 $L$—$R$—$E$—$B$）。`,
     ],
     examQ: [
@@ -539,7 +539,7 @@
         azh: T`给定 $C$ 时，$A$ 和 $B$ 条件独立（conditionally independent）：一旦已知 $C$，再得知 $B$ 不会提供关于 $A$ 的任何进一步信息（反之亦然）。这并不意味着 $A$ 和 $B$ 边缘独立（marginally independent）。` },
     ],
     title: 'D-separation', en: 'Reading conditional independence from a Bayesian network: D-separation',
-    summary: '给一张 BN，问"$X\\perp Y\\mid S$ 成立吗"——不用 CPT 的数字，只看图。课件的方法（**往年 8 分必考，T5**）：**① 取祖先图 → ② moralize（给共同孩子的父母连边）→ ③ 去掉方向 → ④ 删掉 $S$ 里的节点 → ⑤ 看 $X$、$Y$ 还连不连通**：不连通就独立，连通就不能保证独立。最反直觉的一点：两个独立的原因，在**观测到它们的共同结果之后**会变得相关。',
+    summary: '给一张 BN，问"$X\\perp Y\\mid S$ 成立吗"——不用 CPT 的数字，只看图。课件的方法（**往年 8 分必考，T5**）：**① 取祖先图 → ② moralize（给共同孩子的父母连边）→ ③ 去掉方向 → ④ 删掉 $S$ 里的节点 → ⑤ 看 $X$、$Y$ 还连不连通**：不连通就独立，连通就不能保证独立。最反直觉的一点：两个独立的原因，在**观测到它们的共同结果之后**可能变得相关。',
     prereq: ['c53', 'c02'],
     symbols: [
       [T`$X\perp Y\mid S$`, T`给定集合 $S$ 时，$X$ 和 $Y$ 条件独立`],
@@ -556,12 +556,12 @@
       '解释"给定共同孩子，父节点变相关"（硬币例子）',
     ],
     types: ['T05'],
-    notExam: '教科书的 active trail / Bayes ball 说法课件没教；结论相同，但考试按课件的四步写。',
+    notExam: '教科书的 active trail / Bayes ball 是等价方法，课件没讲；考试写课件的四步最稳。',
     what: [
       { t: 'h3', text: '① 先弄清问题：独立和条件独立（L20 p12–p13）' },
       T`c53 留下了两个没回答的问题：两枚硬币本来独立，**知道报告以后**还独立吗？听到警报以后，下不下班和有没有盗窃还有关系吗？要回答"独立吗"，先把这句话写成概率的等式：`,
       T`**独立** $A\perp B$：$P(A,B)=P(A)P(B)$——知道 $B$ 对猜 $A$ 毫无帮助。**条件独立** $A\perp B\mid C$：$P(A,B\mid C)=P(A\mid C)P(B\mid C)$——**在已经知道 $C$ 的前提下**，再知道 $B$ 对猜 $A$ 毫无帮助。两者互不蕴含：本来独立的可以在知道 $C$ 后变得相关，本来相关的也可以在知道 $C$ 后变得独立。`,
-      T`这一章要回答的问题：**给一张 BN 和一句"$X\perp Y\mid S$"，它成立吗？**课件强调：不用看 CPT 里的任何数字，**只看图**就能判断。`,
+      T`这一章要回答的问题：**给一张 BN 和一句"$X\perp Y\mid S$"，它成立吗？**课件强调：不用看 CPT 里的任何数字，**只看图**就能判断这句独立性是不是被图保证。`,
       { t: 'h3', text: '② 硬币例子：本来独立，知道报告后不独立（L20 p11–p13）' },
       fig(COIN, { edges: 'x1>x3 x2>x3', w: 260, notes: { x1: '硬币 1', x2: '硬币 2', x3: '报告' }, caption: '$X_1\\perp X_2$ 成立：两枚硬币各抛各的。$X_1\\perp X_2\\mid X_3$ 不成立：报告说"相同"、又知道 $x_1=1$，就几乎能断定 $x_2=1$。' }),
       { t: 'h3', text: '③ Alarm 的问题：听到警报后，下不下班还和盗窃有关吗？（L20 p15–p16）' },
@@ -571,7 +571,7 @@
       { t: 'graphs', r: 16, items: [
         { nodes: { A: [30, 40], B: [130, 40], C: [230, 40] }, edges: 'A>B B>C', cls: { B: 'given' }, caption: '**链** $A\\to B\\to C$（下雨→地湿→滑倒）：知道 $B$（灰）就把 $A$、$C$ 隔开' },
         { nodes: { B: [130, 30], A: [40, 130], C: [220, 130] }, edges: 'B>A B>C', cls: { B: 'given' }, caption: '**分叉** $A\\leftarrow B\\to C$（地震→电台、地震→警报）：知道共同原因 $B$ 就隔开' },
-        { nodes: { A: [40, 30], C: [220, 30], B: [130, 130] }, edges: 'A>B C>B', cls: { B: 'given' }, caption: '**汇合** $A\\to B\\leftarrow C$（地震→警报←盗窃）：反过来！**不**知道 $B$ 时独立，知道 $B$（或它的后代）后变相关' },
+        { nodes: { A: [40, 30], C: [220, 30], B: [130, 130] }, edges: 'A>B C>B', cls: { B: 'given' }, caption: '**汇合** $A\\to B\\leftarrow C$（地震→警报←盗窃）：反过来！**不**知道 $B$ 时独立，知道 $B$（或它的后代）后可能变相关' },
       ] },
       { t: 'table', cls: 'compact', head: ['结构', '不给 $B$ 时 $A,C$', '给定 $B$ 时 $A,C$', '下面的判断法里怎么体现'], rows: [
         ['链 $A\\to B\\to C$', '可能相关', '**独立**', '删掉 $B$ 后路径断开'],
@@ -617,12 +617,12 @@
     math: [
       { t: 'h3', text: '为什么顺序是"祖先图 → 结婚 → 删条件集"' },
       { t: 'ul', items: [
-        T`**先取祖先图**：没被观测、也不是观测节点祖先的"共同孩子"不该让父母相关（汇合结构不观测时独立）。取祖先图把这样的孩子删掉，它就没机会让父母结婚。`,
-        T`**再结婚**：被观测的共同孩子（或它的后代被观测，于是它在祖先图里）会让父母相关——结婚边表示这件事。`,
+        T`**先取祖先图**：只保留 $X$、$Y$、$S$ 和它们的全部祖先。既不在其中、也不是它们祖先的"共同孩子"不该让父母相关（汇合结构不观测时独立），取祖先图把它删掉，它就没机会让父母结婚。`,
+        T`**再结婚**：被观测的共同孩子（或它的后代被观测，于是它在祖先图里）会让父母可能相关——结婚边表示这件事。`,
         T`**最后删 $S$**：已知的中间节点挡住链和分叉上的信息。如果先删 $S$ 再结婚，就会漏掉"观测孩子后父母相关"的边。`,
       ] },
       { t: 'h3', text: '用数字验证硬币例子（可选）' },
-      T`（数字来自 c53 的硬币表：每种 $x_1x_2$ 组合概率 $\frac14=0.5\times0.5$；两枚相同时 $P(x_3=1)=0.9$，不同时 $0.1$。）$P(x_3=1)=\tfrac14(0.9+0.1+0.1+0.9)=0.5$；$P(x_1=1,x_3=1)=\tfrac14(0.1+0.9)=0.25$（$x_1=1$ 的两种组合 10、11），所以 $P(x_1=1\mid x_3=1)=0.25/0.5=0.5$。再加上 $x_2=1$：只剩组合 11，报告"相同"说对的概率 0.9，于是 $P(x_1=1\mid x_2=1,x_3=1)=\frac{0.25\times0.9}{0.25\times0.9+0.25\times0.1}=0.9$。`,
+      T`（数字来自 c53 的硬币表：每种 $x_1x_2$ 组合概率 $\frac14=0.5\times0.5$；两枚相同时 $P(x_3=1\mid x_1=x_2)=0.9$，不同时 $P(x_3=1\mid x_1\ne x_2)=0.1$。）$P(x_3=1)=\tfrac14(0.9+0.1+0.1+0.9)=0.5$；$P(x_1=1,x_3=1)=\tfrac14(0.1+0.9)=0.25$（$x_1=1$ 的两种组合 10、11），所以 $P(x_1=1\mid x_3=1)=0.25/0.5=0.5$。再加上 $x_2=1$：只剩组合 11，报告"相同"说对的概率 0.9，于是 $P(x_1=1\mid x_2=1,x_3=1)=\frac{0.25\times0.9}{0.25\times0.9+0.25\times0.1}=0.9$。`,
       T`小结：$P(x_1=1\mid x_3=1)=0.5$，但 $P(x_1=1\mid x_2=1,x_3=1)=0.9$——知道 $x_2$ 改变了对 $x_1$ 的判断，所以给定 $x_3$ 时不独立，和四步法的结论一致（硬币图里 $x_1$—$x_2$ 结婚，删掉 $x_3$ 后仍相连）。`,
     ],
     fx: [],
@@ -656,7 +656,7 @@
     ],
     compare: [
       { t: 'table', head: ['条件集里有……', '链 / 分叉的中间节点', '汇合节点（或它的后代）'], rows: [
-        ['效果', '挡住路径（变独立）', '打开路径（变相关）'],
+        ['效果', '挡住这条路径（还要看其他路径）', '打开这条路径（不保证实际相关）'],
         ['判断法里体现为', '删掉 $S$ 后路径断开', '祖先图保留了它 ⇒ 父母结婚的边还在'],
       ] },
       { t: 'exam', md: T`**(2025 Q1c) What does $\Pr(A,B\mid C)=\Pr(A\mid C)\Pr(B\mid C)$ say?** $A$ and $B$ are conditionally independent given $C$: once $C$ is known, learning $B$ gives no further information about $A$ (and vice versa). It does not imply that $A$ and $B$ are marginally independent, nor that either is independent of $C$.` },
@@ -666,7 +666,7 @@
       ['先删 $S$ 再 moralize', '顺序：祖先图 → moralize → 去方向 → 删 $S$。先删会漏掉"观测孩子后父母相关"的边。'],
       ['在整张图上 moralize', '只在祖先图里结婚；不在祖先图里的孩子不会让父母相关。'],
       ['观测了共同原因，两个结果仍相关', '分叉：给定共同原因后独立（$R\\perp A\\mid E$）。'],
-      ['两个独立的原因，观测结果后仍独立', '汇合：观测结果（或其后代）后变相关（硬币、$L\\perp B\\mid A$）。'],
+      ['两个独立的原因，观测结果后仍独立', '汇合：观测结果（或其后代）后可能变相关（硬币、$L\\perp B\\mid A$）。'],
       ['连通 ⇒ 一定相关', '严格说是"图不保证独立"；考试写"does not hold"并给出路径即可。'],
     ],
     quiz: [

@@ -332,10 +332,10 @@
       },
     ],
     example: [
-      { t: 'fade', title: '分步练习：t 检验与 error bar', plan: [T`算 $x=\frac{(\hat\mu_1-\hat\mu_2)\sqrt m}{\sqrt{\hat\sigma_1^2+\hat\sigma_2^2}}$`, '与临界值比较', '下结论（拒绝 / 不能拒绝）'], items: [
+      { t: 'fade', title: '分步练习：t 检验与 error bar', plan: [T`t 检验算 $x=\frac{(\hat\mu_1-\hat\mu_2)\sqrt m}{\sqrt{\hat\sigma_1^2+\hat\sigma_2^2}}$；误差条算半宽 $\frac{\hat\sigma}{\sqrt m}x_{1-\alpha/2,m-1}$`, '与临界值比较', '下结论（拒绝 / 不能拒绝 / 写出区间）'], items: [
         { md: 'L15 p29 例 1。', steps: [{ md: '$x\\approx0.22$' }, { md: '0.22 ≤ 1.75' }, { md: '不能拒绝 $\\mu_1=\\mu_2$' }] },
         { md: T`L15 p30 例 2：$\hat\mu_1=11.6,\hat\sigma_1^2=2$；$\hat\mu_2=9.9,\hat\sigma_2^2=3.2$；$m=9$。`, steps: [
-          { ask: T`$x=?$`, answer: 2.236, tol: 0.01, show: T`$1.7\times3/\sqrt{5.2}\approx2.24$` },
+          { ask: T`$x=?$`, answer: 2.236, tol: 0.01, show: T`$1.7\times3/\sqrt{5.2}\approx2.24$`, sg: 1 },
           { ask: '临界值 1.75，拒绝吗？（是 1 / 否 0）', answer: 1, show: '2.24 > 1.75，拒绝' },
         ] },
         { md: T`Error bar（L15 p31，10% 水平，临界值 1.86）：算法 2 $\hat\mu=9.9$，$\hat\sigma^2=3.2$，$m=9$。`, steps: [
