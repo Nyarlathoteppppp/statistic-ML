@@ -226,7 +226,7 @@ details.deep.storyfold > summary { color: #b07a2a; font-weight: 500; }
 .pc-short { font-size: .9em; margin-left: .4em; }
 .pc-tex .katex-display { margin: .05em 0 .05em .4em; text-align: left; font-size: .92em; overflow: visible; }
 .pc-tex .katex-display > .katex { text-align: left; }
-.pc-must { break-inside: avoid; margin: 0 0 6px; padding-bottom: 4px; border-bottom: 0.5pt solid var(--line-2); font-size: .94em; }
+.pc-must { break-inside: avoid; margin: 0 0 6px; padding-bottom: 4px; border-bottom: 0.5pt solid var(--line-2); font-size: .9em; line-height: 1.25; }
 .pc-mhead { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
 .pc-look { font-size: .92em; color: var(--muted); margin: 1px 0; }
 ol.pc-steps { padding-left: 1.5em; margin: 2px 0; }
@@ -263,7 +263,7 @@ table.pc-mini td, table.pc-mini th { border: 0.4pt solid var(--line-2); padding:
 ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
 @media print {
   .noprint { display: none !important; }
-  @page { size: A4; margin: 9mm 9mm 10mm; }
+  @page { size: A4; margin: 7mm 9mm 8mm; }
   /* the page is laid out 63rem wide on screen and on paper (so formula fitting measures the printed columns);
      printing sets the root size to 11px, so 65.8rem = 724px fits the A4 text width and body text is about 8.2 pt */
   html:has(.outline.pc) { font-size: 11px !important; }

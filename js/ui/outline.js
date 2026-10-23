@@ -25,6 +25,14 @@
     return out;
   }
 
+  // first n characters of a question, cut at a word boundary and never inside $…$ (an unclosed formula would print as raw LaTeX)
+  function clip(q, n) {
+    if (q.length <= n) return q;
+    let c = q.slice(0, n).replace(/\s+\S*$/, '');
+    if ((c.match(/\$/g) || []).length % 2) c = c.slice(0, c.lastIndexOf('$')).replace(/\s+$/, '');
+    return c + ' …';
+  }
+
   // compare formulas by their content: no \htmlClass wrappers, spacing or bracket-size commands, braces or whitespace
   const norm = (t) => String(t || '').replace(/\\htmlClass\{[^}]*\}/g, '').replace(/\\(?:,|;|!|quad|qquad| )/g, '')
     .replace(/\\(?:[bB]igg?|left|right)(?![a-zA-Z])/g, '').replace(/\\[td]frac/g, '\\frac').replace(/[{}\s$]/g, '');
@@ -151,14 +159,14 @@
           '<div class="pc-look">' + inline(m.look) + '</div>' +
           '<ol class="pc-steps">' + m.steps.map((s) => '<li>' + inline(s) + '</li>').join('') + '</ol>' +
           (m.note ? '<div class="pc-look">' + inline(m.note) + '</div>' : '') +
-          (srcs.length ? '<div class="pc-papers">原题：' + srcs.slice(0, 8).map((s) => SML.md.esc(s)).join('、') + (srcs.length > 8 ? ' 等 ' + srcs.length + ' 道' : '') + '（' + meta[m.page].tag + ' 页）</div>' : '');
+          (srcs.length ? '<div class="pc-papers">原题：' + srcs.slice(0, 5).map((s) => SML.md.esc(s)).join('、') + (srcs.length > 5 ? ' 等 ' + srcs.length + ' 道' : '') + '（' + meta[m.page].tag + ' 页）</div>' : '');
         flow.appendChild(d);
       });
       const sa = el('div', 'pc-must');
       const picks = (SML.mustAnswers || []).map(([id, src]) => {
         const p = pages[id];
         const e = p && (p.examQ || []).find((x) => String(x.src || '').indexOf(src) === 0);
-        return e ? '<li><span class="pc-qsrc">' + SML.md.esc(e.src) + '</span> ' + inline(e.q.length > 110 ? e.q.slice(0, 110).replace(/\s+\S*$/, '') + ' …' : e.q) + ' <span class="pc-chref">→ 第 ' + meta[id].tag + ' 章</span></li>' : '';
+        return e ? '<li><span class="pc-qsrc">' + SML.md.esc(e.src) + '</span> ' + inline(clip(e.q, 60)) + ' <span class="pc-chref">→ 第 ' + meta[id].tag + ' 章</span></li>' : '';
       }).join('');
       sa.innerHTML = '<div class="pc-mhead"><b>⑧ Section A 必背简答</b>' + pill('new', '2026 Q1(a)(b) · 4 分') + pill('hot', 'Bayesian 概念 7/7') + '</div>' +
         '<div class="pc-look">这 10 道最常考；英文答案印在所标的那一章的原题里，背下来。</div><ul class="pc-qa">' + picks + '</ul>';
