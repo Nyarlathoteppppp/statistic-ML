@@ -522,6 +522,8 @@
     summary: 'L23 后半讲（p23–p34）。**Bayesian score** = 对参数积分后的 log 边缘似然：$\\log\\int P(\\theta)\\prod_tP(x_{t1}\\mid x_{t2},x_{t3};\\theta)\\,d\\theta$。先验要满足三条准则（参数独立、参数模块化、似然等价），唯一的选择是 CPT 每一列一个 Dirichlet；课件再取均匀分配，超参数 $\\alpha_{1jk}=\\alpha/(r_1q_1)$，$\\alpha$ 叫 equivalent sample size；Dirichlet 和多项分布共轭，积分有 Gamma 函数的闭式解（p28，推导不考）。最后是结构搜索：分数可分解，但父节点的选择要满足"整张图无环"这个全局约束，所以找最高分的 DAG 很难（p30）；课件用 C. elegans 的 25 个表型变量演示（p31–p33）。',
     prereq: ['c61', 'c51', 'c08', 'c60'],
     symbols: [
+      [T`$\mathrm{score}(1|2,3;D)$`, T`节点 $x_1$ 给定父节点 $x_2,x_3$ 的局部分数；$D$ 是数据`],
+      [T`$x_{t1},\ x_{t2},\ x_{t3}$`, T`第 $t$ 行节点 $x_1,x_2,x_3$ 的取值（同 c61）`],
       [T`$P(\theta)$`, T`参数的先验分布（对一张 CPT 的所有 $\theta_{1jk}$）`],
       [T`$\int\cdots d\theta$`, T`对所有可能的参数值求"加权和"（参数是连续的，所以是积分）`],
       [T`Dirichlet`, T`"$r$ 面骰子"各面概率的分布，是 Beta 分布（c51）的多维版；$r=2$ 时就是 Beta`],
@@ -567,7 +569,7 @@
       { t: 'math', tex: T`\alpha_{1jk}=\alpha\,P_U\big(x_1=k,\,(x_2,x_3)=j\big)` },
       T`常数 $\alpha$ 叫 **equivalent sample size（等价样本量）**：讲者说可以把它看成先验信息的总量（先验有多强），相当于"事先假想看过 $\alpha$ 行数据"。$P_U$ 决定这 $\alpha$ 行怎么分到 CPT 的各个格子。课件为了简单取 $P_U$ 为均匀分布：CPT 一共 $r_1q_1$ 个格子，每格分到一样多：`,
       { t: 'math', tex: T`\alpha_{1jk}=\frac{\alpha}{r_1q_1},\qquad\alpha_{1j}=\sum_{k=1}^{r_1}\alpha_{1jk}=\frac{\alpha}{q_1}` },
-      T`例：$\alpha=4$，$x_1$ 二元（$r_1=2$）。没有父节点（$q_1=1$）：每格 $4/2=2$；父节点 $x_2$ 二元（$q_1=2$）：每格 $4/4=1$；父节点 $(x_2,x_3)$（$q_1=6$）：每格 $4/12=1/3$。总的假想数据量始终是 $\alpha=4$ 行，父节点越多，摊到每一列、每一格的越少。`,
+      T`例：$\alpha=4$，$x_1$ 二元（$r_1=2$）。没有父节点（$q_1=1$）：每格 $4/2=2$；父节点 $x_2$ 二元（$q_1=2$）：每格 $4/4=1$；父节点 $(x_2,x_3)$（$x_2$ 二元、$x_3$ 有三个取值，所以 $q_1=2\times3=6$）：每格 $4/12=1/3$。总的假想数据量始终是 $\alpha=4$ 行，父节点越多，摊到每一列、每一格的越少。`,
       { t: 'h3', text: '⑤ 闭式解（L23 p28）' },
       T`先验是 Dirichlet，似然是多项分布（multinomial），两者**共轭（conjugate）**（c51 里 Beta–Binomial 的多维版），所以积分有闭式解：`,
       { t: 'math', tex: T`\mathrm{score}(1|2,3;D)=\sum_{j=1}^{q_1}\left[\log\frac{\Gamma(\alpha_{1j})}{\Gamma(\alpha_{1j}+\hat n_{1j})}+\sum_{k=1}^{r_1}\log\frac{\Gamma(\alpha_{1jk}+\hat n_{1jk})}{\Gamma(\alpha_{1jk})}\right]` },
@@ -582,7 +584,7 @@
       ] },
       { t: 'h3', text: '⑥ 结构搜索：找分最高的 DAG（L23 p29–p30）' },
       T`现在每张候选图都能打分了（BIC 或 Bayesian score，两者都可分解）。最后一步（p29）："find the highest scoring DAG"。`,
-      T`**好消息：分数是局部的。** p30："Each graph is scored locally in the sense that the score decomposes into a sum of scores, one for each conditional table"，即 $\mathrm{score}(G;D)=\sum_i\mathrm{score}(i|pa_i;D)$，每个节点的分数只取决于它自己的父节点集合。`,
+      T`**好消息：分数是局部的。** p30："Each graph is scored locally in the sense that the score decomposes into a sum of scores, one for each conditional table"，即 $\mathrm{score}(G;D)=\sum_i\mathrm{score}(i|pa_i;D)$（$pa_i$ 是节点 $i$ 的父节点集合），每个节点的分数只取决于它自己的父节点集合。`,
       T`**坏消息：父节点的选择受一个全局约束。** "… but the selections of parents for each variable are subject to a global constraint because the graph has to be acyclic"——所有节点的父节点合在一起，整张图必须无环。`,
       { t: 'graphs', r: 16, items: [
         g(DIA, { edges: 'l>t r>t r>b b>l', caption: '允许：左 → 上，右 → 上，右 → 下，下 → 左，没有环' }),
@@ -662,17 +664,17 @@
       },
     ],
     example: [
-      T`和 c61 一样用课件 p9 数据的前三列、前 6 行（$T=6$，$r_1=r_2=2$，$r_3=3$），对数取 $\ln$。`,
+      T`和 [c61](#/c61) 一样用课件 p9 数据的前三列、前 6 行（$T=6$，$r_1=r_2=2$，$r_3=3$），对数取 $\ln$。`,
       { t: 'h3', text: '例 1：手算 $x_1$ 的 Bayesian score（$\\alpha=4$）' },
       T`$x_1$ 整列是 $2,1,1,2,1,1$；按 $x_2$ 分组：$x_2=1$ 的第 3、6 行 $x_1=1,1$；$x_2=2$ 的第 1、2、4、5 行 $x_1=2,1,2,1$。`,
       { t: 'steps', items: [
-        T`**无父节点**（$q_1=1$）：$\alpha_{1k}=4/(2\times1)=2$，$\alpha_1=4$；计数 $\hat n_{11}=4$，$\hat n_{12}=2$，$\hat n_1=6$。$\text{score}=\ln\frac{\Gamma(4)}{\Gamma(10)}+\ln\frac{\Gamma(6)}{\Gamma(2)}+\ln\frac{\Gamma(4)}{\Gamma(2)}=\ln\Big(\frac{3!}{9!}\times\frac{5!}{1!}\times\frac{3!}{1!}\Big)=\ln\frac{6\times120\times6}{362880}=\ln\frac{4320}{362880}=\ln\frac1{84}=-4.431$。`,
+        T`**无父节点**（$q_1=1$，省略下标 $j$：$\alpha_{1k}$ 就是 $\alpha_{1jk}$，$\alpha_1$ 就是 $\alpha_{1j}$）：$\alpha_{1k}=4/(2\times1)=2$，$\alpha_1=4$；计数 $\hat n_{11}=4$，$\hat n_{12}=2$，$\hat n_1=6$。$\text{score}=\ln\frac{\Gamma(4)}{\Gamma(10)}+\ln\frac{\Gamma(6)}{\Gamma(2)}+\ln\frac{\Gamma(4)}{\Gamma(2)}=\ln\Big(\frac{3!}{9!}\times\frac{5!}{1!}\times\frac{3!}{1!}\Big)=\ln\frac{6\times120\times6}{362880}=\ln\frac{4320}{362880}=\ln\frac1{84}=-4.431$。`,
         T`**父节点 $x_2$**（$q_1=2$）：$\alpha_{1jk}=4/(2\times2)=1$，$\alpha_{1j}=2$。列 $x_2=1$：计数 $(2,0)$，$\ln\frac{\Gamma(2)}{\Gamma(4)}+\ln\frac{\Gamma(3)}{\Gamma(1)}+\ln\frac{\Gamma(1)}{\Gamma(1)}=\ln\big(\frac16\times2\times1\big)=\ln\frac13$。列 $x_2=2$：计数 $(2,2)$，$\ln\frac{\Gamma(2)}{\Gamma(6)}+2\ln\frac{\Gamma(3)}{\Gamma(1)}=\ln\big(\frac1{120}\times2\times2\big)=\ln\frac1{30}$。合计 $\ln\frac13+\ln\frac1{30}=\ln\frac1{90}=-4.500$。`,
         T`**比较**：$-4.431>-4.500$，Bayesian score 选无父节点。可 c61 例 2 里最大似然是 $\{x_2\}$ 更高（$-2.773>-3.819$）——把参数积分掉之后，多一个父节点的好处不够付它的代价。`,
       ] },
       T`（补充理解）用"逐行预测"核对。无父节点（伪计数各 2）：依次预测 $x_1=2,1,1,2,1,1$，概率是 $\frac{0+2}{0+4},\frac{0+2}{1+4},\frac{1+2}{2+4},\frac{1+2}{3+4},\frac{2+2}{4+4},\frac{3+2}{5+4}$，即 $\frac12\cdot\frac25\cdot\frac12\cdot\frac37\cdot\frac12\cdot\frac59=\frac{30}{2520}=\frac1{84}$ ✓。父节点 $x_2$（每格伪计数 1）：$x_2=1$ 这一列依次预测 $1,1$：$\frac12\cdot\frac23=\frac13$；$x_2=2$ 这一列依次预测 $2,1,2,1$：$\frac12\cdot\frac13\cdot\frac24\cdot\frac25=\frac1{30}$；合计 $\frac1{90}$ ✓。和闭式解完全一致。`,
       T`四种父节点集合放在一起（$\alpha=4$ 的 Bayesian score 用程序按 p28 算，前两个就是上面的手算）：`,
-      { t: 'table', cls: 'compact', head: ['$x_1$ 的父节点', '每格伪计数 $\\alpha_{1jk}$', '$l(\\hat\\theta)$（c61）', 'BIC（c61）', 'Bayesian score（$\\alpha=4$）'], rows: [
+      { t: 'table', cls: 'compact', head: ['$x_1$ 的父节点', '每格伪计数 $\\alpha_{1jk}$', '$l(\\hat\\theta)$（最大对数似然，c61）', 'BIC（c61）', 'Bayesian score（$\\alpha=4$）'], rows: [
         ['$\\varnothing$', '2', '−3.819', '−4.715', '−4.431'],
         ['$\\{x_2\\}$', '1', '−2.773', '**−4.564**', '−4.500'],
         ['$\\{x_3\\}$', '2/3', '−2.773', '−5.460', '−4.921'],
@@ -692,7 +694,7 @@
         T`**在无环的图里找最大**：两个节点不能互为父节点，只能保留一个方向。$x_1\to x_2$：$-4.715+(-4.564)+(-8.383)\approx-17.663$；$x_2\to x_1$：$-4.564+(-4.715)+(-8.383)\approx-17.663$（各项四舍五入到 3 位，合计用未舍入的数）。`,
         T`**和其他图比**：全部 25 张 DAG 都算一遍（程序核对），这两张并列第一。第三名是空图 $-4.715-4.715-8.383=-17.813$。三条边连满的三角形最大似然最高（$l\approx-9.364$），BIC 却只有 $-19.219$。`,
       ] },
-      T`结论：最高分的是 $\{x_1\to x_2,\ x_2\to x_1\}$ 这一对，两张图分数相同，因为它们是同一个等价类（c60）。结构搜索找到的是一个等价类，不能断定箭头朝哪边——和讲者对 p33 的评论一致。三个变量只有 25 张 DAG，暴力就行；4 个变量就有 543 张，25 个变量是天文数字（补充计算），只能用 p30 的搜索方法。`,
+      T`结论：最高分的是 $x_1\to x_2$ 和 $x_2\to x_1$ 这两张图（不是同时画两条边），分数相同，因为它们是同一个等价类（c60）。结构搜索找到的是一个等价类，不能断定箭头朝哪边——和讲者对 p33 的评论一致。三个变量只有 25 张 DAG，暴力就行；4 个变量就有 543 张，25 个变量是天文数字（补充计算），只能用 p30 的搜索方法。`,
       { t: 'fade', title: '分步练习：代入闭式 Bayesian score', plan: ['定超参数 $\\alpha_{1jk}=\\alpha/(r_1q_1)$', '每列：$\\frac{\\Gamma(\\alpha_{1j})}{\\Gamma(\\alpha_{1j}+\\hat n_{1j})}$ 乘 $\\prod_k\\frac{\\Gamma(\\alpha_{1jk}+\\hat n_{1jk})}{\\Gamma(\\alpha_{1jk})}$', '取 log（或用逐行预测核对）'], items: [
         { md: T`$x_1$ 二元、没有父节点，数据 3 行：$x_1=1,1,2$。取 $\alpha=2$。`, steps: [
           { ask: T`$\alpha_{1k}=?$`, answer: 1, show: T`$\alpha/(r_1q_1)=2/(2\times1)=1$；$\alpha_1=2$。` },
@@ -724,7 +726,7 @@
       { t: 'exam', md: T`**Why is structure search hard even though the score is decomposable?** The score is a sum of local scores, one per node given its parents, so each node's parent set can be evaluated separately. However, the parent sets of all nodes must together form a directed acyclic graph; this is a global constraint, so the best local choices can create a cycle and cannot simply be combined. Finding the highest-scoring DAG is computationally hard (NP-hard), so in practice we use local search, stochastic search, or costly exact search with restrictions such as a maximum number of parents.` },
     ],
     pitfalls: [
-      ['Bayesian score 用后验均值或 MAP 那一组参数算似然', '它不挑任何一组参数：对所有参数值按先验积分（p23）。'],
+      ['Bayesian score 用后验均值或 MAP（最大后验，maximum a posteriori）那一组参数算似然', '它不挑任何一组参数：对所有参数值按先验积分（p23）。'],
       ['每张 CPT 一个 Dirichlet', '每一列（每个父节点配置）一个 Dirichlet，再相乘（p26）。'],
       ['$\\alpha_{1jk}=\\alpha$', '$\\alpha$ 是总伪计数，要平摊到 $r_1q_1$ 个格子：$\\alpha/(r_1q_1)$（p27）。'],
       ['不同的图可以用不同的 $\\alpha$', '所有候选图用同一个 $\\alpha$ 和 $P_U$，否则等价的图分数可能不同（准则 2、3）。'],

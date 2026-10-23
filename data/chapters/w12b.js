@@ -67,7 +67,7 @@
       T`W10–W11 一直假设**模型已经给定**：图画好了，CPT 或 potential 的数也都有了，我们只做推断（求概率）。W12 反过来：手里只有数据，要把模型学出来。学习分两件事：`,
       { t: 'table', cls: 'compact', head: ['', 'Bayesian network（L23）', 'Markov random field（L24）'], rows: [
         ['① 参数学习：图固定，定参数', '每张 CPT 数频率（c53、[c61](#/c61)）', '**本章**：moment matching；树可以直接数'],
-        ['② 结构学习：边该连哪些', 'BIC / Bayesian score + 启发式搜索，一般很难（[c62](#/c62)）', '[c64](#/c64)：只找树，用最大权生成树，又快又准'],
+        ['② 结构学习：边该连哪些', 'BIC（Bayesian information criterion：对数似然减参数罚分，见 c61、c64）／Bayesian score + 启发式搜索，一般很难（[c62](#/c62)）', '[c64](#/c64)：只找树，用最大权生成树，又快又准'],
       ] },
       { t: 'h3', text: '② 数据和模型（L24 p4、p6）' },
       T`**数据**是一张表：每行一个样本，每列一个变量（p4 的表取值 1、2、3）。"complete observations（完整观测）"指每个样本的每个变量都有值，没有缺失。共 $T$ 个样本。`,
@@ -113,7 +113,7 @@
       T`课件 p8：参数估计就是让**从数据算出的统计量和模型预测的统计量相等**——moment matching（矩匹配）。"moment（矩）"泛指频率、均值这类统计量；这里匹配的就是每条边上的成对计数。讲者的叫法：数据那一项是 empirical moment（经验矩），模型那一项是 model moment（model predicted moment，模型矩）；直观地说，就是让模型重现数据里的统计规律。`,
       T`p9 补一句：The matching is achieved only for parameters (edges) included in the model (graph)。只有图里有边的那些变量对才有参数、才有这个方程；**没有边的变量对，模型的预测计数一般和数据对不上**（下面数值例子里 $x_1,x_3$ 就是这样）。`,
       T`p7 还注明最优参数 not unique（不唯一）。讲者解释：最大值本身是唯一的，但可以有多组 $\theta$ 达到同一个最大值（"there can be multiple sets of theta that … give us the same maximum"）。例如：把一条边的四个 $\theta$ 都加同一个常数 $c$，每个组合的分子都乘 $e^c$，$Z$ 也乘 $e^c$，概率一点不变。`,
-      T`**怎么真的解出来？** 讲者：和 BN 不同，这里没有闭式解（"this doesn't directly give us a closed form solution"），因为模型的概率通过 $Z$ 依赖参数；一般的 MRF 要用迭代优化（梯度上升）——每一步 $\theta_{kl}(x'_k,x'_l)\leftarrow\theta_{kl}(x'_k,x'_l)+\eta\,[\hat n(x'_k,x'_l)-T\,P(x'_k,x'_l;\theta)]$（$\eta>0$ 是步长，即 learning rate），模型预测少了就调高、多了就调低。每一次迭代都要用当前参数算 $P(x'_k,x'_l;\theta)$，这是一次推断（W11 的 c56–c58），反复推断很费计算（讲者："it's a hard problem"）。这就是 p4 说"学习需要推断"的具体原因。`,
+      T`**怎么真的解出来？** 讲者：和 BN 不同，这里没有闭式解（"this doesn't directly give us a closed form solution"），因为模型的概率通过 $Z$ 依赖参数；一般的 MRF 要用迭代优化（梯度上升）——每一步 $\theta_{kl}(x'_k,x'_l)\leftarrow\theta_{kl}(x'_k,x'_l)+\eta\,[\hat n(x'_k,x'_l)-T\,P(x'_k,x'_l;\theta)]$（$\eta>0$ 是步长，即 learning rate），模型预测少了就调高、多了就调低。每一次迭代都要用当前参数算 $P(x'_k,x'_l;\theta)$，这是一次推断（W11 的 [c56](#/c56)–[c58](#/c58)），反复推断很费计算（讲者："it's a hard problem"）。这就是 p4 说"学习需要推断"的具体原因。`,
       { t: 'h3', text: '⑦ 特殊情况：树（L24 p10–p12）' },
       T`p10：如果图是一棵**树**，参数可以直接从局部统计量（计数）读出来，MRF 也一样。先看课件的图：同一个形状，左边是 BN（有向树），右边是 MRF（无向树）。`,
       { t: 'graphs', r: 16, items: [
@@ -123,7 +123,7 @@
       T`讲者的解释（p10）：把 BN 的因子分给 MRF 的三条边——$\psi_{12}(x_1,x_2)=P(x_1)P(x_2\mid x_1)$，$\psi_{23}(x_2,x_3)=P(x_3\mid x_2)$，$\psi_{24}(x_2,x_4)=P(x_4\mid x_2)$。三者相乘正好是 BN 的联合分布，本来就归一化，**不需要再除以 $Z$**。讲者强调这只是帮助建立直觉的特例（一般的 MRF 仍要归一化），关键在于：这些都是局部概率，可以直接从数据数出来，所以不需要反复推断，也不需要迭代优化。`,
       T`p12 把它推广成只用边缘概率的一般公式：任何树形分布都能**只用单变量边缘和相邻两点的边缘**写出来（讲者："the tree structure allows us to construct the joint distribution just from this local probabilities"）：`,
       { t: 'math', tex: T`P(x_1,\dots,x_n)=\Big[\prod_{i=1}^nP_i(x_i)\Big]\prod_{(i,j)\in E}\frac{P_{ij}(x_i,x_j)}{P_i(x_i)P_j(x_j)}` },
-      T`讲者的读法：第一部分是所有单变量边缘之积——如果变量全都独立（图里没有边），这就已经是联合分布；第二部分给每条边乘一个"修正因子"（correction factor）$\frac{P_{ij}}{P_iP_j}$，把这条边上的相关性补进来。`,
+      T`讲者的读法：第一部分是所有单变量边缘之积——如果变量全都独立（图里没有边），这就已经是联合分布；第二部分给每条边乘一个"修正因子"（correction factor）$\frac{P_{ij}}{P_iP_j}$，把这条边上的相关性补进来。（注意：这里的 $P_i$、$P_{ij}$ 是分布真正的边缘概率；p11–p12 把它换成从数据数出的频率 $\hat P_i,\hat P_{ij}$，加 hat 就是「来自数据」的意思，读公式时别混。）`,
       { t: 'deep', title: '为什么树形分布能写成这个公式（L24 p12，讲者不推导）', blocks: [
         T`讲者："we won't go through the full derivation here"，并说可以自己在家推（"you can do it at home, it's not hard"）。思路：把 BN 的每个条件概率写成"联合 ÷ 边缘"，$P(x_2\mid x_1)=\frac{P_{12}(x_1,x_2)}{P_1(x_1)}$，$P(x_3\mid x_2)=\frac{P_{23}}{P_2}$，$P(x_4\mid x_2)=\frac{P_{24}}{P_2}$，代进 p10 的 BN 分解：`,
         { t: 'math', tex: T`P(x_1)\frac{P_{12}}{P_1}\frac{P_{23}}{P_2}\frac{P_{24}}{P_2}=\big[P_1P_2P_3P_4\big]\cdot\frac{P_{12}}{P_1P_2}\cdot\frac{P_{23}}{P_2P_3}\cdot\frac{P_{24}}{P_2P_4}` },
@@ -199,7 +199,7 @@
       ] },
       T`意思：模型低估了"$x_1,x_2$ 相同"（数据里 $(0,0)$、$(1,1)$ 各出现 3 次，模型各只预测 2 次），所以 $\theta_{12}(0,0)$、$\theta_{12}(1,1)$ 要调高，另外两个调低。边 (2,3) 的计数一样，梯度也一样。一般的图要这样一步步迭代；**这是树**，可以直接写出答案。`,
       { t: 'h4', text: '第 3 步：树的 MLE——直接代频率' },
-      T`$\hat P_{12}=(\frac38,\frac18,\frac18,\frac38)$，$\hat P_{23}$ 相同，$\hat P_2=(\frac12,\frac12)$。链的 p12 公式约分后是 $P(\mathbf x)=\hat P_1\hat P_2\hat P_3\cdot\frac{\hat P_{12}}{\hat P_1\hat P_2}\cdot\frac{\hat P_{23}}{\hat P_2\hat P_3}=\frac{\hat P_{12}(x_1,x_2)\,\hat P_{23}(x_2,x_3)}{\hat P_2(x_2)}$。逐个算 8 种组合：`,
+      T`$\hat P_{12}=(\frac38,\frac18,\frac18,\frac38)$（四个数依次是 $(0,0),(0,1),(1,0),(1,1)$ 四格的频率，下面各处的四格向量都按这个顺序），$\hat P_{23}$ 相同，$\hat P_2=(\frac12,\frac12)$（依次是 $x_2=0$ 和 $x_2=1$ 的频率）。链的 p12 公式约分后是 $P(\mathbf x)=\hat P_1\hat P_2\hat P_3\cdot\frac{\hat P_{12}}{\hat P_1\hat P_2}\cdot\frac{\hat P_{23}}{\hat P_2\hat P_3}=\frac{\hat P_{12}(x_1,x_2)\,\hat P_{23}(x_2,x_3)}{\hat P_2(x_2)}$。逐个算 8 种组合：`,
       { t: 'table', cls: 'compact', head: ['$(x_1,x_2,x_3)$', '$\\hat P_{12}\\times\\hat P_{23}\\div\\hat P_2$', '$P(\\mathbf x)$'], rows: [
         ['(0,0,0)', T`$\frac38\times\frac38\div\frac12$`, T`$\frac{9}{32}$`],
         ['(0,0,1)', T`$\frac38\times\frac18\div\frac12$`, T`$\frac{3}{32}$`],
@@ -212,7 +212,7 @@
       ] },
       T`自检：$9+3+1+3+3+1+3+9=32$，总和 $\frac{32}{32}=1$，不用再除 $Z$。（例：$(0,0,0)$：$\frac38\times\frac38=\frac{9}{64}$，除以 $\frac12$ 即乘 2，得 $\frac{18}{64}=\frac{9}{32}$。）`,
       { t: 'h4', text: '第 4 步：核对 moment matching' },
-      { t: 'table', cls: 'compact', head: ['变量对', '组合', '模型概率（把对应组合加起来）', '预测计数 $8\\times P$', '数据计数'], rows: [
+      { t: 'table', cls: 'compact', head: ['变量对', '组合', '模型概率（把对应组合加起来）', '预测计数 $8\\times P$', '数据计数（✓ = 与预测计数相等，✗ = 不相等）'], rows: [
         ['(1,2) 有边', '(0,0)', T`$P(0,0,0)+P(0,0,1)=\frac{9+3}{32}=\frac{12}{32}$`, '3', '3 ✓'],
         ['(1,2) 有边', '(0,1)', T`$\frac{1+3}{32}=\frac{4}{32}$`, '1', '1 ✓'],
         ['(1,2) 有边', '(1,0)', T`$\frac{3+1}{32}=\frac{4}{32}$`, '1', '1 ✓'],
@@ -224,7 +224,7 @@
       ] },
       T`（(2,3) 的 (0,1)、(1,0) 两格同理都是 $\frac{4}{32}\to1$ ✓；(1,3) 的 (1,0)、(1,1) 分别是 1.5、2.5，也对不上 2。）两条边上全部匹配，梯度为 0，这就是 MLE；没有边的 $(x_1,x_3)$ 不匹配——正是 p9 说的 only for parameters (edges) included in the model。`,
       { t: 'h4', text: '第 5 步：写成 $\\theta$，看"不唯一"' },
-      T`一种取法：$\psi_{12}=\hat P_{12}$，$\psi_{23}=\hat P_{23}/\hat P_2=\hat P(x_3\mid x_2)=(\frac34,\frac14,\frac14,\frac34)$，此时 $Z=1$。取 log：$\theta_{12}(0,0)=\ln\frac38\approx-0.981$，$\theta_{12}(0,1)=\ln\frac18\approx-2.079$；$\theta_{23}(0,0)=\ln\frac34\approx-0.288$，$\theta_{23}(0,1)=\ln\frac14\approx-1.386$（另两格对称）。把 $\theta_{12}$ 四格都加 $\ln2$（即 $\psi_{12}$ 全乘 2）：每个组合的打分翻倍，$Z$ 变成 2，概率完全不变——参数不唯一（p7）。`,
+      T`一种取法：$\psi_{12}=\hat P_{12}$，$\psi_{23}=\hat P_{23}/\hat P_2=\hat P(x_3\mid x_2)=(\frac34,\frac14,\frac14,\frac34)$，此时 $Z=1$。取 log：$\theta_{12}(0,0)=\ln\frac38\approx-0.981$，$\theta_{12}(0,1)=\ln\frac18\approx-2.079$；$\theta_{23}(0,0)=\ln\frac34\approx-0.288$，$\theta_{23}(0,1)=\ln\frac14\approx-1.386$（另外两格 $(x_2,x_3)=(1,0)$、$(1,1)$ 的频率分别和 $(0,1)$、$(0,0)$ 一样，所以 $\theta_{23}(1,0)\approx-1.386$、$\theta_{23}(1,1)\approx-0.288$）。把 $\theta_{12}$ 四格都加 $\ln2$（即 $\psi_{12}$ 全乘 2）：每个组合的打分翻倍，$Z$ 变成 2，概率完全不变——参数不唯一（p7）。`,
       { t: 'h4', text: '第 6 步：似然真的变大了吗' },
       T`拟合后的对数似然：样本 1,2 是 $(0,0,0)$，5,6 是 $(1,1,1)$，概率都是 $\frac{9}{32}$；样本 3,4,7,8 的概率都是 $\frac{3}{32}$。所以 $l=4\ln\frac{9}{32}+4\ln\frac{3}{32}=4\times(-1.2685)+4\times(-2.3671)=-5.0740-9.4685=-14.5425$。均匀模型（$\theta=0$）：$8\ln\frac18=8\times(-2.0794)=-16.6355$。$-14.54>-16.64$ ✓。这个 $-14.54$ 在 c64 里还会用"熵 + 互信息"的公式再算一次。`,
       { t: 'fade', title: '分步练习：树形 MRF 的 MLE', plan: ['数成对计数和单个计数', '代入 $P=\\hat P_{12}\\hat P_{23}/\\hat P_2$', '核对边上的预测计数 = 数据计数'], items: [
@@ -302,7 +302,7 @@
     summary: '要从数据学出**哪些边**该连，L24 只在树里找。把 c63 的树 MLE 代进对数似然：$l=T[-\\sum_i\\hat H(X_i)+\\sum_{(i,j)\\in E}\\hat I(X_i;X_j)]$，熵那一项对所有树都一样，所以**最好的树 = 边上互信息（mutual information）总和最大的树**。找它用最大权生成树（maximum weighted spanning tree）：从空树开始，每次加权重最大、且不成环的边。只看似然会连成一棵完整的生成树（$n-1$ 条边都加上，因为互信息 ≥ 0），所以改用 BIC：每条边扣罚分，只在 BIC 为正的边上跑，结果可能是森林（forest）。',
     prereq: ['c63', 'c58', 'c62'],
     symbols: [
-      [T`$\hat H(X_i)$`, T`变量 $x_i$ 的经验熵（entropy）：它有多"不确定"；$x_i\in\{1,\dots,r_i\}$`],
+      [T`$\hat H(X_i)$`, T`变量 $x_i$ 的经验熵（entropy）：它有多"不确定"；$x_i$ 有 $r_i$ 种取值（公式里把取值编号写成 $1,\dots,r_i$，但本章例子里的变量取 0/1，求和只是把所有取值走一遍）`],
       [T`$\hat I(X_i;X_j)$`, T`$x_i$ 和 $x_j$ 的经验互信息（mutual information）：知道一个，对另一个少了多少不确定；$\ge0$，独立时为 0`],
       [T`$r_i$`, T`变量 $x_i$ 的取值个数（二元变量 $r_i=2$）`],
       [T`$T$`, T`样本个数；$\log T$ 出现在 BIC 罚分里`],
@@ -326,7 +326,7 @@
       { t: 'h3', text: '② 怎么比较两棵树：熵与互信息（L24 p14）' },
       T`对每一棵候选树，都先用 c63 的方法把参数拟合好（代频率），再看它的对数似然有多高。讲者先把对数似然看成"平均每个样本的 log 概率 × $T$"：$l=T\cdot\mathbb E[\log P(\mathbf x)]$，这就是 c63 p12 那个问题要算的期望。课件 p14 给出结果：`,
       { t: 'math', tex: T`l(D;\hat\theta)=T\Big[-\sum_{i=1}^n\hat H(X_i)+\sum_{(i,j)\in E}\hat I(X_i;X_j)\Big]` },
-      T`这里出现了两个新量，先用大白话说：`,
+      T`这里有两个新量 $\hat H$（熵）、$\hat I$（互信息）。公式里的 $\hat P_i(x_i)$、$\hat P_{ij}(x_i,x_j)$ 都是从数据数出来的频率：$\hat P_i=\hat n_i/T$（$x_i$ 取这个值的样本数 ÷ 样本数）、$\hat P_{ij}=\hat n_{ij}/T$（两个变量同时取这个组合的样本数 ÷ 样本数）。先用大白话说：`,
       { t: 'math', tex: T`\hat H(X_i)=-\sum_{x_i=1}^{r_i}\hat P_i(x_i)\log\hat P_i(x_i),\qquad\hat I(X_i;X_j)=\sum_{x_i=1}^{r_i}\sum_{x_j=1}^{r_j}\hat P_{ij}(x_i,x_j)\log\frac{\hat P_{ij}(x_i,x_j)}{\hat P_i(x_i)\hat P_j(x_j)}` },
       { t: 'ul', items: [
         T`**熵（entropy）$\hat H(X_i)$**：变量 $x_i$ 有多"难猜"。总是取同一个值，$\hat H=0$；两个值各一半，$\hat H=\ln2\approx0.693$，最难猜。讲者的例子：公平硬币正反一样可能，不确定性大；很偏的硬币几乎总出正面，不确定性小。"empirical estimate"指概率用数据频率 $\hat P_i$ 代替。`,
@@ -350,7 +350,7 @@
         T`We iteratively add the candidate edge with maximum weight to the tree, if it does not create a cycle：每次从剩下的候选边里取权重最大的，加进来不成环就加，成环就扔掉。`,
         T`加满 $n-1$ 条边（讲者：$n$ 个节点的任何生成树都恰好有 $n-1$ 条边），所有节点都连通了，就结束。讲者点名：这是 Kruskal 算法（课件上没写名字），它"guarantees that this is a maximum weight spanning tree"。`,
       ] },
-      T`课件的例子：4 个变量，6 条候选边的权重是互信息 $I(x_1,x_3)=3$，$I(x_2,x_3)=2$，$I(x_1,x_2)=1.5$，$I(x_3,x_4)=1$，$I(x_2,x_4)=0.9$，$I(x_1,x_4)=0.7$。黑线是候选边，红色粗线是已经选进树的边：`,
+      T`课件的例子：4 个变量，6 条候选边的权重是互信息（$I$ 就是上面的 $\hat I$）。这些数是课件直接给的示意权重，不是从数据算出来的，只用来练「从大到小加边」的顺序：$I(x_1,x_3)=3$，$I(x_2,x_3)=2$，$I(x_1,x_2)=1.5$，$I(x_3,x_4)=1$，$I(x_2,x_4)=0.9$，$I(x_1,x_4)=0.7$。黑线是候选边，红色粗线是已经选进树的边：`,
       { t: 'graphs', r: 17, items: [
         g(MW, { edges: MW_ALL, caption: 'p15：空树。从大到小排：3 > 2 > 1.5 > 1 > 0.9 > 0.7' }),
         g(MW, { edges: 'x1-x2=1.5 x2-x4=0.9 x3-x4=1 x1-x3:path=3 x1-x4=0.7 x2-x3=2', caption: 'p16：最大的 $x_1$—$x_3$（3）：加入' }),
@@ -365,13 +365,13 @@
       T`**讲者的角度：边数已经被"树"限制住了，为什么还会过拟合？** 树只能有 $n-1$ 条边，模型复杂度比一般 BN 受限得多；但只看似然，仍会偏爱连接取值很多的变量的边。讲者的例子：$x_1$ 有 10 个取值、$x_3$ 有 20 个取值，这条边的 potential 是 $10\times20$ 的表，200 个参数；而二元的 $x_2$ 和 $x_1$ 之间的边只有 $2\times10=20$ 个参数。只看似然会偏向前者——不一定因为它真的更好地描述了数据，而是因为参数多、更能"迁就"数据，于是过拟合。（补充：BIC 罚分里数的是自由参数 $(r_i-1)(r_j-1)$，这两条边分别是 $9\times19=171$ 和 $1\times9=9$ 个，差距同样很大。）`,
       T`解决办法和 L23 一样，名字也一样，还是 BIC：`,
       { t: 'math', tex: T`\begin{aligned}BIC(D;\hat\theta)=&\underbrace{-T\sum_{i=1}^n\hat H(X_i)-\sum_{i=1}^n\frac{r_i-1}{2}\log T}_{\text{所有树都一样}}\\&+\sum_{(i,j)\in E}\underbrace{\Big(T\hat I(X_i;X_j)-\frac{r_ir_j-r_i-r_j+1}{2}\log T\Big)}_{\text{BIC score for an edge}}\end{aligned}` },
-      T`**罚分从哪来**（补充理解）：树形模型的自由参数 = 每个变量自己的 $r_i-1$ 个 + 每条边多出的 $(r_i-1)(r_j-1)$ 个（课件写成展开式 $r_ir_j-r_i-r_j+1$，就是 $(r_i-1)(r_j-1)$）。可以用 BN 来数：把树定一个根，根的 CPT 有 $r-1$ 个自由参数；孩子 $j$ 在父亲 $i$ 下的 CPT 有 $(r_j-1)r_i=(r_j-1)+(r_j-1)(r_i-1)$ 个。每个参数罚 $\frac12\log T$，所以每条边罚 $\frac{(r_i-1)(r_j-1)}{2}\log T$。`,
+      T`**罚分从哪来**（补充理解）：树形模型的自由参数 = 每个变量自己的 $r_i-1$ 个 + 每条边多出的 $(r_i-1)(r_j-1)$ 个（课件写成展开式 $r_ir_j-r_i-r_j+1$，就是 $(r_i-1)(r_j-1)$）。可以用 BN 来数：把树定一个根，设根变量有 $r$ 种取值（就是它的 $r_i$），根的 CPT 有 $r-1$ 个自由参数；孩子 $j$ 在父亲 $i$ 下的 CPT 有 $(r_j-1)r_i=(r_j-1)+(r_j-1)(r_i-1)$ 个。每个参数罚 $\frac12\log T$，所以每条边罚 $\frac{(r_i-1)(r_j-1)}{2}\log T$。`,
       T`讲者：penalty 加在对数似然的两部分上，熵那部分的罚分对所有树都一样，真正起作用的是互信息那部分的罚分。于是每条边有一个自己的分数：$T\hat I(X_i;X_j)$（似然的增益）减去罚分。**分数可以是负的**：互信息太小，带来的似然增益抵不上多出来的参数。二元变量时 $(r_i-1)(r_j-1)=1$，边的 BIC $>0$ 等价于 $\hat I(X_i;X_j)>\frac{\log T}{2T}$。`,
       T`p20 最后：The highest scoring tree (forest) can be found via a maximum weighted spanning tree algorithm over edges with positive BIC scores。只在 BIC 为正的边上跑最大权生成树；负分的边不加，所以结果可能不连通——是一个**森林（forest）**。讲者：the best explanation of the data is not always one tree；加边的似然提升小于罚分时，边的 BIC 为负，就不加；最后边数少于 $n-1$，得到的就是森林。`,
       { t: 'h3', text: '⑤ 真实例子：C. elegans（L24 p21–p22）' },
       T`p21：25 个二元变量，描述线虫 C. elegans 在 926 次基因扰动（gene disruption）实验中的表型变化（如 motility，运动能力）。$T=926$，$n=25$。这和 L23 学 BN 结构时用的是同一份数据（[c62](#/c62)：限制每个变量最多 4 个父节点，仍要为大量候选父节点集合算分数再搜索）。树的做法简单得多：`,
       { t: 'steps', items: [
-        T`对所有 $\binom{25}{2}=300$ 对变量数计数，得到 $\hat P_{ij}$、$\hat P_i$（"it suffices to get the empirical probability estimates for all pairs"）。`,
+        T`对所有 $\binom{25}{2}=\frac{25\times24}{2}=300$ 对变量（25 个变量两两配对的个数）计数，得到 $\hat P_{ij}$、$\hat P_i$（"it suffices to get the empirical probability estimates for all pairs"）。`,
         T`算每一对的 $\hat I$ 和边的 BIC 分数。二元变量、$T=926$：罚分 $\frac12\ln926=\frac12\times6.831=3.415$，所以只有 $\hat I>3.415/926\approx0.0037$ 的边分数为正。`,
         T`把分数交给最大权生成树算法（课件写作 MWSP，应指 MWST）。`,
       ] },
@@ -385,7 +385,7 @@
       ] },
     ],
     why: [
-      T`**考试情况**：往年卷（2021、2025 practice、2026 practice）都没有出过 L24 的题，没有往年题可参考；按官方范围仍要会。最像考题的是：给几条边的互信息，手动跑最大权生成树（和 T6 里取 junction tree 的那一步是同一个动作）；给 $T$、$r_i$、$\hat I$，算一条边的 BIC 判断要不要加；以及概念简答"为什么只看互信息""为什么要 BIC""为什么结果可能是森林"。`,
+      T`**考试情况**：往年卷（2021、2025 practice、2026 practice）都没有出过 L24 的题，没有往年题可参考；按官方范围仍要会。最像考题的是：给几条边的互信息，手动跑最大权生成树（和 [T6](#/T06) 里取 junction tree 的那一步是同一个动作）；给 $T$、$r_i$、$\hat I$，算一条边的 BIC 判断要不要加；以及概念简答"为什么只看互信息""为什么要 BIC""为什么结果可能是森林"。`,
       T`**在主线里的位置**：W12 = 学参数 → 学结构。BN 的结构搜索（[c62](#/c62)）是 NP-hard，通常用启发式（也有昂贵的精确搜索）；MRF 限制成树后，c63 的闭式 MLE 让似然按边拆开，结构搜索变成精确可解的最大权生成树。`,
     ],
     intuition: [
@@ -438,7 +438,7 @@
         ['$\\hat n_{BC}$', '30', '20', '20', '30'],
         ['$\\hat n_{AC}$', '26', '24', '24', '26'],
       ] },
-      T`（这三张表来自同一份 100 条的数据：8 种组合 $(A,B,C)$ 的计数是 000:25，001:15，010:1，011:9，100:5，101:5，110:19，111:21，按两个变量分组相加就得到上表。例如 $\hat n_{AB}(0,0)=25+15=40$。）每个变量都是 50 个 0、50 个 1，所以 $\hat P_i=(\frac12,\frac12)$，独立时每格应为 $\frac14$。`,
+      T`（这三张表来自同一份 100 条的数据：8 种组合 $(A,B,C)$ 的计数（记作 $ABC$：次数，这些联合计数只是用来验算，做题只需要上表的两两计数）是 000:25，001:15，010:1，011:9，100:5，101:5，110:19，111:21，按两个变量分组相加就得到上表。例如 $\hat n_{AB}(0,0)=25+15=40$。）每个变量都是 50 个 0、50 个 1，所以 $\hat P_i=(\frac12,\frac12)$，独立时每格应为 $\frac14$。`,
       { t: 'h4', text: '第 1 步：算三个互信息（自然对数）' },
       { t: 'steps', items: [
         T`$\hat I(A;B)$：频率 $(0.4,0.1,0.1,0.4)$，比值 $\frac{0.4}{0.25}=1.6$、$\frac{0.1}{0.25}=0.4$。$\hat I=2\times0.4\ln1.6+2\times0.1\ln0.4=0.8\times0.4700+0.2\times(-0.9163)=0.3760-0.1833=0.1927$。`,
@@ -461,7 +461,7 @@
       ] },
       { t: 'h4', text: '第 4 步：用整棵树的 BIC 核对' },
       T`三个变量的熵都是 $\ln2=0.6931$，$\sum\hat H=2.0794$。`,
-      { t: 'table', cls: 'compact', head: ['模型', '对数似然 $T[-\\sum\\hat H+\\sum_E\\hat I]$', '自由参数', '罚分 $\\frac{k}{2}\\ln100$', 'BIC'], rows: [
+      { t: 'table', cls: 'compact', head: ['模型', '对数似然 $T[-\\sum\\hat H+\\sum_E\\hat I]$', '自由参数', '罚分 $\\frac{k}{2}\\ln100$（$k$ = 自由参数个数）', 'BIC'], rows: [
         ['链 $A$—$B$—$C$', '$100\\times(-2.0794+0.1927+0.0201)=-186.66$', '$3+2=5$', '$11.51$', '$-198.17$'],
         ['森林 $A$—$B$，$C$', '$100\\times(-2.0794+0.1927)=-188.67$', '$3+1=4$', '$9.21$', '$-197.88$'],
       ] },
@@ -486,8 +486,8 @@
     compare: [
       { t: 'table', head: ['', 'junction tree（c58，L22）', '树形 MRF 结构学习（本章，L24）'], rows: [
         ['图的节点', '极大团（一组变量）', '单个变量'],
-        ['边权', '两团共享的变量个数 $|c_i\\cap c_j|$', '互信息 $\\hat I(X_i;X_j)$ 或边的 BIC'],
-        ['目的', '推断：让团组成树（满足 running intersection）', '学习：选出得分最高的树结构'],
+        ['边权', '两团（clique，团）$c_i,c_j$ 共享的变量个数 $|c_i\\cap c_j|$', '互信息 $\\hat I(X_i;X_j)$ 或边的 BIC'],
+        ['目的', '推断：让团组成树（满足 running intersection：同一个变量出现在哪些团里，这些团在树上要连成一片，不能断开）', '学习：选出得分最高的树结构'],
         ['权重可以是负的吗', '不会', 'BIC 可以，负分的边不加 ⇒ 可能得到森林'],
         ['算法', '最大权生成树：从大到小加边，跳过成环的', '同一个算法'],
       ] },
