@@ -34,6 +34,10 @@ table.dich tr.dup td.sel { background: var(--sunk); color: var(--muted); text-de
 .subset.cur { box-shadow: 0 0 0 2px var(--accent); }
 
 /* graphs (SVG) */
+/* --halo: the background behind a graph, used to outline labels that cross lines */
+:root { --halo: var(--paper); }
+.solver, .card, details.deep, ol.steps > li, .fade-item { --halo: var(--card); }
+details.deep.notexam { --halo: var(--paper); }
 svg.graph { display: block; width: 100%; max-width: 400px; max-height: 60vh; height: auto; margin: 0 auto; }
 svg.graph .edge { stroke: var(--ink-2); stroke-width: 1.6; fill: none; }
 svg.graph .edge.moral { stroke: var(--warn); stroke-dasharray: 5 4; stroke-width: 2; }
@@ -165,7 +169,7 @@ figure.graph-fig figcaption, figure.graph-strip > figcaption, figure.slide-fig f
 figure.graph-strip { margin: 14px 0; text-align: center; }
 figure.slide-fig { margin: 16px auto; text-align: center; }
 figure.slide-fig img { max-width: min(100%, 560px); border: 1px solid var(--line); border-radius: 8px; background: #fff; }
-svg.graph .edge-label { fill: var(--ink-2); font: 500 12px var(--body); text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+svg.graph .edge-label { fill: var(--ink-2); font: 500 12px var(--body); text-anchor: middle; dominant-baseline: central; paint-order: stroke; stroke: var(--halo); stroke-width: 3px; }
 svg.graph .node-note { fill: var(--muted); font: 500 11.5px var(--body); text-anchor: middle; dominant-baseline: hanging; }
 svg.graph .node-note.left { text-anchor: end; dominant-baseline: central; }
 svg.graph .node-note.right { text-anchor: start; dominant-baseline: central; }
@@ -264,7 +268,7 @@ svg.graph .cross { stroke: var(--ink); stroke-width: 2; fill: none; }
 svg.graph .target { fill: none; stroke: var(--line-2); stroke-width: 1.2; }
 svg.graph .fl.shade { fill: var(--sunk); }
 svg.graph .ln.thin { stroke-width: 1.2; stroke-dasharray: 4 3; }
-svg.graph.fig .lbl, svg.graph.fig .tick { paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+svg.graph.fig .lbl, svg.graph.fig .tick { paint-order: stroke; stroke: var(--halo); stroke-width: 3px; stroke-linejoin: round; }
 svg.graph.fig .lbl.inv { stroke: none; }
 svg.graph .frame { fill: none; stroke: var(--line-2); stroke-width: 1; }
 svg.graph .frame.best { stroke: var(--good); stroke-width: 2.2; }
