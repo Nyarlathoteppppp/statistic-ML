@@ -75,7 +75,7 @@
     types: [],
     what: [
       { t: 'h3', text: '① 问题：两张图什么时候是"同一个"（L23 p3–p4）' },
-      T`W10 的 BN 都是先画好图、再填 CPT（conditional probability table，条件概率表：每个节点一张，列出父节点取不同取值时自己的概率）（c53）。这一周反过来：只有数据，要把图学出来。在比较"哪张图更好"之前，先得知道哪些图其实是同一个模型——否则会花力气去比较两张永远分不出高下的图。课件 p4 的定义：`,
+      T`W10 的 BN 都是先画好图、再填 CPT（conditional probability table，条件概率表：每个节点一张，列出父节点取不同取值时自己的概率）（c53）；这一周要从数据把图学出来，先得知道哪些图其实是同一个模型。课件 p4 的定义：`,
       { t: 'good', title: '定义（L23 p4）', md: T`**Two graphs are equivalent if they encode the same set of independence assumptions about the variables.** 两张图等价＝它们对变量做出的（条件）独立性假设完全相同。` },
       T`回忆 c53、c54：BN 的图本身就在声明独立性（比如硬币例子"两枚硬币互相独立"）。所以"等价"不看箭头长得像不像，只看两张图声明的独立性清单是否一字不差。先看最简单的两个变量（p4）：`,
       { t: 'graphs', r: 16, items: [
@@ -118,7 +118,7 @@
       T`核对：$1+3\times2+3\times3+3\times1+6=25$ 张图，$1+3+3+3+1=11$ 类。注意同一个骨架"$x_1$—$x_2$—$x_3$"有 4 种定向：3 种（两个方向的链、分叉）在同一个框里；第 4 种 $x_1\to x_2\leftarrow x_3$ 是 immoral v 结构，单独一个框（p7 第一行）。`,
     ],
     why: [
-      T`**这是学结构的前提。** 后面两章给图打分：c61 的 BIC 对等价的图打一样的分（p22）；c62 的 Bayesian score 也特意把先验设计成这样（likelihood equivalence，p25）。讲者的解释：同一等价类里的图，从观测数据里根本分不出来（"not something we can capture from our observations"），所以打分也不该区分它们。结构搜索最后找到的是一个等价类，而不是唯一的一张图（p33）。`,
+      T`**这是学结构的前提。** c61 的 BIC 和 c62 的 Bayesian score 都给等价的图打一样的分（p22、p25）：同一类里的图从观测数据里分不出来（讲者："not something we can capture from our observations"），所以结构搜索找到的是一个等价类，而不是唯一的一张图（p33）。`,
       T`往年卷还没有考过 L23（这是新内容），所以定 ★。考试范围是 everything covered，可能的考法是短答："这两张图等价吗？为什么？"——按 p6 的两条标准写。`,
     ],
     intuition: [
@@ -131,9 +131,6 @@
       T`把 p6 的判断写成一个式子（$\mathrm{skel}$、$\mathrm{imm}$ 是本站的简写）：`,
       { t: 'math', tex: T`G_1\text{ 与 }G_2\text{ 等价}\iff\mathrm{skel}(G_1)=\mathrm{skel}(G_2)\ \text{且}\ \mathrm{imm}(G_1)=\mathrm{imm}(G_2)` },
       T`$\mathrm{skel}(G)$ = 擦掉方向后的边集合；$\mathrm{imm}(G)$ = 所有满足"$a\to c$、$b\to c$ 都在图中，而 $a,b$ 之间没有边"的三元组 $(a,c,b)$。"当且仅当"意味着两条都要查：骨架相同但 v 结构不同（$A\to B\to C$ 对 $A\to B\leftarrow C$）不等价；v 结构清单都是空的但骨架不同（$A\to B$ 对空图）也不等价。`,
-      T`（补充理解）三个节点时，三种"一串"的因子分解互相转换：`,
-      { t: 'math', tex: T`\underbrace{P(A)P(B\mid A)P(C\mid B)}_{A\to B\to C}=\underbrace{P(B)P(A\mid B)P(C\mid B)}_{A\leftarrow B\to C}=\underbrace{P(C)P(B\mid C)P(A\mid B)}_{A\leftarrow B\leftarrow C}` },
-      T`第一个等号用 $P(A)P(B\mid A)=P(A,B)=P(B)P(A\mid B)$；第二个等号用 $P(B)P(C\mid B)=P(B,C)=P(C)P(B\mid C)$。三者都能写成 $P(A,B,C)=P(A,B)P(C\mid B)$ 这种"给定 $B$ 后 $C$ 不再管 $A$"的形式，这正是 $A\perp C\mid B$。`,
     ],
     fx: [
       {
@@ -260,7 +257,7 @@
     ],
     genesis: T`c53 里图是给定的，学习只剩"数数估 CPT"。可现实里往往连图都不知道：25 个基因表型之间谁影响谁（p31）？最自然的想法是"哪张图把数据拟合得最好就选哪张"。课件 p19 指出这条路走不通：父节点越多，可调的参数越多，训练数据上的似然只会更高，最后总会选出边最多的图——这就是过拟合（c18）。所以这一章先把参数估计写成计数公式，再给似然加上复杂度惩罚，得到能比较不同图的 **BIC 分数**；而且它能拆成每个节点各自一项，为 c62 的结构搜索铺路。`,
     title: '完整数据学 BN：参数 MLE 与 BIC 分数', en: 'Learning Bayesian networks from complete data: MLE of CPTs, log-likelihood and the BIC score',
-    summary: '手里只有一张**完整的数据表**（每一格都有值），要学出 BN。课件把它拆成三件事（L23 p10–p13）：参数估计（图已知，估 CPT）、模型选择（给每张图打分）、结构搜索（找分最高的 DAG）。本章讲前两件：用 $r_i$、父节点配置 $j$、$\\theta_{ijk}$ 写出 CPT，条件对数似然按计数 $\\hat n_{ijk}$ 合并，MLE 就是每一列里数频率（p15–p18）；最大似然不能用来选父节点（p19），要减去复杂度惩罚，得到 BIC score（p20）；整张图的分数等于各节点局部分数之和（decomposable），等价的图分数相同（p21–p22）。',
+    summary: '手里只有一张**完整的数据表**（每一格都有值），要学出 BN。课件把它拆成三件事：参数估计（图已知，估 CPT）、模型选择（给每张候选图打分）、结构搜索（找分最高的 DAG）。本章讲前两件：图已知时，CPT 每一格的最大似然估计就是数频率——在父节点取某一组值的那些行里，$x_i$ 取某个值所占的比例；但似然随父节点增加只升不降，不能拿来挑父节点，要减去「自由参数个数 ÷ 2 × log 数据行数」的惩罚，得到 BIC 分数。整张图的分数是各节点分数之和，等价的图分数相同。',
     prereq: ['c53', 'c06', 'c60'],
     symbols: [
       [T`$D$`, T`数据表：每列一个变量 $x_1,\dots,x_n$，每行一次观测`],
@@ -298,9 +295,8 @@
         T`**Model selection（模型选择）**：给每张候选图 $G$ 打一个分，衡量它对数据拟合得多好。`,
         T`**Structure search（结构搜索）**：在所有候选图里找分最高的 $\hat G$。`,
       ] },
-      T`p13 把三件事串成一条流水线：数据 → 估参数、再加复杂度惩罚 → 得到一个**可分解（decomposable）**的打分函数 $\mathrm{score}(G;D)=\sum_{i=1}^n\mathrm{score}(i\mid pa_i;D)$ → 在无环图里找 $\arg\max_G\mathrm{score}(G;D)$。讲者："this is a two-fold problem"——既要学参数，也要学结构。本章讲前两件（p14–p22）；c62 讲另一种打分（Bayesian score）和第三件（搜索）。`,
+      T`p13 把三件事串成一条流水线（下图）：数据 → 估参数、再加复杂度惩罚，给每张图打分 → 只在**无环**的图里找分数最高的那张。本章讲前两件（p14–p22）；c62 讲另一种打分（Bayesian score）和第三件（搜索）。`,
       { t: 'slide', src: 'L23/p13', caption: '课件 p13 的整条流水线：左边是完整数据（complete data）的矩阵 D；中间箭头写 parameter estimation + complexity penalty；右边得到 score(G;D) = Σ score(i|pa_i,D)，标注为 decomposable scoring function；再经 structure search，落到最下面的 arg max 那张无环图（highest scoring acyclic graph，图里画的是一个基因网络）。' },
-      T`看图注意两处：打分函数在流水线的中间，它同时用到了数据（拟合项）和复杂度惩罚；最后的箭头强调的是 **acyclic**——$\arg\max$ 只在无环图里取，这就是 c62 说的全局约束，也是 BN 结构学习难的原因。`,
       { t: 'h3', text: '② CPT 的记号：$r_i$、父节点配置 $j$、$\\theta_{ijk}$（L23 p15–p16）' },
       T`图给定时，联合分布按图分解（p15，同 c53）：`,
       { t: 'math', tex: T`P(x_1,\dots,x_n;\theta)=\prod_{i=1}^nP(x_i\mid x_{pa_i};\theta)` },
@@ -322,10 +318,9 @@
       T`课件数据里的编号：可见的 6 行里 $x_1,x_2\in\{1,2\}$、$x_3\in\{1,2,3\}$，本周就取 $r_1=r_2=2$、$r_3=3$，于是 $q_1=2\times3=6$。`,
       JTAB,
       { t: 'h3', text: '③ 条件对数似然：每行贡献一个 log，再按 $(j,k)$ 合并（L23 p17）' },
-      T`估 $x_1$ 的 CPT，只需要 $x_1$ 和它的父节点这几列（p17 用红框框出 $x_1$ 和 $(x_2,x_3)$）。假设各行独立同分布（i.i.d.），数据的似然是每行概率的乘积，取 log 变成求和（p15："log of product of probabilities = sum of log of probabilities"）。这就是**条件对数似然（conditional log-likelihood）**：`,
+      T`估 $x_1$ 的 CPT，只需要 $x_1$ 和它的父节点这几列（p17 用红框框出 $x_1$ 和 $(x_2,x_3)$）：整份数据的对数似然能拆成每个节点一项之和（理由见 ⑦），而 $x_1$ 的 CPT 参数只出现在 $x_1$ 那一项里。各行独立同分布（i.i.d.）时，这一项就是每行 $\log P(x_{t1}\mid x_{t2},x_{t3})$ 之和（p15："log of product of probabilities = sum of log of probabilities"），叫**条件对数似然（conditional log-likelihood）**：`,
       { t: 'math', tex: T`l(1|2,3;\theta)=\sum_{t=1}^T\log P(x_{t1}\mid x_{t2},x_{t3};\theta)=\sum_{k=1}^{r_1}\sum_{j=1}^{q_1}\hat n_{1jk}\log\theta_{1jk}` },
       { t: 'slide', src: 'L23/p17', caption: '课件 p17：红框框住 x₁ 列和它的父节点 x₂、x₃ 两列，其余列与这张 CPT 无关；其中两行左侧标着它的 k、j；第 2、5 行涂蓝，因为两行的 (x₂,x₃)=(2,2)、x₁=1 相同，在 l 里合成一项 2 log θ₁₄₁；右下角淡红框就是计数 n̂1jk（同一格出现的行数）。' },
-      T`看图时先注意两点：课件把"这一行的 $(j,k)$"直接标在行左边；蓝色标出的第 2、5 行落在同一格 $(j,k)=(4,1)$，所以它们在 $l$ 里只算一项 $2\log\theta_{141}$。`,
       T`第一个等号是一行一行地加。第 $t$ 行的父节点配置是某个 $j$、$x_1$ 的值是某个 $k$，它贡献的就是 CPT 里那一格的 $\log\theta_{1jk}$。例如第 1 行 $x_1=2$、$(x_2,x_3)=(2,1)$，即 $k=2,j=2$，贡献 $\log\theta_{122}$（p17 的标注"$k=2,j=2$"）。`,
       T`第二个等号把相同的项合并：同一个 $(j,k)$ 组合会出现好几次。**$\hat n_{1jk}$ 就是"父节点配置 $(x_2,x_3)=j$ 后面跟着 $x_1=k$"的行数**（"how many times parent configuration $(x_2,x_3)=j$ is followed by $x_1=k$"）。课件的例子：第 2 行和第 5 行都是 $(x_2,x_3)=(2,2)$（$j=4$）、$x_1=1$（$k=1$），所以 $\log\theta_{141}+\log\theta_{141}=2\log\theta_{141}$，$\hat n_{141}=2$。`,
       { t: 'h3', text: '④ MLE ＝ 每一列里数频率（L23 p18）' },
@@ -341,8 +336,8 @@
       ] },
       { t: 'h3', text: '⑤ 能不能用似然来挑父节点？不能（L23 p19）' },
       T`参数会估了，自然想到：给 $x_1$ 试不同的父节点集合，每种都算出最大的条件对数似然 $l(1|\cdots;\hat\theta)$，哪个大就选哪个。p19 明确说不行："We cannot use the conditional log-likelihood $l(1|2,3;\hat\theta)$ directly to guide which (or how many) parents we should use for predicting $x_1$."`,
-      T`**原因：多加一个父节点，最大似然只会变大或不变。** 父节点越多，数据被切成越细的小组，每组各估一列参数；可调的参数更多，在训练数据上总能拟合得至少一样好（讲者："a more flexible model can achieve a higher maximum likelihood"）。照这样选，永远会选出父节点最多、边最多的图——过拟合（c18；讲者把它比作神经网络参数太多）。例 2 用课件的数据算给你看：$x_1$ 的父节点从 $\varnothing$ 加到 $\{x_2\}$ 再到 $\{x_2,x_3\}$，$l$ 从 $-3.82$ 升到 $-2.77$ 再升到 $0$。`,
-      T`**"似然最高"有时只是把训练数据背下来。** 例 1 里父节点取 $\{x_2,x_3\}$ 时 $l=0$：6 行每行都被预测成概率 1，模型等于把这 6 行抄了一遍。换一行新数据，若它的父节点配置在训练集里没出现过（例如 $j=3$，即 $(x_2,x_3)=(1,2)$），这一列根本没有估计（0/0）；配置出现过时模型也只给 0 或 1，猜错一次这一行的概率就成了 0。所以训练集上的 $l$ 不能当作"好"的证据——BIC 的惩罚就是在替"换一批数据还准不准"收费。`,
+      T`**原因：多加一个父节点，最大似然只会变大或不变。** 父节点为 $\{x_2\}$ 的模型，只要让 $x_2=1$、$x_2=2$ 两列取一样的数，就退回成无父节点的模型，所以它能达到的最大似然至少一样高（讲者："a more flexible model can achieve a higher maximum likelihood"）。照这样选，永远会选出父节点最多、边最多的图——过拟合（c18）。`,
+      T`例 2 用课件的数据算给你看：$x_1$ 的父节点从 $\varnothing$ 加到 $\{x_2\}$ 再到 $\{x_2,x_3\}$，$l$ 从 $-3.82$ 升到 $-2.77$ 再升到 $0$。$l=0$ 表示 6 行每行都被预测成概率 1，模型只是把训练数据背了下来：换一行新数据，它的父节点配置可能根本没见过（0/0），见过的也只会给 0 或 1，猜错一次这一行的概率就是 0。`,
       { t: 'h3', text: '⑥ BIC：似然减去复杂度惩罚（L23 p20）' },
       T`办法是保留似然（还是要拟合得好），但按参数个数扣分。课件用最常见的 **BIC（Bayesian information criterion）** score：`,
       { t: 'math', tex: T`\mathrm{score}(1|2,3;D)=l(1|2,3;\hat\theta)-\frac{(r_1-1)q_1}{2}\log(T)` },
@@ -362,12 +357,11 @@
       T`p22 再加一条性质："The BIC score is the same for each equivalent graph"。所以用 BIC 打分，同一个等价类（c60）里的图打成平手，能分出来的只是等价类（例 3 用数字验证）。`,
     ],
     why: [
-      T`CPT 的 MLE（数数）是往年 Section C 的固定考点（2025 Q4b–c，见 c53 和 [T7](#/T07)）；这一章用课件 L23 的记号把它写成一般公式，并接上"怎么比较不同的图"。L23 本身往年卷还没考过（新内容），但这一章的数数估 CPT 是往年 Section C 的固定考点（必会第 7 类），所以定 ★★★。可能的考法：用计数写 MLE；"为什么不能直接用似然选结构"；"BIC 惩罚的是什么"；"可分解有什么好处"。`,
+      T`CPT 的 MLE（数数）是往年 Section C 的固定考点（必会第 7 类；2025 Q4b–c，见 c53 和 [T7](#/T07)），所以定 ★★★；L23 的其余内容往年卷还没考过。可能的考法：用计数写 MLE；"为什么不能直接用似然选结构"；"BIC 惩罚的是什么"；"可分解有什么好处"。`,
     ],
     intuition: [
-      T`**加父节点 = 把数据切成更细的小组。** 父节点的每一种配置是一组，MLE 在每组里各数各的频率。组越细，每组越"纯"，似然越高；极端情况下每组只有一行，每组都 100% 预测对，$l=0$——这正是例 2 里 $\{x_2,x_3\}$ 的情况：模型只是把训练数据背了下来。`,
-      T`（补充理解）为什么最大似然"只升不降"？父节点为 $\{x_2\}$ 的模型，只要让两列取一样的数（都等于整体频率），就和"无父节点"的模型完全一样。所以它能达到的最大值至少和无父节点一样高，通常更高。`,
-      T`**BIC 给每个参数标了价：$\frac12\log T$。** 新加的参数必须让 $l$ 至少提高这么多才划算。$T=6$ 时每个参数 $\frac12\ln6=0.896$；C. elegans 例子（c62）$T=926$ 时每个参数 $\frac12\ln926=3.415$。数据越多，价越高，但似然的提升（随 $T$ 线性增长）涨得更快。`,
+      T`**加父节点 = 把数据切成更细的小组。** 父节点的每一种配置是一组，MLE 在每组里各数各的频率。组越细，每组越"纯"，似然越高；极端情况下每组只有一行，$l=0$（例 2 的 $\{x_2,x_3\}$）。`,
+      T`**BIC 给每个参数标了价：$\frac12\log T$。** 新加的参数必须让 $l$ 至少提高这么多才划算：$T=6$ 时每个参数 $\frac12\ln6=0.896$；C. elegans 例子（c62）$T=926$ 时 $\frac12\ln926=3.415$。`,
       { t: 'think', q: '$x_1$ 二元。父节点从 $\\{x_2\\}$（$r_2=2$）换成 $\\{x_2,x_3\\}$（$r_3=3$），$T=6$，BIC 的惩罚增加多少？', a: T`自由参数从 $(2-1)\times2=2$ 个变成 $(2-1)\times6=6$ 个，多 4 个，每个 $\frac12\ln6=0.896$：惩罚多 $4\times0.896=3.58$（例 2 里两个惩罚正是 $5.375$ 和 $1.792$，差 $3.583$）。` },
       { t: 'story', title: 'BIC 的来历', md: 'BIC（Bayesian information criterion）由统计学家 Gideon Schwarz 在 1978 年提出，所以也叫 Schwarz criterion。名字里有 "Bayesian"，是因为它最初是作为"边缘似然"的一种近似推出来的——c62 的 Bayesian score 正是那个被近似的东西。' },
     ],
@@ -430,7 +424,7 @@
       T`给 $x_1$ 试四种父节点集合（这四个 BIC 就是后面例 3 要用的局部分数，依次记作 $\mathrm{score}(1|\varnothing)$、$\mathrm{score}(1|2)$、$\mathrm{score}(1|3)$、$\mathrm{score}(1|2,3)$）。每种都先分组数数，再算 $l$、惩罚 $\frac{(r_1-1)q_1}{2}\ln6$（$r_1=2$，$\ln6=1.792$）和 BIC：`,
       { t: 'steps', items: [
         T`$\varnothing$（$q_1=1$）：$x_1$ 整列是 $2,1,1,2,1,1$，$x_1=1$ 有 4 行、$x_1=2$ 有 2 行，$\hat\theta=4/6,\ 2/6$。$l=4\ln\frac23+2\ln\frac13=4(-0.405)+2(-1.099)=-1.622-2.197=-3.819$。惩罚 $\frac{1\times1}{2}\times1.792=0.896$。BIC $=-4.715$。`,
-        T`$\{x_2\}$（$q_1=2$）：$x_2=1$ 的第 3、6 行，$x_1=1,1$，纯的，贡献 $2\ln1=0$；$x_2=2$ 的第 1、2、4、5 行，$x_1=2,1,2,1$，各一半，贡献 $4\ln\frac12=-2.773$。$l=-2.773$。惩罚 $\frac{1\times2}{2}\times1.792=1.792$。BIC $=-4.564$。`,
+        T`$\{x_2\}$（$q_1=2$，两列分开数）：$x_2=1$ 的第 3、6 行，$x_1=1,1$，MLE $\hat\theta(x_1=1)=2/2=1$，两行各贡献 $\ln1$，共 $0$；$x_2=2$ 的第 1、2、4、5 行，$x_1=2,1,2,1$，MLE $\hat\theta(x_1=1)=\hat\theta(x_1=2)=2/4=\frac12$，四行各贡献 $\ln\frac12$，共 $4\ln\frac12=-2.773$。$l=0+(-2.773)=-2.773$。惩罚 $\frac{1\times2}{2}\times1.792=1.792$。BIC $=-2.773-1.792=-4.564$。`,
         T`$\{x_3\}$（$q_1=3$）：$x_3=1$ 的第 1、3 行 $x_1=2,1$，贡献 $2\ln\frac12=-1.386$；$x_3=2$ 的第 2、5 行 $x_1=1,1$，贡献 0；$x_3=3$ 的第 4、6 行 $x_1=2,1$，贡献 $-1.386$。$l=-2.773$。惩罚 $\frac{1\times3}{2}\times1.792=2.688$。BIC $=-5.460$。`,
         T`$\{x_2,x_3\}$（$q_1=6$）：例 1 已算 $l=0$。惩罚 $\frac{1\times6}{2}\times1.792=5.375$。BIC $=-5.375$。`,
       ] },
@@ -523,7 +517,7 @@
       T`Dirichlet 和多项分布共轭，积分有 Gamma 函数的闭式解（推导不考），代进计数就能算；分数照样按节点拆开。`,
       T`结构搜索：分数按节点拆开，但所有节点的父节点合起来必须无环，所以找最高分的图很难，只能局部 / 随机 / 昂贵的精确搜索。`,
     ],
-    genesis: T`c61 的 BIC 用一个固定的惩罚 $\frac{(r_1-1)q_1}{2}\log T$ 压复杂度：只数参数个数，先挑一组"最好的" $\hat\theta$ 再扣分。课件说还有更好的复杂度控制（p23）：像 W10 的 Bayesian 方法（c08、c51）那样，**不挑任何一组参数，把所有可能的参数值都试一遍、按先验加权平均**。参数多的结构要把先验摊到更大的参数空间上，不会因为参数多就白白得高分。分数有了，最后一步是在所有 DAG 里找分最高的那一张——难点在"必须无环"这条全局约束。`,
+    genesis: T`c61 的 BIC 先挑一组最好的 $\hat\theta$，再按参数个数扣分。课件说还有更好的复杂度控制（p23）：像 W10 的 Bayesian 方法（c08、c51）那样，**不挑参数，按先验把所有参数值下的似然加权平均**（① 细说）。分数有了，最后一步是在所有 DAG 里找分最高的那一张——难点在「必须无环」这条全局约束。`,
     title: 'Bayesian score 与结构搜索', en: 'The Bayesian (Dirichlet) score and searching for the highest-scoring DAG',
     summary: 'L23 后半讲（p23–p34）。**Bayesian score** = 对参数积分后的 log 边缘似然：$\\log\\int P(\\theta)\\prod_tP(x_{t1}\\mid x_{t2},x_{t3};\\theta)\\,d\\theta$。先验要满足三条准则（参数独立、参数模块化、似然等价），唯一的选择是 CPT 每一列一个 Dirichlet；课件再取均匀分配，超参数 $\\alpha_{1jk}=\\alpha/(r_1q_1)$，$\\alpha$ 叫 equivalent sample size；Dirichlet 和多项分布共轭，积分有 Gamma 函数的闭式解（p28，推导不考）。最后是结构搜索：分数可分解，但父节点的选择要满足"整张图无环"这个全局约束，所以找最高分的 DAG 很难（p30）；课件用 C. elegans 的 25 个表型变量演示（p31–p33）。',
     prereq: ['c61', 'c51', 'c08', 'c60'],
@@ -577,10 +571,9 @@
       { t: 'math', tex: T`\alpha_{1jk}=\frac{\alpha}{r_1q_1},\qquad\alpha_{1j}=\sum_{k=1}^{r_1}\alpha_{1jk}=\frac{\alpha}{q_1}` },
       T`例：$\alpha=4$，$x_1$ 二元（$r_1=2$）。没有父节点（$q_1=1$）：每格 $4/2=2$；父节点 $x_2$ 二元（$q_1=2$）：每格 $4/4=1$；父节点 $(x_2,x_3)$（$x_2$ 二元、$x_3$ 有三个取值，所以 $q_1=2\times3=6$）：每格 $4/12=1/3$。总的假想数据量始终是 $\alpha=4$ 行，父节点越多，摊到每一列、每一格的越少。`,
       { t: 'h3', text: '⑤ 闭式解（L23 p28）' },
-      T`先验是 Dirichlet，似然是多项分布（multinomial），两者**共轭（conjugate）**（c51 里 Beta–Binomial 的多维版），所以积分有闭式解：`,
+      T`先验是 Dirichlet，似然是多项分布（multinomial：掷 $r_1$ 面骰子时各面出现次数的分布，二元时就是二项分布），两者**共轭（conjugate）**（c51 里 Beta–Binomial 的多维版），所以积分有闭式解：`,
       { t: 'math', tex: T`\mathrm{score}(1|2,3;D)=\sum_{j=1}^{q_1}\left[\log\frac{\Gamma(\alpha_{1j})}{\Gamma(\alpha_{1j}+\hat n_{1j})}+\sum_{k=1}^{r_1}\log\frac{\Gamma(\alpha_{1jk}+\hat n_{1jk})}{\Gamma(\alpha_{1jk})}\right]` },
       T`怎么用：对每个父节点配置 $j$，先用这一列的伪计数总和 $\alpha_{1j}$ 和这一列的真实行数 $\hat n_{1j}=\sum_k\hat n_{1jk}$ 算第一项；再对这一列的每个格子，用 $\alpha_{1jk}$ 和计数 $\hat n_{1jk}$ 算第二项；所有列加起来。$\hat n_{1jk}$ 就是 c61 数出来的计数。数据里没出现过的配置（$\hat n_{1j}=0$）两项都是 $\log1=0$，不影响分数。讲者："I won't derive how this came about … you also don't need to know how to derive it"——推导放在下面的折叠框里。`,
-      T`**积分到底在做什么：一个数字。** 取一个二元变量、没有父节点、equivalent sample size $\alpha=2$（每格伪计数 1，就是 $\mathrm{Beta}(1,1)$）。只看到一行数据 $x_1=1$：最大似然把概率定成 1，$l=0$，看起来完美；Bayesian score 只有 $\ln\frac{\Gamma(2)}{\Gamma(3)}+\ln\frac{\Gamma(2)}{\Gamma(1)}=\ln\frac12=-0.693$，因为它要在所有可能的概率值上按先验平均，先为"参数还很不确定"付钱。数据多了，似然项随 $T$ 增长，这类代价就相对越轻。`,
       { t: 'fold', title: '闭式解的推导（L23 p28）', blocks: [
         { t: 'steps', items: [
           T`准则 1 让先验按列相乘，似然也按列分组（c61：$\prod_t P(x_{t1}\mid\cdot)=\prod_j\prod_k\theta_{1jk}^{\hat n_{1jk}}$），所以积分拆成每一列各自的积分之积，取 log 后变成按 $j$ 求和。`,
@@ -619,7 +612,6 @@
     ],
     intuition: [
       T`**（补充理解）Bayesian score ＝ 一行一行地"预测下一行"。** 把闭式解展开，它等于按顺序预测每一行的概率之积再取 log（即逐行预测的 log 概率之和）：读到第 $t$ 行时，在它的父节点配置 $j$ 里，猜 $x_1=k$ 的概率是 $\frac{(\text{之前这一列里 }k\text{ 出现的次数})+\alpha_{1jk}}{(\text{之前这一列的行数})+\alpha_{1j}}$——就是 c51 的"计数 + 伪计数"（日出问题的 $\frac{k+1}{k+2}$ 也是这个形状）。例 1 用它验证了闭式解。`,
-      T`**复杂度控制藏在"每一列从零学起"里。** 父节点越多，列越多；每一列第一次出现时没有任何真实计数，只能按先验猜（二元时是 1/2）。只有当一列后来被反复用到、而且每次都猜对，才能把多付的"学费"挣回来。数据少时付学费不划算，所以 Bayesian score 不会盲目选父节点多的结构。`,
       T`**$\alpha$ 的大小 ＝ 先验有多固执。** $\alpha$ 大：伪计数多，预测长时间停在均匀附近，数据要很多才能推开；$\alpha$ 小：很快相信数据。它和 c51 里 $\mathrm{Beta}(\alpha,\beta)$ 的 $\alpha+\beta$ 是同一个意思。`,
       { t: 'think', q: '为什么不能每个节点各自挑局部分数最高的父节点集合，再拼成一张图？', a: T`拼出来可能有环，不是 DAG。例 2：$x_1$ 局部最好的父节点是 $\{x_2\}$，$x_2$ 局部最好的父节点是 $\{x_1\}$，拼起来 $x_1\to x_2$ 和 $x_2\to x_1$ 同时存在，是环。无环是全局约束，所以要搜索。` },
       { t: 'story', title: '名字里的人', md: '这种 Dirichlet 先验的打分常叫 BDe / BDeu score（Bayesian Dirichlet equivalent，u 指 uniform）。这套准则和对应的 Dirichlet 打分出自 David Heckerman、Dan Geiger 和 Max Chickering 1995 年的论文；第二年 Chickering 证明了：在这类打分下找最高分的 BN 是 NP-complete 问题——就是课件说的 "computationally hard"。' },
@@ -634,7 +626,6 @@
         T`整数：$\Gamma(m)=(m-1)!$，例如 $\Gamma(4)=3!=6$，$\Gamma(10)=9!=362880$。`,
         T`递推：$\Gamma(x+1)=x\,\Gamma(x)$，所以 $\frac{\Gamma(x+n)}{\Gamma(x)}=x(x+1)\cdots(x+n-1)$——$n$ 个连续数相乘，$x$ 是分数也能算。例：$\frac{\Gamma(\frac13+2)}{\Gamma(\frac13)}=\frac13\times\frac43=\frac49$。`,
       ] },
-      T`（补充理解）用第二条，一列积分的结果（还没取 log）就是"逐行预测"的乘积：$\frac{\Gamma(\alpha_{j})}{\Gamma(\alpha_{j}+\hat n_{j})}\prod_k\frac{\Gamma(\alpha_{k}+\hat n_{k})}{\Gamma(\alpha_{k})}=\frac{\prod_k\alpha_k(\alpha_k+1)\cdots(\alpha_k+\hat n_k-1)}{\alpha_j(\alpha_j+1)\cdots(\alpha_j+\hat n_j-1)}$。分母的每个因子是"第几次用到这一列 + 伪计数"，分子的每个因子是"这个值第几次出现 + 伪计数"。`,
     ],
     fx: [
       {

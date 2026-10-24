@@ -19,7 +19,7 @@
       { text: '2026 practice Q4', cls: 'hot' }, { text: '2025 practice Q1c', cls: 'src' }, { text: '2021 exam Q18a', cls: 'src' }, { text: '2017 exam Q9', cls: 'src' },
       { text: 'Workshop 12 Q1–Q2', href: '#/T05/ws12', cls: 'src' },
     ],
-    lead: 'BN 是 Bayesian network（贝叶斯网络）的缩写：用节点表示随机变量，用有向边（箭头）表示依赖关系。moralize（道德化，俗称“结婚”）是在共同孩子的父节点之间补上无向边。考试按这个方法写：**祖先图 → moralize → 去方向 → 删掉条件节点 → 看还连不连通**。每一步都写在卷面上，就能拿满步骤分。\n\n记号：$X,Y$ 是要判断的两个随机变量，$S$ 是条件集；这些是通用占位名，具体题目可能换成别的字母。$X\\perp Y\\mid S$ 读作“给定 $S$ 中变量的取值后，$X$ 与 $Y$ 条件独立”。竖线**右边**列出的就是条件节点（given，表示取值已知），合起来叫条件集。注意 2026 真题里恰好有一个节点也叫 $S$——那道题的条件集是 $\\{V,W\\}$，节点 $S$ 是要判断的对象之一，不要删它。',
+    lead: 'BN 是 Bayesian network（贝叶斯网络）的缩写：用节点表示随机变量，用有向边（箭头）表示依赖关系。箭头 $A\\to C$ 中 $A$ 是 $C$ 的父节点，$C$ 是 $A$ 的子节点；若 $A\\to C\\leftarrow B$，$C$ 就叫 $A$、$B$ 的共同孩子。moralize（道德化，俗称“结婚”）就是在共同孩子的两个父节点之间补一条无向边（不带箭头的边）。考试按这个方法写：**祖先图 → moralize → 去方向 → 删掉条件节点 → 看还连不连通**。每一步都写在卷面上，就能拿满步骤分。\n\n记号：$X,Y$ 是要判断的两个随机变量，$S$ 是条件集；这些是通用占位名，具体题目可能换成别的字母。$X\\perp Y\\mid S$ 读作“给定 $S$ 中变量的取值后，$X$ 与 $Y$ 条件独立”。竖线**右边**列出的就是条件节点（given，表示取值已知），合起来叫条件集。注意 2026 真题里恰好有一个节点也叫 $S$——那道题的条件集是 $\\{V,W\\}$，节点 $S$ 是要判断的对象之一，不要删它。',
     blocks: [
       { t: 'h2', text: '1. 先确认符号', id: 'notation' },
       T`下表的 $A,B,C$ 表示随机变量。$P(A)$ 表示 $A$ 的概率分布，$P(A,B)$ 表示两者的联合概率分布，$P(A\mid C)$ 表示已知 $C$ 的取值后 $A$ 的条件概率分布。$P$ 和 $\Pr$ 是含义相同的两种概率记号；并排的概率项表示相乘。边缘独立（marginal independence）就是不附加任何条件时的独立；条件独立（conditional independence）则是在指定条件已知时的独立。`,
@@ -35,18 +35,18 @@
       },
 
       { t: 'h2', text: '2. 四步法（D-separation，d-分离：用图判断条件独立）', id: 'method' },
+      T`动手前先把每条有向边抄成「父节点 $\to$ 子节点」（如 $E\to A$），防止读图漏边（解答里的「第 0 步」）。然后按下面四步做：`,
       {
         t: 'steps', items: [
-          T`**列出所有边。** 先把图里每条有向边写成"父节点 $\to$ 子节点"的形式（如 $E\to A$），防止读图出错。`,
           T`**祖先图（ancestral graph）。** 只保留 $X$、$Y$、条件集里的节点以及它们的**所有祖先**（父、父的父……）。其他节点和它们的边全部删掉（L20 p17）。`,
-          T`**Moralize。** 在祖先图里，凡是有共同孩子的两个父节点，连一条无向边（"结婚"）。然后把所有边的方向去掉（p19–p20）。`,
+          T`**Moralize。** 在祖先图里，凡是有两个或更多父节点的孩子，把它的父节点两两连一条无向边（「结婚」；本来就相连的不用再加）。然后把所有边的方向去掉（p19–p20）。`,
           T`**删掉条件集里的节点**（竖线右边那些，以及和它们相连的边）。`,
-          T`**看 $X$ 和 $Y$ 是否还连通。** 没有路径 ⇒ $X\perp Y\mid S$ **成立**；还有路径 ⇒ 这条独立性**不成立**（图不能保证独立），写出这条路径（p20–p25）。`,
+          T`**看 $X$ 和 $Y$ 是否还连通**：能不能沿剩下的边一步步从 $X$ 走到 $Y$（这样走过的一串边叫路径）。走不到 ⇒ $X\perp Y\mid S$ 成立；走得到 ⇒ 这条独立性不成立（图不能保证独立），写出这条路径（p20–p25）。`,
         ],
       },
       {
         t: 'warn', title: '两个最容易错的地方',
-        md: '- **顺序不能反**：必须先取祖先图、再 moralize、最后删条件集。先删条件节点再 moralize，就会漏掉"给定共同孩子以后两个父节点变相关"的那条边。\n- **只在祖先图里结婚**：某个共同孩子若已被删掉，就不因这个孩子给父母连边；但这两个父母若还有另一个保留在祖先图里的共同孩子，仍要按那个孩子结婚。后代是沿箭头往下能到达的节点；不要只凭“它是某节点的后代”就删点，只要它是 $X$、$Y$ 或某个条件节点的祖先，仍须保留。',
+        md: '- **顺序不能反**：必须先取祖先图、再 moralize、最后删条件集。先删条件节点再 moralize，就会漏掉"给定共同孩子以后两个父节点变相关"的那条边。\n- **只在祖先图里结婚**：一个点留不留，只看它是不是 $X$、$Y$、条件节点本身或它们的祖先；不在祖先图里的共同孩子不让父母结婚。所以共同孩子的后代（沿箭头往下能走到的点）被给定时，这个孩子是条件节点的祖先，必须留下，父母照样结婚。例：$A\\to C\\leftarrow B$，$C\\to D$，问 $A\\perp B\\mid D$：$C$ 是 $D$ 的父节点，留下，$A$—$B$ 结婚，删 $D$ 后仍相连 ⇒ 不成立。',
       },
       {
         t: 'deep', title: '展开详解：为什么要"结婚"和"取祖先图"（直觉）', hint: '看懂就不容易忘步骤',
@@ -61,7 +61,7 @@
           '"给定共同孩子，父节点变得相关"——moralize 时给两个父节点连的边就是在表示这件事。删掉 $X_3$ 后 $X_1$—$X_2$ 那条边还在，所以判定为不独立。',
           '为什么要先取祖先图：如果共同孩子**不在**条件集里（也不是条件节点的祖先），两个父节点之间本来就没有信息流动。取祖先图会把这种孩子删掉，它就不会让父节点"结婚"。所以没有条件时 $X_1\\perp X_2$ 成立：祖先图只剩 $\\{X_1,X_2\\}$，两点之间没有边。',
           {
-            t: 'ext', md: '很多教材直接检查路径是否被条件集阻断：active trail 指未被阻断的通路。常见结构有链（chain，$A\\to C\\to B$）、分叉（fork，$A\\leftarrow C\\to B$）和对撞点（collider，$A\\to C\\leftarrow B$ 中的 $C$）；最后一种结构若 $A,B$ 之间没有直接边，也叫 v-structure（V 形结构）。链和分叉给定中间节点就阻断；对撞点则要给定它或它的某个后代才打开。和本页四步法结论完全一样，但**课件没有教这套说法**，考试按四步法写。',
+            t: 'ext', md: '等价的自查法：看 $X$ 到 $Y$ 的每条路径（沿边一步步走、不管箭头方向）上的每个中间点 $C$。链 $A\\to C\\to B$ 或分叉 $A\\leftarrow C\\to B$：$C$ 被给定，这条路就断；对撞点（collider）$A\\to C\\leftarrow B$ 正相反：$C$ 和它的所有后代都没被给定，这条路才断。每条路都断 ⇒ 成立，和四步法结论相同；图解见 [c54](#/c54)，考试仍按四步法写。',
           },
         ],
       },
@@ -87,6 +87,7 @@
         azh: T`不成立。$\{S,Z,V,W\}$ 的祖先图（ancestral graph）包含所有节点。道德化（moralise）会加上 $S$–$U$ 和 $S$–$T$（分别是 $V$ 和 $W$ 的父节点）、$U$–$X$（$Y$ 的父节点），以及 $V$–$W$、$V$–$Y$、$W$–$Y$（$Z$ 的父节点）。去掉方向并删除条件节点 $V,W$ 后，路径 $S$–$U$–$Y$–$Z$ 仍然连接 $S$ 和 $Z$。因此给定 $\{V,W\}$ 时 $S$ 和 $Z$ 没有被分隔，$S\perp Z\mid V,W$ **不**成立。`,
         blocks: [{ t: 'fig', src: 'assets/figures/ex2026_q4_bn.png', w: 260 }],
         sol: [
+          T`对照记号：本题 $X=S$，$Y=Z$，条件集是 $\{V,W\}$。节点 $S$ 是要判断的一端，不是条件集，不能删。`,
           { t: 'h4', text: '第 0 步：边' },
           '$S\\to V,\\ S\\to W,\\ T\\to W,\\ U\\to V,\\ U\\to Y,\\ X\\to Y,\\ V\\to Z,\\ W\\to Z,\\ Y\\to Z$',
           { t: 'h4', text: '第 1 步：祖先图' },
@@ -153,7 +154,7 @@
           { t: 'h4', text: '(b) 第 1 步：先看全图的结构，一次判完 8 种' },
           {
             t: 'ul', items: [
-              T`**结婚不加新边。** 唯一有两个父节点的是 $D$（父节点 $B,C$），而 $B$—$C$ 本来就有边。所以 moralize 永远不加新边，只把祖先图里剩下的边去掉方向：祖先图同时含 $A,D$ 时有 5 条边（$A$—$B$，$B$—$C$，$B$—$D$，$C$—$D$，$C$—$E$）。若含 $D$ 但不含 $A$，还要去掉 $A$—$B$，只剩 4 条；若不含 $D$，$B$—$D$、$C$—$D$ 就不在图里。$A$—$B$ 也只有在祖先图保留 $A$ 时才保留。`,
+              T`**结婚不加新边。** 唯一有两个父节点的是 $D$（父节点 $B,C$），而 $B$—$C$ 本来就有边，所以只需把祖先图里的边去掉方向；每种条件集的祖先图见下表第二列。`,
               T`$E$ 只和 $C$ 相连。所以条件集里有 $C$ 时，删掉 $C$ 后 $E$ 成了孤立点 ⇒ 独立。`,
               T`条件集里没有 $C$ 时，$B$—$C$ 和 $C$—$E$ 这两条边都碰不到条件集里的点，删完还在，$B$—$C$—$E$ 连通 ⇒ 不独立。`,
             ],
@@ -189,7 +190,7 @@
       },
 
       { t: 'h2', text: '6. Workshop 12 练习（Q1 BN、Q2 MRF）', id: 'ws12' },
-      T`Workshop 12 的前两题都是"读条件独立"。Q1 是 BN（Bayesian network，贝叶斯网络），照第 2 节的四步法做。它和 [上一节](#/T05/past) 的 2026 practice Q4 **是同一道题**（同一张图、同一个问题），workshop 原题直接上了考卷；这里按 workshop 官方答案（WK12 p6）的四张图再走一遍。Q2 换成 MRF（Markov random field，马尔可夫随机场，边没有箭头的无向图），四步只剩最后两步。`,
+      T`Workshop 12 的前两题都是「读条件独立」。Q1 是 BN，和 [上一节](#/T05/past) 的 2026 practice Q4 **是同一道题**（workshop 原题直接上了考卷），这里只补最常见的错法。Q2 换成 MRF（Markov random field，马尔可夫随机场，边没有箭头的无向图），四步只剩最后两步。`,
       {
         t: 'past', src: 'Workshop 12 Q1', topic: 'L20 p17 · WK12 p6',
         q: T`Consider the following Bayesian network. Does the conditional independence statement $S\perp Z\mid V,W$ hold in this Bayesian network?`,
@@ -197,33 +198,7 @@
         azh: T`不成立。每个节点都是 $Z$ 的祖先，所以 $\{S,Z,V,W\}$ 的祖先图（ancestral graph）就是整张网络。道德化（moralise）把每个共同孩子的父节点两两相连：$S$–$U$（$V$ 的父节点）、$S$–$T$（$W$ 的父节点）、$U$–$X$（$Y$ 的父节点），以及 $V$–$W$、$V$–$Y$、$W$–$Y$（$Z$ 的父节点）；然后去掉所有边的方向。删除条件节点 $V$ 和 $W$ 后，剩下 $S$–$U$、$S$–$T$、$U$–$X$、$U$–$Y$、$X$–$Y$、$Y$–$Z$，仍能沿 $S$–$U$–$Y$–$Z$ 从 $S$ 走到 $Z$。因此给定 $\{V,W\}$ 时 $S$ 和 $Z$ 没有被分隔，$S\perp Z\mid V,W$ **不**成立。`,
         blocks: [Object.assign({ t: 'graph' }, Q4, { edges: WS1_EDGES, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, w: 260, caption: '题图（位置照 tutorial 原图）。蓝圈 $S$、绿圈 $Z$ 是要判断的两点；灰色 $V,W$ 是条件集，也就是竖线右边的节点。' })],
         sol: [
-          { t: 'h4', text: '第 0 步：把边抄下来' },
-          T`$S\to V$，$S\to W$，$T\to W$，$U\to V$，$U\to Y$，$X\to Y$，$V\to Z$，$W\to Z$，$Y\to Z$，一共 9 条。先抄一遍再做，读图就不容易漏边。`,
-          { t: 'h4', text: '第 1 步：祖先图（ancestral graph）' },
-          T`要保留 $S$、$Z$、$V$、$W$ 这四个点，以及它们所有的祖先（父母、父母的父母……）。从 $Z$ 往上找：$Z$ 的父母是 $V,W,Y$；$V$ 的父母是 $S,U$；$W$ 的父母是 $S,T$；$Y$ 的父母是 $U,X$。8 个点全被找到了，所以祖先图就是整张原图，一个点也不删。`,
-          { t: 'h4', text: '第 2 步：moralize（父母"结婚"），再去掉方向' },
-          {
-            t: 'table', head: ['孩子', '它的父节点', '两两连上的无向边'], rows: [
-              ['$V$', '$S,U$', '$S$—$U$'],
-              ['$W$', '$S,T$', '$S$—$T$'],
-              ['$Y$', '$U,X$', '$U$—$X$'],
-              ['$Z$', '$V,W,Y$（3 个父节点，两两配对共 3 对）', '$V$—$W$，$V$—$Y$，$W$—$Y$'],
-            ],
-          },
-          T`一共加 6 条结婚边。然后把 9 条原边的箭头去掉，变成无向边，图里现在有 $9+6=15$ 条边。`,
-          { t: 'h4', text: '第 3 步：删掉条件集 $V,W$' },
-          T`把 $V$、$W$ 两个点删掉，一端碰到 $V$ 或 $W$ 的边也一起删，共 9 条：$S$—$V$，$U$—$V$，$V$—$Z$，$S$—$W$，$T$—$W$，$W$—$Z$，$V$—$W$，$V$—$Y$，$W$—$Y$。剩下 6 条：$S$—$U$，$S$—$T$，$U$—$X$，$U$—$Y$，$X$—$Y$，$Y$—$Z$。`,
-          { t: 'h4', text: '第 4 步：$S$ 还能走到 $Z$ 吗' },
-          T`从 $S$ 出发：先走 $S$—$U$，再走 $U$—$Y$，再走 $Y$—$Z$，到了。只要找到一条路，$S$ 和 $Z$ 就没有被 $\{V,W\}$ 分开，所以 $S\perp Z\mid V,W$ 不成立。注意第一段 $S$—$U$ 是第 2 步加的结婚边，原图里没有。`,
-          { t: 'graphs', r: 15, caption: 'WK12 p6 的四张图（蓝圈 $S$、绿圈 $Z$；灰 = 条件集 $V,W$；橙色虚线 = 结婚边；红 = 找到的路径）。', items: [
-            Object.assign({}, Q4, { edges: WS1_EDGES, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, caption: '① 祖先图 = 原图' }),
-            Object.assign({}, Q4, { edges: WS1_EDGES + ' ' + WS1_MORAL, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, caption: '② 结婚：加 6 条边' }),
-            Object.assign({}, Q4, { edges: 'S-V S-W T-W U-V U-Y X-Y V-Z W-Z Y-Z ' + WS1_MORAL, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, caption: '③ 去掉方向' }),
-            Object.assign({}, Q4, { edges: 'S-V:gone S-W:gone T-W:gone U-V:gone V-Z:gone W-Z:gone V-W:gone V-Y:gone W-Y:gone S-T U-X X-Y S-U:path U-Y:path Y-Z:path', cls: { S: 'x', Z: 'y', V: 'removed', W: 'removed' }, caption: '④ 删 $V,W$：$S$—$U$—$Y$—$Z$ 还连着' }),
-          ] },
-          {
-            t: 'exam', md: T`No. Every node is an ancestor of $Z$, so the ancestral graph of $\{S,Z,V,W\}$ is the whole network. Moralising connects the parents of each common child: $S$–$U$ (parents of $V$), $S$–$T$ (parents of $W$), $U$–$X$ (parents of $Y$), and $V$–$W$, $V$–$Y$, $W$–$Y$ (parents of $Z$); then all edge directions are dropped. Removing the conditioning nodes $V$ and $W$ leaves $S$–$U$, $S$–$T$, $U$–$X$, $U$–$Y$, $X$–$Y$, $Y$–$Z$, so we can still go from $S$ to $Z$ along $S$–$U$–$Y$–$Z$. Hence $S$ and $Z$ are not separated given $\{V,W\}$, and $S\perp Z\mid V,W$ does **not** hold.`,
-          },
+          T`逐步解答（祖先图、6 条结婚边、删 $V,W$ 后剩下的边、路径 $S$—$U$—$Y$—$Z$）和英文答案都在 [上一节](#/T05/past) 的 2026 practice Q4，两题完全相同。这里只看最常见的错法。`,
           {
             t: 'warn', title: '易错：先删条件集、再结婚，会错答"成立"', blocks: [
               T`有人一上来就把 $V,W$ 删掉，再去找共同孩子结婚。这时 $V$ 已经不在了，$S$ 和 $U$ 不再有共同孩子，结婚边 $S$—$U$ 根本不会出现；$S$ 原来只有 $S\to V$、$S\to W$ 两条边，删完后 $S$ 成了孤立点，于是得出"成立"的错误结论。`,

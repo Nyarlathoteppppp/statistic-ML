@@ -15,12 +15,23 @@
     ],
     lead: '这一类题分值最高，套路也最固定：**画图 → 写因子分解 → 数 CPT → 填 0/1 或数数估计 → 解释怎么用模型做决定**。山火题（Dandenongs / Bayesville）在 2025 和 2026 都出现了，务必背熟。全页缩写：PGM = 概率图模型（probabilistic graphical model），CPT = 条件概率表（conditional probability table），MLE = 最大似然估计（maximum likelihood estimate）。',
     blocks: [
+      { t: 'h2', text: '步骤', id: 'steps' },
+      {
+        t: 'steps', items: [
+          T`**画图**：每个变量一个节点。题目说「$Y$ 取决于 / 由 $X$ 引起 / 根据 $X$ 判断」就画 $X\to Y$（原因 → 结果）；没说有关系的两个变量不连边（不连 = 假设独立）。`,
+          T`**写因子分解**：每个节点写 $P(\text{节点}\mid\text{它的父节点})$，没有父节点就写 $P(\text{节点})$，全部相乘。`,
+          T`**数 CPT**：每个节点一张表，$k$ 行（节点的取值数）× $c$ 列（父节点的取值组合数）；每列和为 1，所以自由参数是 $(k-1)\,c$（[第 2 节](#/T07/count)）。`,
+          T`**填表**：规则确定（如「传感器绝对准确」）就填 0/1；给了数据就数数：在父节点取值相符的行里，数节点取某值的比例（[第 4 节](#/T07/mle)）。`,
+          T`**观测会出错**：加一个「真实状态」节点，画「真实状态 → 读数」，表 $P(\text{读数}\mid\text{真实状态})$ 填 0 到 1 之间的误报 / 漏报率。`,
+          T`**用模型做决定**：把观测值代进去，算要判断的变量在给定观测下的概率（后验，看不到的变量求和掉），超过阈值就行动。`,
+        ],
+      },
       { t: 'h2', text: '1. 基础：图 ↔ 因子分解 ↔ CPT', id: 'basics' },
       {
         t: 'fx', title: 'Bayesian network 的定义（L20 p27）',
         tex: T`P(x_1,\dots,x_n)=\prod_{i=1}^{n}\htmlClass{fx-p1}{P(x_i\mid \htmlClass{fx-p2}{x_{pa_i}})}`,
         parts: [
-          { label: '每个节点一张 CPT', note: '图里有几个节点，就有几张条件概率表（conditional probability table）。根节点的表就是它的边缘分布 $P(x_i)$。' },
+          { label: '每个节点一张 CPT', note: '图里有几个节点，就有几张条件概率表（CPT）：列出「父节点取每一种组合时，这个节点取各个值的概率」（详见 [c53](#/c53)）。根节点（没有箭头指向它的节点）没有父节点，它的表就是它自己的分布 $P(x_i)$。' },
           { label: '父节点', note: '$pa_i$ 是指向 $x_i$ 的那些节点。画图时，$P(D\\mid A,B)$ 就意味着 $A\\to D$ 和 $B\\to D$ 两条边。' },
         ],
       },
@@ -33,7 +44,7 @@
       },
 
       { t: 'h2', text: '2. 数 CPT：三种口径都要会', id: 'count' },
-      '先约定记号：$k$ 是变量 $X$ 的取值个数（布尔变量——只取 0/1、真/假——则 $k=2$）；$c$ 是父节点的取值组合数（各父节点的取值个数相乘；没有父节点时 $c=1$，即只有一种组合）。下面三种「口径」就是同一张表的三种数法。',
+      T`先约定记号：$k$ 是变量 $X$ 的取值个数（布尔变量只取 0/1、真/假，$k=2$）；$c$ 是父节点的取值组合数（各父节点的取值个数相乘；没有父节点时 $c=1$）。CPT 的每一列是「父节点取某一种组合时 $X$ 的分布」，所以每列加起来为 1：如 [c53](#/c53) 硬币例子的 $P(x_3\mid x_1,x_2)$ 是 $2\times4$ 表，$x_1x_2=00$ 那一列是 $(0.1,\,0.9)$。每列只需填 $k-1$ 个数，最后一个用 1 减出来，这些要填的数就是自由参数；下面三种「口径」是同一张表的三种数法。`,
       {
         t: 'table', head: ['口径', '公式', '布尔变量、2 个父节点时', '什么时候用'], rows: [
           ['表的形状（L20 p11 的画法）', '$k\\times c$：行是 $X$ 的取值，列是父节点组合', '$2\\times4$', '问"dimensions of the table"'],
@@ -73,7 +84,7 @@
 (e) 观测所有传感器读数，通过对 $F_1$ 求和（边缘化，marginalising）计算 $P(A=1\mid s_1,s_2,s_3,c_1,c_2)$；超过阈值就发出警报。`,
         sol: [
           { t: 'h4', text: '(a) 画图' },
-          '五个传感器都是根节点，都指向 $A$：$S_1,S_2,S_3,C_1,C_2\\to A$。$A$ 的规则：$A=1$ 当且仅当 $(S_1\\lor S_2\\lor S_3)\\land\\lnot C_1\\land\\lnot C_2$（$\\lor$ = 或，$\\land$ = 并且，$\\lnot$ = 非：三个远处传感器至少一个响，并且两个近处传感器都不响）。',
+          T`逐句翻成箭头：$A$ 是「是否提醒撤离」这个决定，「any of $S_1,S_2,S_3$ on ⇒ evacuate」「either of $C_1,C_2$ on ⇒ stay put」都在说它由传感器读数决定，所以五个传感器都指向 $A$：$S_1,S_2,S_3,C_1,C_2\to A$。题目没说传感器之间有关系，它们互不相连，都是根节点（没有父节点）。$A$ 的规则：$A=1$ 当且仅当 $(S_1\lor S_2\lor S_3)\land\lnot C_1\land\lnot C_2$（$\lor$ = 或，$\land$ = 并且，$\lnot$ = 非：三个远处传感器至少一个响，并且两个近处传感器都不响）。`,
           {
             t: 'html', html: '<svg class="graph" viewBox="0 0 360 150" role="img" aria-label="S1 S2 S3 C1 C2 指向 A"><defs><marker id="arrT7" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>' +
               [[40, 'S1'], [110, 'S2'], [180, 'S3'], [250, 'C1'], [320, 'C2']].map(([x, l]) => {
@@ -84,15 +95,14 @@
           },
           { t: 'h4', text: '(b) 数 CPT' },
           '6 个节点 ⇒ **6 张 CPT**：$P(S_1),P(S_2),P(S_3),P(C_1),P(C_2)$ 各是 $2\\times1$（2 个取值 × 只有 1 种父节点组合：根节点没有父节点，$c=1$）；$P(A\\mid S_1,S_2,S_3,C_1,C_2)$ 是 $2\\times2^5=2\\times32$。',
-          { t: 'note', md: '两套口径数的是同一张表。**课件口径**（上面）：行 = $A$ 的取值（2 行），列 = 5 个父节点的组合 $2^5=32$，形状 $2\\times32$，共 64 格、32 个自由参数。**2025 题的口径**问"每张表几**列**"，把表里出现的变量各算一列：5 张根节点表各 1 列，$A$ 的表 6 列（$A$ 加 5 个父节点）；把所有赋值一行一行列出来共 $2^6=64$ 行——这 64 行就是上面那 64 格，只是换了排法。' },
-          { t: 'good', title: '官方答案的写法（2026 practice 解答）', md: '官方把表画成"一行 = 一种父节点组合，只写取 True 的概率"（False 的概率就是 1 减它）：5 个传感器的表各 **1 行**（只有 $P(S_i=\\text{True})$）；$A$ 的表有 6 列（5 个父节点 + $A$）、**32 行**（$2^5=32$ 种父节点组合，每行给 $P(A=\\text{True}\\mid\\cdot)$）。和上面课件口径的 $2\\times32$ 是同一张表，只是转置、并省掉了"1 减"的那一半。考试按任一种写都行，写清楚行和列各代表什么。' },
+          { t: 'note', md: T`同一张 $A$ 表有三种写法，考试写哪种都行，写清行和列各代表什么：① 课件：行 = $A$ 的 2 个取值，列 = 5 个父节点的 $2^5=32$ 种组合，$2\times32$，共 64 格、32 个自由参数；② 2025 题问「几列」：表里每个变量算一列，$A$ 的表 6 列（$A$ + 5 个父节点），列出全部赋值共 $2^6=64$ 行，传感器表各 1 列；③ 2026 官方解答：一行 = 一种父节点组合，只写 $P(A=\text{True}\mid\cdot)$（False 用 1 减），所以 $A$ 的表 32 行、传感器表各 1 行。` },
           { t: 'h4', text: '(c) 传感器绝对准确' },
           '$A$ 的 CPT 变成**确定性**的：每个条目都是 0 或 1。32 种父节点组合中：三个 $S$ 有 $2^3=8$ 种，去掉全 off 的 1 种，"至少一个为 1"有 7 种；$C_1=C_2=0$ 只有 1 种；所以 $7\\times1=7$ 种父节点组合下 $P(A{=}1\\mid s_1,s_2,s_3,c_1,c_2)=1$，其余 $32-7=25$ 种组合下这个条件概率为 0。传感器本身的先验 $P(S_i),P(C_j)$ **不**变成 0/1（"准确"不代表火灾不随机）。',
           { t: 'h4', text: '(d) $S_1$ 不准确' },
           '加一个隐变量 $F_1$ = $S_1$ 位置真实是否有火。$F_1\\to S_1$（**原因 → 观测**：先有真实火情，传感器读数才随之出现，误报 / 漏报是测量噪声；不要画成 $S_1\\to F_1$），并把 $S_1\\to A$ 换成 $F_1\\to A$（应该根据真实火情决定）。新增 CPT：$P(F_1)$ 和 $P(S_1\\mid F_1)$（$2\\times2$，表示误报率与漏报率，不是 0/1）。$A$ 的规则不变，只是用 $F_1$ 代替 $S_1$。',
           { t: 'note', md: '这和"传感器会出错"的通用做法一样：观测到的读数可能有噪声时，不把它当成真值，而是加一个"真实状态"节点，再用一张不全是 0/1 的表 $P(\\text{读数}\\mid\\text{真实状态})$ 表示出错的概率，这里就是 $P(S_1\\mid F_1)$。' },
           { t: 'h4', text: '(e) 怎么用模型报警' },
-          '$F_1$（真实火情）看不到，所以要求和掉；$s_1$ 是读到的传感器 $S_1$ 的取值（0 或 1；$s_2,c_1$ 等小写字母同理，都是对应变量被观测到的值）。$A$ 的父节点现在是 $F_1,S_2,S_3,C_1,C_2$（不含 $S_1$）；为什么 $P(f\\mid s_1,\\dots,c_2)=P(f\\mid s_1)$：$F_1$ 和其他读数 $S_2,\\dots,C_2$ 只通过 $A$ 连在一起（$F_1\\to A\\leftarrow S_2$ 这种形状），$A$ 是它们的共同孩子而且没被观测，这条路是断的（[D-separation](#/T05) 的 v-structure 规则）。所以知道 $s_1$ 以后，其他读数不再提供 $F_1$ 的信息。$P(f\\mid s_1)$ 用 Bayes 公式由先验 $P(f)$ 和 $P(s_1\\mid f)$ 算出。$f$ 只有 0、1 两项。观测到五个读数后，对隐变量 $F_1$ 求和，算后验 $P(A=1\\mid s_1,s_2,s_3,c_1,c_2)=\\sum_{f}P(A=1\\mid f,s_2,s_3,c_1,c_2)\\,P(f\\mid s_1)$。超过阈值就报警。题目没给阈值：最朴素的选择是 0.5（后验大于一半就报警），也可以按漏报 / 误报的代价来定。若 $C_1$ 或 $C_2$ 为 1，求和里两项的 $P(A=1\\mid\\cdot)$ 都是 0，后验为 0，不报警。',
+          T`真实火情 $F_1$ 看不到，要对它求和（边缘化）；$s_1,\dots,c_2$ 是读到的传感器取值（0 或 1）：$P(A=1\mid s_1,s_2,s_3,c_1,c_2)=\sum_{f\in\{0,1\}}P(A=1\mid f,s_2,s_3,c_1,c_2)\,P(f\mid s_1)$。$P(f\mid s_1)$ 用 Bayes 公式由 $P(f)$ 和 $P(s_1\mid f)$ 算出（其他读数与 $F_1$ 只经未观测的 $A$ 相连，不提供 $F_1$ 的信息，见 [T5](#/T05) 的 v-structure 规则）。后验超过阈值（如 0.5）就报警；只要 $C_1$ 或 $C_2$ 为 1，后验就是 0，不报警。`,
           {
             t: 'exam', title: 'Exam phrasing · (a)–(e) 要点',
             md: T`(a) Nodes $S_1,S_2,S_3,C_1,C_2,A$; edges $S_1\to A$, $S_2\to A$, $S_3\to A$, $C_1\to A$, $C_2\to A$, i.e. $P(S_1)P(S_2)P(S_3)P(C_1)P(C_2)P(A\mid S_1,S_2,S_3,C_1,C_2)$.
@@ -105,7 +115,7 @@
       },
 
       { t: 'h2', text: '4. MLE 估计 CPT（数数）', id: 'mle' },
-      '完整观测（每个变量都观测到）时，MLE 就是**计数比例**（和 L02 的 Bernoulli MLE 一样：$\\hat\\theta=k/n$，其中 $n$ = 样本数，$k$ = "成功"出现的次数，$\\hat\\theta$ = 成功概率的估计；Bernoulli 指只有 0/1 两种结果的变量。注意这里的 $k$ 和第 2 节"$X$ 有 $k$ 种取值"的 $k$ 无关；MLE 在这里只是把样本按父节点组合分组）。某个父节点组合在数据里一次都没出现时，计数比例是 $0/0$，数据定不下这一列（任何归一化的分布似然都一样大），需要额外约定（例如平滑：每个计数都加一个伪计数，比如 1，就不会出现 0/0）。下面公式里 $\\#\\{\\cdots\\}$ 读作"满足条件的数据点个数"（$\\#$ 就是"数个数"），$x$ 是 $X$ 的某个具体取值，$\\text{pa}=u$ 表示父节点取某一组具体取值，$u$ 是那组取值的代号：',
+      T`完整观测（每行数据里所有变量都有值）时，MLE（选使已观测数据概率最大的参数）就是数数，每张 CPT 单独算：① 分母：数父节点取值为 $u$ 的行；② 分子：在这些行里再数 $X=x$ 的行；③ 分子 ÷ 分母（根节点没有父节点，分母就是总行数 $n$）。某个父节点组合一次都没出现时是 $0/0$，数据定不下这一列，要额外约定（如每个计数先加 1 再算）。下面 $\#\{\cdots\}$ 读作「满足条件的行数」：`,
       { t: 'math', tex: T`\hat P(X=x\mid \text{pa}=u)=\frac{\#\{X=x,\ \text{pa}=u\}}{\#\{\text{pa}=u\}}` },
       {
         t: 'past', src: '2025 S1 practice Q4', marks: '5 + 5 + 5', topic: 'L20 p9–p11, L02 MLE',
@@ -125,6 +135,7 @@
           { t: 'h4', text: '(b) MLE 原则' },
           { t: 'exam', md: T`Choose the CPT entries that maximise the likelihood of the observed data, $\prod_{i=1}^{n}P(a_i)P(b_i)P(c_i\mid a_i,b_i)$ (equivalently the log-likelihood), subject to each distribution summing to one. With complete data this decouples per table, and the solution is the relative frequency: each entry equals the count of that value (for that parent configuration) divided by the count of the parent configuration.` },
           { t: 'h4', text: '(c) 计数' },
+          T`做法：每个条件概率只看父节点取值相符的行。例如 $A=F,B=F$ 的行是 $(F,F,F)$、$(F,F,T)$，共 2 行（分母），其中 $C=T$ 有 1 行（分子），得 $1/2$。每列的 $P(C{=}F\mid\cdot)$ 用 1 减，填回 (a) 的 $2\times4$ 表（列依次为 $FF,FT,TF,TT$）：$C{=}T$ 行是 $0.5,0,1,1$，$C{=}F$ 行是 $0.5,1,0,0$。`,
           {
             t: 'table', head: ['表', '计数', 'MLE'], rows: [
               ['$P(A{=}T)$', '$A=T$：2/5', '**0.4**（$P(A{=}F)=0.6$）'],
@@ -141,20 +152,6 @@
       { t: 'viz', id: 'mle-counter', opts: { preset: 'EX2025Q4c' } },
 
       { t: 'h2', text: '5. 2021 卷的变体', id: 'variants' },
-      {
-        t: 'past', src: '2021 S1 exam Q14(b)', marks: 6, topic: 'Gibbs sampling（L1–L22 课件未讲；用 L20 的因子分解推导）',
-        q: 'For the Bayesian network $P(A)P(B)P(C\\mid A)P(D\\mid A,B)P(E\\mid D)P(F\\mid C,E)$ (all Boolean), Gibbs sampling resamples one variable at a time given the current values of all the others. Give the distribution used to resample $E$, simplified as far as possible.',
-        qzh: T`对于贝叶斯网络 $P(A)P(B)P(C\mid A)P(D\mid A,B)P(E\mid D)P(F\mid C,E)$（全部为布尔变量），吉布斯抽样（Gibbs sampling）每次在给定其他所有变量当前值的条件下重新抽样一个变量。给出用于重新抽样 $E$ 的分布，并尽可能化简。`,
-        azh: T`从 $E$ 的完全条件分布（full conditional）中重新抽样 $E$，它正比于所有含 $E$ 的因子之积（其他因子全部约掉）：$P(E=e\mid A,B,C,D,F)=\dfrac{P(e\mid D)\,P(F\mid C,e)}{\sum_{e'}P(e'\mid D)\,P(F\mid C,e')}$。它只依赖于 $E$ 的马尔可夫毯（Markov blanket）$\{D,C,F\}$；计算两个未归一化的权重，归一化，然后抽样。`,
-        blocks: [{ t: 'graph', nodes: { A: [60, 30], B: [200, 30], C: [30, 130], D: [170, 130], E: [170, 230], F: [60, 300] }, edges: 'A>C A>D B>D D>E C>F E>F', cls: { E: 'cur', D: 'hl', F: 'hl', C: 'hl' }, w: 240, caption: '$P(A)P(B)P(C\\mid A)P(D\\mid A,B)P(E\\mid D)P(F\\mid C,E)$ 的图。黄 = 要重新抽样的 $E$；蓝 = 它的 Markov blanket（父 $D$、子 $F$、子的另一个父 $C$）。' }],
-        sol: [
-          '**思路**：Gibbs 每次从"给定其他所有变量时 $E$ 的条件分布"里抽 $E$。联合分布里不含 $E$ 的因子在分子分母里一样，会约掉，只剩含 $E$ 的因子：$P(E\\mid D)$ 和 $P(F\\mid C,E)$。具体：分子是 $P(A)P(B)P(C\\mid A)P(D\\mid A,B)P(E=e\\mid D)P(F\\mid C,E=e)$，分母是把 $e$ 换成 0 和 1 的两个式子相加；$P(A)P(B)P(C\\mid A)P(D\\mid A,B)$ 上下都有、约掉。"归一化"就是除以这两项之和，让 $e=0,1$ 的两个概率加起来等于 1。',
-          { t: 'math', tex: 'P(E=e\\mid A,B,C,D,F)=\\frac{P(E=e\\mid D)\\,P(F\\mid C,E=e)}{\\sum_{e\'\\in\\{0,1\\}}P(E=e\'\\mid D)\\,P(F\\mid C,E=e\')}' },
-          '只依赖 $E$ 的 **Markov blanket（马尔可夫毯）**：父节点 $D$、子节点 $F$、子节点的另一个父节点 $C$；$A,B$ 不出现。实际抽样：算出 $e=0$ 和 $e=1$ 两个权重，归一化后按这个概率抽。',
-          { t: 'exam', md: 'Resample $E$ from its full conditional, which is proportional to the product of the factors containing $E$ (all other factors cancel): $P(E=e\\mid A,B,C,D,F)=\\dfrac{P(e\\mid D)\\,P(F\\mid C,e)}{\\sum_{e\'}P(e\'\\mid D)\\,P(F\\mid C,e\')}$. It depends only on $E$\'s Markov blanket $\\{D,C,F\\}$; compute the two unnormalised weights, normalise, and sample.' },
-          { t: 'note', md: 'Gibbs sampling 在 L1–L22 里没有讲。如果 L23–L24 讲到，再按课件的说法核对。' },
-        ],
-      },
       {
         t: 'past', src: '2021 S1 exam Q14(c)', marks: 4, topic: 'L04 logistic, L20 CPT',
         q: 'Instead of implementing $P(D\\mid A,B)$ as a large conditional probability table, we decide to use a logistic regression model with three parameters (one for each of the two conditioning variables, and a bias term). Besides reducing the number of parameters, state another important consequence of this change.',

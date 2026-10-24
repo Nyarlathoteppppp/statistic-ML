@@ -87,10 +87,10 @@
       { text: 'L02 p20–p27', href: '#/L02', cls: 'src' }, { text: 'L18', href: '#/L18', cls: 'src' }, { text: 'L19', href: '#/L19', cls: 'src' }, { text: 'WK02', cls: 'src' },
       { text: '2026/2025 Q1b', cls: 'hot' }, { text: '2021 Q5, Q6, Q10, Q11', cls: 'hot' },
     ],
-    lead: '往年卷这一块主要是**简答**（定义 + 解释），计算题是共轭先验的一步代入：课件和 Workshop 2 的手算重点是 Beta–Binomial；往年真题里唯一的共轭计算题是 2016 年的 Poisson–Gamma（第 3 节）。原题全解已放在 [T13 简答题库](#/T13/past)，这一页把背后的公式理清楚。',
+    lead: '往年卷这一块主要是**简答**（定义 + 解释），计算题是共轭先验的一步代入（共轭：先验乘上似然后，后验和先验仍是同一种分布，只是参数变了，所以更新就是改参数）。课件和 Workshop 2 的手算重点是 Beta–Binomial；往年真题里唯一的共轭计算题是 2016 年的 Poisson–Gamma（第 3 节）。原题全解已放在 [T13 简答题库](#/T13/past)，这一页把背后的公式理清楚。',
     blocks: [
       { t: 'h2', text: '1. 三个估计，一张表', id: 'three' },
-      T`Bayesian 指贝叶斯方法；MLE 是最大似然估计（maximum likelihood estimation），MAP 是最大后验估计（maximum a posteriori estimation）。这里 $D$ 表示已经观测到的整批数据，$\theta$ 表示待估计的参数；$p(A\mid B)$ 表示给定 $B$ 时 $A$ 的概率或概率密度，竖线读作“给定”。`,
+      T`MLE 是最大似然估计（maximum likelihood estimation），MAP 是最大后验估计（maximum a posteriori estimation）。这里 $D$ 表示已经观测到的整批数据，$\theta$ 表示待估计的参数；$p(A\mid B)$ 表示给定 $B$ 时 $A$ 的概率或概率密度，竖线读作“给定”。先验 $p(\theta)$ = 看数据之前对参数的看法；似然 $p(D\mid\theta)$ = 参数取 $\theta$ 时看到这批数据的概率；后验 $p(\theta\mid D)$ = 看过数据之后的看法，正比于似然 × 先验（下面的 Bayes rule）。`,
       T`$\argmax_\theta f(\theta)$ 是“找出让 $f(\theta)$ 最大的参数值”，不是求那个最大函数值。点估计只报一个参数值；众数是概率最高的位置，连续参数则看概率密度最高的位置。`,
       {
         t: 'table', head: ['', '求什么', '公式', '特点'], rows: [
@@ -124,6 +124,13 @@
           ['日出问题（Sunrise）：把每天是否日出视为一次成功／失败试验，已观察的 $n$ 天全成功（$k=n$）；采用均匀先验 $\\alpha=\\beta=1$，本行 $E[q]$ 表示后验均值', '$E[q]=\\frac{k+1}{k+2}$（后验均值一般式 $\\frac{\\alpha+k}{\\alpha+\\beta+n}$，代入 $\\alpha=\\beta=1$、$n=k$：$\\frac{1+k}{2+k}$；比 MLE $k/n=1$ 小一点）', 'L19 p15'],
         ],
       },
+      { t: 'steps', items: [
+        T`例：先验 $\mathrm{Beta}(3,3)$，抛 $n=6$ 次、$k=5$ 次正面，所以反面 $n-k=1$ 次。`,
+        T`后验：正面次数加到 $\alpha$、反面次数加到 $\beta$：$\mathrm{Beta}(3+5,\ 3+1)=\mathrm{Beta}(8,4)$。`,
+        T`后验均值 $=\frac{8}{8+4}=\frac{8}{12}\approx0.667$。`,
+        T`MAP：后验密度 $\propto q^{7}(1-q)^{3}$（指数 = 参数 − 1），$q^a(1-q)^b$ 的峰在 $\frac{a}{a+b}$，所以峰在 $\frac{7}{7+3}=0.7$；套表中公式 $\frac{5+3-1}{6+3+3-2}=\frac{7}{10}$，一样。两个后验参数 8、4 都 $>1$，可以用。`,
+        T`MLE $=k/n=5/6\approx0.833$。先验均值 $0.5$ 把 MAP 和后验均值往 $0.5$ 拉；数据越多，三者越接近。`,
+      ] },
       { t: 'viz', id: 'beta-update' },
       '（下面英文里的 kernel 不是 T8 的核函数，意思是"去掉和 $q$ 无关的常数后剩下的那一截"。Beta 先验那一截 $q^{\\alpha-1}(1-q)^{\\beta-1}$ 乘似然 $q^k(1-q)^{n-k}$，指数相加，仍是 Beta 的样子——这就是"共轭"：后验和先验同一族，成功次数加进 $\\alpha$、失败次数加进 $\\beta$。下面的 closed-form（闭式更新）指能直接写出新参数，无须迭代求解。）',
       {
@@ -133,9 +140,8 @@
       { t: 'practice', gen: 'beta', title: 'Beta 后验随机题' },
 
       { t: 'h2', text: '3. 其他共轭对：Poisson–Gamma（2016 真题）', id: 'conj' },
-      T`本节每个观测是一段相同长度时间内的计数；$x_i$ 是第 $i$ 个观测值，$n$ 是独立观测的个数，$\sum_i x_i=x_1+\cdots+x_n$ 是总计数。所有观测共享未知的平均次数 $\lambda>0$。`,
-      T`这里复用 $\alpha,\beta$ 表示 Gamma（伽马）先验的两个参数，不是上一节的 Beta 模型。全节采用 shape–rate（形状–率）约定：$\alpha>0$ 是形状参数，$\beta>0$ 是率参数，密度中的指数因子写成 $e^{-\beta\lambda}$。`,
       'Beta–Binomial 不是唯一的共轭对。L19 p17 列了一张"有用的共轭先验"表，2016 年的考试就考了表里的 Poisson–Gamma：证明它共轭，再写出后验参数。方法和第 2 节完全一样：先验乘似然，只看和参数有关的部分，认出是哪个分布。',
+      T`符号：每个观测 $x_i$ 是一段相同长度时间内的计数，共 $n$ 个独立观测，总计数 $\sum_ix_i$，它们共享未知的平均次数 $\lambda>0$。$\alpha,\beta>0$ 在这里是 Gamma 先验的形状参数（shape）和率参数（rate，密度里写成 $e^{-\beta\lambda}$），不是第 2 节 Beta 的参数。`,
       {
         t: 'table', head: ['似然（数据）', '共轭先验', 'L19 p17 的用途', '更新规则'], rows: [
           ['Normal / Gaussian（正态／高斯分布，均值未知）', 'Normal（正态先验）', 'regression（回归：预测连续数值）', '见第 4 节（L18）'],
@@ -215,7 +221,7 @@ Consider a random variable over $X\in\{0,1,2,\dots\}$ governed by a *Poisson*($\
       },
 
       { t: 'h2', text: '4. Bayesian 线性回归', id: 'blr' },
-      '（本节按 L18 假设噪声方差 $\\sigma^2$ 已知；$\\sigma^2$ 也未知时先验要加 Inverse-Gamma，预测变成 Student-t（t 分布，尾部比正态分布更厚，表示较大的预测偏差也有更多可能），课件只简单提到。）',
+      '（本节按 L18 假设噪声方差 $\\sigma^2$ 已知；未知时的 Inverse-Gamma 先验课件只简单提到，不用掌握。）',
       T`符号：$\bx$ 是输入特征列向量，$\bw$ 是待学习的权重列向量，$y$ 是对应的实数输出。训练集仍记为 $D$，包含 $N$ 个训练点（前面用 $n$ 表示观测数）；$\bx_i$、$y_i$ 是第 $i$ 个点的输入和输出。$\bx_*$ 是要预测的新点，$y_*$ 是它的输出，星号表示新点。`,
       T`撇号表示转置：向量由列变行，矩阵则行列互换；整个 $\bx'\bw$ 才是点积，即对应分量相乘再相加。$\bX$ 把每个训练点 $\bx_i'$ 排成一行，$\by$ 把所有 $y_i$ 排成一列。$\mathbf 0$ 是零向量，$I$ 是单位矩阵（对角线为 1，其余为 0）；对方阵 $A$，$A^{-1}$ 表示矩阵逆，满足 $AA^{-1}=I$，不是把每个元素取倒数。`,
       T`$\mathcal N(\text{均值},\text{方差或协方差})$ 表示正态分布；单个数用方差，向量用协方差矩阵（对角线是各分量的方差，非对角线描述两个分量如何共同变化）。$\sigma^2$ 是噪声方差，$\gamma^2$ 是先验里每个权重的方差（越大先验越松）。$V_N$ 是权重的后验协方差，$\bw_N$ 是权重的后验均值；正态分布的均值位置也是密度峰顶，所以它也是 MAP。`,
@@ -225,6 +231,7 @@ Consider a random variable over $X\in\{0,1,2,\dots\}$ governed by a *Poisson*($\
           ['后验', '$\\bw\\mid D\\sim\\mathcal N(\\bw_N,V_N)$，$V_N=\\sigma^2\\big(\\bX\'\\bX+\\frac{\\sigma^2}{\\gamma^2}I\\big)^{-1}$，$\\bw_N=\\frac1{\\sigma^2}V_N\\bX\'\\by$'],
           ['MAP', '$\\bw_N$ 本身，等于岭回归（ridge regression：在线性回归的平方误差中加上权重平方和惩罚）的解；这里 $\\lambda=\\sigma^2/\\gamma^2$ 是正则强度，不是第 3 节 Poisson 的平均次数'],
           ['预测', '$y_*\\sim\\mathcal N\\big(\\bx_*\'\\bw_N,\\ \\sigma^2+\\bx_*\'V_N\\bx_*\\big)$'],
+          ['一维手算（一个权重、无截距 $y=wx+$噪声）', '$V_N=\\frac{\\sigma^2}{\\sum_ix_i^2+\\sigma^2/\\gamma^2}$，$w_N=\\frac{\\sum_ix_iy_i}{\\sum_ix_i^2+\\sigma^2/\\gamma^2}$，预测方差 $\\sigma^2+x_*^2V_N$；数字例子见 [c50](#/c50)'],
         ],
       },
       {
@@ -248,12 +255,6 @@ Consider a random variable over $X\in\{0,1,2,\dots\}$ governed by a *Poisson*($\
           '**Monte Carlo**：从后验采样，用样本平均近似积分。',
           '**Variational**：在一个简单分布族里找最接近后验的分布。',
           '**Laplace approximation**：在众数（MAP）处用一个 Gaussian 近似后验，均值是众数，宽度由二阶导数（一个 Hessian）决定（L19 p23）。',
-        ],
-      },
-      {
-        t: 'table', head: ['似然', '共轭先验', '出处'], rows: [
-          ['Bernoulli（伯努利：单次试验的 0/1 结果）/ Binomial（二项：多次独立试验中的成功次数）', 'Beta', 'L19 p17'], ['Normal（均值未知，方差已知）', 'Normal', 'L18、L19 p17'],
-          ['Normal（方差未知）', 'Inverse-Gamma', 'L18 p26'], ['Logistic（sigmoid）', '无', 'L19 p21'],
         ],
       },
       {
