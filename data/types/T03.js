@@ -15,16 +15,24 @@
     lead: '核心只有一句话：**卷积层的权重是共享的**（weight sharing），filter（卷积核）是一组随窗口在输入上滑动的可学习权重。一个 filter 不管滑到哪里都用同一组参数。所以卷积层的参数不按输出位置重复计：权重数 = filter 个数 × 输入通道数 × filter 的空间格子数（一维数宽度；二维数高 × 宽，例如 5 × 5 算 25；含 bias 时每个 filter 再加 1），和输出有多少个单元无关。真题那种一维、单通道、单 filter 的层，权重数就等于 filter 宽度。',
     blocks: [
       { t: 'h2', text: '1. 三条公式', id: 'rules' },
-      '符号：1D（一维序列）里 $n$ 是输入长度、$k$ 是 filter 宽（每次连看几个数）、$s$ 是 stride（窗口每次滑几格，没写就是 1）。2D（二维图像）里 $H$ 是输入的高（宽用同一个公式）、$K$ 是正方形 filter 的边长、$P$ 是 padding（四周补几圈 0，没写就是 0）、$S$ 是 stride、$C_{in}$ 是输入通道数（同一像素位置记录几种数，就有几个通道：灰度图记录 1 种亮度；RGB 彩色图记录红、绿、蓝 3 种分量，所以是 3 通道）、$C_{out}$ 是 filter 个数（= 输出通道数）。bias（偏置）是额外加上的可学习常数。卷积层每个 filter 有 1 个 bias，在该 filter 的所有输出位置共享；全连接层则每个输出单元有 1 个 bias。最终输出写成"高 × 宽 × 通道"，如 $28\\times28\\times6$。下面公式中的 $\\lfloor\\cdot\\rfloor$ 表示向下取整，即取不超过原数的最大整数，例如 $\\lfloor2.8\\rfloor=2$。',
+      { t: 'table', cls: 'compact', head: ['字母', '意思', '题目没写时'], rows: [
+        ['$n$', '输入边长：1D 是输入有几个数；2D 是高（宽同法再算一次）', '—'],
+        ['$k$', 'filter（或 pooling 窗口）的边长；1D 就是每个单元连几个输入', '—'],
+        ['$p$', 'padding：每一边补几圈 0', '0'],
+        ['$s$', 'stride：窗口每次滑几格', '卷积 1；pooling 常等于 $k$（窗口不重叠）'],
+        ['$C_{in}$', '输入通道数：每个位置存几个数。灰度图 1，RGB 彩色图 3（红、绿、蓝各一个）；上一层是卷积层时 = 上一层的 filter 个数（中间隔着 pooling 也一样，pooling 不改通道数）', '—'],
+        ['$C_{out}$', '这一层 filter 的个数 = 输出通道数', '—'],
+      ] },
+      T`bias（偏置）是额外加上的可学习常数：卷积层每个 filter 1 个（它的所有输出位置共用），全连接层每个输出单元 1 个。$\lfloor\cdot\rfloor$ 是向下取整，如 $\lfloor2.8\rfloor=2$；输出写成「高 × 宽 × 通道」，如 $28\times28\times6$。`,
       {
-        t: 'table', head: ['层', '权重（weights）', 'bias', '输出大小（2D 这里只算高；宽同法计算，通道数另写）'], rows: [
-          ['1D 卷积（单通道、无 padding），宽 $k$，1 个 filter', '$k$', '$1$', '$\\lfloor (n-k)/s\\rfloor+1$'],
-          ['2D 卷积，$C_{out}$ 个 $K\\times K$ filter，输入 $C_{in}$ 通道', '$C_{out}\\cdot C_{in}\\cdot K^2$', '$C_{out}$', '$\\lfloor (H+2P-K)/S\\rfloor+1$'],
-          ['全连接 $n_{in}\\to n_{out}$（$n_{in}$ 是输入单元数，$n_{out}$ 是输出单元数；每对输入、输出单元之间各有一个独立权重）', '$n_{in}\\cdot n_{out}$', '$n_{out}$', '$n_{out}$'],
-          ['Max pooling（最大池化：每个通道内按窗口取最大值；窗口边长 $K$，无 padding，通道数不变）', '0', '0', '$\\lfloor (H-K)/S\\rfloor+1$'],
+        t: 'table', head: ['层', '权重（weights）', 'bias', '输出边长（高、宽各算一次；通道数另写）'], rows: [
+          ['1D 卷积，$C_{out}$ 个宽 $k$ 的 filter，输入 $C_{in}$ 通道（真题：1 个 filter、单通道，权重就是 $k$）', '$C_{out}\\cdot C_{in}\\cdot k$', '$C_{out}$', '$\\lfloor (n+2p-k)/s\\rfloor+1$'],
+          ['2D 卷积，$C_{out}$ 个 $k\\times k$ filter，输入 $C_{in}$ 通道', '$C_{out}\\cdot C_{in}\\cdot k^2$', '$C_{out}$', '$\\lfloor (n+2p-k)/s\\rfloor+1$'],
+          ['全连接 $n_{in}\\to n_{out}$（每对输入、输出单元之间一个权重；接在卷积 / pooling 后面时先拉平，$n_{in}=$ 高 × 宽 × 通道）', '$n_{in}\\cdot n_{out}$', '$n_{out}$', '$n_{out}$'],
+          ['Max pooling（每个通道内按窗口取最大值；无 padding，通道数不变）', '0', '0', '$\\lfloor (n-k)/s\\rfloor+1$'],
         ],
       },
-      '来源：卷积和 weight sharing 见 L13 p9–p17；参数计数公式 $C_{out}C_{in}K^2+C_{out}$ 和输出尺寸公式见 WS08 / worksheet 8。题目说 *exclude the bias* 时不加 bias 列。输出边长的来由：补零后共有 $H+2P$ 格，窗口宽 $K$，所以窗口起点最多能移动 $H+2P-K$ 格。每次移动 $S$ 格，能完整移动 $\\lfloor(H+2P-K)/S\\rfloor$ 次；再加上尚未移动时的第一个窗口，就得到输出边长。',
+      T`题目说 *exclude the bias* 时不加 bias 列。输出边长的来由：补零后共有 $n+2p$ 格，窗口宽 $k$，所以窗口起点最多能移动 $n+2p-k$ 格；每次移动 $s$ 格，能完整移动 $\lfloor(n+2p-k)/s\rfloor$ 次，再加上尚未移动时的第一个窗口，就是 $+1$。`,
 
       { t: 'h2', text: '2. 读图步骤', id: 'steps' },
       { t: 'fig', src: 'assets/figures/ex2026_q1d_cnn.png', caption: '2026 practice Q1d / 2025 practice Q5 原图：从下到上 7、5、4、5 个圆。图上的"…"表示中间的连线没画全，不是没有那些边。题目要求不算 bias。', w: 460 },
@@ -45,7 +53,7 @@ Total (excluding biases): $3+20+20=$ **43**.`,
       },
       {
         t: 'warn', title: '最常见的错',
-        md: '把卷积层算成 $5\\times3=15$。那是**不共享权重**的 locally connected 层。卷积的定义就是同一个 filter 在所有位置重复使用（L13 p6 "parameter sharing"）。如果把卷积层算成 15，总数会写成 55，丢分。',
+        md: '把卷积层算成 $5\\times3=15$。那是**不共享权重**的 locally connected 层。卷积的定义就是同一个 filter 在所有位置重复使用（L13 p6 "parameter sharing"）。如果把卷积层算成 15，总数会写成 55，丢分。（随机练习里的「不共享」题才是这种层：每个输出位置各有 $k$ 个权重和 1 个 bias。）',
       },
 
       { t: 'h2', text: '3. 计数器', id: 'solver' },
@@ -67,7 +75,7 @@ Total (excluding biases): $3+20+20=$ **43**.`,
           {
             t: 'ul', items: [
               '**Weight sharing（权重共享）/ translation equivariance（平移等变）**：同一个 pattern（比如一条边）出现在图像任何位置，都由同一个 filter 检测，不需要在每个位置重新学（L13 p4–p6）；特征图是同一个 filter 在各位置算出的输出排成的网格。图案平移，特征图跟着平移，这叫平移等变（stride 1、忽略边界）。平移**不变**则指图案移动后输出仍不变；后面的 pooling 可对部分小范围移动产生这种效果，但不能保证任意平移都不改变输出。',
-              '**Max pooling**：设池化窗口的边长为 $m$，把每个 $m\\times m$ 区域换成其中的最大值，降低分辨率、减少后面全连接层的参数，并带来有限的平移不变性（p22–p24）。没有参数；反向传播是从输出往回计算梯度（损失对各层数值的变化率）的过程。这里把后一层传来的梯度交给窗口中取得最大值的位置，其他位置得到 0；sub-gradient（次梯度）是最大值运算在不可导处可采用的梯度替代（p23）。',
+              '**Max pooling**：把每个 $m\\times m$ 窗口换成其中的最大值（$m$ 是窗口边长），降低分辨率、减少后面全连接层的参数，并带来有限的平移不变性。它没有参数；反向传播时梯度只传给窗口里的最大值（详见 [c39](#/c39)）。',
               '**多通道**：每个 filter 覆盖输入的全部 $C_{in}$ 个通道，所以权重是 $C_{in}\\cdot K^2$（p18）；有 $C_{out}$ 个 filter 就有 $C_{out}$ 个输出通道（p17）。',
             ],
           },
@@ -85,7 +93,7 @@ Total (excluding biases): $3+20+20=$ **43**.`,
           ['输入', '$32\\times32\\times3$', '0', '0'],
           ['Conv I：8 个 $5\\times5$', '$28\\times28\\times8$（$32-5+1=28$）', '$8\\times(5\\cdot5\\cdot3)+8=608$', '600'],
           ['Max pooling', '$14\\times14\\times8$', '0', '0'],
-          ['Conv II：16 个 $5\\times5$', '$10\\times10\\times16$（$14-5+1=10$）', '$16\\times(5\\cdot5\\cdot8)+16=3216$', '3200'],
+          ['Conv II：16 个 $5\\times5$（$C_{in}=8$：Conv I 有 8 个 filter，pooling 不改通道数）', '$10\\times10\\times16$（$14-5+1=10$）', '$16\\times(5\\cdot5\\cdot8)+16=3216$', '3200'],
           ['Max pooling', '$5\\times5\\times16$，拉平成 $400$', '0', '0'],
           ['Dense I（全连接层 I）：$400\\to256$', '256', '$400\\times256+256=102656$', '102400'],
           ['Dense II：$256\\to10$', '10', '$256\\times10+10=2570$', '2560'],
@@ -99,7 +107,7 @@ Total (excluding biases): $3+20+20=$ **43**.`,
       T`前面几节数的是参数。同一张网络图还常这样问：每层输出多大、缺的 stride 是多少、能不能用几层小 filter 代替一层大 filter。公式与 [c38](#/c38)、[c39](#/c39) 一致：$n$ 是输入边长，$p$ 是每边补零的圈数（padding），$k$ 是 filter（或 pooling 窗口）的边长，$s$ 是 stride。`,
       {
         t: 'steps', items: [
-          T`**逐层算边长。** 每层都用 $\lfloor(n+2p-k)/s\rfloor+1$（即第 1 节表里的 $\lfloor(H+2P-K)/S\rfloor+1$），高、宽各算一次。除不尽就向下取整：最后剩下的几列不够放一个窗口，直接丢掉。通道数：卷积层等于 filter 个数，pooling 层不变。`,
+          T`**逐层算边长。** 每层都用 $\lfloor(n+2p-k)/s\rfloor+1$，高、宽各算一次。除不尽就向下取整：最后剩下的几列不够放一个窗口，直接丢掉。通道数：卷积层等于 filter 个数，pooling 层不变。`,
           T`**反推未知量（如 stride）。** 把已知数代进去，得到 $\lfloor(n+2p-k)/s\rfloor=\text{输出边长}-1$，再试 $s=1,2,3,\dots$，向下取整后对得上的就是答案。`,
           T`**每层参数。** 卷积层 $C_{out}\cdot C_{in}\cdot k^2$（另加 $C_{out}$ 个 bias），pooling 层 0。全连接层先把上一层拉平成 $H\times W\times C$ 个数（这里 $H$、$W$、$C$ 分别是上一层输出的高、宽、通道数），再乘输出单元数。`,
           T`**感受野（receptive field）。** 感受野是一个单元能"看到"的输入范围（L13 p26）。设共叠 $L$ 层卷积，每层 stride 都是 1；$i$ 是层号，第 $i$ 层的 filter 宽度记为 $k_i$。从一个输入位置开始，感受野宽度是 1。每加一层，其窗口会合并上一层连续 $k_i$ 个位置的感受野；因为相邻位置在原输入上只错开 1 格，合并后的宽度就增加 $k_i-1$。所以最上层的感受野宽度是 $1+\sum_{i=1}^{L}(k_i-1)$，其中求和表示把第 1 到第 $L$ 层的增加量全部相加。例如两层宽 3 的卷积得到 $1+(3-1)+(3-1)=5$。全部同宽 $k$ 时，就是 $1+L(k-1)$。`,

@@ -30,7 +30,7 @@
       {
         t: 'past', src: '2021 S1 exam Q15', marks: 12, topic: 'L09 p21, p33',
         q: 'If $k_1(\\mathbf a,\\mathbf a\')$ and $k_2(\\mathbf b,\\mathbf b\')$ are both valid kernels over vector valued inputs of size $d_1$ and $d_2$ respectively, prove that $k_3\\left(\\begin{bmatrix}\\mathbf a\\\\\\mathbf b\\end{bmatrix},\\begin{bmatrix}\\mathbf a\'\\\\\\mathbf b\'\\end{bmatrix}\\right)=k_1(\\mathbf a,\\mathbf a\')+k_2(\\mathbf b,\\mathbf b\')$ is also a valid kernel over vectors of size $d_1+d_2$. (Prime means "prime", not transpose; $[\\mathbf a;\\mathbf b]$ is concatenation.)',
-        qzh: T`如果 $k_1(\mathbf a,\mathbf a')$ 和 $k_2(\mathbf b,\mathbf b')$ 分别是定义在维数为 $d_1$ 和 $d_2$ 的向量输入上的合法核（valid kernel），证明 $k_3\left(\begin{bmatrix}\mathbf a\\\mathbf b\end{bmatrix},\begin{bmatrix}\mathbf a'\\\mathbf b'\end{bmatrix}\right)=k_1(\mathbf a,\mathbf a')+k_2(\mathbf b,\mathbf b')$ 也是维数为 $d_1+d_2$ 的向量上的合法核。（撇号只表示“另一个输入”（英文 prime），$\\mathbf a'$ 是与 $\\mathbf a$ 同维的另一个向量，不表示转置；$[\mathbf a;\mathbf b]$ 表示拼接（concatenation）。）`,
+        qzh: T`如果 $k_1(\mathbf a,\mathbf a')$ 和 $k_2(\mathbf b,\mathbf b')$ 分别是定义在维数为 $d_1$ 和 $d_2$ 的向量输入上的合法核（valid kernel），证明 $k_3\left(\begin{bmatrix}\mathbf a\\\mathbf b\end{bmatrix},\begin{bmatrix}\mathbf a'\\\mathbf b'\end{bmatrix}\right)=k_1(\mathbf a,\mathbf a')+k_2(\mathbf b,\mathbf b')$ 也是维数为 $d_1+d_2$ 的向量上的合法核。（撇号只表示“另一个输入”（英文 prime），$\mathbf a'$ 是与 $\mathbf a$ 同维的另一个向量，不表示转置；$[\mathbf a;\mathbf b]$ 表示拼接（concatenation）。）`,
         azh: T`由于 $k_1$ 和 $k_2$ 是合法核，存在特征映射（feature map）$\varphi_1,\varphi_2$，使得 $k_1(\mathbf a,\mathbf a')=\varphi_1(\mathbf a)^\top\varphi_1(\mathbf a')$，$k_2(\mathbf b,\mathbf b')=\varphi_2(\mathbf b)^\top\varphi_2(\mathbf b')$。
 对 $\mathbf x=[\mathbf a;\mathbf b]\in\mathbb R^{d_1+d_2}$，定义拼接的特征映射 $\varphi_3(\mathbf x)=\begin{bmatrix}\varphi_1(\mathbf a)\\ \varphi_2(\mathbf b)\end{bmatrix}$。则
 $$\varphi_3(\mathbf x)^\top\varphi_3(\mathbf x')=\varphi_1(\mathbf a)^\top\varphi_1(\mathbf a')+\varphi_2(\mathbf b)^\top\varphi_2(\mathbf b')=k_1(\mathbf a,\mathbf a')+k_2(\mathbf b,\mathbf b')=k_3(\mathbf x,\mathbf x').$$
@@ -149,7 +149,7 @@ so $K_1+K_2$ is a dot product in the feature space of $\varphi$, i.e. a kernel.`
           '阈值取 1.7（任何 $\\sqrt2$ 到 2 之间的数都行）：$\\bw\'\\varphi(\\bx)>1.7$ 判为 1。四个点全部分对。',
           { t: 'fig', src: 'reference/pages/L03/p24.jpg', caption: 'L03 p24 原图', w: 560 },
           { t: 'h4', text: '解法二：加乘积特征（更短）' },
-          '$\\varphi(\\bx)=(x_1,\\ x_2,\\ x_1x_2)$，取 $\\bw=(1,1,-2)$，$b=-0.5$（同样是凑的，要逐点验算）：$(0,0)\\to0+0-0-0.5=-0.5$，$(0,1)\\to0+1-0-0.5=0.5$，$(1,0)\\to1+0-0-0.5=0.5$，$(1,1)\\to1+1-2-0.5=-0.5$。按符号分类，全部正确。',
+          '$\\varphi(\\bx)=(x_1,\\ x_2,\\ x_1x_2)$，取 $\\bw=(1,1,-2)$，$b=-0.5$（怎么想到的：$x_1+x_2-2x_1x_2$ 在四个点上正好等于 XOR 标签 0、1、1、0，再减 0.5 让两类落在 0 的两侧；写完仍要逐点验算）：$(0,0)\\to0+0-0-0.5=-0.5$，$(0,1)\\to0+1-0-0.5=0.5$，$(1,0)\\to1+0-0-0.5=0.5$，$(1,1)\\to1+1-2-0.5=-0.5$。按符号分类，全部正确。',
           {
             t: 'exam', md: T`XOR is not linearly separable in $(x_1,x_2)$. Use the basis expansion $\varphi(\mathbf x)=(x_1,\,x_2,\,x_1x_2)$. With $\mathbf w=(1,1,-2)$ and $b=-0.5$, the score $\mathbf w^\top\varphi(\mathbf x)+b$ equals $-0.5,\ 0.5,\ 0.5,\ -0.5$ for $(0,0),(0,1),(1,0),(1,1)$, so predicting $y=1$ iff the score is positive classifies all four points correctly: the data are linearly separable in the new feature space. (Equivalently, distance features $\varphi_i(\mathbf x)=\|\mathbf x-\mathbf z_i\|$ to the four corners with $\mathbf w=(1,0,0,1)$ give scores $\sqrt2$ for class 0 and $2$ for class 1.)`,
           },

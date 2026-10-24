@@ -23,7 +23,7 @@
       T`方差（variance）= 偏离均值的平方的平均，手算用"平方的期望 − 期望的平方"；乘 $a$ 方差变 $a^2$ 倍，加常数不变；只有不相关（如独立）时方差才能直接相加。`,
     ],
     title: '概率：随机变量、期望、方差', en: 'Probability, random variables, expectation, variance',
-    summary: '整门课的语言。后面所有东西——likelihood、risk、bias/variance、bandit 的平均回报——都是"某个随机变量的期望"。这一章把这套语言讲清楚。',
+    summary: '整门课的语言。后面的 risk、bias/variance、bandit 的平均回报，都是"某个随机变量的期望"。这一章把这套语言讲清楚。',
     symbols: [
       [T`$\Omega$`, T`所有可能结果的集合（骰子：$\{1,\dots,6\}$）`],
       [T`$\omega$`, T`其中一个结果`],
@@ -56,7 +56,7 @@
       T`接下来要把"结果"变成**数**——赢多少钱、身高多少——才能求平均、做计算：`,
       T`**[[Random variable]]（随机变量）** 不是"随机的变量"，而是一个**函数**：把 outcome 映射成一个数，$X(\omega)\in\mathbb R$（L01 p16）。课件的例子：押偶数，掷出 $\{2,4,6\}$ 赢 5 元，掷出 $\{1,3,5\}$ 输 5 元，于是 $X$ 只取 $\pm5$，各 $1/2$。`,
       T`随机变量的**分布**说的是"它取各个值的可能性"，有两种写法（L01 p17）。离散的（如 $\pm5$）：每个可能的值一个概率，列成表就行，这张表叫 **[[PMF]]（probability mass function，概率质量函数）** $p(x)=P(X=x)$。连续的（如身高）：取到某一个精确值的概率是 0，表列不出来，只能说"落在一小段里"的概率，用曲线下的**面积**来算，这条曲线叫 **PDF（probability density function，概率密度函数）** $p(x)$：$P(X\le x)=\int_{-\infty}^x p(a)\,da$（从最左边到 $x$ 的面积），这个 $P(X\le x)$ 叫 **CDF（累积分布函数）**。本课手算基本只用离散的表。`,
-      T`一整张分布表往往太多了。后面几乎每章只需要两个问题的答案：**长期平均是多少**、**结果离这个平均有多散**（L01 p18）。第一个叫 **[[expectation]]（期望）** $E[X]$；第二个叫 **variance（方差）** $\mathrm{Var}(X)=E[(X-E[X])^2]$。例：公平骰子的期望 $=(1+2+3+4+5+6)/6=3.5$——3.5 掷不出来，期望不必是能取到的值；押偶数的 $X=\pm5$ 期望是 0，方差是 $25$（每次都离平均 5 元）。`,
+      T`一整张分布表往往太多了。后面几乎每章只需要两个问题的答案：**长期平均是多少**、**结果离这个平均有多散**（L01 p18）。第一个叫 **[[expectation]]（期望）** $E[X]=\sum_x x\,P(X=x)$：每个值乘它的概率再相加；第二个叫 **variance（方差）** $\mathrm{Var}(X)=E[(X-E[X])^2]$：先看每个值偏离平均多少，平方，再按概率求平均。例：公平骰子的期望 $=(1+2+3+4+5+6)/6=3.5$——3.5 掷不出来，期望不必是能取到的值；押偶数的 $X=\pm5$ 期望是 0，每次都偏离平均 5 元，$5^2=25$，所以方差是 $25$。`,
     ],
     why: [
       T`你可能会问：为什么 ML 课第一周先复习概率？因为这门课叫 **Statistical** Machine Learning——几乎每个核心概念都是一个期望：`,
@@ -67,14 +67,13 @@
         ['bandit 的 arm 价值（c47）', '这只手臂奖励的期望 $\\mu_i$'],
         ['Bayesian 预测（c50）', '对参数后验求期望'],
       ] },
-      T`所以这一章不难，但它是后面每一章的"语法"。看到 $E[\cdot]$ 不发怵，后面就顺了。`,
       { t: 'story', title: '概率论起源于赌桌', md: '1654 年，Pascal 和 Fermat 通信讨论"赌局中途停止，赌注该怎么分"（problem of points），这被看作概率论的起点——所以课件第一个例子就是押骰子。将近三百年后的 1933 年，Kolmogorov 在 *Grundbegriffe der Wahrscheinlichkeitsrechnung* 里用三条公理（就是 L01 p15 的非负、可数可加、$P(\\Omega)=1$）把概率论变成严格的数学。' },
     ],
     intuition: [
       T`**期望 = 长期平均 = 重心。** 把 PMF 画成一根根柱子，柱子高度是概率，把 x 轴当成一根杆、柱子当成重量，$E[X]$ 就是这根杆的平衡点。公平骰子平衡在 3.5——注意 3.5 根本掷不出来，期望不必是可能取到的值。`,
       T`**方差 = 平均"偏离的平方"。** 先算每个值离重心多远，平方（让正负偏离都算数，并且大偏离惩罚更重），再按概率加权平均。押偶数那个赌局：值总是 $\pm5$，离平均 0 都是 5，平方是 25，所以 $\mathrm{Var}=25$，标准差 $\sigma=5$。`,
       T`**PDF 不是概率。** 连续变量取到某一个精确值的概率是 0，PDF 的值是"概率密度"：在 $x$ 附近一小段 $\Delta$ 上的概率约等于 $p(x)\Delta$。所以 PDF 可以大于 1（比如很窄的 Gaussian），只要曲线下总面积是 1。`,
-      { t: 'think', q: '掷两个骰子，点数之和的期望是多少？算的时候需要用到"两个骰子独立"吗？', a: T`$E[X_1+X_2]=E[X_1]+E[X_2]=3.5+3.5=7$。**不需要独立**——期望的 linearity 对任何随机变量都成立。方差就不同了：一般 $\mathrm{Var}(X_1+X_2)=\mathrm{Var}(X_1)+\mathrm{Var}(X_2)+2\mathrm{Cov}(X_1,X_2)$，只有协方差为 0（不相关；独立是常用的充分条件）时才直接相加。` },
+      { t: 'think', q: '掷两个骰子，点数之和的期望是多少？算的时候需要用到"两个骰子独立"（一个掷出几点不影响另一个，[c02](#/c02) 正式定义）吗？', a: T`$E[X_1+X_2]=E[X_1]+E[X_2]=3.5+3.5=7$。**不需要独立**——期望的 linearity 对任何随机变量都成立。方差就不同了：一般 $\mathrm{Var}(X_1+X_2)=\mathrm{Var}(X_1)+\mathrm{Var}(X_2)+2\mathrm{Cov}(X_1,X_2)$，其中协方差 $\mathrm{Cov}(X,Y)=E[(X-E[X])(Y-E[Y])]$ 衡量两者是否"同涨同跌"；只有 $\mathrm{Cov}=0$（叫不相关，uncorrelated；独立一定不相关）时方差才直接相加。` },
     ],
     math: [
       { t: 'h3', text: '三条公理（L01 p15）' },
@@ -93,11 +92,10 @@
         T`逐项求期望：$E[X^2]-E[2\mu X]+E[\mu^2]=E[X^2]-2\mu E[X]+\mu^2$`,
         T`代入 $E[X]=\mu$：$E[X^2]-2\mu^2+\mu^2=E[X^2]-\mu^2$ ✓`,
       ] },
-      { t: 'deep', title: '再多两条常用性质', hint: '课件没单列，但后面推导会用', blocks: [
-        T`$\mathrm{Var}(aX+b)=a^2\mathrm{Var}(X)$。推导：$E[aX+b]=a\mu+b$，所以偏离 $=(aX+b)-(a\mu+b)=a(X-\mu)$，平方后 $a^2(X-\mu)^2$，求期望得 $a^2\mathrm{Var}(X)$。直觉：平移（$+b$）不改变分散程度，放大 $a$ 倍则偏离放大 $a$ 倍、平方后是 $a^2$ 倍。`,
-        T`若 $X,Y$ **独立**，$\mathrm{Var}(X+Y)=\mathrm{Var}(X)+\mathrm{Var}(Y)$，并且 $E[XY]=E[X]E[Y]$。c05 证明"样本均值的方差是 $\sigma^2/n$"就靠这一条。`,
-        T`$E[X+Y]=E[X]+E[Y]$ **不需要**独立——这是 linearity 最好用的地方。`,
-      ] },
+      { t: 'h3', text: '方差的两条运算规则（课件没单列，c05 要用）' },
+      T`$\mathrm{Var}(aX+b)=a^2\mathrm{Var}(X)$。推导：$E[aX+b]=a\mu+b$，所以偏离 $=(aX+b)-(a\mu+b)=a(X-\mu)$，平方后 $a^2(X-\mu)^2$，求期望得 $a^2\mathrm{Var}(X)$。直觉：平移（$+b$）不改变分散程度，放大 $a$ 倍则偏离放大 $a$ 倍、平方后是 $a^2$ 倍。`,
+      T`若 $X,Y$ **独立**，$\mathrm{Var}(X+Y)=\mathrm{Var}(X)+\mathrm{Var}(Y)$，并且 $E[XY]=E[X]E[Y]$。c05 证明"样本均值的方差是 $\sigma^2/n$"就靠这一条。`,
+      T`$E[X+Y]=E[X]+E[Y]$ **不需要**独立——这是 linearity 最好用的地方。`,
     ],
     fx: [
       {
@@ -226,7 +224,7 @@
       ] },
       T`**把条件反过来。** 上面算的是"已知下雨，带伞的概率"。很多时候手里只有这种"正向"的数，想要的却是反方向：看到有人带伞，下雨的概率是多少？更重要的例子是体检：知道"有病时检测阳性的概率"，想知道"检测阳性时真的有病的概率"。**Bayes' theorem（贝叶斯定理）** 就做这件事（L01 p22）：`,
       { t: 'math', tex: T`P(A\mid B)=\frac{P(B\mid A)\,P(A)}{P(B)}` },
-      T`分子 = 正向的条件概率 × $A$ 本身的概率；分母 $P(B)$ 用上面的 sum rule，把能产生 $B$ 的所有情况加起来：$P(B)=\sum_aP(B\mid A=a)P(A=a)$。带伞的例子：$P(\text{rain}\mid\text{umb})=\dfrac{0.75\times0.4}{0.4}=0.75$。体检的完整计算在下面"例子"一节。`,
+      T`分子 = 正向的条件概率 $P(B\mid A)$（叫 likelihood，似然）× $A$ 本身的概率 $P(A)$（叫 prior，先验：看到 $B$ 之前对 $A$ 的信念）；算出的 $P(A\mid B)$ 叫 posterior（后验）。分母 $P(B)$ 用上面的 sum rule，把能产生 $B$ 的所有情况加起来：$P(B)=\sum_aP(B\mid A=a)P(A=a)$。带伞的例子：$P(\text{rain}\mid\text{umb})=\dfrac{0.75\times0.4}{0.4}=0.75$，和正向的 0.75 相等只是巧合（这张表里 $P(\text{rain})=P(\text{umb})=0.4$），一般两个方向不相等，见"例子"一节；体检的完整计算也在那里。`,
       { t: 'story', title: '一篇死后才发表的论文', md: 'Thomas Bayes 是 18 世纪英国的一位牧师。他去世（1761）后，朋友 Richard Price 整理出他的手稿，1763 年发表为 "An Essay towards solving a Problem in the Doctrine of Chances"。真正把这个公式发展成通用推断方法的是 Laplace。所以"Bayes"这个名字背后其实是好几个人的工作。' },
     ],
     why: [
@@ -234,9 +232,9 @@
       { t: 'ul', items: [
         T`知道"参数是 $\theta$ 时数据长什么样" $P(\text{data}\mid\theta)$（这叫 likelihood），想要"看到数据后 $\theta$ 是多少" $P(\theta\mid\text{data})$。这就是 c08 的 Bayesian 推断，完全是 Bayes' theorem。`,
         T`知道"有病时检测阳性的概率"，想要"阳性时有病的概率"。`,
-        T`知道每个节点在父节点给定时的分布（CPT），想算任意变量的 marginal——这是 c53–c58 的图模型推断，核心操作就是 marginalisation。`,
+        T`图模型（c53–c58）：已知一堆条件概率表（CPT，conditional probability table，例如"下雨 / 不下雨时各自带伞的概率"），想算某个变量自己的概率（marginal）——核心操作就是 marginalisation。`,
       ] },
-      T`另外，Bayes 公式的**分母** $P(B)=\sum_a P(B\mid A=a)P(A=a)$ 用的就是 marginalisation。往年卷问过的 **marginal likelihood（边缘似然）**（2026 Q1b、2025 Q1b）是同一种操作，但专指**数据**在**参数**被先验积掉后的概率 $p(D)=\int p(D\mid\theta)p(\theta)d\theta$，c08 正式定义。`,
+      T`另外，Bayes 公式的分母 $P(B)=\sum_a P(B\mid A=a)P(A=a)$ 用的就是 marginalisation。往年卷问过的 **marginal likelihood（边缘似然）**（2026 Q1b、2025 Q1b）是同一种操作：$A$ 换成参数 $\theta$、$B$ 换成数据 $D$，把 $\theta$ 的所有取值按先验加权加掉（连续时求和变积分），得到数据本身的概率 $p(D)=\int p(D\mid\theta)p(\theta)d\theta$，c08 正式定义。`,
     ],
     intuition: [
       T`**Conditioning = 切一刀再放大。** 看 L01 p24 右图：在 joint 曲面上固定 $x_1$ 切一刀，得到一条曲线；这条曲线下面积不是 1，所以除以 $x_1$ 处的边缘密度 $p(x_1)$（要求 $>0$）重新归一化，就是 $p(x_2\mid x_1)=p(x_1,x_2)/p(x_1)$。离散情形同理，条件概率 $P(A\mid B)$ 要求 $P(B)>0$。`,
@@ -251,10 +249,11 @@
       { t: 'math', tex: T`\textbf{sum rule:}\quad P(A)=\sum_b P(A,B=b)=\sum_b P(A\mid B=b)P(B=b)` },
       T`sum rule 的第二个等号只是对 joint 再用一次 product rule：$P(A,B=b)=P(A\mid B=b)P(B=b)$。考题里通常给的是条件概率（如 CPT），所以第二种写法更常用。`,
       T`Bayes' theorem 就是 product rule 两种写法相等再移项（L01 p22–p23）：$P(A\mid B)P(B)=P(B\mid A)P(A)$ ⇒ 两边除以 $P(B)$。`,
+      T`反复用 product rule，可以把任意多个变量的 joint 拆成一串条件概率相乘，这叫 **chain rule（链式法则）**：$P(A,B,C)=P(A\mid B,C)\,P(B,C)=P(A\mid B,C)\,P(B\mid C)\,P(C)$。变量顺序可以任意选；c53 的图模型就从这条式子出发。`,
       { t: 'h3', text: '独立与条件独立' },
       { t: 'math', tex: T`X\perp Y \iff P(X,Y)=P(X)P(Y)\iff P(Y\mid X)=P(Y)` },
       { t: 'math', tex: T`X\perp Y\mid Z \iff P(X,Y\mid Z)=P(X\mid Z)P(Y\mid Z)` },
-      T`第二行是 **conditional independence**：给定 $Z$ 之后 $X,Y$ 独立。它**不**蕴含 $X\perp Y$，反过来也不成立。2025 Q1c 直接考过这句话的含义，第 54 章（D-separation）整章都在判断它。`,
+      T`第二行是 **conditional independence**：给定 $Z$ 之后 $X,Y$ 独立。例：$Z$= 下没下雨，$X$= 地面湿不湿，$Y$= 路人带没带伞——不知道天气时，看到带伞你会猜地是湿的（$X,Y$ 相关）；一旦知道下雨了，带不带伞不再提供关于地面的新信息（给定 $Z$ 独立）。所以它不蕴含 $X\perp Y$，反过来也不成立；2025 Q1c 直接考过这句话的含义，第 54 章（D-separation）整章都在判断它。`,
     ],
     fx: [
       {
@@ -277,12 +276,12 @@
       { t: 'steps', items: [
         T`marginal：行和、列和。$P(\text{rain})=0.3+0.1=0.4$，$P(\text{umb})=0.1+0.3=0.4$。`,
         T`conditional：$P(\text{umb}\mid\text{rain})=\dfrac{0.3}{0.4}=0.75$。`,
-        T`Bayes 反过来：$P(\text{rain}\mid\text{umb})=\dfrac{P(\text{umb}\mid\text{rain})P(\text{rain})}{P(\text{umb})}=\dfrac{0.75\times0.4}{0.4}=0.75$（也可以直接 $0.3/0.4$）。`,
+        T`Bayes 反过来（换晴天这一对，看清两个方向不相等）：$P(\text{umb}\mid\text{sun})=0.1/0.6\approx0.167$，而 $P(\text{sun}\mid\text{umb})=\dfrac{P(\text{umb}\mid\text{sun})P(\text{sun})}{P(\text{umb})}=\dfrac{(0.1/0.6)\times0.6}{0.4}=0.25$（也可以直接 $0.1/0.4$）。`,
         T`独立吗？$P(\text{rain})P(\text{umb})=0.16\ne0.3=P(\text{rain},\text{umb})$，**不独立**。`,
       ] },
       { t: 'h3', text: '例 2：检测阳性（经典 Bayes 题）' },
       { t: 'think', q: '先**凭直觉猜**：一种病患病率 1%，检测灵敏度 90%、误报率 5%。一个人检测阳性，他真的有病的概率大约是多少？写下你的猜测再往下看。', a: '大多数人猜 80%–90%。正确答案约 **15%**（下面算）。差距来自先验：没病的人太多了，5% 的误报绝对数量远超真阳性。' },
-      T`患病率 $P(D)=0.01$，灵敏度 $P(+\mid D)=0.9$，误报率 $P(+\mid\neg D)=0.05$。`,
+      T`记 $D$ = 有病，$+$ = 检测阳性。患病率 $P(D)=0.01$（所以没病 $P(\neg D)=1-0.01=0.99$），灵敏度 $P(+\mid D)=0.9$（有病的人里阳性的比例），误报率 $P(+\mid\neg D)=0.05$（没病的人里阳性的比例）。`,
       { t: 'video', id: 'bayes-grid' },
       { t: 'steps', items: [
         T`分母（sum rule）：$P(+)=0.9\times0.01+0.05\times0.99=0.009+0.0495=0.0585$`,
@@ -374,11 +373,11 @@
     ],
     types: ['T04'],
     what: [
-      T`**向量** $\bu\in\mathbb R^m$ 是 $m$ 个数排成一列。课件统一用 **列向量**，[[转置|Transpose]]写成 $\bu'$（一撇 = transpose，有的书写 $\bu^\top$）。`,
-      T`**[[点积|Dot product]]（dot product / inner product）**有两种等价定义（L01 p28–p29），其中 $\theta$ 是两个向量起点放在一起时的夹角。点积不分先后：$\bu'\bv=\bv'\bu$，所以课件写 $\bx'\bw$ 和 $\bw'\bx$ 是一回事。`,
+      T`**向量** $\bu\in\mathbb R^m$ 是 $m$ 个数排成一列，例如 $\bu=(3,4)'$；画在图上，它既是点 $(3,4)$，也是从原点指向这个点的箭头。课件统一用 **列向量**，[[转置|Transpose]]写成 $\bu'$（一撇 = transpose，列变行；有的书写 $\bu^\top$）。`,
+      T`**[[点积|Dot product]]（dot product / inner product）**有两种等价定义：代数式是对应分量相乘再相加，结果是一个数，例如 $\bu=(1,2)'$、$\bv=(3,4)'$ 时 $\bu'\bv=1\times3+2\times4=11$；几何式里 $\|\bu\|$ 是 $\bu$ 的长度（勾股定理，$\|(3,4)'\|=5$，下面 norm 再讲），$\theta$ 是两个向量起点放在一起时的夹角（$\cos0^\circ=1$，$\cos90^\circ=0$，超过 $90^\circ$ 为负）。点积不分先后：$\bu'\bv=\bv'\bu$，所以课件写 $\bx'\bw$ 和 $\bw'\bx$ 是一回事。`,
       { t: 'math', tex: T`\bu'\bv=\sum_{i=1}^m u_iv_i\qquad(\text{algebraic})\qquad\qquad \bu'\bv=\|\bu\|\,\|\bv\|\cos\theta\qquad(\text{geometric})` },
       T`点积回答的是"两个箭头有多对齐"。它马上就有用：分类时我们想要一条**把点分开的线**——线的一边算正类，另一边算负类。这条线（高维里是一块"平板"）正好可以用点积写出来：`,
-      T`**[[Hyperplane]]（超平面）**：由 $\bw\ne\mathbf 0$ 和 $b$ 决定的点集 $\{\bx:\ \bx'\bw+b=0\}$（L01 p31）。在 2D 里是一条直线，3D 里是一个平面，$m$ 维里是一个 $m-1$ 维的"平板"。$\bw$ 叫 **[[normal vector]]（法向量）**，它垂直于这个超平面。`,
+      T`**[[Hyperplane]]（超平面）**：由 $\bw\ne\mathbf 0$ 和 $b$ 决定的点集 $\{\bx:\ \bx'\bw+b=0\}$，读作"所有满足 $\bx'\bw+b=0$ 的点 $\bx$"。例：$\bw=(1,1)'$、$b=-2$ 时条件是 $x_1+x_2-2=0$，就是 2D 里的直线 $x_1+x_2=2$；在 3D 里它是一个平面，$m$ 维里是一个 $m-1$ 维的"平板"。$\bw$ 叫 **[[normal vector]]（法向量）**，它垂直于这个超平面。`,
       T`**[[Norm]]（范数）** 衡量向量的长度（L01 p34）：`,
       { t: 'math', tex: T`\|\mathbf a\|_2=\sqrt{a_1^2+\cdots+a_n^2}=\sqrt{\mathbf a'\mathbf a}\qquad\qquad \|\mathbf a\|_1=|a_1|+\cdots+|a_n|` },
     ],
@@ -392,10 +391,10 @@
       ] },
     ],
     intuition: [
-      T`**点积 = 一个向量在另一个方向上的投影 × 长度。** 几何式里 $\|\bu\|\cos\theta$ 是 $\bu$ 在 $\bv$ 方向上的 **[[scalar projection]]**（L01 p29），所以 $\bu'\bv=(\text{投影长})\times\|\bv\|$。同向时点积最大，垂直时为 0，反向时为负（L01 p30）。`,
+      T`**点积 = 一个向量在另一个方向上的投影 × 长度。** 几何式里 $\|\bu\|\cos\theta$ 是 $\bu$ 在 $\bv$ 方向上的 **[[scalar projection]]**：从 $\bu$ 的箭头尖向 $\bv$ 所在直线作垂线，落点到起点的（带符号）长度，像 $\bu$ 投在 $\bv$ 上的影子。所以 $\bu'\bv=(\text{投影长})\times\|\bv\|$。同向时点积最大，垂直时为 0，反向时为负。`,
       { t: 'video', id: 'dot' },
       T`**为什么 $\bw$ 垂直于超平面？** 取超平面上任意两点 $\bx_1,\bx_2$，都有 $\bw'\bx_i+b=0$，相减得 $\bw'(\bx_1-\bx_2)=0$。$\bx_1-\bx_2$ 是超平面内部的任意方向，和 $\bw$ 点积为 0 ⇒ 垂直。`,
-      T`**为什么符号决定哪一侧？** $\bw'\bx+b$ 本质上是"$\bx$ 沿着 $\bw$ 方向走了多远，再减去超平面所在的位置"。顺着 $\bw$ 方向越过超平面就为正，反方向为负。这就是线性分类器 $\hat y=\sgn(\bw'\bx+b)$（[[sgn]] = 取符号）的来历。`,
+      T`**为什么符号决定哪一侧？** 由上面的投影式，$\bw'\bx$ 等于 $\|\bw\|$ 乘以 $\bx$ 在 $\bw$ 方向上的投影长，而超平面上所有点的 $\bw'\bx$ 都等于 $-b$。所以 $\bx$ 顺着 $\bw$ 方向越过超平面时 $\bw'\bx>-b$，即 $\bw'\bx+b>0$；反方向则 $<0$（例：$\bw=(1,1)'$、$b=-2$，点 $(3,2)$ 代入得 $3>0$，原点得 $-2<0$）。这就是线性分类器 $\hat y=\sgn(\bw'\bx+b)$（[[sgn]] = 取符号）的来历。`,
       { t: 'fig', src: 'reference/pages/L01/p33.jpg', caption: 'L01 p33：3D 里用平面分开点云、2D 里用直线分开点云——都是 hyperplane', w: 560 },
     ],
     math: [
@@ -408,7 +407,7 @@
       T`知道点在线的哪一侧，只够做分类。后面的 SVM 还要问"离线有多远"：离得远的点分得更稳。$\bw'\bx+b$ 本身还不是距离——上面说过 $(\bw,b)$ 放大成 $(2\bw,2b)$ 时线没动，这个数却翻倍了。除以 $\|\bw\|$ 把这个缩放抵消掉，才是真正的几何距离：`,
       { t: 'math', tex: T`\text{dist}(\bx,\ \{\bw'\bx+b=0\})=\frac{|\bw'\bx+b|}{\|\bw\|}` },
       { t: 'viz', id: 'fig-hyperplane-dist', opts: { caption: T`具体算一次：直线 $x_1+x_2-2=0$（$\bw=(1,1)$，$b=-2$）。步骤见图右。` } },
-      T`推导：从 $\bx$ 沿单位法向量 $\bw/\|\bw\|$ 走距离 $t$ 落到超平面上（$t$ 可正可负）：`,
+      T`推导：点到超平面的最短路是垂线，也就是沿法向量走。把 $\bw$ 除以自己的长度得到单位法向量 $\bw/\|\bw\|$（方向不变、长度为 1），从 $\bx$ 沿它走距离 $t$ 落到超平面上（$t$ 可正可负）：`,
       { t: 'steps', items: [
         T`落点 $\bx-t\,\bw/\|\bw\|$ 在超平面上：$\bw'(\bx-t\,\bw/\|\bw\|)+b=0$`,
         T`展开：$\bw'\bx-t\,\frac{\bw'\bw}{\|\bw\|}+b=0$，而 $\bw'\bw=\|\bw\|^2$，所以中间项 $=t\|\bw\|$`,
@@ -540,8 +539,8 @@
       ] },
       T`把数据排成矩阵 $\mathbf X$（每行一个人、每列一个特征），**列线性相关 = 有一个特征是多余的**。下面会看到，这正是 $\mathbf X'\mathbf X$ 没有逆的原因。`,
       { t: 'h3', text: '③ 矩阵、转置、逆（L01 p39）' },
-      T`转置 $(\mathbf A')_{ij}=A_{ji}$（行列互换）；**symmetric（对称）** 指 $\mathbf A=\mathbf A'$；**invertible（可逆）** 指存在 $\mathbf A^{-1}$ 使 $\mathbf A^{-1}\mathbf A=\mathbf I$。`,
-      T`把矩阵看成"把向量 $\bv$ 变成 $\mathbf A\bv$"的变换，逆就是**撤销**这个变换。要能撤销，变换就不能把某个方向**压成 0**——压扁了，原来的信息就丢了，回不去。哪些方向被压扁、每个方向被拉伸多少，要用特征值来看。`,
+      T`转置 $(\mathbf A')_{ij}=A_{ji}$（行列互换）；**symmetric（对称）** 指 $\mathbf A=\mathbf A'$；**invertible（可逆）** 指存在 $\mathbf A^{-1}$ 使 $\mathbf A^{-1}\mathbf A=\mathbf I$，其中 $\mathbf I$ 是单位矩阵（对角线全 1、其余 0，$\mathbf I\bv=\bv$，作用像数字 1）。`,
+      T`矩阵乘向量 $\mathbf A\bv$：$\mathbf A$ 的每一行和 $\bv$ 做点积，得到新向量的对应分量，例如 $\begin{bmatrix}2&1\\1&2\end{bmatrix}\begin{bmatrix}1\\0\end{bmatrix}=\begin{bmatrix}2\times1+1\times0\\1\times1+2\times0\end{bmatrix}=\begin{bmatrix}2\\1\end{bmatrix}$。所以可以把矩阵看成"把向量 $\bv$ 变成 $\mathbf A\bv$"的变换，逆就是撤销这个变换。要能撤销，变换就不能把某个方向**压成 0**——压扁了，原来的信息就丢了，回不去；哪些方向被压扁、每个方向被拉伸多少，要用特征值来看。`,
       { t: 'h3', text: '④ 特征值：矩阵在某些方向上只做拉伸（L01 p40）' },
       { t: 'math', tex: T`\mathbf A\bv=\lambda\bv,\qquad \bv\ne\mathbf 0` },
       T`方阵 $\mathbf A$ 作用在 **eigenvector（特征向量）** $\bv$ 上时**不改变方向，只拉伸** $\lambda$ 倍（$\lambda<0$ 时反向）。$\lambda$ 叫 **eigenvalue（特征值）**。`,
@@ -549,10 +548,10 @@
       { t: 'video', id: 'eigen' },
       { t: 'story', title: 'eigen 是德语', md: '"eigen" 是德语，意思是"自己的、特有的"——eigenvector 就是"矩阵特有的方向"。这个叫法来自 20 世纪初 David Hilbert 等德国数学家的工作，中文译作"特征"。' },
       { t: 'h3', text: '⑤ PSD：二次型永远不小于 0（L01 p42）' },
-      T`最后一个概念回答"损失函数是不是一只碗"。W2 的平方损失展开后有一项 $\bw'(\mathbf X'\mathbf X)\bw$——这种"向量 × 矩阵 × 同一个向量"的乘积叫 **quadratic form（二次型）**，结果是一个数。如果朝**任何**方向它都 $\ge0$，损失就像一只朝上的碗，一定有最低点。这样的对称矩阵叫 **PSD（positive semidefinite，半正定）**；严格 $>0$ 叫 **PD（positive definite，正定）**：`,
+      T`最后一个概念回答"损失函数是不是一只碗"。W2 的平方损失展开后有一项 $\bw'(\mathbf X'\mathbf X)\bw$——这种"向量 × 矩阵 × 同一个向量"的乘积叫 **quadratic form（二次型）**：先算 $\mathbf A\bv$，再和 $\bv$ 做点积，结果是一个数（例：$\mathbf A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$、$\bv=(1,-1)'$ 时 $\mathbf A\bv=(1,-1)'$，$\bv'\mathbf A\bv=1+1=2$）。如果对任何 $\bv$ 它都 $\ge0$，损失就像一只朝上的碗，一定有最低点。这样的对称矩阵叫 **PSD（positive semidefinite，半正定）**；严格 $>0$ 叫 **PD（positive definite，正定）**：`,
       { t: 'math', tex: T`\textbf{PSD: }\ \bv'\mathbf A\bv\ge0\ \ \forall\bv\qquad\qquad \textbf{PD: }\ \bv'\mathbf A\bv>0\ \ \forall\bv\ne\mathbf 0` },
       T`（$\mathbf A$ 对称。）等价地：PSD ⇔ 所有特征值 $\ge0$；PD ⇔ 所有特征值 $>0$。上面的 $\mathbf A$（特征值 3、1）是 PD；$\mathbf B$（特征值 2、0）是 PSD 但不是 PD——特征值为 0 的那个方向上碗底是**平的**，最低点不唯一，这也正是它不可逆的方向。`,
-      T`**把链条串起来**（证明在下面"数学定义"一节）：$\mathbf X$ 的列线性相关（米 / 厘米两列）⇒ $\mathbf X'\mathbf X$ 有特征值 0 ⇒ PSD 但不是 PD ⇒ 没有逆 ⇒ 线性回归的公式失效（c10）。ridge 给它加上 $\lambda\mathbf I$，把所有特征值抬高 $\lambda$，0 变成 $\lambda>0$，就又可逆了（c16）。`,
+      T`**把链条串起来**（证明在下面"数学定义"一节）：$\mathbf X$ 的列线性相关（米 / 厘米两列）⇒ $\mathbf X'\mathbf X$ 有特征值 0 ⇒ PSD 但不是 PD ⇒ 没有逆 ⇒ 线性回归的公式失效（c10）。ridge 给它加上 $\lambda\mathbf I$（这里 $\lambda>0$ 是 ridge 的惩罚系数，不是特征值）：若 $\mathbf X'\mathbf X\bv=\mu\bv$，则 $(\mathbf X'\mathbf X+\lambda\mathbf I)\bv=\mu\bv+\lambda\bv=(\mu+\lambda)\bv$，每个特征值都抬高 $\lambda$，0 变成 $\lambda>0$，就又可逆了（c16）。`,
     ],
     why: [
       { t: 'table', head: ['结论', '后面在哪用'], rows: [
@@ -572,7 +571,7 @@
       { t: 'h3', text: '2×2 对称矩阵的特征值：从定义推出来' },
       { t: 'steps', items: [
         T`定义 $\mathbf A\bv=\lambda\bv$。右边写成 $\lambda\mathbf I\bv$（$\mathbf I$ 是单位矩阵，$\mathbf I\bv=\bv$），移项得 $(\mathbf A-\lambda\mathbf I)\bv=\mathbf 0$。`,
-        T`我们要的是 $\bv\ne\mathbf 0$。如果 $\mathbf A-\lambda\mathbf I$ 可逆，两边乘它的逆就得到 $\bv=\mathbf 0$——所以它必须**不可逆**，即 $\det(\mathbf A-\lambda\mathbf I)=0$。`,
+        T`我们要的是 $\bv\ne\mathbf 0$。如果 $\mathbf A-\lambda\mathbf I$ 可逆，两边乘它的逆就得到 $\bv=\mathbf 0$——所以它必须**不可逆**。判断不可逆用行列式（determinant，由方阵算出的一个数，2×2 的算法见下一步）：方阵不可逆 ⇔ 行列式为 0，所以条件是 $\det(\mathbf A-\lambda\mathbf I)=0$。`,
         T`2×2 行列式 $\det\begin{bmatrix}p&q\\r&s\end{bmatrix}=ps-qr$。对 $\mathbf A=\begin{bmatrix}a&b\\b&d\end{bmatrix}$：$(a-\lambda)(d-\lambda)-b^2=0$，展开就是下面的一元二次方程，用求根公式解出两个 $\lambda$。`,
       ] },
       { t: 'math', tex: T`\lambda^2-(a+d)\lambda+(ad-b^2)=0\ \Rightarrow\ \lambda_{1,2}=\frac{a+d}{2}\pm\sqrt{\Big(\frac{a-d}{2}\Big)^2+b^2}` },
@@ -580,8 +579,8 @@
       { t: 'h3', text: '$\\mathbf X\'\\mathbf X$ 是 PSD（L01 p42，要会写）' },
       { t: 'math', tex: T`\bv'(\mathbf X'\mathbf X)\bv=(\mathbf X\bv)'(\mathbf X\bv)=\|\mathbf X\bv\|^2\ge0` },
       T`另外 $(\mathbf X'\mathbf X)'=\mathbf X'(\mathbf X')'=\mathbf X'\mathbf X$，所以它是**对称**的（PSD 的定义要求对称）。第一个等号用的是转置规则 $(\mathbf X\bv)'=\bv'\mathbf X'$（"乘积的转置 = 各自转置、顺序反过来"）；第二个等号是 c03 的 $\bu'\bu=\|\bu\|^2$，这里 $\bu=\mathbf X\bv$ 是一个向量。`,
-      T`而且只有当 $\mathbf X\bv=\mathbf 0$ 对某个 $\bv\ne\mathbf 0$ 成立时才会等于 0——这正是"$\mathbf X$ 的列线性相关"。所以：**列线性无关 ⇔ $\mathbf X'\mathbf X$ 是 PD ⇔ 可逆**。`,
-      T`L01 p41 还说：**对称矩阵的特征值都是实数**；**方阵**列线性相关 ⇒ **[[rank deficient]]**（秩亏）、0 是特征值、不可逆。数据矩阵 $\mathbf X$ 通常不是方阵，要说的是：$\mathbf X$ 列相关 ⇒ $\mathbf X'\mathbf X$ 有零特征值、不可逆。`,
+      T`而且只有当 $\mathbf X\bv=\mathbf 0$ 对某个 $\bv\ne\mathbf 0$ 成立时才会等于 0。$\mathbf X\bv=v_1\times(\text{第 1 列})+v_2\times(\text{第 2 列})+\cdots$ 是各列的线性组合，它为 $\mathbf 0$ 而 $\bv\ne\mathbf 0$，正说明"$\mathbf X$ 的列线性相关"（米 / 厘米两列：取 $\bv=(100,-1)'$，$100\times$米列 $-$ 厘米列 $=\mathbf 0$）。所以：**列线性无关 ⇔ $\mathbf X'\mathbf X$ 是 PD ⇔ 可逆**。`,
+      T`L01 p41 还说：**对称矩阵的特征值都是实数**；**方阵**列线性相关 ⇒ **[[rank deficient]]**（秩亏：rank = 线性无关的列最多有几列，比总列数少就叫秩亏，即有多余的列）、0 是特征值、不可逆。数据矩阵 $\mathbf X$ 通常不是方阵，要说的是：$\mathbf X$ 列相关 ⇒ $\mathbf X'\mathbf X$ 有零特征值、不可逆。`,
     ],
     fx: [
       {
@@ -600,7 +599,7 @@
       { t: 'h3', text: '例 2：PSD 但不可逆' },
       T`$\mathbf A=\begin{bmatrix}1&1\\1&1\end{bmatrix}$：$\lambda=1\pm1=2,0$。有 0 ⇒ PSD 但不是 PD；两列相同（线性相关）⇒ $\det=0$，不可逆。`,
       { t: 'h3', text: '例 3：不是 PSD（找反例）' },
-      T`$\mathbf A=\begin{bmatrix}1&2\\2&1\end{bmatrix}$：$\lambda=1\pm2=3,-1$。取 $\bv=(1,-1)'$：$\bv'\mathbf A\bv=1-2-2+1=-2<0$。一个反例就够了。`,
+      T`$\mathbf A=\begin{bmatrix}1&2\\2&1\end{bmatrix}$：$\lambda=1\pm\sqrt{0+2^2}=3,-1$。取 $\bv=(1,-1)'$：先算 $\mathbf A\bv=(1-2,\ 2-1)'=(-1,1)'$，再和 $\bv$ 点积，$\bv'\mathbf A\bv=1\times(-1)+(-1)\times1=-2<0$。一个反例就够了。`,
       { t: 'fade', title: '分步练习：2×2 特征值', plan: [T`中点 $\frac{a+d}2$、半径 $\sqrt{(\frac{a-d}2)^2+b^2}$`, T`$\lambda=$ 中点 ± 半径，判 PD/PSD`], items: [
         { md: T`$\mathbf A=\begin{bmatrix}4&1\\1&4\end{bmatrix}$`, steps: [
           { md: T`$\frac{a+d}{2}=4$，$\sqrt{(\frac{a-d}{2})^2+b^2}=\sqrt{0+1}=1$` },
@@ -685,13 +684,13 @@
     ],
     types: [],
     what: [
-      T`**Frequentist statistics（频率学派）**：未知参数 $\theta$ 有一个**固定的真值**，只是我们不知道（L02 p3）。数据 $X_1,\dots,X_n$ 是从 $p_\theta$ 中 **[[i.i.d.]]**（independent and identically distributed，独立同分布）抽出来的。`,
-      T`**[[Estimator]]（估计量）** $\hat\theta(X_1,\dots,X_n)$：任何一个"输入数据、输出一个猜测"的函数（L02 p4）。例如样本均值 $\hat\theta=\frac1n\sum_iX_i$。`,
-      T`关键转念：**数据是随机的 ⇒ 估计量也是随机变量**。重新抽一批数据，$\hat\theta$ 就变了。所以可以问它的期望和方差：`,
+      T`**Frequentist statistics（频率学派）**：数据来自某个分布 $p_\theta$，参数 $\theta$ 是决定这个分布的未知数（例如硬币正面朝上的概率），它有一个**固定的真值**，只是我们不知道。数据 $X_1,\dots,X_n$ 是从 $p_\theta$ 中 [[i.i.d.]]（independent and identically distributed，独立同分布）抽出来的：每次抽样互不影响，并且都来自同一个 $p_\theta$，就像同一枚硬币抛 $n$ 次。`,
+      T`**[[Estimator]]（估计量）** $\hat\theta(X_1,\dots,X_n)$：任何一个"输入数据、输出一个猜测"的函数（戴帽子 = 估计）。例如样本均值 $\hat\theta=\frac1n\sum_iX_i$：抛 5 次硬币得 $1,0,1,1,0$（1 = 正面），$\hat\theta=3/5=0.6$。`,
+      T`关键转念：**数据是随机的 ⇒ 估计量也是随机变量**。重新抽一批数据，$\hat\theta$ 就变了（再抛 5 次可能得 $0.4$）。所以可以像 c01 那样问它的期望和方差：`,
       { t: 'ul', items: [
         T`**[[Bias]]（偏差）**：$B_\theta(\hat\theta)=E_\theta[\hat\theta]-\theta$（下标 $\theta$：假设真值是 $\theta$，对所有可能抽到的数据集求平均）。平均起来偏离真值多少（L02 p5）。$B=0$ 叫 **unbiased**。`,
         T`**Variance**：$\mathrm{Var}_\theta(\hat\theta)=E_\theta\big[(\hat\theta-E_\theta[\hat\theta])^2\big]$。换一批数据它晃动多大（L02 p7）。`,
-        T`**Consistency**：$n\to\infty$ 时 $\hat\theta\to\theta$（[[in probability|Convergence in probability]]）（L02 p9）。数据无限多时能猜对。`,
+        T`**Consistency**：$n\to\infty$ 时 $\hat\theta\to\theta$（[[in probability|Convergence in probability]]：$n$ 越大，$\hat\theta$ 离 $\theta$ 超过任意给定小距离的概率越接近 0），即数据无限多时能猜对。常用判断（足够条件）：bias 和 variance 都随 $n\to\infty$ 趋于 0，就一定 consistent。`,
         T`**[[Asymptotic efficiency]]**：$n\to\infty$ 时方差达到所有估计量里可能的最小值（L02 p9）。`,
       ] },
     ],
@@ -699,22 +698,23 @@
       T`ML 的"训练"就是在构造估计量：线性回归的 $\hat\bw$、logistic 的 $\hat\bw$、神经网络的权重，全都是"数据的函数"。评价它们好不好，就是问 bias 和 variance。`,
       T`这一章是两个大考点的地基：`,
       { t: 'ul', items: [
-        T`c07：平方误差 = $\text{bias}^2+\text{variance}$（L02 p19）。`,
+        T`c07：估计量的均方误差 MSE $=E[(\hat\theta-\theta)^2]$（平均"猜错的平方"）$=\text{bias}^2+\text{variance}$。`,
         T`c19：模型的 **bias–variance trade-off**（L05 p29–p40，往年简答高频）——简单模型 bias 高、复杂模型 variance 高。`,
       ] },
     ],
     intuition: [
       T`**射箭比喻。** 真值 $\theta$ 是靶心。每抽一批数据就射一箭（得到一个 $\hat\theta$）。**bias** = 箭的平均落点离靶心多远；**variance** = 箭有多分散。可以"准而散"（无偏高方差），也可以"偏而紧"（有偏低方差）。`,
-      T`**L02 p5–p8 的实验正是这样做的**：从 $\mathcal N(\theta=0,\sigma^2=1)$ 抽 20 个点算一次样本均值，重复 40 次，得到 40 个 $\hat\theta_i$（散布在 $-0.4$ 到 $0.4$）。它们的平均（红三角）几乎就在 0 ⇒ 无偏；它们平方的平均接近 $\sigma^2/20=0.05$ ⇒ 方差。`,
+      T`**L02 p5–p8 的实验正是这样做的**：从 $\mathcal N(\theta=0,\sigma^2=1)$ 抽 20 个点算一次样本均值，重复 40 次，得到 40 个 $\hat\theta_i$（散布在 $-0.4$ 到 $0.4$）。它们的平均（红三角）几乎就在 0 ⇒ 无偏。因为平均是 0，每个"偏离平均的平方"就是 $\hat\theta_i^2$；它们的平均接近 $\sigma^2/n=1/20=0.05$（下面"数学定义"证明这个公式），这就是方差。`,
       { t: 'fig', src: 'reference/pages/L02/p06.jpg', caption: 'L02 p6：40 次重复的样本均值（点），红三角 = 它们的平均，黑三角 = 真值 0', w: 560 },
       { t: 'viz', id: 'fig-bv-dartboard', opts: { caption: T`同一个估计方法重复抽样 8 次。bias 和 variance 是两件独立的事，可以任意组合。` } },
     ],
     math: [
       { t: 'h3', text: '样本均值无偏（只用 linearity）' },
+      T`设每个 $X_i$ 的均值是 $\theta$、方差是 $\sigma^2$（例如 $X_i\overset{iid}{\sim}\mathcal N(\theta,\sigma^2)$），即 $E[X_i]=\theta$、$\mathrm{Var}(X_i)=\sigma^2$。`,
       { t: 'math', tex: T`E[\bar X]=E\Big[\frac1n\sum_{i=1}^nX_i\Big]=\frac1n\sum_{i=1}^nE[X_i]=\frac1n\cdot n\theta=\theta\ \Rightarrow\ B(\bar X)=0` },
       { t: 'h3', text: '样本均值的方差（用到独立）' },
       { t: 'math', tex: T`\mathrm{Var}(\bar X)=\frac1{n^2}\mathrm{Var}\Big(\sum_iX_i\Big)\overset{\text{indep.}}{=}\frac1{n^2}\sum_i\mathrm{Var}(X_i)=\frac{n\sigma^2}{n^2}=\frac{\sigma^2}{n}` },
-      T`方差随 $n$ 以 $1/n$ 下降，bias 始终为 0 ⇒ 样本均值是 **consistent** 的。`,
+      T`第一个等号：常数 $\frac1n$ 提到方差外面要平方（c01：$\mathrm{Var}(cY)=c^2\mathrm{Var}(Y)$）；第二个等号：独立变量的方差直接相加（c01）。方差随 $n$ 以 $1/n$ 下降，bias 始终为 0 ⇒ 样本均值是 **consistent** 的。`,
       { t: 'think', q: T`上面第二行推导里，"独立"用在哪一步？如果 $n$ 个样本其实是同一个数抄了 $n$ 遍（完全相关），$\mathrm{Var}(\bar X)$ 是多少？`, a: T`用在 $\mathrm{Var}(\sum X_i)=\sum\mathrm{Var}(X_i)$（独立时交叉的协方差项为 0）。如果全部相同，$\bar X=X_1$，方差还是 $\sigma^2$——再多"数据"也没用。这就是为什么 i.i.d. 假设重要。` },
       { t: 'story', title: '大数定律', md: 'Jacob Bernoulli 在遗著 *Ars Conjectandi*（猜测的艺术，1713 年出版）里首次严格证明：重复试验时，成功的**频率**会依概率收敛到真实概率 $p$。样本均值的 consistency 是同一思想的推广（一般情形由后来的大数定律给出）。' },
       { t: 'errata', md: T`L02 p9 写"we could calculate its exact bias (zero) and variance ($\sigma^2$)"。准确地说，样本均值的方差是 $\sigma^2/n$（p8 的模拟结果 $1/20=0.05$ 也是这么来的）。考试按 $\sigma^2/n$ 写。` },
@@ -830,7 +830,7 @@
     what: [
       { t: 'h3', text: '① MLE 想回答什么问题' },
       T`手上有一批数据，假设它来自某个分布 $p_\theta$，但参数 $\theta$ 不知道。**该猜哪个 $\theta$？** MLE 的回答：**挑让这批数据"最可能出现"的那个 $\theta$。**`,
-      T`例：一枚硬币抛 10 次，7 次正面（$\theta$ = 正面概率）。把几个候选 $\theta$ 代进去，算"恰好得到这串结果"的概率 $\theta^7(1-\theta)^3$：`,
+      T`例：一枚硬币抛 10 次，7 次正面（$\theta$ = 正面概率）。每次正面的概率是 $\theta$、反面是 $1-\theta$，各次独立所以相乘：「恰好得到这串结果」的概率是 7 个 $\theta$ 乘 3 个 $1-\theta$，即 $\theta^7(1-\theta)^3$。把几个候选 $\theta$ 代进去：`,
       { t: 'table', cls: 'compact', head: ['候选 $\\theta$', '0.1', '0.3', '0.5', '0.7', '0.9'], rows: [
         ['$\\theta^7(1-\\theta)^3$', '$7\\times10^{-8}$', '$7.5\\times10^{-5}$', '$9.8\\times10^{-4}$', '$\\mathbf{2.2\\times10^{-3}}$', '$4.8\\times10^{-4}$'],
       ] },
@@ -838,24 +838,24 @@
       { t: 'h3', text: '② 定义（L02 p10）' },
       { t: 'math', tex: T`\hat\theta(x_1,\dots,x_n)\in\argmax_{\theta\in\Theta}\ \prod_{i=1}^n p_\theta(x_i)` },
       T`（$\prod$ 是连乘，$\argmax$ 是"让它最大的那个 $\theta$"，$\Theta$ 是 $\theta$ 允许的取值范围，见上面的符号速查。）$\prod_i p_\theta(x_i)$ 叫 **[[likelihood]]（似然）**：在参数 $\theta$ 下，整批数据出现的概率（数据 i.i.d.，所以是各个样本概率的乘积）。`,
-      T`**Likelihood 和 probability 是同一个式子** $p(x\mid\theta)$，区别在于把谁当变量：固定 $\theta$、看 $x$ 的函数是 probability（对 $x$ 求和为 1）；固定观测到的数据、看 $\theta$ 的函数是 likelihood（对 $\theta$ 积分不一定为 1，所以它不是 $\theta$ 的分布）。上面那张表就是一个 likelihood：数据固定（7 正 3 反），$\theta$ 在变。`,
+      T`**Likelihood 和 probability 是同一个式子** $p(x\mid\theta)$，区别在于把谁当变量：固定 $\theta$、看 $x$ 的函数是 probability（对 $x$ 求和为 1）；固定观测到的数据、看 $\theta$ 的函数是 likelihood。上面那张表就是一个 likelihood：数据固定（7 正 3 反），$\theta$ 在变；把 $\theta^7(1-\theta)^3$ 对 $\theta$ 从 0 到 1 积分（连续地「加起来」）只有约 0.00076，远不是 1，所以 likelihood 不是 $\theta$ 的分布。`,
       { t: 'h3', text: '③ Bernoulli：推出 $\\hat\\theta=k/n$（L02 p11–p12）' },
-      T`每次抛硬币：$p_\theta(x)=\theta^x(1-\theta)^{1-x}$，$x\in\{0,1\}$（$x=1$ 时是 $\theta$，$x=0$ 时是 $1-\theta$）。令 $k=\sum_ix_i$（正面次数），取 log（原因见 ⑤）：`,
+      T`每次抛硬币：$p_\theta(x)=\theta^x(1-\theta)^{1-x}$，$x\in\{0,1\}$（$x=1$ 时是 $\theta$，$x=0$ 时是 $1-\theta$）。令 $k=\sum_ix_i$（正面次数），整批数据的似然 $\prod_i\theta^{x_i}(1-\theta)^{1-x_i}=\theta^k(1-\theta)^{n-k}$，就是 ① 里的 $\theta^7(1-\theta)^3$。取 log（最高点不变、连乘变连加，详见 ⑤；用 $\log(ab)=\log a+\log b$ 和 $\log a^k=k\log a$）：`,
       { t: 'math', tex: T`L(\theta)=\sum_{i=1}^n\big[x_i\log\theta+(1-x_i)\log(1-\theta)\big]=k\log\theta+(n-k)\log(1-\theta)` },
-      { t: 'math', tex: T`\frac{dL}{d\theta}=\frac{k}{\theta}-\frac{n-k}{1-\theta}=0\ \Rightarrow\ k(1-\theta)=(n-k)\theta\ \Rightarrow\ \hat\theta=\frac kn` },
+      T`为什么令导数 = 0：曲线在最高点处是平的，斜率（导数）为 0。求导用两条规则：$\frac{d}{d\theta}\log\theta=\frac1\theta$；$\frac{d}{d\theta}\log(1-\theta)=-\frac1{1-\theta}$（链式法则：里面的 $1-\theta$ 对 $\theta$ 求导得 $-1$）。`,
+      { t: 'math', tex: T`\frac{dL}{d\theta}=\frac{k}{\theta}-\frac{n-k}{1-\theta}=0\ \Rightarrow\ k(1-\theta)=(n-k)\theta\ \Rightarrow\ k-k\theta=n\theta-k\theta\ \Rightarrow\ k=n\theta\ \Rightarrow\ \hat\theta=\frac kn` },
       T`10 次 7 正面：$\hat\theta=7/10=0.7$，和 ① 的表一致。（二阶导 $-\frac{k}{\theta^2}-\frac{n-k}{(1-\theta)^2}<0$，确实是最大值。）`,
       { t: 'warn', title: '课件记号', md: T`L02 p12 写 "$\bar X=\sum_{i=1}^n x_i$"，这里 $\bar X$ 指的是**和**（正面次数），不是平均。所以课件的 $\hat\theta=\bar X/n$ 和这里的 $k/n$ 是一回事。` },
       { t: 'h3', text: '④ Gaussian 均值：推出 $\\hat\\theta=\\bar x$（L02 p13）' },
-      T`硬币的观测只有 0/1。如果观测是连续的实数（身高、温度），就不能再用 $\theta^x(1-\theta)^{1-x}$。课件下一个例子假设数据来自钟形的 Gaussian，方差已知为 1，只估中心——同样的四步，你会看到"最大化似然"变成了"最小化平方误差"。`,
-      T`[[Gaussian]]（正态分布）是钟形曲线，$\mathcal N(\mu,\sigma^2)$ 中 $\mu$ 是中心、$\sigma^2$ 是方差。设方差已知为 1：$p_\theta(x)=\frac{1}{\sqrt{2\pi}}\exp\!\big(-\frac12(x-\theta)^2\big)$。`,
+      T`如果观测是连续的实数（身高、温度），就要换成 [[Gaussian]]（正态分布，钟形曲线 $\mathcal N(\mu,\sigma^2)$，$\mu$ 是中心、$\sigma^2$ 是方差）。设方差已知为 1、只估中心 $\theta$：$p_\theta(x)=\frac{1}{\sqrt{2\pi}}\exp\!\big(-\frac12(x-\theta)^2\big)$。`,
       { t: 'math', tex: T`L(\theta)=-\frac n2\log(2\pi)-\frac12\sum_i(x_i-\theta)^2,\qquad \frac{dL}{d\theta}=\sum_i(x_i-\theta)=0\ \Rightarrow\ \hat\theta=\frac1n\sum_ix_i` },
-      T`求导细节：第一项是常数，导数 0；$-\frac12(x_i-\theta)^2$ 对 $\theta$ 求导用链式法则：$-\frac12\cdot2(x_i-\theta)\cdot(-1)=(x_i-\theta)$。令 $\sum_i(x_i-\theta)=0$ 即 $\sum_ix_i=n\theta$。**这一步的意义**：最大化 Gaussian 似然 ⇔ 最小化 $\sum_i(x_i-\theta)^2$（平方误差）——c11 会看到线性回归的 least squares 就是 Gaussian 噪声下的 MLE。`,
+      T`取 log：每个样本贡献 $\log\frac{1}{\sqrt{2\pi}}=-\frac12\log(2\pi)$，以及由 $\log e^{z}=z$ 得到的 $-\frac12(x_i-\theta)^2$，$n$ 个相加得上式。求导：第一项是常数，导数 0；$-\frac12(x_i-\theta)^2$ 用链式法则得 $-\frac12\cdot2(x_i-\theta)\cdot(-1)=(x_i-\theta)$，令 $\sum_i(x_i-\theta)=0$ 即 $\sum_ix_i=n\theta$。**这一步的意义**：最大化 Gaussian 似然 ⇔ 最小化 $\sum_i(x_i-\theta)^2$（平方误差）——c11 会看到线性回归的 least squares 就是 Gaussian 噪声下的 MLE。`,
       { t: 'h3', text: '⑤ 归纳成四步（L02 p14）' },
       { t: 'steps', items: [
         T`假设数据由 $p_\theta$ 生成（选模型）。`,
         T`写出似然 $\prod_ip_\theta(x_i)$，通常取 log：$L(\theta)=\sum_i\log p_\theta(x_i)$。`,
         T`对 $\theta$ 求导，令其为 0。`,
-        T`解析求解；解不出就用数值迭代（对负对数似然 $-L$ 做梯度**下降**，等价于对 $L$ 做梯度上升，第 13 章）。严谨时检查二阶导 < 0 确认是最大值。`,
+        T`解析求解（直接解出公式，如 $k/n$）；解不出就用数值迭代：梯度下降（gradient descent）从一个初始 $\theta$ 出发，每次沿让 $-L$ 变小的方向走一小步，直到导数接近 0（c13 详讲）。严谨时检查二阶导 < 0 确认是最大值。`,
       ] },
       T`**为什么取 log？**（L02 p14 问 "why?"）① log 单调递增，最大值点不变；② 连乘变连加，求导容易得多；③ 很多小于 1 的数连乘会 [[underflow]]（数值下溢成 0），连加不会。`,
     ],
@@ -870,8 +870,7 @@
       T`往年卷 T7（CPT 的 MLE）几乎每年出现，而它就是本章 Bernoulli MLE 的推广："事件发生次数 ÷ 条件成立次数"。`,
     ],
     intuition: [
-      T`**挑一个最能"解释"数据的参数。** 就是 ① 那张表的想法：每个候选 $\theta$ 都是一种"世界的样子"，看在哪种世界里你的观测最不奇怪。`,
-      T`**为什么"求导 = 0"？** 光滑函数在内部最大值点导数为 0。求不出解析解时（如 logistic），就用 gradient descent 数值地找（L02 p14 "failing that, use gradient descent"）。`,
+      T`**挑一个最能"解释"数据的参数。** 每个候选 $\theta$ 都是一种"世界的样子"，看在哪种世界里你的观测最不奇怪。求不出"导数 = 0"的解析解时（如 logistic），就用 gradient descent 数值地找。`,
       { t: 'think', q: '抛 3 次硬币全是正面，Bernoulli 的 MLE 是多少？你觉得这个估计合理吗？', a: T`$\hat\theta=3/3=1$：MLE 断定"永远不会出反面"。数据太少时 MLE 会过度自信——c08 的 MAP 用先验来缓和这个问题。` },
       { t: 'story', title: 'likelihood 是特意和 probability 分开的', md: 'R. A. Fisher 在 1912 年提出"最大化联合密度"的准则，1921–1922 年（"On the mathematical foundations of theoretical statistics"）才把英文里本来就有的 **likelihood** 一词定为术语，用来强调：把数据固定、看参数的函数，不是参数的概率分布。这正是本章"常见误区"第一条。' },
     ],
@@ -1005,10 +1004,10 @@
       T`c06 回答的是"哪个参数让数据最可能"，没说**猜错了要付多少代价**。这一章换个问题：做一个决定（给出一个预测），平均要付多少代价？先看两个能算的代价：真值是 2、你猜 2.5，平方损失（square loss）是 $(2.5-2)^2=0.25$；分类猜错一次，0-1 loss 记 1、猜对记 0。`,
       T`**Statistical decision theory（统计决策论）**（L02 p16–p17）把这件事拆成四个零件：`,
       { t: 'ul', items: [
-        T`**[[Decision rule]]** $\delta(\bx)\in\mathcal A$：看到数据后做出的决定。可以是一个参数估计 $\hat\theta$，也可以是对新样本的预测 $\hat Y_{n+1}$。`,
-        T`**Action space** $\mathcal A$：所有可选的决定。`,
+        T`**[[Decision rule]]** $\delta(\bx)\in\mathcal A$：看到数据后做出的决定。可以是一个参数估计 $\hat\theta$，也可以是对第 $n+1$ 个（新）样本标签的预测 $\hat Y_{n+1}$。`,
+        T`**Action space** $\mathcal A$：所有可选的决定。例：估计硬币正面概率时 $\mathcal A=[0,1]$；判断一封邮件时 $\mathcal A$ = {spam，正常}。`,
         T`**[[Loss function]]** $l(\delta,X)$：这个决定有多糟。例如 **square loss** $l(\hat\theta,x)=(\hat\theta-x)^2$，**0-1 loss** $l(\hat y,y)=\mathbb I(\hat y\ne y)$（$\mathbb I$ 是 [[indicator function]]，预测错就记 1）。`,
-        T`**[[Risk]]**（L02 p18）：期望损失 $R_\theta(\delta)=E_{(X,Y)\sim\theta}\big[l(\delta(X),Y)\big]$。下标 $(X,Y)\sim\theta$ 的意思是：对"从真实分布（参数 $\theta$）里抽出来的新数据"求平均。`,
+        T`**[[Risk]]**（L02 p18）：期望损失 $R_\theta(\delta)=E_{(X,Y)\sim\theta}\big[l(\delta(X),Y)\big]$。$X$ 是输入（如一封邮件），$Y$ 是它的真实答案（标签）；下标 $(X,Y)\sim\theta$ 的意思是：对「从真实分布（参数 $\theta$）里抽出来的新数据」求平均。例：分类器在 0-1 loss 下的 risk 就是它在无穷多新样本上的错误率，即真实测试误差（true test error），又叫泛化误差（generalization error）。`,
       ] },
       T`目标：选 $\delta$ 使 risk 最小。**但不能直接做**——risk 是对真实分布 $\theta$ 求期望，而 $\theta$ 未知（L02 p18 "Can't directly! Why?"）。`,
       T`**Empirical Risk Minimisation (ERM)**：用训练数据的平均损失近似 risk：`,
@@ -1027,7 +1026,7 @@
     ],
     intuition: [
       T`**Risk = 在所有可能的未来数据上的平均代价。** 我们没法看到所有未来数据，只能看训练集。训练集足够大、和未来同分布时，平均损失接近期望损失（大数定律）——这是 ERM 的合理性。`,
-      T`**MSE 分解的直觉**：估计量的误差有两个来源——瞄偏了（bias）和手抖（variance）。平方损失恰好把它们**干净地拆开相加**，没有交叉项。`,
+      T`**MSE 分解的直觉**：估计量的 MSE（mean squared error，均方误差）是「估计值离真值的距离平方」在所有可能数据集上的平均 $E_\theta[(\theta-\hat\theta)^2]$，也就是平方损失下估计量的 risk。它的误差有两个来源——瞄偏了（bias）和手抖（variance），平方损失恰好把它们干净地拆开相加，没有交叉项。`,
       T`**一个反直觉的结论**：有偏估计量可以比无偏估计量的 MSE 更小——只要它减少的 variance 比增加的 bias² 多。这正是正则化（ridge，c16）"故意引入偏差"的道理。`,
       { t: 'think', q: '一个模型在训练集上 empirical risk = 0（全对）。它的真实 risk 一定很小吗？', a: '不一定。它可能把训练集"背"下来了（overfitting），在新数据上表现很差。经验风险和真实风险之间的差距就是 W3 的泛化理论（c18、c20、c21）要回答的问题。' },
       { t: 'story', title: '名字的来历', md: '把统计推断看成"在不确定下做决策、最小化期望损失"的框架，由 Abraham Wald 在 1939–1950 年间建立（*Statistical Decision Functions*, 1950）。"empirical risk minimisation" 这个名称则来自 Vapnik 的统计学习理论——也就是 W3–W4 泛化界、VC 维的那套理论。' },
@@ -1038,7 +1037,7 @@
       { t: 'math', tex: T`E_\theta\big[(\theta-\hat\theta)^2\big]=\big[B(\hat\theta)\big]^2+\mathrm{Var}_\theta(\hat\theta)` },
       T`推导：记 $m=E[\hat\theta]$，在中间加减 $m$：`,
       { t: 'math', tex: T`\begin{aligned}E[(\theta-\hat\theta)^2]&=E\big[\big((\theta-m)+(m-\hat\theta)\big)^2\big]\\&=(\theta-m)^2+2(\theta-m)\underbrace{E[m-\hat\theta]}_{=0}+E[(m-\hat\theta)^2]\\&=B(\hat\theta)^2+\mathrm{Var}(\hat\theta)\end{aligned}` },
-      T`交叉项：$\theta-m$ 是常数，可以提到期望外面（c01 的规则 $E[cX]=cE[X]$），剩下 $E[m-\hat\theta]=m-E[\hat\theta]=m-m=0$。所以只剩两项。`,
+      T`第二行：展开 $(a+b)^2=a^2+2ab+b^2$（$a=\theta-m$ 是常数，$b=m-\hat\theta$）再逐项求期望；交叉项里常数 $\theta-m$ 提到期望外面（c01 的 $E[cX]=cE[X]$），剩下 $E[m-\hat\theta]=m-E[\hat\theta]=m-m=0$。第三行：$(\theta-m)^2=(m-\theta)^2=B(\hat\theta)^2$，而 $E[(m-\hat\theta)^2]=E[(\hat\theta-E[\hat\theta])^2]$ 正是 c05 的方差定义。`,
       { t: 'note', title: '和 c19 的关系', md: T`这里分解的是**参数估计**的误差（L02 p19）。c19（L05 p29–p40）分解的是**预测**的期望平方误差，多一项不可约噪声：$\text{bias}^2+\text{variance}+\text{noise}$。推导思路完全相同。` },
     ],
     fx: [
@@ -1200,7 +1199,7 @@
         ],
       },
       T`数据少时两人结论差很多，prior 说了算；数据一多，两人得到同一个答案，prior 被数据"冲掉"了。所以 prior 的作用是**在数据不够时给一个合理的起点**，数据够了它就不重要。c17 会看到，ridge 回归里那个惩罚项其实就是一个 prior：它看起来同样"凭空"，但能防止数据少时过拟合。`,
-      T`**数据很多时，Bayesian 的结论会和 MLE 几乎一样。** 用 c51 的 Beta(2,2) 先验（偏向公平硬币），正面比例都是 70%：`,
+      T`**数据很多时，Bayesian 的结论会和 MLE 几乎一样。** 下面的先验 Beta(2,2) 是 $[0,1]$ 上中间高、两头低的一条曲线，表示「偏向公平硬币」（本章数学部分详讲）；后验均值 = 按后验可信度给每个 $\theta$ 加权求平均。正面比例都是 70%：`,
       {
         t: 'table', head: ['抛的次数', 'MLE', '后验均值', '后验的标准差（有多不确定）'], rows: [
           ['10', '0.7', '0.643', '0.124'],
@@ -1208,13 +1207,13 @@
           ['10000', '0.7', '0.6999', '0.0046'],
         ],
       },
-      T`那还要 Bayesian 干什么？两个原因。第一，数据少的时候它更靠谱，而实际问题里"数据少"很常见：参数一多，平均到每个参数头上的数据就少了（神经网络常常参数比样本还多），每个新病人、新用户、新老虎机臂刚开始也只有几条数据。第二，它除了给一个数，还给出"有多不确定"。后验是一整条曲线，标准差就是曲线的宽度：粗略按"均值 ± 2 个标准差"，抛 10 次时真实的 $\theta$ 大致在 0.40 到 0.89 之间（只是猜个大概），抛 10000 次时大致在 0.691 到 0.709 之间（几乎确定）。MLE 两次都只说 0.7，分不出这两种情况。c50 的 Bayesian 线性回归和 c48 的 UCB 用的都是这份"不确定"。`,
+      T`那还要 Bayesian 干什么？第一，数据少时它更靠谱，而实际问题里数据少很常见（参数比样本多、新用户刚开始只有几条记录）。第二，它还给出「有多不确定」：按「均值 ± 2 个标准差」，抛 10 次时 $\theta$ 大致在 0.40 到 0.89 之间，抛 10000 次时在 0.691 到 0.709 之间，而 MLE 两次都只说 0.7，分不出这两种情况。`,
       { t: 'h3', text: '② Bayes 公式把它们连起来（L02 p22）' },
       { t: 'math', tex: T`P(\theta\mid X=x)=\frac{P(X=x\mid\theta)\,P(\theta)}{P(X=x)}=\frac{P(X=x\mid\theta)\,P(\theta)}{\sum_tP(X=x\mid\theta=t)P(\theta=t)}` },
       T`对照上表：分子 = 第 4 列（先验 × 似然），分母 = 第 4 列的总和。连续参数时 $\theta$ 有无穷多个取值，列不出表，分母的求和换成积分 $P(X=x)=\int P(X=x\mid\theta)P(\theta)\,d\theta$。`,
       { t: 'h3', text: '③ 课件例子：Gaussian 先验 + 一个观测（L02 p23–p24）' },
       T`课件的例子里 $\theta$ 可以是任意实数，就是这种列不出表的情况。好在先验和噪声都是 Gaussian（正态）时不用真的去积分：两个钟形相乘还是钟形，把指数**配方**就能读出后验的中心和宽度。看不懂配方可以先记结论：后验是 $\mathcal N(0.5,0.5)$，中心夹在先验中心 0 和数据 1 的正中间。`,
-      T`先验 $\theta\sim\mathcal N(0,1)$，似然 $X\mid\theta\sim\mathcal N(\theta,1)$，观测 $X=1$：`,
+      T`先验 $\theta\sim\mathcal N(0,1)$，似然 $X\mid\theta\sim\mathcal N(\theta,1)$，观测 $X=1$。代入 Gaussian 密度：似然 $P(X=1\mid\theta)=\frac1{\sqrt{2\pi}}\exp\!\big(-\frac{(1-\theta)^2}{2}\big)$（均值 $\theta$、方差 1 的钟形在 $x=1$ 处的高度），先验 $P(\theta)=\frac1{\sqrt{2\pi}}\exp\!\big(-\frac{\theta^2}{2}\big)$。后验 ∝ 两者相乘：`,
       { t: 'math', tex: T`\begin{aligned}P(\theta\mid X=1)&\propto\exp\Big(-\frac{(1-\theta)^2}{2}\Big)\exp\Big(-\frac{\theta^2}{2}\Big)=\exp\Big(-\frac{2\theta^2-2\theta+1}{2}\Big)\\&=\exp\Big(-\frac{\theta^2-\theta+\frac12}{2\times\frac12}\Big)=\exp\Big(-\frac{(\theta-\frac12)^2+\frac14}{2\times\frac12}\Big)\propto\exp\Big(-\frac{(\theta-\frac12)^2}{2\times\frac12}\Big)\end{aligned}` },
       T`最后一个式子正是均值 $\frac12$、方差 $\frac12$ 的 Gaussian 核（$\propto$ 读作 [[正比于|Proportional to]]） ⇒ $\theta\mid X=1\sim\mathcal N(0.5,0.5)$。关键技巧是**配方（[[completing the square]]）**，并把与 $\theta$ 无关的常数全部扔进 $\propto$。上面一行压缩了好几步，逐步拆开：`,
       { t: 'steps', items: [
@@ -1234,8 +1233,8 @@
       { t: 'slide', src: 'L02/p25', caption: 'L02 p25：蓝线是整条后验分布 P(θ|X)，虚线标出的 θ_MAP 是曲线的最高点；后验均值是整条曲线按概率加权的「重心」。曲线不对称时重心就不在峰上，所以 MAP ≠ 后验均值。这张图右边拖着长尾，重心在峰的右边；本页 Beta(9,5) 的例子正好反过来，左边尾巴更长，所以均值 0.643 在峰 0.667 的左边。' },
       { t: 'h3', text: '⑤ MAP 和 MLE 的关系（L02 p26）' },
       { t: 'math', tex: T`\hat\theta_{\text{MAP}}=\argmax_\theta P(\theta\mid X=x)=\argmax_\theta\frac{P(X=x\mid\theta)P(\theta)}{P(X=x)}=\argmax_\theta P(X=x\mid\theta)\,P(\theta)` },
-      T`取 log：$\argmax_\theta\big[\underbrace{\log P(X\mid\theta)}_{\text{MLE 的目标}}+\underbrace{\log P(\theta)}_{\text{先验 = 正则项}}\big]$。若 $P(\theta)\propto1$，第二项是常数 ⇒ $\hat\theta_{\text{MAP}}=\hat\theta_{\text{MLE}}$。`,
-      T`**均匀先验 ⇒ MAP = MLE**（L02 p26）：先验处处相等时，乘上它不改变 argmax。所以 MLE 可以看成"没有先验偏好的 MAP"。`,
+      T`第二个等号扔掉了分母 $P(X=x)$：它与 $\theta$ 无关，除以同一个正数不改变最高点的位置，所以求 MAP 不用算 evidence。再取 log：$\argmax_\theta\big[\underbrace{\log P(X\mid\theta)}_{\text{MLE 的目标}}+\underbrace{\log P(\theta)}_{\text{先验 = 正则项}}\big]$，第二项把 $\theta$ 往先验偏好的值拉，作用就是 c17 的正则项（regulariser）。`,
+      T`**均匀先验 ⇒ MAP = MLE**：$P(\theta)\propto1$ 时第二项是常数，不改变 argmax，所以 MLE 就是「没有先验偏好的 MAP」。`,
     ],
     why: [
       { t: 'ul', items: [
@@ -1260,9 +1259,9 @@
       ] },
       { t: 'h3', text: 'Beta–Bernoulli（WK02，T9 的主力题）' },
       T`上面的 Gaussian 先验允许 $\theta$ 取任意实数。但硬币的 $\theta$ 是概率，只能在 0 和 1 之间。**Beta distribution（贝塔分布）** 就是放在 $[0,1]$ 上的分布：$a$、$b$ 可以理解成"还没抛之前，假想已经看过 $a-1$ 次正面、$b-1$ 次反面"。真的抛了 $n$ 次、$k$ 次正面，后验只要把次数加上去，仍然是 Beta：`,
-      T`先验 $\theta\sim\mathrm{Beta}(a,b)\propto\theta^{a-1}(1-\theta)^{b-1}$，$n$ 次中 $k$ 次正面：`,
+      T`先验 $\theta\sim\mathrm{Beta}(a,b)\propto\theta^{a-1}(1-\theta)^{b-1}$，$n$ 次中 $k$ 次正面的似然是 $\theta^k(1-\theta)^{n-k}$（c06）。后验 ∝ 两者相乘 $=\theta^{(a+k)-1}(1-\theta)^{(b+n-k)-1}$，指数相加后正是下面这个 Beta 的形状：`,
       { t: 'math', tex: T`\theta\mid D\sim\mathrm{Beta}(a+k,\ b+n-k),\qquad \hat\theta_{\text{MAP}}=\frac{k+a-1}{n+a+b-2},\qquad E[\theta\mid D]=\frac{k+a}{n+a+b}` },
-      T`（MAP 公式要求后验参数 $a+k>1$ 且 $b+n-k>1$，这时后验在内部有唯一峰；考试题的数字一般满足。）$a=b=1$ 是均匀先验 ⇒ $\hat\theta_{\text{MAP}}=k/n=\hat\theta_{\text{MLE}}$。这种"后验和先验同一家族"的先验叫 **[[conjugate prior]]**（c51 详讲）。[[Beta distribution|Beta distribution]] 是 $[0,1]$ 上的分布，$a,b$ 像"先验里假想看过的正面、反面次数"。`,
+      T`（MAP 公式要求后验参数 $a+k>1$ 且 $b+n-k>1$，这时后验在内部有唯一峰；考试题的数字一般满足。）MAP 的来历：对 log 后验 $(a+k-1)\log\theta+(b+n-k-1)\log(1-\theta)$ 求导令为 0，和 c06 推 $k/n$ 一模一样，结果相当于多看了 $a-1$ 次正面、$b-1$ 次反面。$a=b=1$ 是均匀先验 ⇒ $\hat\theta_{\text{MAP}}=k/n=\hat\theta_{\text{MLE}}$。这种「后验和先验同一家族」的先验叫 **[[conjugate prior]]**（c51 详讲）。`,
     ],
     fx: [
       {
@@ -1392,7 +1391,7 @@
     what: [
       { t: 'h3', text: '尺子 1：parametric vs non-parametric（L02 p29）' },
       { t: 'fig', src: 'reference/pages/L02/p29.jpg', caption: 'L02 p29', w: 520 },
-      T`**Parametric**：模型由**固定、有限**个参数决定，与数据量无关（如线性回归有 $d+1$ 个权重）。**Non-parametric**：参数个数**随数据增长**，可能无限。`,
+      T`Parametric（参数化）：模型由固定、有限个参数决定，与数据量无关（如线性回归只存 $d+1$ 个权重，$d$ 是特征个数）。Non-parametric（非参数化）：参数个数随数据增长，可能无限（如 [[kNN]]：预测新点时找训练集里离它最近的 $k$ 个点、按它们多数的类别投票，所以必须一直存着全部训练数据）。`,
       { t: 'h3', text: '尺子 2：generative vs discriminative（L02 p30）' },
       T`第一把尺子只问"要记的参数会不会随数据变多"，没问模型**学的是什么**。监督学习里，想对新的 $X$ 预测 $Y$，最终要的是 $P(Y\mid X)$。有两条路能走到它，下面用同一批数据把两条路都走一遍。`,
       {
@@ -1402,7 +1401,7 @@
           ['合计', '250', '750', '1000'],
         ],
       },
-      T`**生成式：按行看，先学"每一类邮件长什么样"。** spam 占 $300/1000=0.3$；spam 里含 "free" 的占 $180/300=0.6$；正常邮件里占 $70/700=0.1$。学到的是 $P(Y)$ 和 $P(X\mid Y)$，也就是"每一类的数据是怎么产生的"。预测时用 Bayes 反推：$\frac{0.3\times0.6}{0.3\times0.6+0.7\times0.1}=\frac{0.18}{0.25}=0.72$。`,
+      T`**生成式：按行看，先学"每一类邮件长什么样"。** spam 占 $300/1000=0.3$（正常邮件占 $0.7$）；spam 里含 "free" 的占 $180/300=0.6$；正常邮件里占 $70/700=0.1$。学到的是 $P(Y)$ 和 $P(X\mid Y)$，也就是"每一类的数据是怎么产生的"。预测时用 Bayes 反推：$\frac{0.3\times0.6}{0.3\times0.6+0.7\times0.1}=\frac{0.18}{0.25}=0.72$。`,
       T`**判别式：按列看，直接学"看到这个特征时是哪一类"。** 含 "free" 的 250 封里 spam 有 180 封，$180/250=0.72$；不含的 750 封里 spam 有 120 封，$120/750=0.16$。学到的直接就是 $P(Y\mid X)$，不需要知道每一类邮件长什么样，也不用 Bayes。`,
       T`两条路答案一样（只有一个特征、数据完整时总是一样），区别在**学到的东西不同**：`,
       {
@@ -1428,7 +1427,7 @@
         ['**Discriminative**', '线性回归、logistic regression（c15）、perceptron、固定结构的神经网络', '[[kNN]]、RBF kernel 这类无限维 kernel 方法（第 29–30 章）'],
         ['**Generative**', '[[Naive Bayes]]、Beta–Bernoulli 模型（c51）、Bayesian network 的 CPT（c53）', '（本课不重点讨论）'],
       ] },
-      { t: 'note', title: '说明', md: '表中例子来自课程后面的讲次（L19 p10 明确对比了 logistic regression 与 Naïve Bayes），L02 本身只说 "examples to come"。RBF kernel 的特征空间是无限维，模型只能通过\"每个训练点一个系数\"来表示，系数个数随 $n$ 增长，所以算 non-parametric；线性核、固定次数多项式核的特征空间有限维，仍是 parametric。' },
+      { t: 'note', title: '说明', md: 'RBF kernel（第 29 章）的特征空间是无限维，模型只能用「每个训练点一个系数」来表示，系数个数随 $n$ 增长，所以算 non-parametric；线性核、固定次数多项式核的特征空间有限维，仍是 parametric。' },
     ],
     intuition: [
       T`**L01 p13 的三种模型**正好对应这里：`,
@@ -1441,7 +1440,7 @@
     math: [
       { t: 'h3', text: '生成式分类器怎么预测' },
       { t: 'math', tex: T`\hat y=\argmax_y P(\bx,y)=\argmax_y P(y)\,P(\bx\mid y),\qquad P(y\mid\bx)=\frac{P(y)P(\bx\mid y)}{\sum_{y'}P(y')P(\bx\mid y')}` },
-      T`对比判别式：直接给出 $P(y\mid\bx)$，例如 logistic regression $P(y=1\mid\bx)=\sigma(\bw'\bx)$，其中 $\sigma(z)=\frac{1}{1+e^{-z}}$ 是 [[sigmoid]] 函数，把超平面的"带符号距离" $\bw'\bx$ 压成 0 到 1 之间的概率（第 15 章详讲）。`,
+      T`对比判别式：直接给出 $P(y\mid\bx)$，例如 logistic regression $P(y=1\mid\bx)=\sigma(\bw'\bx)$，其中 $\sigma(z)=\frac{1}{1+e^{-z}}$ 是 [[sigmoid]] 函数，把任意实数 $\bw'\bx$（与点到超平面 $\bw'\bx=0$ 的带符号距离成正比）压成 0 到 1 之间的概率（第 15 章详讲）。`,
     ],
     example: [
       { t: 'h3', text: '用生成式模型分类一封邮件' },

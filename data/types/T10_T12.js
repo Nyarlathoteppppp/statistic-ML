@@ -66,7 +66,7 @@
         },
         { t: 'h2', text: '2. 三个公式', id: 'formulas' },
         { t: 'math', tex: T`\delta=\frac{\partial L}{\partial s}=(z-y)\,h'(s)\ \ (=z-y\text{ when }z=s),\qquad \frac{\partial L}{\partial w_j}=\delta\,u_j,\qquad \frac{\partial L}{\partial v_{ij}}=\underbrace{\delta\,w_j\,g'(r_j)}_{\varepsilon_j}\,x_i` },
-        T`五个因子逐项：$\partial L/\partial z=z-y$（$L=\frac12(z-y)^2$，$\frac12$ 就是为了消掉求导出来的 2）；$\partial z/\partial s=h'(s)$，回归时 $h$ 是恒等，这一项是 1——所以 $\delta=z-y$ **只在平方损失 + 恒等输出时成立**；$\partial s/\partial u_j=w_j$（输出层权重）；$\partial u_j/\partial r_j=g'(r_j)$；$\partial r_j/\partial v_{ij}=x_i$。五个相乘就是 $\delta\,w_j\,g'(r_j)\,x_i$。`,
+        T`五个因子逐项：$\partial L/\partial z=z-y$（$L=\frac12(z-y)^2$，$\frac12$ 就是为了消掉求导出来的 2）；$\partial z/\partial s=h'(s)$，回归时 $h$ 是恒等，这一项是 1——所以 $\delta=z-y$ **只在平方损失 + 恒等输出时成立**；$\partial s/\partial u_j=w_j$（$s=\sum_ju_jw_j$ 里只有 $u_jw_j$ 这一项含 $u_j$）；$\partial u_j/\partial r_j=g'(r_j)$；$\partial r_j/\partial v_{ij}=x_i$（同理，$r_j$ 里只有 $x_iv_{ij}$ 含 $v_{ij}$）。五个相乘就是 $\delta\,w_j\,g'(r_j)\,x_i$（前两个合起来是 $\delta$）。$\delta$ 对每个权重都一样，所以先在输出端算一次、再往回传给隐藏层反复用，这就是「反向」传播；逐步演示见 [c34](#/c34)。`,
         T`**记号撞车提醒**：2021 Q13(b) 题目把隐藏层权重叫 $w$；本页和课件把隐藏层权重叫 $v_{ij}$（输入 $i$ → 隐藏单元 $j$），输出层权重叫 $w_j$。所以题目问的 $\partial L/\partial w$ 就是这里的 $\partial L/\partial v_{ij}$；答题时先声明记号，别让两个 $w$ 混在一个式子里。`,
         {
           t: 'past', src: '2021 S1 exam Q13(b)', marks: 6, topic: 'L11 p27–p31',
@@ -85,7 +85,7 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
           ],
         },
         { t: 'h2', text: '3. 数值例子', id: 'example' },
-        '2 个输入（含偏置 $x_0=1$，$x_1=1$），2 个 ReLU 隐藏单元，恒等输出，$y=0$。$V=\\begin{bmatrix}0.5&-0.5\\\\1&1\\end{bmatrix}$（第 $i$ 行是输入 $x_i$ 到各隐藏单元的权重），$\\bw=(w_0,w_1,w_2)=(0,1,-1)$。',
+        '输入是偏置 $x_0=1$ 和 $x_1=1$（所以 $m=1$），2 个 ReLU 隐藏单元，恒等输出，$y=0$。$V=\\begin{bmatrix}0.5&-0.5\\\\1&1\\end{bmatrix}$（第 $i$ 行是输入 $x_i$ 到各隐藏单元的权重），$\\bw=(w_0,w_1,w_2)=(0,1,-1)$。',
         { t: 'graph', r: 20, nodes: { x0: [40, 70], x1: [40, 190], u0: [230, 30], u1: [230, 120], u2: [230, 210], z: [400, 120] }, labels: { x0: 'x₀', x1: 'x₁', u0: 'u₀', u1: 'u₁', u2: 'u₂', z: 'z' }, notes: { x0: '=1（偏置）', x1: '=1', u0: '=1（偏置）', u1: 'u₁=1.5', u2: 'u₂=0.5', z: 'z=1' }, edges: 'x0>u1 x0>u2 x1>u1 x1>u2 u0>z=w₀=0 u1>z=w₁=1 u2>z=w₂=−1', w: 460, caption: '这道题的网络。输入到隐藏层的权重（矩阵 $V$ 只是把它们排成表：行 = 哪个输入，列 = 哪个隐藏单元）：$x_0\\to u_1$：0.5，$x_0\\to u_2$：−0.5，$x_1\\to u_1$：1，$x_1\\to u_2$：1。节点旁是前向算出的值。' },
         {
           t: 'steps', items: [
@@ -95,7 +95,7 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
             '隐藏层：ReLU 在正数处导数为 1，$\\varepsilon_1=\\delta\\cdot w_1\\cdot g\'(r_1)=1\\cdot1\\cdot1=1$，$\\varepsilon_2=1\\cdot(-1)\\cdot1=-1$；$\\partial L/\\partial v_{ij}=\\varepsilon_jx_i$。梯度矩阵和 $V$ 同形状（行 = 输入 $x_0,x_1$，列 = $u_1,u_2$）：$x_0=x_1=1$，所以 $\\begin{bmatrix}1&-1\\\\1&-1\\end{bmatrix}$。',
           ],
         },
-        { t: 'note', md: '这些数字由 `js/core/backprop.js` 计算，并与 L11 p28–p31 的公式逐项核对过。' },
+        
 
         { t: 'h2', text: '4. 真题全解：卷积 + global max pooling 的反传', id: 'cnn-max' },
         T`2022 S1 Q5（14 分）考的是一个缩到最小的 CNN（卷积神经网络，convolutional neural network）：一个 $2\times2$ 的 filter（滤波器）在 $3\times3$ 的图上滑，得到 $2\times2$ 的特征图，再取全局最大值（global max pooling）作为输出。前向就是 [T3](#/T03) 的卷积手算；反向要用两件事：max 的次梯度（sub-gradient，[c39](#/c39)，L13 p23）和权重共享（weight sharing）。`,
@@ -126,7 +126,7 @@ where $\delta=\partial L/\partial s$ (e.g. $z-y$ for squared loss with identity 
               ],
             },
             { t: 'math', tex: T`y=\max\big(h_{1,1},h_{1,2},h_{2,1},h_{2,2}\big)=\max_{i,j\in\{1,2\}}\Big(\sum_{a=1}^{2}\sum_{c=1}^{2}w_{a,c}\,x_{i+a-1,\,j+c-1}+b\Big)` },
-            T`下标的意思：$(i,j)$ 是窗口左上角在图上的位置，$(a,c)$ 是 filter 里的位置，所以 filter 的 $(a,c)$ 格乘的是图上的 $(i+a-1,\ j+c-1)$ 格。这和 L13 p11 的写法一样，都不翻转 kernel（kernel 就是 filter，两种叫法）。题目没有提激活函数，所以不加；如果 pooling 前有 ReLU 之类的单调激活 $\phi$，赢家位置不变，第 2 问的梯度多乘一个 $\phi'(h_{i^*,j^*})$。`,
+            T`下标的意思：$(i,j)$ 是窗口左上角在图上的位置，$(a,c)$ 是 filter 里的位置，所以 filter 的 $(a,c)$ 格乘的是图上的 $(i+a-1,\ j+c-1)$ 格。题目没有提激活函数，所以不加；如果 pooling 前有 ReLU 之类的单调激活 $\phi$，赢家位置不变，第 2 问的梯度多乘一个 $\phi'(h_{i^*,j^*})$。`,
             { t: 'h4', text: '第 2 问：反向传播' },
             T`设输出端的 loss 梯度为 $\delta=\partial L/\partial y$（本节 $y$ 指网络输出，目标值改用 $t$；第 1–3 节的 $y$ 是目标值，那里的 $\delta=\partial L/\partial s$，两者不是同一个量）。例如平方损失 $L=\frac12(y-t)^2$（$t$ 是目标值）时，$\delta=y-t$。`,
             T`**① 穿过 max pooling。** max 不是处处可导，用 sub-gradient：前向时记下赢家 $(i^*,j^*)=\arg\max_{i,j}h_{i,j}$，规定 $\frac{\partial y}{\partial h_{i,j}}=1$ 若 $(i,j)=(i^*,j^*)$，否则为 0。所以 $\frac{\partial L}{\partial h_{i^*,j^*}}=\delta$，另外三格的梯度是 0：没赢的格子稍微变一点，$y$ 不会变。`,
@@ -243,12 +243,12 @@ where $\eta>0$ is the learning rate (a parameter we introduce). With $\eta=0.1$:
       chips: [{ text: 'L16', href: '#/L16', cls: 'src' }, { text: 'L06 p17', href: '#/L06', cls: 'src' }, { text: 'L07 p31', href: '#/L07', cls: 'src' }],
       lead: '往年卷没直接考计算，但简答可能问"这个界说明了什么"。会代数、会解释每一项就够了。',
       blocks: [
-        '符号：每一行的「界」（bound）都是**上界**——最坏情况下也不会超过的值。前四行的 $n$ 是**专家个数**，$M$ 是学习者犯错次数，$m$ 是最好专家的犯错次数；第 4 行改用损失（每轮在 $[0,1]$ 内）：$L$ 是学习者的期望总损失，$L^*$ 是最好专家的总损失，$L-L^*$ 叫 regret（遗憾）。后两行的 $n$ 是样本个数（不是专家个数）；$R$ 是真实风险（期望测试误差），$\\hat R$ 是训练误差，$|\\mathcal F|$ 是模型类里有几个模型，界以至少 $1-\\delta$ 的概率成立。表格里的 $\\varepsilon$ 是算法自己的参数（题目会给值，如 0.5）；$\\VC$ 是 VC 维（VC dimension，衡量模型类有多复杂的一个数，见 [T1](#/T01)）。',
         T`前四行是四个「专家建议」算法：每轮专家先预测，学习者据此预测，事后才看到对错。Majority 假设存在一个**从不出错**的专家，按剩余专家的多数票预测，猜错的专家直接淘汰；Halving 不假设完美专家，按加权多数票预测，猜错的专家权重减半（不淘汰），所以它的界里多出最好专家的错数 $m$；Weighted majority 和 Halving 一样，只是猜错时权重乘 $1-\varepsilon$；Probabilistic experts 每轮按权重随机抽一个专家来用，衡量的是期望损失。`,
+        '符号：每一行的「界」（bound）都是**上界**——最坏情况下也不会超过的值。前四行的 $n$ 是**专家个数**，$M$ 是学习者犯错次数，$m$ 是最好专家的犯错次数；第 4 行改用损失（每轮在 $[0,1]$ 内）：$L$ 是学习者的期望总损失，$L^*$ 是最好专家的总损失，$L-L^*$ 叫 regret（遗憾）。后两行的 $n$ 是样本个数（不是专家个数）；$R$ 是真实风险（期望测试误差），$\\hat R$ 是训练误差，$|\\mathcal F|$ 是模型类里有几个模型，界以至少 $1-\\delta$ 的概率成立。表格里的 $\\varepsilon$ 是算法自己的参数（题目会给值，如 0.5）；$\\VC$ 是 VC 维（VC dimension，衡量模型类有多复杂的一个数，见 [T1](#/T01)）。',
         {
           t: 'table', head: ['界', '公式', '每一项说明什么'], rows: [
-            ['Majority（完美专家）', '$M\\le\\log_2 n$', '每错一次，存活专家至少减半'],
-            ['Halving', '$M\\le\\frac{m+\\log_2n}{\\log_2(4/3)}$（系数 $1/\\log_2(4/3)\\approx1/0.415\\approx2.41$）', '最好专家错 $m$ 次；专家数只以 $\\log$ 影响'],
+            ['Majority（完美专家）', '$M\\le\\log_2 n$', '每错一次，存活专家至少减半：错 $M$ 次后最多剩 $n/2^M$ 个，而完美专家一直在，所以 $n/2^M\\ge1$，即 $M\\le\\log_2n$'],
+            ['Halving', '$M\\le\\frac{m+\\log_2n}{\\log_2(4/3)}$（系数 $1/\\log_2(4/3)\\approx1/0.415\\approx2.41$）', '学习者每错一次，总权重最多剩原来的 $3/4$，最好专家的权重是 $(1/2)^m$，由 $(1/2)^m\\le n(3/4)^M$ 取 $\\log_2$ 解出；专家数只以 $\\log$ 影响'],
             ['Weighted majority', '$M\\le2(1+\\varepsilon)m+2\\ln n/\\varepsilon$（注意这里是自然对数 $\\ln$，上面两行是 $\\log_2$）', '$\\varepsilon$ 小：$m$ 系数接近 2，但 $\\ln n$ 项变大'],
             ['Probabilistic experts', '$L\\le\\frac{\\ln n}{\\varepsilon}+(1+\\varepsilon)L^*$（自然对数）', '对最好专家的系数降到 $1+\\varepsilon$；$\\frac{\\ln n}{\\varepsilon}$ 不随轮数变，轮数少时界可能比平凡上界（轮数 × 1）还大，例见 [c46](#/c46)'],
             ['有限类泛化', '$R\\le\\hat R+\\sqrt{(\\log|\\mathcal F|+\\log(1/\\delta))/(2n)}$', '模型类大 → 惩罚大；$n$ 大 → 惩罚小'],

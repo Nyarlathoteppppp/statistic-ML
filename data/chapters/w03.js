@@ -61,22 +61,21 @@
       { t: 'math', tex: T`\mathbf X=\begin{bmatrix}3&3&7\\6&6&9\\21&21&79\\34&34&2\end{bmatrix}` },
       T`若某个解是 $(\hat w_1,\hat w_2,\hat w_3)$，那么 $(\hat w_1+\delta,\ \hat w_2-\delta,\ \hat w_3)$ 对任意 $\delta$ 给出**完全一样的预测**（因为 $x_1=x_2$，$(w_1+\delta)x_1+(w_2-\delta)x_2=(w_1+w_2)x_1$）。所以解有无穷多个，"哪个特征更重要"也无从谈起（L05 p6–p8）。`,
       T`更一般地，**multicollinearity（多重共线性）**：某一列是其他列的线性组合 $\mathbf X_{\cdot j}=\sum_{l\ne j}\alpha_l\mathbf X_{\cdot l}$ ⇔ $\mathbf X'\mathbf X$ 有零特征值、$\det=0$、不可逆（L05 p9）。`,
-      T`**问题 2：数据太少**（L05 p10）。只有 1 个点却要拟合斜率和截距两个参数——过这个点的直线有无穷多条。$n<p$ 时同样不可逆（**underdetermined system，欠定方程组**）。`,
+      T`**问题 2：数据太少**（L05 p10）。只有 1 个点却要拟合斜率和截距两个参数——过这个点的直线有无穷多条。一般地，样本数 $n$ 少于参数个数 $p$（$n<p$）时同样不可逆（underdetermined system，欠定方程组：方程比未知数少）。`,
       T`**怎么修**：平谷底上的解都一样好，那就再加一条偏好——**权重越小越好**。在 RSS 上加 $\lambda\|\bw\|_2^2$（$\lambda>0$），相当于叠上一个以原点为中心的碗，把平谷底"翘"成唯一的最低点。代数上：$\mathbf X'\mathbf X$ 的每个特征值都加了 $\lambda$，全部 $\ge\lambda>0$，所以 $\mathbf X'\mathbf X+\lambda\mathbf I$ 一定可逆，闭式解总存在。这就是：`,
       T`**Ridge regression（岭回归）**（L05 p14）：`,
       { t: 'math', tex: T`\hat\bw=\argmin_\bw\ \|\by-\mathbf X\bw\|_2^2+\lambda\|\bw\|_2^2=(\mathbf X'\mathbf X+\lambda\mathbf I)^{-1}\mathbf X'\by,\qquad\lambda>0` },
       T`$\lambda$ 越大，权重越被压向 0。这种"给学习问题加一条额外偏好"的做法有一个总称：`,
-      T`**Regularisation（正则化）**（L05 p3）：给学习问题加入额外信息，用来解决 ill-posed 问题或防止 overfitting。课件列了三个作用：① 数值上：修好"病态"的计算（**ill-conditioning**）；② 统计上：防止 **overfitting（过拟合）**；③ 加入先验知识（**prior knowledge**）。`,
+      T`**Regularisation（正则化）**（L05 p3）：给学习问题加入额外信息，用来解决 ill-posed 问题（不适定：解不唯一，正是上面两种情况）或防止 overfitting（过拟合：把训练数据里的噪声也学进去，换新数据就变差，c18 详讲）。课件列了三个作用：① 数值上：修好 ill-conditioning（病态：解唯一，但数据稍一变动解就变很多，见「数学定义」）；② 统计上：防止 overfitting；③ 加入先验知识（prior knowledge）。`,
     ],
     why: [
       T`L05 讲者反复强调："Regularization is very, very important… you'll see it come again and again"——正则化会以不同形式贯穿后面所有内容：lasso（c17）、多项式过拟合（c18）、SVM 的 $\|\bw\|^2$（c26）、神经网络的 weight decay 和 dropout（c36）。`,
       T`考试角度：*Why does ridge help with collinear features?* 是 T13 的高概率简答题。`,
     ],
     intuition: [
-      T`**平底山谷 vs 碗。** 共线时 RSS 曲面沿着 $w_1+w_2=$ 常数的方向是**平的**（L05 p11：一条水平的谷底）——凸但不严格凸，谷底每一点都是最优。加上 $\lambda\|\bw\|^2$（一个以原点为中心的碗）后，整个曲面在所有方向都向上弯，变成**严格凸**，最低点唯一（L05 p14）。`,
+      T`**平底山谷 vs 碗。** 二次曲面的特征值就是它在对应方向上的弯曲程度，特征值 0 = 那个方向完全平：共线时 RSS 沿 $w_1+w_2=$ 常数的方向是平的（凸但不严格凸，c13），谷底每一点都最优。加上 $\lambda\|\bw\|^2$ 等于给每个方向的弯曲程度都加 $\lambda$，曲面变成严格凸，最低点唯一。`,
       { t: 'slide', src: 'L05/p11', caption: '共线时 RSS 曲面沿 $w_1+w_2=$ 常数的方向是**平的**：图上标 unstable 的那条谷底，整条线上每一点误差都一样，所以最优解不唯一。' },
       { t: 'slide', src: 'L05/p14', caption: T`同一个曲面加上 $\lambda\|\bw\|^2$ 之后变成处处向上弯的碗（标 stable），最低点唯一——这就是「每个特征值加 $\lambda$」的几何含义。` },
-      T`把两页放在一起看：二次曲面的**特征值就是它在这个方向上的弯曲程度**。特征值 0 = 那个方向完全平（像山谷的谷底，沿它走多远误差都不变）；加上 $\lambda\mathbf I$ 等于给每个方向的弯曲程度都加 $\lambda$，最平的方向也变弯了，于是有了唯一的最低点。`,
       T`**特征值加 $\lambda$。** $\mathbf X'\mathbf X$ 是 PSD，特征值 $\ge0$；有 0 就不可逆。$\mathbf X'\mathbf X+\lambda\mathbf I$ 的特征值是原来的每个加 $\lambda$（若 $\bv$ 是 $\mathbf A$ 的特征向量、特征值 $\mu$，则 $(\mathbf A+\lambda\mathbf I)\bv=\mathbf A\bv+\lambda\bv=(\mu+\lambda)\bv$——同一个特征向量，特征值加 $\lambda$），全部 $\ge\lambda>0$ ⇒ 正定 ⇒ 可逆。`,
       { t: 'think', q: T`在克隆特征的例子里，ridge 会怎么在 $w_1$ 和 $w_2$ 之间"分配"？`, a: T`平均分配。因为 $w_1+w_2$ 固定时，$w_1^2+w_2^2$ 在 $w_1=w_2$ 时最小——ridge 惩罚偏好"把权重摊开"。下面例 1 就算出 $w_1=w_2$。` },
       { t: 'story', title: 'Ridge 名字的由来', md: 'Hoerl 和 Kennard 在 1970 年提出 ridge regression，用来处理工程数据里的共线问题。名字来自他们分析时画的"ridge trace"（岭迹）——系数随 $\\lambda$ 变化的曲线。同样的想法在数学里更早就有，叫 Tikhonov 正则化。' },
@@ -115,7 +114,7 @@
       { t: 'steps', items: [
         T`$\mathbf X'\mathbf X=\begin{bmatrix}5&5\\5&5\end{bmatrix}$（两列都是 $(1,2)'$，每格都是 $1^2+2^2=5$），特征值 10 和 0（c04 公式：中点 5、半径 5，$5\pm5$）⇒ 不可逆。两列相同，预测是 $(w_1+w_2)\times(1,2)'$，要等于 $\by=(1,2)'$ 只需 $w_1+w_2=1$——所以最小二乘的解是所有满足 $w_1+w_2=1$ 的点。`,
         T`$\lambda=1$：$\mathbf X'\mathbf X+\mathbf I=\begin{bmatrix}6&5\\5&6\end{bmatrix}$，特征值 11 和 1，可逆。`,
-        T`$(\cdot)^{-1}=\frac1{11}\begin{bmatrix}6&-5\\-5&6\end{bmatrix}$，$\mathbf X'\by=(5,5)'$ ⇒ $\hat\bw=\frac1{11}(30-25,\ -25+30)=(\frac5{11},\frac5{11})\approx(0.455,0.455)$。`,
+        T`求逆（2×2 公式）：行列式 $6\times6-5\times5=11$，主对角对调、副对角变号、再除以 11 ⇒ $(\cdot)^{-1}=\frac1{11}\begin{bmatrix}6&-5\\-5&6\end{bmatrix}$。$\mathbf X'\by=(1\times1+2\times2,\ 1\times1+2\times2)'=(5,5)'$ ⇒ $\hat\bw=\frac1{11}(6\times5-5\times5,\ -5\times5+6\times5)=(\frac5{11},\frac5{11})\approx(0.455,0.455)$。`,
         T`两个克隆特征平分权重；和 $0.909<1$——被往 0 方向压缩了一点。`,
       ] },
       { t: 'h3', text: '例 2：一维看 shrinkage（收缩）' },
@@ -203,7 +202,7 @@
         azh: T`Lasso 的 $L_1$ 惩罚给出稀疏解（sparse solutions）：它把一些权重恰好压成 0，相当于自动做特征选择（feature selection），模型更简单、更好解释（无关特征很多时尤其有用）；岭回归只会把权重往 0 收缩。` },
     ],
     title: 'Lasso、正则化 = MAP', en: 'Lasso, sparsity, and regularisation as MAP',
-    summary: '**Lasso** 用 $L_1$ 惩罚 $\\lambda\\|\\bw\\|_1$，能把一些权重压成**恰好 0**（稀疏 sparse，自动做特征选择）。两种正则化都是 MAP：ridge = Gaussian 先验，lasso = Laplace 先验。这是"第三条路"——Bayesian 视角下的正则化。',
+    summary: '**Lasso** 用 $L_1$ 惩罚 $\\lambda\\|\\bw\\|_1$，能把一些权重压成**恰好 0**（稀疏 sparse，自动做特征选择）。两种正则化都是 MAP：ridge = Gaussian 先验，lasso = Laplace 先验——「加惩罚」和「加先验」是同一件事。',
     prereq: ['c08', 'c16'],
     symbols: [
       [T`$\|\bw\|_1$`, T`$\sum_j|w_j|$，$L_1$ 范数`],
@@ -227,37 +226,37 @@
       T`**Lasso**（Least Absolute Shrinkage and Selection Operator，L05 p17–p18）：`,
       { t: 'math', tex: T`\hat\bw=\argmin_\bw\ \|\by-\mathbf X\bw\|_2^2+\lambda\|\bw\|_1` },
       T`特点：解是**稀疏的（sparse）**——很多权重恰好为 0，相当于自动做了**特征选择（feature selection）**；**没有闭式解**（$|w|$ 在 0 处不可导），要数值优化；适合 $p\gg n$（特征远多于样本）的高维数据。`,
-      T`**约束形式**（L05 p17）：等价地可以写成"在一个范数球里找 RSS 最小的点"：ridge 是 $\min\|\by-\mathbf X\bw\|^2$ s.t. $\|\bw\|_2^2\le t$（圆 / 球），lasso 是 s.t. $\|\bw\|_1\le t$（菱形）。（课件约束里也用 $\lambda$ 表示约束的大小，这里改写成 $t$，以免和惩罚系数 $\lambda$ 混淆。适当选择 $t$ 和 $\lambda$ 两种形式能得到同一个解，但参数之间一般不是一一对应：例如一维 lasso 中所有 $\lambda\ge2\bx'\by$ 都给出 $w=0$。）`,
-      T`**几何：等高线先碰到哪里。** RSS 的等高线是以最小二乘解为中心的椭圆。把椭圆从中心慢慢放大，第一次碰到约束区域的点就是解。圆（$L_2$）是光滑的，碰点一般不在坐标轴上；菱形（$L_1$）有**尖角在坐标轴上**，椭圆往往先碰到尖角 ⇒ 某个坐标恰好为 0（L05 p17，讲者强调）。`,
+      T`**约束形式**（L05 p17）：等价地可以写成"在一个范数球里找 RSS 最小的点"：ridge 是 $\min\|\by-\mathbf X\bw\|^2$ s.t. $\|\bw\|_2^2\le t$（圆 / 球），lasso 是 s.t. $\|\bw\|_1\le t$（菱形）。（课件约束里也用 $\lambda$ 表示约束的大小，这里改写成 $t$，以免和惩罚系数 $\lambda$ 混淆；$t$ 越小约束越紧，相当于 $\lambda$ 越大。）`,
+      T`**几何：等高线先碰到哪里。** RSS 的等高线是「RSS 相同的点」连成的椭圆，中心是最小二乘解，越往外 RSS 越大；所以把椭圆从中心慢慢放大，第一次碰到约束区域的点就是区域内 RSS 最小的点，也就是解。圆（$L_2$）是光滑的，碰点一般不在坐标轴上；菱形（$L_1$：$|w_1|+|w_2|\le t$ 的边界是连接 $(\pm t,0)$、$(0,\pm t)$ 的四条直线，c03）有**尖角在坐标轴上**，椭圆往往先碰到尖角 ⇒ 某个坐标恰好为 0。`,
       { t: 'fig', src: 'reference/pages/L05/p17.jpg', caption: 'L05 p17：左 ridge（圆），右 lasso（菱形）。椭圆是 RSS 等高线，碰到菱形的角 ⇒ $w_1=0$', w: 600 },
       { t: 'video', id: 'ridge-lasso' },
       { t: 'h3', text: '③ 惩罚 = 先验：ridge 是 Gaussian 先验下的 MAP（L05 p15–p16）' },
       T`ridge 和 lasso 的惩罚项看起来是"人为加的"。课件 L05 p15–p19 说明：它们其实就是 c08 的 **MAP（最大后验）**——给 $\bw$ 一个先验，再求后验的众数，log 先验就是惩罚项。先看 ridge：`,
-      T`似然：$y\mid\bx,\bw\sim\mathcal N(\bx'\bw,\sigma^2)$（c11）。先验：$\bw\sim\mathcal N(\mathbf 0,\frac1\lambda\mathbf I)$，即 $p(\bw)\propto\exp(-\frac\lambda2\|\bw\|^2)$。`,
+      T`似然：$y\mid\bx,\bw\sim\mathcal N(\bx'\bw,\sigma^2)$（c11）。先验：$\bw\sim\mathcal N(\mathbf 0,\frac1\lambda\mathbf I)$，即每个 $w_j$ 独立、均值 0、方差 $1/\lambda$；一维 Gaussian 密度 $\propto\exp(-\frac{w_j^2}{2\cdot(1/\lambda)})=\exp(-\frac\lambda2w_j^2)$。各分量独立，密度相乘、指数相加，得 $p(\bw)\propto\exp(-\frac\lambda2\|\bw\|^2)$。`,
       { t: 'steps', items: [
-        T`MAP：$\hat\bw=\argmax_\bw\big[\log p(\by\mid\mathbf X,\bw)+\log p(\bw)\big]$（分母 evidence 与 $\bw$ 无关，c08）。`,
+        T`MAP：后验 $\propto$ 似然 × 先验（分母 evidence 与 $\bw$ 无关，c08）；取 log 把乘积变成相加，且 log 越大原数越大、最大点不变，所以 $\hat\bw=\argmax_\bw\big[\log p(\by\mid\mathbf X,\bw)+\log p(\bw)\big]$。`,
         T`$\log p(\by\mid\mathbf X,\bw)=-\frac{1}{2\sigma^2}\|\by-\mathbf X\bw\|^2+C_1$；$\log p(\bw)=-\frac\lambda2\|\bw\|^2+C_2$。`,
         T`最大化它们的和 ⇔ 最小化 $\frac{1}{2\sigma^2}\|\by-\mathbf X\bw\|^2+\frac\lambda2\|\bw\|^2$。取 $\sigma^2=1$（课件隐含）并乘 2：$\|\by-\mathbf X\bw\|^2+\lambda\|\bw\|^2$——正是 ridge。`,
       ] },
       { t: 'note', title: '课件的简化', md: T`若保留 $\sigma^2$，等效的正则系数是 $\lambda\sigma^2$。课件 p16 省略了 $\sigma^2$（相当于设为 1），p18 的先验也省略了归一化常数和 $\frac12$。考试按课件结论写：**Gaussian prior ⇒ ridge，Laplace prior ⇒ lasso**。` },
       { t: 'h3', text: '④ Lasso 也是 MAP：Laplace 先验（L05 p18）' },
       T`把 Gaussian 先验换成在 0 处有尖角的 **Laplace 先验**，同样的三步就得到 lasso：`,
-      T`$p(\bw)\propto e^{-\alpha\|\bw\|_1}$，取 log 得 $-\alpha\|\bw\|_1$。和 Gaussian 似然 $-\frac{1}{2\sigma^2}\text{RSS}$ 相加后乘 $2\sigma^2$，就是 $\text{RSS}+\lambda\|\bw\|_1$，其中 $\lambda=2\sigma^2\alpha$（课件简写成同一个 $\lambda$，常数因子不影响结论）。为什么稀疏：$\log$ 先验 $-\alpha|w|$ 在 0 处有一个**尖角**（不可导），这个尖角能把最优点"卡"在 $w=0$；Gaussian 的 $-w^2$ 在 0 处是平滑的，没有这个效果。`,
+      T`$p(\bw)\propto e^{-\alpha\|\bw\|_1}$，取 log 得 $-\alpha\|\bw\|_1$。和 Gaussian 似然 $-\frac{1}{2\sigma^2}\text{RSS}$ 相加，取负号再乘 $2\sigma^2$，就是最小化 $\text{RSS}+\lambda\|\bw\|_1$，其中 $\lambda=2\sigma^2\alpha$（课件简写成同一个 $\lambda$，常数因子不影响结论）。`,
       { t: 'slide', src: 'L05/p18', caption: '最后一列就是两种先验的形状：Gaussian 是平滑的钟形，Laplace 在 0 处有一个尖峰。中间两列的圆和菱形是对应的约束区域（前两章已经用过）。' },
-      T`**尖峰为什么等于稀疏。** 先验说的是「离 0 越远越不可能」：高斯先验在 0 附近几乎是平的，把 $w$ 从 0 挪一小步几乎不损失概率，所以数据稍一支持，最优点就挪出去；Laplace 先验在 0 处是尖的，一离开 0 概率就按线性速度掉，代价很大，于是数据不够强时最优点干脆停在 $w=0$。换成导数的说法更直白：ridge 的惩罚在 0 处导数为 0，没有力把 $w$ 推向 0；lasso 的惩罚在 0 处左右导数分别是 $\pm\lambda$，总有一个不小于 $\lambda$ 的力把 $w$ 按在 0 上——数据给出的「拉力」$\bx'\by$ 不够大，就按不动。`
+      T`**尖角为什么等于稀疏。** 在 $w=0$ 处，lasso 惩罚 $\lambda|w|$ 的斜率是 $\pm\lambda$，像一股大小为 $\lambda$ 的力把 $w$ 按在 0 上；ridge 惩罚 $\lambda w^2$ 在 0 处斜率为 0，没有这股力。一维时数据把 $w$ 拉离 0 的力是 RSS 在 $w=0$ 处的斜率大小 $2|\bx'\by|$，只要 $2|\bx'\by|\le\lambda$（即 $|\bx'\by|\le\lambda/2$），解就停在 0——这就是下面软阈值的条件。`
     ],
     why: [
       T`这一章把 W1 的 Bayesian（c08）和 W3 的正则化连起来：**"加惩罚项" ⇔ "加先验"**。这是课程里最常被考的"联系"之一（T13：MLE vs MAP、ridge vs lasso）。`,
       T`稀疏性在实践中很重要：上千个基因里找出与疾病相关的几十个、上万个词里找出关键词——lasso 直接告诉你哪些特征没用（权重为 0）。`,
     ],
     intuition: [
-      T`**一维代数直觉。** 一维时 lasso 的解是"软阈值"：$w=\frac{\text{soft}(\bx'\by,\lambda/2)}{\bx'\bx}$，其中 $\text{soft}(z,c)=\sgn(z)\max(|z|-c,0)$。当 $|\bx'\by|\le\lambda/2$ 时直接为 0；ridge 的 $w=\frac{\bx'\by}{\bx'\bx+\lambda}$ 只是除以更大的数，除非 $\bx'\by$ 本来就是 0，否则不会变成 0。阈值为什么是 $\lambda/2$：一维目标 $\|\by-w\bx\|^2+\lambda|w|$ 对 $w>0$ 求导得 $-2\bx'\by+2w\bx'\bx+\lambda=0$，即 $w=(\bx'\by-\lambda/2)/\bx'\bx$，要 $w>0$ 就需要 $\bx'\by>\lambda/2$。`,
+      T`**一维代数直觉。** 一维时 lasso 的解是"软阈值"：$w=\frac{\text{soft}(\bx'\by,\lambda/2)}{\bx'\bx}$，其中 $\text{soft}(z,c)=\sgn(z)\max(|z|-c,0)$（把 $z$ 往 0 方向减去 $c$，减过头就取 0）。当 $|\bx'\by|\le\lambda/2$ 时直接为 0；ridge 的 $w=\frac{\bx'\by}{\bx'\bx+\lambda}$ 只是除以更大的数，除非 $\bx'\by$ 本来就是 0，否则不会变成 0。阈值为什么是 $\lambda/2$：展开 $\|\by-w\bx\|^2=\by'\by-2w\bx'\by+w^2\bx'\bx$，加上 $\lambda|w|$ 后对 $w>0$ 求导（此时 $|w|=w$，导数为 1）得 $-2\bx'\by+2w\bx'\bx+\lambda=0$，即 $w=(\bx'\by-\lambda/2)/\bx'\bx$，要 $w>0$ 就需要 $\bx'\by>\lambda/2$。`,
       { t: 'think', q: '什么时候选 ridge，什么时候选 lasso？（L05 讲者的建议）', a: '认为所有特征都有贡献、只想让权重别太大、别让某个特征主导 → ridge。想自动扔掉无关特征（特征选择），尤其是特征很多、样本很少（$p\\gg n$）→ lasso。' },
       { t: 'story', title: 'LASSO 这个名字', md: 'Robert Tibshirani 在 1996 年的论文里提出 lasso，名字是 "Least Absolute Shrinkage and Selection Operator" 的缩写，也暗合"套索"——把重要特征套住、其余扔掉。' },
     ],
     math: [
       { t: 'h3', text: '通用写法（L05 p26）' },
-      T`ridge 和 lasso 其实是同一个模板：**数据拟合项 + 一个只看参数、不看数据的惩罚**。下一章（c18）就用它来控制模型复杂度——惩罚太弱，会把噪声也拟合进去；太强，会把有用的权重也压没。所以 $\lambda$ 不能在训练集上挑。`,
+      T`ridge 和 lasso 其实是同一个模板：**数据拟合项 + 一个只看参数、不看数据的惩罚**。下一章（c18）就用它来控制模型复杂度——惩罚太弱，会把噪声也拟合进去；太强，会把有用的权重也压没。$\lambda$ 不能在训练集上挑：惩罚非负，训练目标总在 $\lambda=0$ 时最小，那样就等于不正则化。`,
       { t: 'math', tex: T`\hat{\boldsymbol\theta}\in\argmin_{\boldsymbol\theta\in\Theta}\Big(L(\text{data},\boldsymbol\theta)+\lambda R(\boldsymbol\theta)\Big)` },
       T`$R(\boldsymbol\theta)$ 只依赖参数、不依赖数据。所有正则化方法都是这个模板。`,
     ],
@@ -383,14 +382,13 @@
       T`注意看虚线的**摆动幅度**：它跟着每个点的随机起伏走，而这些起伏是噪声，换一批数据就完全变了。记住这个画面——c19 会给它一个名字：高 variance（方差）。`,
       { t: 'ul', items: [
         T`**Underfitting（欠拟合）**（p22）：用直线 $y=wx+b$ 拟合——模型太简单，抓不住波浪形，训练误差和测试误差都大。`,
-        T`**Overfitting（过拟合）**（p23）：用一条穿过每个点的光滑曲线（非参数平滑）——训练误差为 0，但曲线在点之间乱摆，测试误差极大。`,
+        T`**Overfitting（过拟合）**（p23）：用一条几乎穿过每个点的光滑曲线（非参数平滑：不预设公式形状，曲线跟着数据走，c09）——训练误差接近 0，但曲线在点之间乱摆，测试误差极大。`,
         T`**合适**（p24）：真实函数 $x\sin x$ 抓住了大的波形，忽略点对点的噪声。`,
       ] },
       T`怎么找到"合适"的复杂度？不能看训练误差：模型越复杂，训练误差几乎总是越低，用它来挑次数或 $\lambda$，永远会挑最复杂的。必须留一批**没参与训练**的数据来打分。下面两种做法都是这个思路，而且挑完之后都要用全部数据把选中的模型重新训练一遍：`,
-      T`**两种控制复杂度的方法**：`,
       { t: 'ol', items: [
         T`**显式模型选择（explicit model selection）**（L05 p25）：把训练数据分成 $D_{\text{train}}$ 和 $D_{\text{validate}}$；对每个次数 $d=1,\dots,d_{\max}$ 在 $D_{\text{train}}$ 上训练、在 $D_{\text{validate}}$ 上评估；选验证表现最好的 $\hat d$；最后用**全部**数据重新训练 $f_{\hat d}$。`,
-        T`**正则化（regularisation）**（L05 p26）：直接用一个足够复杂的模型，目标加 $\lambda R(\boldsymbol\theta)$；用验证集 / 交叉验证选 $\hat\lambda$；再用全部数据拟合。`,
+        T`**正则化（regularisation）**（L05 p26）：直接用一个足够复杂的模型，目标加 $\lambda R(\boldsymbol\theta)$；用验证集或交叉验证选 $\hat\lambda$；再用全部数据拟合。$\lambda$ 这种训练前定好、不由训练学出来的数叫超参数（hyperparameter）。交叉验证（cross-validation）：把训练数据分成 $k$ 份，轮流留 1 份做验证、其余 $k-1$ 份训练，取 $k$ 次验证误差的平均（详见 [c43](#/c43)）。`,
       ] },
     ],
     why: [
@@ -406,11 +404,11 @@
       { t: 'h3', text: 'Bishop 的例子（L05 p27）' },
       T`10 个点来自 $\sin(2\pi x)$ 加噪声，模型是 9 次多项式 $\hat f=\sum_{j=0}^9w_jx^j$，加 $\lambda\|\bw\|_2^2$：`,
       { t: 'table', head: ['$\\ln\\lambda$', '曲线', '诊断'], rows: [
-        ['$-\\infty$（$\\lambda=0$）', '穿过每个点、剧烈振荡', 'overfit'],
+        ['$-\\infty$（$\\lambda=0$）', '剧烈振荡，跟着噪声走', 'overfit'],
         ['$-18$', '平滑地贴近 $\\sin$', '合适'],
         ['$0$', '几乎压成水平线', 'underfit'],
       ] },
-      T`误差曲线：训练 $E_{\text{RMS}}$ 随 $\lambda$ 增大而单调上升；测试 $E_{\text{RMS}}$ 先降后升，在 $\ln\lambda\approx-18$ 附近最小。`,
+      T`误差曲线：训练 $E_{\text{RMS}}$ 随 $\lambda$ 增大而单调上升；测试 $E_{\text{RMS}}$ 先降后升——$\lambda$ 太小过拟合、太大欠拟合，最低点在中间某个 $\lambda$。`,
       { t: 'h3', text: '训练 vs 测试误差（L05 p39）' },
       T`横轴从简单到复杂：训练误差单调下降趋于 0；测试误差呈 **U 形**。左边是 underfit 区，右边是 overfit 区，最低点是最佳复杂度。`,
       { t: 'slide', src: 'L05/p39', caption: '两条线的形状就是全章重点：Training error 一路单调下降，Test error 先降后升。最低点左边欠拟合，右边过拟合。' },
@@ -442,7 +440,7 @@
     ],
     viz: [
       { id: 'poly-fit', opts: { degree: 1, test: true }, how: '12 个训练点（蓝），灰色小点是测试点，灰虚线是真实函数 $x\\sin x$。拖次数滑块看训练 MSE 和测试 MSE。',
-        try: '① 次数 1：直线，两个 MSE 都大（underfit）。② 次数 4–5：贴近真实函数，测试 MSE 最小。③ 次数 9：训练 MSE 进一步下降（12 个点、10 个系数，一般不会恰好穿过每个点），曲线在边缘剧烈摆动、测试 MSE 暴涨（overfit）。（L05 p27 Bishop 的例子是 10 个点配 9 次多项式，所以能穿过全部点。）④ 点"换一批训练数据"：高次数曲线变得面目全非——这就是第 19 章的 variance。' },
+        try: '① 次数 1：直线，两个 MSE 都大（underfit）。② 次数 4–5：贴近真实函数，测试 MSE 最小。③ 次数 9：训练 MSE 进一步下降（12 个点、10 个系数，一般不会恰好穿过每个点），曲线在边缘剧烈摆动、测试 MSE 暴涨（overfit）。④ 点"换一批训练数据"：高次数曲线变得面目全非——这就是第 19 章的 variance。' },
     ],
     compare: [
       { t: 'table', head: ['', 'Underfitting', '合适', 'Overfitting'], rows: [
@@ -503,7 +501,7 @@
     ],
     goals: [
       '写出 bias–variance 分解（L05 p37）并指出每一项',
-      '能按 L05 p38 的步骤推导分解（用 $\\mathbb E[Z^2]=\\mathrm{Var}[Z]+(\\mathbb E Z)^2$）',
+      '（不考，了解即可）看懂推导只用到两件事：$\\mathbb E[Z^2]=\\mathrm{Var}[Z]+(\\mathbb EZ)^2$，以及测试标签与训练集独立',
       '说出简单 / 复杂模型、正则化强弱分别对 bias 和 variance 的影响',
       '手算：给几个训练集上的预测，算 bias²、variance、期望测试误差',
     ],
@@ -516,21 +514,20 @@
         T`**复杂模型（高次多项式）**：三天学到的曲线天差地别（**高 variance**），但它们的平均正好在真实曲线附近（**低 bias**）。`,
       ] },
       { t: 'video', id: 'bias-variance' },
-      { t: 'fig', src: 'reference/pages/L05/p36.jpg', caption: 'L05 p36：随复杂度增加，bias² 下降、variance 上升，测试误差（两者之和 + 噪声）呈 U 形', w: 560 },
       { t: 'slide', src: 'L05/p34', caption: '只盯住一个测试点 $x_0$：左边三天的直线在 $x_0$ 处几乎给出同一个预测（variance 小）；右边三条复杂曲线在 $x_0$ 处各说各的（variance 大）。' },
       { t: 'slide', src: 'L05/p35', caption: '同一个 $x_0$：红点是真实值。直线的预测离它很远（bias 大）；复杂曲线平均下来正好在它附近（bias 小）。' },
-      T`把这个画面写成公式：`,
-      T`**关键视角**（L05 p32–p35）：训练数据本身是随机的（换一个月采集就不一样，L06 讲者也强调）。所以学到的模型 $\hat f_D$ 也是随机的。固定一个测试点 $x_0$：`,
+      { t: 'fig', src: 'reference/pages/L05/p36.jpg', caption: 'L05 p36：随复杂度增加，bias² 下降、variance 上升，测试误差（两者之和 + 噪声）呈 U 形', w: 560 },
+      T`把这个画面写成公式。用训练集 $D$ 学到的模型记作 $\hat f_D$，它随 $D$ 变，是随机的；固定一个测试点 $x_0$：`,
       { t: 'ul', items: [
         T`**Bias（偏差）**：所有可能训练集上的平均预测 $\mathbb E[\hat f]$ 离测试点的真实期望 $\mathbb E[Y]$ 多远（$x_0$ 固定，所以 $\mathbb E[Y]$ 就是 $\mathbb E[Y\mid x_0]$，课件省略了条件）。`,
         T`**Variance（方差）**：换训练集时预测 $\hat f$ 的波动 $\mathrm{Var}[\hat f]$。`,
         T`**Irreducible error（不可约误差）**：$\mathrm{Var}[Y]$，数据本身的噪声，任何模型都消除不了。下式左边的 $\mathbb E$ **同时**对训练集 $D$ 的随机性（影响 $\hat f$）和测试标签的噪声（影响 $Y$）求平均。`,
       ] },
       { t: 'math', tex: T`\mathbb E\big[(Y-\hat f)^2\big]=\underbrace{\big(\mathbb E[Y]-\mathbb E[\hat f]\big)^2}_{\text{bias}^2}+\underbrace{\mathrm{Var}[\hat f]}_{\text{variance}}+\underbrace{\mathrm{Var}[Y]}_{\text{irreducible error}}` },
-      T`**这个期望你看不见。** 现实里你只拿到一份数据、只训练出一个 $\hat f$，所以 bias² 和 variance 都**不是能算出来的数**——它们是思想实验：假装把数据重新采很多次。这就是为什么式子里要对 $D$ 求期望（描述「换一批数据」的平均表现），也是为什么 $Y$ 与 $D$ 独立（测试点没参与训练）。它的用途是**解释过拟合**，而不是做题时拿来算。`
+      T`**现实里算不出这两项。** 你只有一份数据、一个 $\hat f$，所以 bias² 和 variance 是思想实验（假装把数据重采很多次）；考题会直接给出几个训练集上的预测，让你按定义算（见下面例子）。`
     ],
     why: [
-      T`这是往年简答的高频题（T13 预测："State the bias–variance decomposition and what increases each term"）。它也是理解正则化、模型选择、集成方法（如 bagging 降 variance）的统一框架。`,
+      T`这是往年简答的高频题（T13 预测："State the bias–variance decomposition and what increases each term"）。它也是理解正则化、模型选择的统一框架。`,
       T`和 c07 的区别：c07 分解的是**参数估计** $\hat\theta$ 的 MSE（两项）；这里分解的是**对新样本的预测**误差，多了噪声项（三项）。`,
     ],
     intuition: [
@@ -538,7 +535,7 @@
       { t: 'story', title: '"bias/variance dilemma"', md: '这个名字因 Geman、Bienenstock 和 Doursat 1992 年的论文 "Neural Networks and the Bias/Variance Dilemma" 而广为人知。他们用它解释为什么神经网络需要大量数据：模型越灵活，variance 越大。' },
     ],
     math: [
-      { t: 'h3', text: '推导（L05 p38，四步）' },
+      { t: 'h3', text: '推导（不考，了解即可）' },
       T`记 $\hat f=\hat f_D(x_0)$。用到：$\mathbb E[Z^2]=\mathrm{Var}[Z]+(\mathbb E[Z])^2$（c01 方差公式移项），以及测试标签 $Y$ 与训练集 $D$ 独立 ⇒ $\hat f\perp Y$ ⇒ $\mathbb E[Y\hat f]=\mathbb E[Y]\mathbb E[\hat f]$。`,
       { t: 'steps', items: [
         T`展开：$\mathbb E[(Y-\hat f)^2]=\mathbb E[Y^2]+\mathbb E[\hat f^2]-2\mathbb E[Y\hat f]$`,
@@ -650,7 +647,7 @@
       T`c18 里模型一复杂，训练误差可以很小，换一批数据却很大。这一章（L06）先给这两个数起准确的名字，下一章（c21）再问：**它们最多能差多少？** 先看一个能手算的小例子。`,
       { t: 'h3', text: '② 两种风险：算得出的和算不出的（L06 p12–p15）' },
       T`两个特征 $x_1,x_2$，标签 $\pm1$，训练集只有 4 个点：$(1,2)\to+1$，$(2,-1)\to+1$，$(-1,1)\to-1$，$(-2,-1)\to-1$。拿规则 $f=\sgn(x_1)$（$x_1>0$ 判 $+1$）去分：四个点的预测是 $+,+,-,-$，全对，错 0 个，平均每个点错 $0/4=0$。换成 $\sgn(x_2)$：预测 $+,-,+,-$，错 2 个，平均 $0.5$。`,
-      T`这个"在训练集上的平均损失"叫 **empirical risk（经验风险）** $\hat R_D[f]$——手上有数据，**算得出**。可我们真正关心的是规则在**新数据**上的平均损失，叫 **true risk（真实风险）** $R[f]$：它是对真实数据分布求期望，而分布不知道，所以**算不出**（L06 p12–p14）。用这两个词，c18 的现象就能说准确：**欠拟合** = 两种风险都大；**过拟合** = 经验风险小、真实风险大（L06 p15）。这里的损失 $l$ 用 0-1 loss（错记 1、对记 0）：`,
+      T`这个"在训练集上的平均损失"叫 **empirical risk（经验风险）** $\hat R_D[f]$——手上有数据，算得出。可我们真正关心的是规则在新数据上的平均损失，叫 true risk（真实风险）$R[f]$：下面式子里的 $(X,Y)$ 表示从真实数据分布 $P$ 里新抽的一个样本，对它求期望；$P$ 不知道，所以算不出。用这两个词，c18 的现象就能说准确：欠拟合 = 两种风险都大；过拟合 = 经验风险小、真实风险大（L06 p15）。这里的损失 $l$ 用 0-1 loss（错记 1、对记 0）：`,
       { t: 'math', tex: T`\hat R_D[f]=\frac1n\sum_{i=1}^n l\big(y_i,f(\bx_i)\big)\qquad\text{（经验风险：训练集上数错误）}` },
       { t: 'math', tex: T`R[f]=\mathbb E\,l\big(Y,f(X)\big)\qquad\text{（真实风险：新数据上的期望错误率）}` },
       { t: 'h3', text: '③ ERM：在一份固定的"菜单"里挑训练误差最小的（L06 p9–p13）' },
@@ -683,7 +680,7 @@
         ['Over-fitting', '**小**', '**大**'],
         ['理想', '小', '小（且接近 $\\hat R$）'],
       ] },
-      T`真实风险的定义（L06 p14）：$R[f]=\int l(Y,f(X))\,P(X,Y)\,dX\,dY$。对 0-1 loss，它就是**泛化误差（generalisation error，期望测试错误率）**。`,
+      T`真实风险的定义：$R[f]=\int l(Y,f(X))\,P(X,Y)\,dX\,dY$——按概率 $P$ 把所有可能样本 $(X,Y)$ 的损失加权平均；直观地说，就是用无穷多个样本算出的经验风险。对 0-1 loss，它就是**泛化误差（generalisation error，期望测试错误率）**。`,
       { t: 'graph', nodes: { P: [60, 80], D: [60, 200], F: [250, 140], RH: [430, 70], R: [460, 210] }, edges: 'P>D=抽样 D>F=ERM F>RH=数错误 F>R=求期望 P>R:moral', labels: { P: 'P 未知', D: 'D', F: 'f̂_D', RH: 'R̂_D', R: 'R[f̂_D]' }, notes: { F: '与数据有关，是随机的', RH: '算得出：训练错误率', R: '算不出：泛化误差' }, cls: { P: 'given', F: 'hl', R: 'y' }, w: 500, caption: T`两个风险在这里分岔。左边是现实：分布 $P$ 未知，只能抽到一份训练集 $D$；$D$ 经 ERM 决定 $\hat f_D$（所以 $\hat f_D$ 跟数据一样是随机的）。往右上走，把 $\hat f_D$ 拿到 $D$ 上数错误，得到能算的经验风险；往右下走，把 $\hat f_D$ 放回未知的 $P$ 上求期望，得到真正关心的真实风险——它算不出，只能被上界估计（c21）。` },
     ],
     fx: [
@@ -712,7 +709,7 @@
         ['$\\sgn(-x_1+x_2)$', '+ − + +', '3', '0.75'],
         ['$\\sgn(-x_1-x_2)$', '− − − +', '3', '0.75'],
       ] },
-      T`ERM：$\sgn(x_1)$ 和 $\sgn(x_1+x_2)$ 并列最优（经验风险 0），任选其一。注意点 3 的 $x_1+x_2=0$：$\sgn(x_1+x_2)$ 和 $\sgn(-x_1-x_2)$ 在这里**都**给 $-1$（因为 $\sgn(0)=-1$），所以后者不是前者简单取反。（$\sgn(x_1-x_2)$ 在点 1：$1-2=-1\le0$ ⇒ $-1$，错。）`,
+      T`ERM：$\sgn(x_1)$ 和 $\sgn(x_1+x_2)$ 并列最优（经验风险 0），任选其一。注意点 3 的 $x_1+x_2=0$：$\sgn(x_1+x_2)$ 和 $\sgn(-x_1-x_2)$ 在这里**都**给 $-1$（因为 $\sgn(0)=-1$），所以后者不是前者简单取反。`,
       { t: 'fade', title: '分步练习：算经验风险', plan: ['逐点算预测（$z\\le0$ 给 $-1$）', '数错误个数', '$\\hat R$ = 错误数 / $n$'], items: [
         { md: T`$f=\sgn(x_2)$，上面的 4 个点。`, steps: [
           { md: '预测 $+,-,+,-$' }, { md: '点 2、3 错，共 2 个' }, { md: '$\\hat R=2/4=0.5$' },
@@ -730,7 +727,7 @@
     ],
     viz: [
       { id: 'poly-fit', opts: { degree: 6, test: true }, how: '训练 MSE 是**经验风险**（能算）；大量测试点上的 MSE 近似**真实风险**（理论上需要无穷多测试点）。',
-        try: '把次数从 1 拉到 9：经验风险一路下降，真实风险（测试 MSE）先降后升。两者的**差距**在复杂模型上最大。c21 会在"有限模型类、损失在 $[0,1]$、i.i.d."的条件下给这个差距一个理论上界——注意这张图是平方损失 + 实数系数的多项式，不满足那些条件，所以只用来直观感受。' },
+        try: '把次数从 1 拉到 9：经验风险一路下降，真实风险（测试 MSE）先降后升。两者的**差距**在复杂模型上最大——c21 会给这个差距一个上界（这张图不满足那个界的条件，只用来直观感受）。' },
     ],
     compare: [
       { t: 'table', head: ['', 'Empirical risk', 'True risk'], rows: [
@@ -794,9 +791,8 @@
     what: [
       { t: 'h3', text: '① 问题：训练误差低，真实风险就低吗？（L06 p16）' },
       T`c20 选出了训练误差（经验风险）最小的分类器 $\hat f$。但我们真正关心的是它在**新数据**上的表现（真实风险）。两者能差多少？这一章给一个数：**真实风险 ≤ 训练风险 + 一个惩罚项**。`,
-      T`先看数字：c20 的单特征类有 $|\mathcal F|=4$ 个分类器，$n=100$ 个训练样本，要求 95% 的把握（$\delta=0.05$）。惩罚项 $=\sqrt{\frac{\ln4+\ln20}{200}}\approx0.148$。也就是说：在 95% 的训练集上，挑出来的分类器真实风险最多比训练风险高 0.148。`,
       { t: 'h3', text: '② 定理：真实风险 ≤ 训练误差 + 复杂度惩罚（L06 p17）' },
-      T`**定理**（L06 p17）：模型类 $\mathcal F$ 有限、且在看到数据**之前**就固定，训练集是 $n$ 个 [[i.i.d.]] 样本，损失在 $[0,1]$（如 0-1 loss，p32）。则以至少 $1-\delta$ 的概率（对训练集的随机性而言）：`,
+      T`**定理**（L06 p17）：模型类 $\mathcal F$ 有限、且在看到数据之前就固定，训练集是 $n$ 个 [[i.i.d.]] 样本，损失在 $[0,1]$（如 0-1 loss，p32）。则以至少 $1-\delta$ 的概率（意思是：想象反复抽训练集，至少 $1-\delta$ 比例的训练集上下式成立；如 $\delta=0.05$ 就是 95% 的训练集）：`,
       { t: 'math', tex: T`R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}` },
       { t: 'slide', src: 'L06/p17', caption: '老师的原页：左边真实风险（算不出来）≤ 训练误差（算得出来）+ 根号里的"复杂度惩罚"。下方是 $|\\mathcal F|=8,\\ \\delta=0.1$ 的代入例子。' },
       T`特点（L06 p17、p19）：**不需要知道分布 $P$**；是**高概率**保证而非必然（训练集可能"不走运"）；对所有分布都成立（worst-case）；$|\mathcal F|$ 是第一个"模型复杂度"的度量。`,
@@ -810,14 +806,13 @@
       T`**Structural Risk Minimisation（SRM，结构风险最小化）**（L06 p18）：有多个候选模型类时（如单特征类 vs 多特征类），选使"经验风险 + 惩罚项"最小的那个类。`,
       T`**SRM 的权衡**（L06 p18）：简单类经验风险大、惩罚小；复杂类经验风险小、惩罚大——和 c19 的 bias–variance 是同一个故事的另一种讲法。`,
       { t: 'slide', src: 'L06/p18', caption: T`两个括号就是取舍本身：左边 $\hat R_D[\hat f_D]$ 对简单类大、对复杂类小；右边根号里的惩罚对简单类小（$|\mathcal F|$ 小）、对复杂类大。SRM 选两者之和最小的类。` },
-      T`换个名字就是 c19：左边是 bias（简单类压不下去的训练误差），右边是 variance（类太大带来的不确定性）。所以「用最复杂的类」和「用最简单的类」都不对，答案在中间——正是 bias–variance 那条 U 形曲线的最低点。`,
     ],
     why: [
       T`这是第一次给"过拟合"一个**定量**的回答：真实风险最多比训练风险高 $\varepsilon$，而 $\varepsilon$ 由模型复杂度和样本量决定。T12 的泛化界计算题就基于它；c24 的 VC 界是同一个形状，只是把 $\log|\mathcal F|$ 换成和 VC 维相关的量。`,
     ],
     intuition: [
       { t: 'think', q: '样本量变成 4 倍，$\\varepsilon$ 变成原来的几倍？', a: T`$\varepsilon\propto1/\sqrt n$，所以变成 $1/2$。` },
-      T`**这个根号是怎么来的。** 想同时信任 $|\mathcal F|=8$ 个候选，就不能给每个只要求 $1-\delta$：用 union bound，让每个分类器的「坏概率」不超过 $\delta/8$，8 个加起来才不超过 $\delta$。Hoeffding 说，$n$ 个样本下，一个固定分类器的偏差超过 $\varepsilon$ 的概率不超过 $e^{-2n\varepsilon^2}$。令它等于 $\delta/|\mathcal F|$ 再解出 $\varepsilon$，就得到 $\sqrt{(\log|\mathcal F|+\log(1/\delta))/(2n)}$——$\log|\mathcal F|$ 来自「$\delta$ 要除以 $|\mathcal F|$」，根号来自解指数方程。`,
+      T`**这个根号是怎么来的。** 想同时信任 $|\mathcal F|=8$ 个候选，就不能给每个只要求 $1-\delta$：用 union bound（几件坏事至少发生一件的概率 ≤ 各自概率之和），让每个分类器的「坏概率」不超过 $\delta/8$，8 个加起来才不超过 $\delta$。Hoeffding 说，$n$ 个样本下，一个固定分类器的真实风险比训练风险高出 $\varepsilon$ 以上的概率不超过 $e^{-2n\varepsilon^2}$。令它等于 $\delta/|\mathcal F|$，两边取 log 得 $2n\varepsilon^2=\log|\mathcal F|+\log(1/\delta)$，解出 $\varepsilon$ 就是那个根号——$\log|\mathcal F|$ 来自「$\delta$ 要除以 $|\mathcal F|$」。`,
       { t: 'story', title: 'Hoeffding 与 PAC', md: 'Hoeffding 不等式来自 Wassily Hoeffding 1963 年的论文。把它和 union bound 结合来分析学习算法，是 Leslie Valiant 1984 年提出的 PAC（Probably Approximately Correct）学习框架的核心思想——"大概率（probably）近似正确（approximately correct）"正是这个界的形状。Valiant 因此获得 2010 年图灵奖。' },
     ],
     math: [
@@ -887,7 +882,7 @@
         ['复杂度度量', '没有明确定义', '$|\\mathcal F|$（之后是 VC 维）'],
         ['给出什么', '误差的分解', '真实风险的上界'],
       ] },
-      T`（L06 p6：之前的统计理论多是渐近的、依赖分布的；这里想要有限样本、与分布无关、与学习器无关的理论。）`,
+      T`（L06 p6：之前的统计理论多是渐近的（只在 $n\to\infty$ 时成立）、依赖分布的；这里想要有限样本、与分布无关、与学习器无关的理论。）`,
       { t: 'exam', md: T`**Interpreting the finite-class bound:** For a finite class $\mathcal F$ fixed before seeing the data, $n$ i.i.d. examples and a loss in $[0,1]$, with probability at least $1-\delta$ over the training sample (simultaneously for all $f\in\mathcal F$, in particular the ERM choice $\hat f$), $R[\hat f]\le\hat R[\hat f]+\sqrt{(\log|\mathcal F|+\log(1/\delta))/(2n)}$. The class size and the confidence enter logarithmically inside the square root, and the penalty shrinks as $1/\sqrt n$ with more data. Structural risk minimisation chooses the model class minimising this upper bound, trading training error against complexity.` },
     ],
     pitfalls: [
