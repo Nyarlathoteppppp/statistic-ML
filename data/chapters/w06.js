@@ -504,7 +504,7 @@
     what: [
       T`**为什么需要**（L12 p18）：DNN 非常灵活、通常**over-parameterised（过参数化）**，参数比样本还多，很容易把训练集背下来。`,
       T`**Early stopping（早停）**：训练时盯着验证集误差，它不再下降（开始上升）就停止，并保留验证误差最低时的那组权重。L12 把它归为 **implicit regularisation（隐式正则化）**：权重从接近 0 的小值开始，早停让它们没机会长大；对 sigmoid/tanh 这类在 0 附近近似线性的激活，网络会被"拉向"一个线性模型。`,
-      { t: 'viz', id: 'fig-early-stop', opts: { caption: T`示意图（课件 L12 p18 只有定义，没有这条曲线）：训练误差一直降，验证误差先降后升。早停就是在验证误差最低的那一轮停下，并用那一轮的权重；灰色区域里继续训练只会过拟合。` } },
+      { t: 'viz', id: 'fig-early-stop', opts: { caption: T`示意图（课件 L12 p18 只有定义，没有这条曲线）。` } },
       T`早停不改损失函数，只是不让训练跑太久（权重从接近 0 出发，停得早就没机会长得很大）。如果想**直接**惩罚大权重、并且能用 $\lambda$ 调力度，就像 c16 的 ridge 一样在损失上加权重平方和。平方的导数是 $2\lambda w$，所以反传得到的梯度多加这一项：`,
       T`**Weight decay / $L_2$ regularisation（显式正则化）**（L12 p19）：`,
       { t: 'math', tex: T`\min\ L+\lambda\Big(\sum_{i,j}v_{ij}^2+\sum_jw_j^2\Big)\quad\Rightarrow\quad\frac{\partial}{\partial w_j}\text{ 多一项 }2\lambda w_j` },
@@ -641,7 +641,7 @@
       T`**先看一个二维例子。** 数据已经减去均值，协方差矩阵 $\Sigma_x=\begin{bmatrix}2&1\\1&2\end{bmatrix}$。把数据投到一个单位方向 $\mathbf p$ 上，投影的方差是 $\mathbf p'\Sigma_x\mathbf p$。怎么算：$\mathbf p'\Sigma_x\mathbf p=\sum_{i,j}p_i\,(\Sigma_x)_{ij}\,p_j$，就是矩阵的每一格乘上"它所在行的 $p_i$ × 所在列的 $p_j$"再全部加起来。沿 $\mathbf p=(1,1)/\sqrt2$：每个 $p_ip_j=\frac12$，四格 $2,1,1,2$ 各乘 $\frac12$：$\frac12(2+1+1+2)=3$。沿 $(1,-1)/\sqrt2$：对角的 $p_ip_j=\frac12$，非对角的 $p_1p_2=-\frac12$，所以中间两个 1 变号：$\frac12(2-1-1+2)=1$。所以 $(1,1)$ 方向铺得最开，一条轴就解释了 $3/(3+1)=75\%$ 的方差。（$3$ 和 $1$ 正是 c04 里同一个矩阵的两个特征值。）一般情况就是下面这个带约束的最大化，解是最大特征值对应的特征向量：`,
       { t: 'math', tex: T`\max_{\mathbf p_1}\ \mathbf p_1'\Sigma_x\mathbf p_1\quad\text{s.t.}\ \mathbf p_1'\mathbf p_1=1\qquad\Rightarrow\qquad\Sigma_x\mathbf p_1=\lambda_1\mathbf p_1` },
       T`**回到 autoencoder**：投影方差最大，等价于"投影后丢掉的部分"（重建误差）最小——这正是 autoencoder 在最小化的量。所以线性、单隐藏层、平方误差的 autoencoder（训练到最优时）张成的子空间和 PCA 前几个主成分的子空间相同；但它的权重本身不一定两两正交、也不按方差排序——课件 p30 称之为 "almost PCA"：PCA 找的是按方差排好的标准正交基，网络可能找到另一组基。`,
-      { t: 'viz', id: 'fig-almost-pca', opts: { caption: T`同一个子空间，两组基。PCA 给的是互相垂直、按方差排好序的方向；线性、单隐藏层、平方误差的 autoencoder 训练到最优时张成同一个子空间，但学到的权重向量不必垂直、也不按方差排序——这就是课件 L12 p30 说的「almost PCA」。` } },
+      { t: 'viz', id: 'fig-almost-pca', opts: { caption: T`同一个子空间，两组基（课件 L12 p30 的「almost PCA」）。` } },
       T`**图像上的非线性版本：卷积 autoencoder**（Worksheet 8；卷积和输出尺寸公式见 c38）。encoder 是 3 层 $4\times4$ 卷积，stride 2、padding 1，每层边长减半：$\lfloor(32+2-4)/2\rfloor+1=16$，再到 8、4。这里用 stride 2 的卷积代替 pooling 做下采样。通道数 $3\to8\to16\to32$，编码是 $4\times4\times32=512$ 个数，输入是 $32\times32\times3=3072$ 个数，压缩到 1/6。decoder 和 encoder 镜像，用 transposed convolution（转置卷积）把边长一层层翻倍回到 32：每个输入格乘上 filter，"盖"到输出上一块 $4\times4$ 的区域，相邻输入格在输出上隔 2 格，重叠处相加。这是一种学出来的上采样。最后一层用 tanh，因为输入像素已归一化到 $[-1,1]$。训练仍然是最小化重建误差 $\sum_k\|\bx_k-g(f(\bx_k))\|^2$，$f$ 是 encoder，$g$ 是 decoder。`,
     ],
     why: [

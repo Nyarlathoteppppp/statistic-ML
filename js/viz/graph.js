@@ -28,8 +28,10 @@
     const ids = Object.keys(nodes);
     const radius = finite(opts.r) && opts.r > 0 ? opts.r : 20;
     const notes = opts.notes && typeof opts.notes === 'object' ? opts.notes : {};
-    const noteLen = Math.max(0, ...Object.keys(notes).map(function (k) { return String(notes[k]).length; }));
-    const padding = radius + 24, padX = padding + (noteLen ? noteLen * 12 + 8 : 0), padY = padding + (noteLen ? 10 : 0);
+    // Rough rendered width of a note at 11.5px: CJK characters are full width, the rest (letters, subscripts, braces) about 7.5px.
+    const noteWidth = function (t) { return Array.from(String(t)).reduce(function (w, ch) { return w + (ch.codePointAt(0) >= 0x2e80 ? 12 : 7.5); }, 0); };
+    const noteLen = Math.max(0, ...Object.keys(notes).map(function (k) { return noteWidth(notes[k]); }));
+    const padding = radius + 24, padX = padding + (noteLen ? noteLen + 8 : 0), padY = padding + (noteLen ? 10 : 0);
     let minX = 0, minY = 0, maxX = 100, maxY = 80;
     if (ids.length) {
       minX = Math.min.apply(null, ids.map(function (id) { return nodes[id].x; })) - padX;

@@ -179,6 +179,7 @@ svg.graph .node.q circle { stroke: var(--bad); stroke-width: 3; }
 svg.graph .edge.msg { stroke: var(--good); stroke-width: 2.6; }
 svg.graph .edge.hl { stroke: var(--accent); stroke-width: 3; }
 .graph-row.n4 > figure.graph-fig { flex: 1 1 40%; max-width: 300px; }
+.graph-row.n2 > figure.graph-fig { max-width: 330px; }
 
 /* ---------- 3B1B-style step animations (js/viz/anim.js) ---------- */
 .anim-box { margin: 1rem 0 1.4rem; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--card); box-shadow: var(--shadow); }

@@ -183,7 +183,7 @@
       T`**0.632 bootstrapping（0.632 自助抽样）**（L15 p19）：重复 $B$ 次：从 $D$ 中**有放回**抽 $n$ 个作为训练集 $S_i$（可重复），在没被抽到的 $D-S_i$ 上测试。`,
       T`k-fold 还有一个陷阱：如果在**同一折**上又挑超参数 $C$、又报最终成绩，挑 $C$ 时已经看过这份"测试"数据，报出来的数字会偏乐观（和"用测试集选超参数"是同一种偷看）。所以要两层：外层那一折只负责最后打分，挑 $C$ 在外层的训练部分**内部**再做一次验证：`,
       T`**Nested cross-validation（嵌套交叉验证）**（L15 p21）：内层（如 bootstrap 或 train/validation）选超参数；外层（如 k-fold 或 train/test）用选出的超参数报告性能。`,
-      { t: 'viz', id: 'fig-nested-cv', opts: { caption: '嵌套交叉验证（L15 p21）：左边外层 5 折，每轮拿 1 块（橙）只等最后打分；右边是第 1 轮的 4 块训练数据，在它们内部再做 4 折挑超参数 C。橙色块从头到尾没参与挑 C，所以它给的分数不偏乐观。' } },
+      { t: 'viz', id: 'fig-nested-cv', opts: { caption: '嵌套交叉验证（L15 p21）：橙色块从头到尾没参与挑 C，所以它给的分数不偏乐观。' } },
       T`**具体例子**：外层 5-fold 报告性能。每一轮外层拿 4 折（80% 数据）当外层训练集，在它**内部**再做 4-fold CV，从 $C\in\{0.1,1,10\}$ 里挑最好的 $C$；用这个 $C$ 在整个外层训练集上重新训练，最后在外层留出的那一折上测试。外层测试折从没参与选 $C$，所以报告的数字不偏乐观。一共训练几个模型？数一遍：内层 4 折、每折试 3 个 $C$ 值，共 $4\times3=12$ 个；选好 $C$ 后在整个外层训练集上重训 $1$ 个，所以每轮 $12+1=13$ 个；外层 5 轮，$5\times(4\times3+1)=65$ 个。`,
       T`同一种"偷看"还有**特征选择**：如果先用全部数据选出特征、再做交叉验证，选特征时已经看过每一折的测试样本，估计同样偏乐观。每一折只能用该折的训练部分选特征。`,
       { t: 'slide', src: 'L15/p22', caption: '课件 L15 p22：绿框是「特征选择 / 降维」这一步。错误做法是绿框同时罩住 Training set 和 Validation set，于是验证集的信息也流进了右边的 Reduced training set——训练偷看了本应未见的数据。对照 L15 p23，正确做法是绿框只罩住 Training set，Validation set 原样不动。' },
@@ -440,8 +440,8 @@
       { t: 'story', title: 'Weighted majority', md: 'Nick Littlestone 和 Manfred Warmuth 1989 年提出 weighted majority 算法（1994 年期刊版）。"专家建议"这一框架后来系统整理在 Cesa-Bianchi 和 Lugosi 的书《Prediction, Learning, and Games》里——L16 p7 放的就是这本书的封面。' },
     ],
     math: [
-      T`**两个界怎么来的，一句话**：都是"势函数"论证——找一个量，每次学习者犯错它就按比例缩小，但它又有下界。majority 里是存活专家数（每错一次至少减半，最少剩 1 个）；halving 里是总权重（每错一次至少剩 3/4，最少是最好专家的 $(1/2)^m$）。夹出来取 log 就是界。`,
-      { t: 'viz', id: 'fig-halving-bound', opts: { caption: T`把证明画出来（$n=8$、$m=3$）：蓝线是总权重的上界，每错一次至少降到 3/4；红线是下界，最好的专家只错 3 次，权重至少剩 $(1/2)^3$。上界一路下滑，迟早撞上下界，交点横坐标 $\approx14.5$ 就是错误次数的上限。` } },
+      T`**两个界怎么来的，一句话**：都是"势函数"论证——找一个量，每次学习者犯错它就按比例缩小，但它又有下界。majority 里是存活专家数（每错一次至少减半，最少剩 1 个）；halving 里是总权重（每错一次最多剩 3/4，但不会低于最好专家的 $(1/2)^m$）。夹出来取 log 就是界。`,
+      { t: 'viz', id: 'fig-halving-bound', opts: { caption: T`把证明画出来（$n=8$、$m=3$）。` } },
     ],
     fx: [
       {
@@ -543,7 +543,7 @@
       T`界的形状和 halving 一样：最好专家的错误数乘一个系数，再加上专家个数的对数。来历也一样：学习者每错一次，至少一半的权重乘上 $(1-\varepsilon)$：错的那些权重加起来至少是 $W/2$，每个都乘 $(1-\varepsilon)$，所以总权重至少减少 $\varepsilon\cdot\frac W2$，即 $W'\le W-\frac{\varepsilon W}{2}=W\big(1-\frac\varepsilon2\big)$（换个写法：错的一半乘 $(1-\varepsilon)$、对的一半不变，因子 $=\frac12+\frac12(1-\varepsilon)=1-\frac\varepsilon2$）；最好的专家错 $m$ 次后还剩 $(1-\varepsilon)^m$。两边夹起来、取对数，就是：`,
       { t: 'math', tex: T`M\le2(1+\varepsilon)m+\frac{2\ln n}{\varepsilon}` },
       T`**$\varepsilon$ 的权衡**：$\varepsilon$ 小 ⇒ 降权温和，$m$ 的系数接近 2，但要更多轮才能把坏专家压下去，$\frac{\ln n}{\varepsilon}$ 项变大；$\varepsilon$ 大则相反。`,
-      { t: 'viz', id: 'fig-wm-epsilon', opts: { caption: T`$n=10^4$、$m=3$ 时界的两项：蓝线（$m$ 项）随 $\varepsilon$ 变大而变大，红线（$\ln n$ 项）随 $\varepsilon$ 变大而变小，黑线是两者之和。课件的证明只覆盖 $\varepsilon\le0.5$（绿色）；在这一段里黑线一路下降。` } },
+      { t: 'viz', id: 'fig-wm-epsilon', opts: { caption: T`$n=10^4$、$m=3$。课件的证明只覆盖 $\varepsilon\le0.5$（绿色）。` } },
       { t: 'h3', text: '③ 为什么系数 2 改不了：对手论证（L16 p19–p20）' },
       T`**Lower bound（下界）**（L16 p19）：为什么确定性算法对 $m$ 的系数 2 改不了？**adversarial argument（对手论证）**：假想一个专门和你作对、能看到你算法的"对手"来决定每天的真实结果。取 2 个永远意见相反的专家（一个说 $+$，另一个说 $-$）。确定性算法的预测对手能提前算出来，于是对手每天都把真实结果设成**和学习者相反**——学习者天天错，$T$ 天错 $M=T$ 次。两个专家每天恰好一对一错，错误总数是 $T$，较好的那个最多错 $m\le T/2$ 次。所以 $M\ge2m$。课件用"$E_1$ 奇数天对、$E_2$ 偶数天对"来演示这个结论：系数 2 不能再改进（$2(1+\varepsilon)$ 已经很接近）。`,
       { t: 'h3', text: '④ 随机化：probabilistic experts（L16 p21–p23）' },
