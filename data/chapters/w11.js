@@ -664,7 +664,31 @@ $$\begin{aligned}m_{V\to S}(S)=\sum_{V}\psi_{VS}(V,S)\,&m_{R\to V}(V)\,m_{T\to V
       { type: 'num', q: '同上，记录的团有几个变量？', answer: 4, explain: T`消元时记录的团 = 被消的变量自己 ∪ 它当前的所有邻居。上一题这个变量有 3 个邻居，加上它自己：$1+3=4$ 个变量。加完 fill-in（填补边）后，这 4 个点两两相连，正好构成一个团。陷阱：只数邻居答 3，漏了被消的变量本身。` },
       { type: 'mc', q: 'Junction tree 的 separator 是：', options: ['任意两团的交集', '相邻两团的交集', '最大的团', '被删掉的团'], answer: 1, explain: T`separator（分隔集）是 junction tree（联结树）里**相邻**两个团的交集，画在两团之间的连线上。例：L22 的树 $c_1=\{x_1,x_2,x_3\}$—$c_2=\{x_2,x_3,x_4\}$—$c_3=\{x_3,x_4,x_5\}$，separator 是 $\{x_2,x_3\}$ 和 $\{x_3,x_4\}$；团之间的消息只依赖 separator 里的变量。"任意两团的交集"不对：$c_1$ 和 $c_3$ 共享 $x_3$，但它们在树里不相邻、之间没有边，这个交集不是 separator。L22 p22。` },
       { type: 'show', q: '（英文）State the running intersection property and why it matters.', answer: T`If two cliques of the junction tree share a variable, that variable appears in every clique on the path between them. This guarantees that information about a shared variable can flow along the tree through separators, so the beliefs about that variable in different cliques are consistent after message passing.`, qzh: '陈述交集连通性质（running intersection property），并说明它为什么重要。', azh: '如果联结树（junction tree）中的两个团（clique）共享某个变量，那么这个变量出现在它们之间路径上的每一个团中。这保证了关于共享变量的信息能沿着树、经由分隔集（separator）传递，因此消息传递（message passing）之后，不同团中关于该变量的信念（belief）是一致的。' },
-      SML.canvasQuiz.elimAH,
+      {
+        cq: '6.1', type: 'num',
+        q: [
+          T`（平时小测原题）Consider the following *Markov random field*. If the nodes are eliminated in order $A,B,C,D,E,F,G,H$, how many nodes does the largest clique in the *junction tree* have?`,
+          { t: 'graph', nodes: { H: [130, 40], G: [220, 40], F: [40, 130], D: [130, 130], C: [220, 130], E: [40, 220], B: [130, 220], A: [220, 220] }, edges: 'H-G H-D F-D D-C F-E D-B D-A C-A B-A', w: 260 },
+        ],
+        qzh: T`按 $A,B,C,\dots,H$ 的顺序消元这个 MRF，junction tree 里最大的团有几个节点？`,
+        answer: 4,
+        explain: [
+          T`每一步：删掉这个点，记下"它 + 它此刻的邻居"为一个团，邻居之间缺的边补上（fill-in）。`,
+          {
+            t: 'table', head: ['删', '当前邻居', 'fill-in', '团'], rows: [
+              [T`$A$`, T`$B,C,D$`, T`$B$—$C$`, T`$\{A,B,C,D\}$`],
+              [T`$B$`, T`$C,D$（$C$ 来自刚补的边）`, '—', T`$\{B,C,D\}$`],
+              [T`$C$`, T`$D$`, '—', T`$\{C,D\}$`],
+              [T`$D$`, T`$F,H$`, T`$F$—$H$`, T`$\{D,F,H\}$`],
+              [T`$E$`, T`$F$`, '—', T`$\{E,F\}$`],
+              [T`$F$`, T`$H$（来自刚补的边）`, '—', T`$\{F,H\}$`],
+              [T`$G$`, T`$H$`, '—', T`$\{G,H\}$`],
+              [T`$H$`, '无', '—', T`$\{H\}$`],
+            ],
+          },
+          T`去掉被别的团包含的，留下极大团 $\{A,B,C,D\}$、$\{D,F,H\}$、$\{E,F\}$、$\{G,H\}$。最大的是 $\{A,B,C,D\}$，**答案 4**。`,
+        ],
+      },
     ],
   });
 

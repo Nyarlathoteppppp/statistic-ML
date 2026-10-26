@@ -30,35 +30,41 @@
     return out;
   }
 
-  // Canvas weekly quiz questions (tagged （平时小测原题）) in course order. A question shared by a chapter
-  // and a T page (data/canvasquiz.js) is one object, so it is listed once, under the first page.
+  // Canvas weekly quiz questions: chapter quiz items with cq: 'quiz.question', sorted by quiz, then question.
   function canvasItems() {
-    const out = [], seen = new Set();
-    collect('quiz').forEach(({ page, block }) => (block.items || []).forEach((it) => {
-      if (/平时小测原题/.test(it.q || '') && !seen.has(it)) { seen.add(it); out.push({ page, it }); }
-    }));
-    return out;
+    const out = [];
+    collect('quiz').forEach(({ page, block }) => (block.items || []).forEach((it) => { if (it.cq) out.push({ page, it }); }));
+    const key = (x) => x.it.cq.split('.').map(Number);
+    return out.sort((a, b) => key(a)[0] - key(b)[0] || key(a)[1] - key(b)[1]);
   }
 
-  // 平时小测合集: every Canvas quiz question, answerable on one page, grouped by chapter.
+  // { t:'canvasQuiz' }: all six quizzes, answerable on one page (平时小测合集).
+  // { t:'canvasQuiz', pick:['4.1'] }: only those questions, shown on a T page before the older papers.
   SML.render.blocks.canvasQuiz = function (b, ctx) {
     const { el } = SML.render;
     const box = el('div');
-    const strip = (x) => (typeof x === 'string' ? x.replace(/（平时小测原题）\s*/, '') : x);
+    const link = (page) => { const m = SML.app.metaOf(page); return '<a href="#/' + page + '">' + SML.md.inline((m.tag ? m.tag + ' · ' : '') + m.title) + '</a>'; };
+    const asItem = (x) => Object.assign({}, x.it, { id: 'cq' + x.it.cq });
+    const all = canvasItems();
+    if (b.pick) {
+      const picked = b.pick.map((cq) => all.find((x) => x.it.cq === cq)).filter(Boolean);
+      box.appendChild(SML.quiz.mountQuiz({ items: picked.map(asItem) }, ctx));
+      box.insertAdjacentHTML('beforeend', '<p class="small muted">出自 ' + picked.map((x) => link(x.page)).join('、') + '；6 次 quiz 全部在 <a href="#/canvasquiz">平时小测合集</a>。</p>');
+      return box;
+    }
     const groups = [];
-    canvasItems().forEach(({ page, it }) => {
+    all.forEach((x) => {
+      const n = x.it.cq.split('.')[0];
       let g = groups[groups.length - 1];
-      if (!g || g.page !== page) groups.push(g = { page: page, items: [] });
-      g.items.push(Object.assign({}, it, { id: page + '-cq' + g.items.length, q: Array.isArray(it.q) ? it.q.map(strip) : strip(it.q) }));
+      if (!g || g.n !== n) groups.push(g = { n: n, xs: [] });
+      g.xs.push(x);
     });
-    let n = 0;
-    groups.forEach(({ page, items }) => {
-      const m = SML.app.metaOf(page);
-      box.insertAdjacentHTML('beforeend', '<h3><a href="#/' + page + '">' + SML.md.inline((m.tag ? m.tag + ' · ' : '') + m.title) + '</a></h3>');
-      box.appendChild(SML.quiz.mountQuiz({ items: items, label: 'Quiz' }, ctx));
-      n += items.length;
+    box.insertAdjacentHTML('beforeend', '<p class="small muted">' + groups.length + ' 次 quiz，共 ' + all.length + ' 题。</p>');
+    groups.forEach((g) => {
+      box.insertAdjacentHTML('beforeend', '<h3>Canvas Quiz ' + g.n + '</h3><p class="small muted">' +
+        g.xs.map((x) => 'Q' + x.it.cq.split('.')[1] + ' 出自 ' + link(x.page)).join('；') + '</p>');
+      box.appendChild(SML.quiz.mountQuiz({ items: g.xs.map(asItem) }, ctx));
     });
-    box.insertAdjacentHTML('afterbegin', '<p class="small muted">共 ' + n + ' 题。</p>');
     return box;
   };
 
@@ -95,7 +101,7 @@
       const erows = eq.map(({ id, e }) => { const m = SML.app.metaOf(id); return '<tr><td>' + SML.md.esc(e.src || '') + '</td><td><a href="#/' + id + '">' + SML.md.inline((m.tag ? m.tag + ' ' : '') + m.title) + '</a></td></tr>'; });
       box.insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>真题</th><th>在哪一章</th></tr></thead><tbody>' + erows.join('') + '</tbody></table></div>');
     }
-    // Canvas weekly quiz questions (tagged （平时小测原题） in chapter quizzes) — examinable too
+    // Canvas weekly quiz questions — examinable too
     const quiz = [];
     canvasItems().forEach(({ page, it }) => quiz.push({ page, it }));
     if (quiz.length) {
@@ -103,9 +109,9 @@
       const qrows = quiz.map(({ page, it }) => {
         const m = SML.app.metaOf(page);
         const q = (Array.isArray(it.q) ? it.q.filter((x) => typeof x === 'string').join(' ') : String(it.q)).replace(/（平时小测原题）\s*/, '');
-        return '<tr><td><a href="#/' + page + '/quiz">' + SML.md.inline((m.tag ? m.tag + ' ' : '') + m.title) + '</a></td><td>' + SML.md.inline(q.length > 140 ? q.slice(0, 140) + '…' : q) + '</td></tr>';
+        return '<tr><td>Quiz ' + it.cq.replace('.', ' Q') + '</td><td><a href="#/' + page + '/quiz">' + SML.md.inline((m.tag ? m.tag + ' ' : '') + m.title) + '</a></td><td>' + SML.md.inline(q.length > 140 ? q.slice(0, 140) + '…' : q) + '</td></tr>';
       });
-      box.insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>章节</th><th>题目</th></tr></thead><tbody>' + qrows.join('') + '</tbody></table></div>');
+      box.insertAdjacentHTML('beforeend', '<div class="table-wrap"><table><thead><tr><th>Quiz</th><th>章节</th><th>题目</th></tr></thead><tbody>' + qrows.join('') + '</tbody></table></div>');
     }
     return box;
   };
@@ -187,7 +193,7 @@
   SML.content.add([
     { id: 'mistakes', title: '错题本', lead: '小测答错的题。点页面名回去重做。', blocks: [{ t: 'mistakes' }] },
     { id: 'phrases', title: '英文答题句式库', lead: '全站所有"卷面写法"（紫色框）汇总在这里，按页面分组。考前通读一遍，重点背关键词。', blocks: [{ t: 'phraseIndex' }] },
-    { id: 'canvasquiz', title: '平时小测合集', lead: '全部 Canvas 平时小测原题，按章节排。官方说 quiz 也在考试范围内。直接在这里做，做错的自动进[错题本](#/mistakes)。以后的新 quiz 也会加到这里。', blocks: [{ t: 'canvasQuiz' }] },
+    { id: 'canvasquiz', title: '平时小测合集', lead: '今年 6 次 Canvas 平时小测的全部原题，按第几次排。官方说 quiz 也在考试范围内。直接在这里做，做错的自动进[错题本](#/mistakes)。每道题也出现在对应题型页和章节小测的最前面。', blocks: [{ t: 'canvasQuiz' }] },
     { id: 'pastindex', title: '真题索引', lead: '三份往年卷的每道题在网站哪一页有完整解答；下面另列平时小测（Canvas quiz）原题。', blocks: [{ t: 'pastIndex' }] },
   ]);
 })(window);

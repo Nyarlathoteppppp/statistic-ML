@@ -94,6 +94,9 @@
           },
         ],
       },
+      { t: 'h3', text: 'Canvas Quiz 2 Q2（今年平时小测）' },
+      { t: 'canvasQuiz', pick: ['2.2'] },
+      { t: 'h3', text: '往年真题' },
       {
         t: 'past', src: '2021 S1 exam Q16', marks: '5 + 7', topic: 'L07 p23, p29',
         q: 'Consider an input domain of six points $x_1,\\dots,x_6$ and binary classifier family $\\mathcal F$ defined by the table of dichotomies below. (a) Calculate $\\mathrm{VC}(\\mathcal F)$ and show a corresponding shattered set of points. (b) List all shattered sets of points. How many are there in total?',

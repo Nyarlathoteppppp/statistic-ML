@@ -79,7 +79,7 @@
         ],
       },
 
-      { t: 'h2', text: '5. 真题全解', id: 'past' },
+      { t: 'h2', text: '5. 今年的题：2026 practice Q4、Canvas Quiz 6 Q2', id: 'past' },
       {
         t: 'past', src: '2026 S2 practice Q4', marks: 8, topic: 'L20 p17',
         q: 'Consider the following Bayesian network. Does the conditional independence statement $S\\perp Z\\mid V,W$ hold in this Bayesian network?',
@@ -114,6 +114,57 @@
           { t: 'note', md: '直觉：条件集里有 $V$（$S$ 和 $U$ 的共同孩子；"条件集"只表示竖线右边写了它，判定时把它删掉，不需要知道它取 0 还是 1），$S$ 和 $U$ 变得相关；$U\\to Y\\to Z$ 不经过 $V,W$，信息就从 $S$ 流到了 $Z$。' },
         ],
       },
+      { t: 'h3', text: 'Canvas Quiz 6 Q2（今年平时小测）' },
+      { t: 'canvasQuiz', pick: ['6.2'] },
+
+      { t: 'h2', text: '6. 今年的题：Workshop 12（Q1 BN、Q2 MRF）', id: 'ws12' },
+      T`Workshop 12 的前两题都是「读条件独立」。Q1 是 BN，和 [上一节](#/T05/past) 的 2026 practice Q4 **是同一道题**（workshop 原题直接上了考卷），这里只补最常见的错法。Q2 换成 MRF（Markov random field，马尔可夫随机场，边没有箭头的无向图），四步只剩最后两步。`,
+      {
+        t: 'past', src: 'Workshop 12 Q1', topic: 'L20 p17 · WK12 p6',
+        q: T`Consider the following Bayesian network. Does the conditional independence statement $S\perp Z\mid V,W$ hold in this Bayesian network?`,
+        qzh: T`考虑下面的贝叶斯网络（Bayesian network）。在这个贝叶斯网络中，条件独立（conditional independence）命题 $S\perp Z\mid V,W$ 成立吗？`,
+        azh: T`不成立。每个节点都是 $Z$ 的祖先，所以 $\{S,Z,V,W\}$ 的祖先图（ancestral graph）就是整张网络。道德化（moralise）把每个共同孩子的父节点两两相连：$S$–$U$（$V$ 的父节点）、$S$–$T$（$W$ 的父节点）、$U$–$X$（$Y$ 的父节点），以及 $V$–$W$、$V$–$Y$、$W$–$Y$（$Z$ 的父节点）；然后去掉所有边的方向。删除条件节点 $V$ 和 $W$ 后，剩下 $S$–$U$、$S$–$T$、$U$–$X$、$U$–$Y$、$X$–$Y$、$Y$–$Z$，仍能沿 $S$–$U$–$Y$–$Z$ 从 $S$ 走到 $Z$。因此给定 $\{V,W\}$ 时 $S$ 和 $Z$ 没有被分隔，$S\perp Z\mid V,W$ **不**成立。`,
+        blocks: [Object.assign({ t: 'graph' }, Q4, { edges: WS1_EDGES, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, w: 260, caption: '题图（位置照 tutorial 原图）。蓝圈 $S$、绿圈 $Z$ 是要判断的两点；灰色 $V,W$ 是条件集，也就是竖线右边的节点。' })],
+        sol: [
+          T`逐步解答（祖先图、6 条结婚边、删 $V,W$ 后剩下的边、路径 $S$—$U$—$Y$—$Z$）和英文答案都在 [上一节](#/T05/past) 的 2026 practice Q4，两题完全相同。这里只看最常见的错法。`,
+          {
+            t: 'warn', title: '易错：先删条件集、再结婚，会错答"成立"', blocks: [
+              T`有人一上来就把 $V,W$ 删掉，再去找共同孩子结婚。这时 $V$ 已经不在了，$S$ 和 $U$ 不再有共同孩子，结婚边 $S$—$U$ 根本不会出现；$S$ 原来只有 $S\to V$、$S\to W$ 两条边，删完后 $S$ 成了孤立点，于是得出"成立"的错误结论。`,
+              Object.assign({ t: 'graph' }, Q4, { edges: 'U-Y X-Y Y-Z U-X:moral', cls: { S: 'x', Z: 'y', V: 'removed', W: 'removed' }, w: 230, caption: '错误顺序的结果：$S$ 和 $T$ 都成了孤立点，$S$ 走不到 $Z$，于是误判"成立"。' }),
+              T`为什么必须先结婚：$V$ 在条件集里，表示 $V$ 的值已经知道了；知道了共同孩子，它的两个父母 $S$、$U$ 就变得相关（第 2 节"展开详解"里的硬币例子）。结婚边 $S$—$U$ 记录的正是这一点，所以顺序永远是：祖先图 → 结婚 → 去方向 → 删条件集。`,
+            ],
+          },
+        ],
+      },
+      {
+        t: 'past', src: 'Workshop 12 Q2', topic: 'L20 p36 · WK12 p7',
+        q: T`Consider the following Markov random field. Does the conditional independence statement $W\perp Y\mid V,Z$ hold in this Markov random field?`,
+        qzh: T`考虑下面的马尔可夫随机场（Markov random field）。在这个马尔可夫随机场中，条件独立命题 $W\perp Y\mid V,Z$ 成立吗？`,
+        azh: T`成立。在马尔可夫随机场中，如果删掉 $S$ 里的节点后 $X$ 和 $Y$ 被分开，那么 $X\perp Y\mid S$ 成立（普通的图分离（graph separation），不需要祖先图或道德化）。删掉 $V$ 和 $Z$ 后只剩边 $T$–$W$、$U$–$X$、$X$–$Y$，$W$ 只和 $T$ 相连，到不了 $Y$。因此 $W\perp Y\mid V,Z$ 成立。`,
+        blocks: [Object.assign({ t: 'graph' }, WS2, { edges: WS2_EDGES, cls: { W: 'x', Y: 'y', V: 'given', Z: 'given' }, w: 260, caption: '题图：无向图，边没有箭头。蓝圈 $W$、绿圈 $Y$ 是要判断的两点；灰色 $V,Z$ 是条件集。' })],
+        sol: [
+          T`MRF 的边没有箭头，谈不上"父母"和"祖先"，所以四步法的前两步（取祖先图、结婚）直接跳过，只做后两步：删掉条件集，看还连不连通。课件 L20 p36 说的就是这条规则：删掉条件集以后两点不连通，就条件独立（详细讲解见 [c55](#/c55)）。`,
+          { t: 'h4', text: '第 0 步：把边抄下来' },
+          T`$T$—$W$，$U$—$V$，$V$—$W$，$U$—$X$，$V$—$Y$，$W$—$Z$，$X$—$Y$，$Y$—$Z$，一共 8 条。`,
+          { t: 'h4', text: '第 1 步：删掉条件集 $V,Z$' },
+          T`删 $V$ 带走 $U$—$V$、$V$—$W$、$V$—$Y$ 三条边；删 $Z$ 带走 $W$—$Z$、$Y$—$Z$ 两条。剩下 3 条：$T$—$W$，$U$—$X$，$X$—$Y$。`,
+          { t: 'h4', text: '第 2 步：$W$ 还能走到 $Y$ 吗' },
+          T`$W$ 只连着 $T$，而 $T$ 没有别的边；$Y$ 在 $U$—$X$—$Y$ 那一块。两块之间没有边，$W$ 走不到 $Y$，所以 $W\perp Y\mid V,Z$ 成立。`,
+          { t: 'graphs', r: 15, caption: 'WK12 p7：删掉 $V,Z$ 后图断成两块。', items: [
+            Object.assign({}, WS2, { edges: WS2_EDGES, cls: { W: 'x', Y: 'y', V: 'given', Z: 'given' }, caption: '① 原图：灰色 $V,Z$ 是条件集' }),
+            Object.assign({}, WS2, { edges: 'U-V:gone V-W:gone V-Y:gone W-Z:gone Y-Z:gone T-W U-X X-Y', cls: { W: 'x', Y: 'y', V: 'removed', Z: 'removed' }, caption: T`② 删 $V,Z$：$\{T,W\}$ 和 $\{U,X,Y\}$ 不相连，成立` }),
+          ] },
+          {
+            t: 'exam', md: T`Yes. In a Markov random field, $X\perp Y\mid S$ holds when removing the nodes in $S$ separates $X$ from $Y$ (ordinary graph separation; no ancestral graph or moralisation is needed). Removing $V$ and $Z$ leaves only the edges $T$–$W$, $U$–$X$ and $X$–$Y$, so $W$ is connected only to $T$ and cannot reach $Y$. Hence $W\perp Y\mid V,Z$ holds.`,
+          },
+          {
+            t: 'warn', md: T`- **只删 $V$ 不够**：删掉 $V$ 后 $W$—$Z$—$Y$ 这条路还在，所以 $W\perp Y\mid V$ 不成立。快速检查法：$W$ 的邻居只有 $T,V,Z$，$T$ 是死胡同，$V$ 和 $Z$ 都被删了，$W$ 就出不去。
+- 不要把 BN 的步骤搬过来：MRF 的边没有方向，没有"父母"，不用取祖先图，也不用结婚加边。多加的边可能把本来分开的两点连起来，答案就反了。`,
+          },
+        ],
+      },
+
+      { t: 'h2', text: '7. 往年真题（2021、2017）', id: 'past-old' },
       {
         t: 'past', src: '2021 S1 exam Q18(a)', marks: 6, topic: 'L20 p17（HMM 本身课件未讲）',
         q: 'A multiple-chain HMM has hidden chains $a_1\\to a_2\\to\\dots\\to a_T$ and $b_1\\to b_2\\to\\dots\\to b_T$, and observations $x_t$ with parents $a_t$ and $b_t$. What random variables are marginally independent of $a_1$? As we are considering marginal independence, no values of $x_t$ are observed. Explain your answer.',
@@ -189,54 +240,7 @@
         ],
       },
 
-      { t: 'h2', text: '6. Workshop 12 练习（Q1 BN、Q2 MRF）', id: 'ws12' },
-      T`Workshop 12 的前两题都是「读条件独立」。Q1 是 BN，和 [上一节](#/T05/past) 的 2026 practice Q4 **是同一道题**（workshop 原题直接上了考卷），这里只补最常见的错法。Q2 换成 MRF（Markov random field，马尔可夫随机场，边没有箭头的无向图），四步只剩最后两步。`,
-      {
-        t: 'past', src: 'Workshop 12 Q1', topic: 'L20 p17 · WK12 p6',
-        q: T`Consider the following Bayesian network. Does the conditional independence statement $S\perp Z\mid V,W$ hold in this Bayesian network?`,
-        qzh: T`考虑下面的贝叶斯网络（Bayesian network）。在这个贝叶斯网络中，条件独立（conditional independence）命题 $S\perp Z\mid V,W$ 成立吗？`,
-        azh: T`不成立。每个节点都是 $Z$ 的祖先，所以 $\{S,Z,V,W\}$ 的祖先图（ancestral graph）就是整张网络。道德化（moralise）把每个共同孩子的父节点两两相连：$S$–$U$（$V$ 的父节点）、$S$–$T$（$W$ 的父节点）、$U$–$X$（$Y$ 的父节点），以及 $V$–$W$、$V$–$Y$、$W$–$Y$（$Z$ 的父节点）；然后去掉所有边的方向。删除条件节点 $V$ 和 $W$ 后，剩下 $S$–$U$、$S$–$T$、$U$–$X$、$U$–$Y$、$X$–$Y$、$Y$–$Z$，仍能沿 $S$–$U$–$Y$–$Z$ 从 $S$ 走到 $Z$。因此给定 $\{V,W\}$ 时 $S$ 和 $Z$ 没有被分隔，$S\perp Z\mid V,W$ **不**成立。`,
-        blocks: [Object.assign({ t: 'graph' }, Q4, { edges: WS1_EDGES, cls: { S: 'x', Z: 'y', V: 'given', W: 'given' }, w: 260, caption: '题图（位置照 tutorial 原图）。蓝圈 $S$、绿圈 $Z$ 是要判断的两点；灰色 $V,W$ 是条件集，也就是竖线右边的节点。' })],
-        sol: [
-          T`逐步解答（祖先图、6 条结婚边、删 $V,W$ 后剩下的边、路径 $S$—$U$—$Y$—$Z$）和英文答案都在 [上一节](#/T05/past) 的 2026 practice Q4，两题完全相同。这里只看最常见的错法。`,
-          {
-            t: 'warn', title: '易错：先删条件集、再结婚，会错答"成立"', blocks: [
-              T`有人一上来就把 $V,W$ 删掉，再去找共同孩子结婚。这时 $V$ 已经不在了，$S$ 和 $U$ 不再有共同孩子，结婚边 $S$—$U$ 根本不会出现；$S$ 原来只有 $S\to V$、$S\to W$ 两条边，删完后 $S$ 成了孤立点，于是得出"成立"的错误结论。`,
-              Object.assign({ t: 'graph' }, Q4, { edges: 'U-Y X-Y Y-Z U-X:moral', cls: { S: 'x', Z: 'y', V: 'removed', W: 'removed' }, w: 230, caption: '错误顺序的结果：$S$ 和 $T$ 都成了孤立点，$S$ 走不到 $Z$，于是误判"成立"。' }),
-              T`为什么必须先结婚：$V$ 在条件集里，表示 $V$ 的值已经知道了；知道了共同孩子，它的两个父母 $S$、$U$ 就变得相关（第 2 节"展开详解"里的硬币例子）。结婚边 $S$—$U$ 记录的正是这一点，所以顺序永远是：祖先图 → 结婚 → 去方向 → 删条件集。`,
-            ],
-          },
-        ],
-      },
-      {
-        t: 'past', src: 'Workshop 12 Q2', topic: 'L20 p36 · WK12 p7',
-        q: T`Consider the following Markov random field. Does the conditional independence statement $W\perp Y\mid V,Z$ hold in this Markov random field?`,
-        qzh: T`考虑下面的马尔可夫随机场（Markov random field）。在这个马尔可夫随机场中，条件独立命题 $W\perp Y\mid V,Z$ 成立吗？`,
-        azh: T`成立。在马尔可夫随机场中，如果删掉 $S$ 里的节点后 $X$ 和 $Y$ 被分开，那么 $X\perp Y\mid S$ 成立（普通的图分离（graph separation），不需要祖先图或道德化）。删掉 $V$ 和 $Z$ 后只剩边 $T$–$W$、$U$–$X$、$X$–$Y$，$W$ 只和 $T$ 相连，到不了 $Y$。因此 $W\perp Y\mid V,Z$ 成立。`,
-        blocks: [Object.assign({ t: 'graph' }, WS2, { edges: WS2_EDGES, cls: { W: 'x', Y: 'y', V: 'given', Z: 'given' }, w: 260, caption: '题图：无向图，边没有箭头。蓝圈 $W$、绿圈 $Y$ 是要判断的两点；灰色 $V,Z$ 是条件集。' })],
-        sol: [
-          T`MRF 的边没有箭头，谈不上"父母"和"祖先"，所以四步法的前两步（取祖先图、结婚）直接跳过，只做后两步：删掉条件集，看还连不连通。课件 L20 p36 说的就是这条规则：删掉条件集以后两点不连通，就条件独立（详细讲解见 [c55](#/c55)）。`,
-          { t: 'h4', text: '第 0 步：把边抄下来' },
-          T`$T$—$W$，$U$—$V$，$V$—$W$，$U$—$X$，$V$—$Y$，$W$—$Z$，$X$—$Y$，$Y$—$Z$，一共 8 条。`,
-          { t: 'h4', text: '第 1 步：删掉条件集 $V,Z$' },
-          T`删 $V$ 带走 $U$—$V$、$V$—$W$、$V$—$Y$ 三条边；删 $Z$ 带走 $W$—$Z$、$Y$—$Z$ 两条。剩下 3 条：$T$—$W$，$U$—$X$，$X$—$Y$。`,
-          { t: 'h4', text: '第 2 步：$W$ 还能走到 $Y$ 吗' },
-          T`$W$ 只连着 $T$，而 $T$ 没有别的边；$Y$ 在 $U$—$X$—$Y$ 那一块。两块之间没有边，$W$ 走不到 $Y$，所以 $W\perp Y\mid V,Z$ 成立。`,
-          { t: 'graphs', r: 15, caption: 'WK12 p7：删掉 $V,Z$ 后图断成两块。', items: [
-            Object.assign({}, WS2, { edges: WS2_EDGES, cls: { W: 'x', Y: 'y', V: 'given', Z: 'given' }, caption: '① 原图：灰色 $V,Z$ 是条件集' }),
-            Object.assign({}, WS2, { edges: 'U-V:gone V-W:gone V-Y:gone W-Z:gone Y-Z:gone T-W U-X X-Y', cls: { W: 'x', Y: 'y', V: 'removed', Z: 'removed' }, caption: T`② 删 $V,Z$：$\{T,W\}$ 和 $\{U,X,Y\}$ 不相连，成立` }),
-          ] },
-          {
-            t: 'exam', md: T`Yes. In a Markov random field, $X\perp Y\mid S$ holds when removing the nodes in $S$ separates $X$ from $Y$ (ordinary graph separation; no ancestral graph or moralisation is needed). Removing $V$ and $Z$ leaves only the edges $T$–$W$, $U$–$X$ and $X$–$Y$, so $W$ is connected only to $T$ and cannot reach $Y$. Hence $W\perp Y\mid V,Z$ holds.`,
-          },
-          {
-            t: 'warn', md: T`- **只删 $V$ 不够**：删掉 $V$ 后 $W$—$Z$—$Y$ 这条路还在，所以 $W\perp Y\mid V$ 不成立。快速检查法：$W$ 的邻居只有 $T,V,Z$，$T$ 是死胡同，$V$ 和 $Z$ 都被删了，$W$ 就出不去。
-- 不要把 BN 的步骤搬过来：MRF 的边没有方向，没有"父母"，不用取祖先图，也不用结婚加边。多加的边可能把本来分开的两点连起来，答案就反了。`,
-          },
-        ],
-      },
-
-      { t: 'h2', text: '7. 随机练习', id: 'practice' },
+      { t: 'h2', text: '8. 随机练习', id: 'practice' },
       '随机生成一张 DAG（directed acyclic graph，有向无环图：边有箭头，沿箭头走不能绕回出发点）和一个问题。先在纸上按四步法做，再看解答。',
       { t: 'practice', gen: 'dsep', title: 'D-separation 随机题' },
       {
@@ -266,7 +270,6 @@
             options: ['成立', '不成立'], answer: 1,
             explain: T`MRF 只看普通的图分离：删掉 $V$ 和它的 3 条边（$U$—$V$、$V$—$W$、$V$—$Y$），剩下 $T$—$W$、$U$—$X$、$W$—$Z$、$X$—$Y$、$Y$—$Z$。$W$—$Z$—$Y$ 这条路还在，$W$ 能走到 $Y$，所以不成立。原题把 $Z$ 也放进条件集，这条路才断开，原题因此成立。`,
           },
-          root.SML.canvasQuiz.dsepXT,
         ],
       },
     ],

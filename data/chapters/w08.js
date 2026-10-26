@@ -617,7 +617,7 @@
     ],
     quiz: [
       {
-        type: 'mc', q: T`（平时小测原题）Weighted Majority with $n$ experts, best expert makes $m$ mistakes, learning rate $\epsilon>0$: $M\le2(1+\epsilon)m+\frac{2\ln n}{\epsilon}$. Assume $n\ge10^4$ and $m\le3$. Which statement is TRUE about the bound and the optimal choice of $\epsilon$?`,
+        cq: '4.2', type: 'mc', q: T`（平时小测原题）Weighted Majority with $n$ experts, best expert makes $m$ mistakes, learning rate $\epsilon>0$: $M\le2(1+\epsilon)m+\frac{2\ln n}{\epsilon}$. Assume $n\ge10^4$ and $m\le3$. Which statement is TRUE about the bound and the optimal choice of $\epsilon$?`,
         qzh: T`Weighted Majority 有 $n$ 个专家，最好的专家犯 $m$ 次错，学习率 $\epsilon>0$，算法错误次数的上界是 $M\le2(1+\epsilon)m+\frac{2\ln n}{\epsilon}$。设 $n\ge10^4$、$m\le3$。关于这个界和最优的 $\epsilon$，哪句话对？`,
         options: [
           T`Increasing $\epsilon$ always decreases $M$ until the bound becomes independent of $n$, hence taking $\epsilon$ very large is optimal.`,

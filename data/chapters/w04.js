@@ -312,7 +312,7 @@
     ],
     quiz: [
       {
-        type: 'set',
+        cq: '2.2', type: 'set',
         q: [
           T`（平时小测原题）The table lists all 9 unique dichotomies of a family $\mathcal F$ on $\mathcal X=\{x_1,x_2,x_3,x_4\}$ (labels in $\{0,1\}$). Select all true facts about $\mathrm{VC}(\mathcal F)$ that can be deduced from the table (you are not asked for the exact value). 1: Based on the number of rows, the VC dimension cannot be more than 3. 2: $\mathcal F$ shatters $\{x_1,x_3\}$. 3: $\mathcal F$ shatters $\{x_2,x_4\}$.`,
           { t: 'table', cls: 'mono compact', head: ['$x_1$', '$x_2$', '$x_3$', '$x_4$'], rows: ['0001', '0101', '0110', '0111', '1001', '1011', '1101', '1110', '1111'].map((r) => r.split('')) },

@@ -55,7 +55,7 @@
         if (v.try) B.push({ t: 'good', title: '动手试试', md: v.try });
       });
       else if (k === 'pitfalls') B.push({ t: 'table', head: ['常见错误', '正确理解'], rows: c.pitfalls });
-      else if (k === 'quiz') B.push({ t: 'quiz', items: c.quiz });
+      else if (k === 'quiz') B.push({ t: 'quiz', items: c.quiz.filter((q) => q.cq).concat(c.quiz.filter((q) => !q.cq)) }); // this year's Canvas quiz first
       else asBlocks(c[k]).forEach((b) => B.push(b));
     });
     B.push({ t: 'notes', id: c.id });

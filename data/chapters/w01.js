@@ -947,7 +947,7 @@
       { type: 'num', q: '某 BN 中，"Rain = T"出现 40 次，其中"WetGrass = T"有 30 次。$P(\\text{Wet}=T\\mid\\text{Rain}=T)$ 的 MLE？', answer: 0.75, explain: 'CPT 的 MLE = 条件计数比例 $30/40$，即 Bernoulli MLE 在"Rain = T"的子集上。详见 T7。' },
       { type: 'show', q: '推导 $p_\\theta(x)=\\theta e^{-\\theta x}$ 的 MLE（写出关键步骤，英文）。', answer: T`Log-likelihood $L(\theta)=\sum_i(\log\theta-\theta x_i)=n\log\theta-\theta\sum_ix_i$. Setting $dL/d\theta=n/\theta-\sum_ix_i=0$ gives $\hat\theta=n/\sum_ix_i=1/\bar x$. The second derivative $-n/\theta^2<0$ confirms a maximum.` },
       {
-        type: 'mc', q: T`（平时小测原题）Suppose $f(w)>0$ for all $w$, and we define $g(w)=\log f(w)$. Why do $f(w)$ and $g(w)$ have the same minimiser?`,
+        cq: '1.2', type: 'mc', q: T`（平时小测原题）Suppose $f(w)>0$ for all $w$, and we define $g(w)=\log f(w)$. Why do $f(w)$ and $g(w)$ have the same minimiser?`,
         qzh: T`设对所有 $w$ 都有 $f(w)>0$，令 $g(w)=\log f(w)$。为什么 $f(w)$ 和 $g(w)$ 的最小值点相同？`,
         options: [
           T`The logarithm is a concave function.`,
@@ -1336,7 +1336,7 @@
       { type: 'mc', q: '下面关于 MAP 的说法哪个正确？', options: ['MAP 最大化 $p(D\\mid\\theta)$', 'MAP 需要计算 evidence', '均匀先验时 MAP = MLE', 'MAP 输出后验分布'], answer: 2, explain: 'L02 p26。MAP 不需要 evidence（与 $\\theta$ 无关）。' },
       { type: 'show', q: '（往年原题 2026 Q1b）In words or a mathematical expression, what is the marginal likelihood for a Bayesian probabilistic model?', answer: T`The marginal likelihood (evidence) is the probability of the observed data under the model with the parameters integrated out according to the prior: $p(D)=\int p(D\mid\theta)\,p(\theta)\,d\theta$ (a sum for discrete $\theta$). It is the normalising constant (denominator) in Bayes' rule for the posterior.`, qzh: '用文字或数学表达式说明：对于一个贝叶斯概率模型（Bayesian probabilistic model），边缘似然（marginal likelihood）是什么？', azh: T`边缘似然（marginal likelihood），又称证据（evidence），是在该模型下观测数据出现的概率，其中参数已按先验（prior）积分掉：$p(D)=\int p(D\mid\theta)\,p(\theta)\,d\theta$（$\theta$ 离散时为求和）。它是用 Bayes 公式（Bayes' rule）求后验时的归一化常数（normalising constant），即分母。` },
       {
-        type: 'mc', q: T`（平时小测原题）Which statement best describes the relationship between Maximum Likelihood Estimation (MLE) and Maximum A Posteriori (MAP) estimation?`,
+        cq: '1.1', type: 'mc', q: T`（平时小测原题）Which statement best describes the relationship between Maximum Likelihood Estimation (MLE) and Maximum A Posteriori (MAP) estimation?`,
         qzh: T`下面哪句话最准确地描述了极大似然估计（MLE）和最大后验估计（MAP）的关系？`,
         options: [
           T`MAP and MLE differ only when the likelihood function is non-convex.`,

@@ -715,7 +715,7 @@
     ],
     quiz: [
       {
-        type: 'mc', q: '（平时小测原题）Which of the following statements about autoencoders and PCA is **true**?',
+        cq: '3.1', type: 'mc', q: '（平时小测原题）Which of the following statements about autoencoders and PCA is **true**?',
         qzh: '下面关于 autoencoder 和 PCA 的说法，哪一个是对的？',
         options: [
           'PCA and autoencoders always produce the same low-dimensional representation, even when the autoencoder uses nonlinear activations.',

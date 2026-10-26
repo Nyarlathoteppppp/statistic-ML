@@ -116,7 +116,10 @@ Total (excluding biases): $3+20+20=$ **43**.`,
       },
       { t: 'slide', src: 'L13/p26', caption: '左图两层宽 3 的卷积叠起来，$g_3$ 看到 $x_1$–$x_5$ 共 5 个输入：$1+2+2=5$。' },
 
-      { t: 'h2', text: '7. 真题全解：尺寸、stride、卷积手算、感受野', id: 'past-more' },
+      { t: 'h2', text: '7. 今年的题：Canvas Quiz 4 Q1（参数个数）', id: 'quiz' },
+      { t: 'canvasQuiz', pick: ['4.1'] },
+      
+      { t: 'h2', text: '8. 往年真题：尺寸、stride、卷积手算、感受野', id: 'past-more' },
       { t: 'note', md: '这一节的 5 道题都只在学生笔记（Travis）里找到，**图来自学生笔记，未与原卷核对**；网络结构图在这里改画成表格。笔记里的学生答案有几处算错（例如 2020 Q5 的总参数），下面的答案全部重新算过。2022 S1 Q5（$3\\times3$ 图、$2\\times2$ filter、global max pooling（全局最大池化：每个通道在整张特征图上只取一个最大值），写函数并反传）放在 [T10](#/T10)。' },
       {
         t: 'past', src: '2020 Q5(a)(b)(c)（据学生笔记）', topic: 'L13 p17, p23, p26',
@@ -319,7 +322,7 @@ Note: the padding size is the number of rows/columns on each side of the input. 
         ],
       },
 
-      { t: 'h2', text: '8. 随机练习', id: 'practice' },
+      { t: 'h2', text: '9. 随机练习', id: 'practice' },
       { t: 'practice', gen: 'cnn', title: 'CNN 参数随机题' },
       {
         t: 'quiz', items: [

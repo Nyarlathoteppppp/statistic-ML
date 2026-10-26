@@ -157,7 +157,7 @@
     ],
     quiz: [
       {
-        type: 'set',
+        cq: '2.1', type: 'set',
         q: [
           T`（平时小测原题）Irrelevant features can cause problems with computation, interpretation and statistical performance. The table shows three features (columns) for four instances (rows). Which features can be written as a linear combination of the other two? (Select all: 1 = $x_1$, 2 = $x_2$, 3 = $x_3$.)`,
           { t: 'table', head: ['$x_1$', '$x_2$', '$x_3$'], rows: [['−2', '−2', '1'], ['0.5', '1', '−0.5'], ['8', '8', '−4'], ['−6', '−6', '3']] },

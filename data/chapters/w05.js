@@ -602,7 +602,7 @@
     ],
     quiz: [
       {
-        type: 'num', q: T`（平时小测原题）Imagine you are training a Perceptron as described in lectures: for $s=w_0+w_1x_1+w_2x_2$, the classifier predicts positive if $s\ge0$ and negative if $s<0$. You use the Perceptron loss $L(s,y)=\max\{0,-sy\}$ and the standard update rule with learning rate $\eta=1$. If the current weights are $(w_0,w_1,w_2)=(1,-2,2)$, what will the new weight $w_2$ be after processing the training example $(x_1,x_2)=(2,-1)$, $y=-1$?`,
+        cq: '3.2', type: 'num', q: T`（平时小测原题）Imagine you are training a Perceptron as described in lectures: for $s=w_0+w_1x_1+w_2x_2$, the classifier predicts positive if $s\ge0$ and negative if $s<0$. You use the Perceptron loss $L(s,y)=\max\{0,-sy\}$ and the standard update rule with learning rate $\eta=1$. If the current weights are $(w_0,w_1,w_2)=(1,-2,2)$, what will the new weight $w_2$ be after processing the training example $(x_1,x_2)=(2,-1)$, $y=-1$?`,
         qzh: T`按课件训练感知机：$s=w_0+w_1x_1+w_2x_2$，$s\ge0$ 判正类、$s<0$ 判负类；损失 $L(s,y)=\max\{0,-sy\}$，学习率 $\eta=1$。当前权重 $(w_0,w_1,w_2)=(1,-2,2)$，处理样本 $(x_1,x_2)=(2,-1)$、$y=-1$ 之后，新的 $w_2$ 是多少？`,
         answer: 2,
         explain: T`先算得分：$s=1+(-2)\times2+2\times(-1)=1-4-2=-5$。$s<0$ 判负类，真实 $y=-1$，分对了。等价地看损失：$y\,s=(-1)(-5)=5>0$，$L=\max\{0,-5\}=0$，梯度为 0，所以**不更新**，$w_2$ 仍是 2。常见错误是不管分没分对都套 $\mathbf w\leftarrow\mathbf w+\eta y\mathbf x$，会得到 $w_2=2+1\times(-1)\times(-1)=3$。`,

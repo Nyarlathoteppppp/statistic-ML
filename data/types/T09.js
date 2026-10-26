@@ -110,6 +110,9 @@
         ],
       },
 
+      { t: 'h3', text: 'Canvas Quiz 1 Q1（今年平时小测）' },
+      { t: 'canvasQuiz', pick: ['1.1'] },
+      
       { t: 'h2', text: '2. Beta–Binomial（最常见的手算题）', id: 'beta' },
       T`已知模型：每次试验只有成功／失败两种结果，各次独立，成功概率都是未知的 $q\in[0,1]$。做 $n$ 次，观察到 $k$ 次成功、$n-k$ 次失败。Binomial（二项分布）描述这 $n$ 次中的成功次数。`,
       T`Beta（贝塔分布）用来表示我们对成功概率 $q$ 的不确定性；$\alpha>0$、$\beta>0$ 是题目给定的两个先验参数。符号 $q\sim\mathrm{Beta}(\alpha,\beta)$ 读作“$q$ 服从这个 Beta 分布”。`,
@@ -139,6 +142,9 @@
       },
       { t: 'practice', gen: 'beta', title: 'Beta 后验随机题' },
 
+      { t: 'h3', text: 'Canvas Quiz 5 Q2（今年平时小测）' },
+      { t: 'canvasQuiz', pick: ['5.2'] },
+      
       { t: 'h2', text: '3. 其他共轭对：Poisson–Gamma（2016 真题）', id: 'conj' },
       'Beta–Binomial 不是唯一的共轭对。L19 p17 列了一张"有用的共轭先验"表，2016 年的考试就考了表里的 Poisson–Gamma：证明它共轭，再写出后验参数。方法和第 2 节完全一样：先验乘似然，只看和参数有关的部分，认出是哪个分布。',
       T`符号：每个观测 $x_i$ 是一段相同长度时间内的计数，共 $n$ 个独立观测，总计数 $\sum_ix_i$，它们共享未知的平均次数 $\lambda>0$。$\alpha,\beta>0$ 在这里是 Gamma 先验的形状参数（shape）和率参数（rate，密度里写成 $e^{-\beta\lambda}$），不是第 2 节 Beta 的参数。`,

@@ -78,7 +78,7 @@
         ],
       },
 
-      { t: 'h2', text: '3. 真题全解', id: 'past' },
+      { t: 'h2', text: '3. 今年的题：2026 practice Q5、Canvas Quiz 6 Q1', id: 'past' },
       {
         t: 'past', src: '2026 S2 practice Q5', marks: 8, topic: 'L22 p6–p22',
         q: 'Consider the following Markov Random Field. Assume the following node elimination order: $T, X, Z, U, W, V, Y$. What are the cliques in the junction tree (by using the above elimination order)?',
@@ -118,6 +118,63 @@ A valid tree: $\{U,V,W,Y\}$ connected to $\{T,U,W\}$ (separator $\{U,W\}$), $\{U
           { t: 'warn', md: '删 $U$ 时最容易漏掉 $W$ 和 $Y$：它们原本不是 $U$ 的邻居，是删 $T$、$X$ 时加的 fill-in 边让它们成了邻居。' },
         ],
       },
+      { t: 'h3', text: 'Canvas Quiz 6 Q1（今年平时小测）' },
+      { t: 'canvasQuiz', pick: ['6.1'] },
+
+      { t: 'h2', text: '4. 今年的题：Workshop 12 Q4', id: 'ws12' },
+      T`Workshop 12 Q4 和 [上一节](#/T06/past) 的 2026 practice Q5 **是同一道题**（同一张图、同一个消元顺序），workshop 原题直接上了考卷。这里按 workshop 官方答案（WK12 p9）的格式写：每删一个点记一个团，最后划掉被包含的团。上一节还多画了 junction tree 本身。`,
+      {
+        t: 'past', src: 'Workshop 12 Q4', topic: 'L22 p6–p17 · WK12 p9',
+        q: T`Consider the following Markov Random field. Assume the following node elimination order: $T, X, Z, U, W, V, Y$. (Eliminate the first node in the list, then eliminate the second node in the list, then eliminate the third node in the list, etc.) What are the cliques in the junction tree (by using the above elimination order)?`,
+        qzh: T`考虑下面的马尔可夫随机场（Markov random field）。消元顺序（elimination order）为 $T, X, Z, U, W, V, Y$（先消去列表里的第一个节点，再消第二个，再消第三个……）。用这个消元顺序，联结树（junction tree）里的团（clique）有哪些？`,
+        azh: T`按 $T,X,Z,U,W,V,Y$ 的顺序消元，每次把被消节点的当前邻居两两相连，并记下团（节点 + 邻居）：
+
+- $T$：邻居 $U,W$，填补边（fill-in edge）$U$–$W$，团 $\{T,U,W\}$；
+- $X$：邻居 $U,Y$，填补边 $U$–$Y$，团 $\{U,X,Y\}$；
+- $Z$：邻居 $V,W,Y$，填补边 $W$–$Y$，团 $\{V,W,Y,Z\}$；
+- $U$：邻居 $V,W,Y$，没有填补边，团 $\{U,V,W,Y\}$；
+- $W$、$V$、$Y$：团 $\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$，它们是 $\{U,V,W,Y\}$ 的子集，丢掉。
+
+联结树的团就是这些极大团（maximal clique）：$\{T,U,W\}$、$\{U,X,Y\}$、$\{V,W,Y,Z\}$、$\{U,V,W,Y\}$。`,
+        blocks: [Object.assign({ t: 'graph', w: 240 }, q5('T-U T-W U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z', {}, '题图（位置照 tutorial 原图）：7 个点、10 条边的无向图。'))],
+        sol: [
+          { t: 'h4', text: '第 0 步：把边抄下来' },
+          T`$T$—$U$，$T$—$W$，$U$—$V$，$U$—$X$，$V$—$W$，$V$—$Y$，$V$—$Z$，$W$—$Z$，$X$—$Y$，$Y$—$Z$，一共 10 条。`,
+          { t: 'h4', text: '第 1 步：按顺序消元，每步一行' },
+          {
+            t: 'table', head: ['被删节点', '当前邻居', 'fill-in 边', '团'], rows: [
+              ['$T$', '$U,W$', '$U$—$W$', T`$\{T,U,W\}$`],
+              ['$X$', '$U,Y$', '$U$—$Y$', T`$\{U,X,Y\}$`],
+              ['$Z$', '$V,W,Y$', '$W$—$Y$（$V$—$W$、$V$—$Y$ 原来就有）', T`$\{V,W,Y,Z\}$`],
+              ['$U$', '$V,W,Y$（$W$、$Y$ 是 fill-in 带来的）', '无（三者已两两相连）', T`$\{U,V,W,Y\}$`],
+              ['$W$', '$V,Y$', '无', T`$\{V,W,Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
+              ['$V$', '$Y$', '无', T`$\{V,Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
+              ['$Y$', '—', '无', T`$\{Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
+            ],
+          },
+          { t: 'h4', text: '第 2 步：只留极大团' },
+          T`7 个团里，后 3 个都是 $\{U,V,W,Y\}$ 的子集，不带新信息，划掉（L22 p17）。前 4 个谁也不包含谁，全部留下：$\{T,U,W\}$，$\{U,X,Y\}$，$\{V,W,Y,Z\}$，$\{U,V,W,Y\}$。`,
+          Object.assign({ t: 'graph', w: 250 }, q5('T-U T-W U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z U-W:fill U-Y:fill W-Y:fill', {}, T`核对：把 3 条 fill-in 边（紫色虚线）画回原图，4 个极大团 $\{T,U,W\}$、$\{U,X,Y\}$、$\{V,W,Y,Z\}$、$\{U,V,W,Y\}$ 在这张图里都是两两相连的。`)),
+          {
+            t: 'exam', md: T`Eliminate the nodes in the order $T,X,Z,U,W,V,Y$, each time connecting the current neighbours of the eliminated node (fill-in edges) and recording the clique "node + neighbours":
+
+- $T$: neighbours $U,W$, fill-in $U$–$W$, clique $\{T,U,W\}$;
+- $X$: neighbours $U,Y$, fill-in $U$–$Y$, clique $\{U,X,Y\}$;
+- $Z$: neighbours $V,W,Y$, fill-in $W$–$Y$, clique $\{V,W,Y,Z\}$;
+- $U$: neighbours $V,W,Y$, no fill-in, clique $\{U,V,W,Y\}$;
+- $W$, $V$, $Y$: cliques $\{V,W,Y\}$, $\{V,Y\}$, $\{Y\}$, which are subsets of $\{U,V,W,Y\}$ and are dropped.
+
+The cliques in the junction tree are the maximal cliques $\{T,U,W\}$, $\{U,X,Y\}$, $\{V,W,Y,Z\}$, $\{U,V,W,Y\}$.`,
+          },
+          {
+            t: 'warn', md: T`- **删 $U$ 时只看原图的邻居**（$T,V,X$ 去掉已删的，只剩 $V$），会把团写成 $\{U,V\}$。邻居要按当前的图算，前面补的 fill-in 边也算。
+- 不要把 $\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$ 写进最终答案：被别的团包含的团要划掉。
+- 团要把被删的点自己写进去：删 $Z$ 记的是 $\{V,W,Y,Z\}$，不是 $\{V,W,Y\}$。`,
+          },
+        ],
+      },
+
+      { t: 'h2', text: '5. 往年真题（2021–2023）', id: 'past-old' },
       {
         t: 'past', src: '2021 S1 exam Q18(b)', marks: 8, topic: 'L21 消息记法；HMM 本身课件未讲',
         q: 'We wish to use the elimination algorithm to perform inference in the multiple-chain HMM given observed $x$. Show the first two steps of the algorithm, for eliminating $X_1=x_1$ then $A_1$. As part of your answer, state the formulation of the $\\psi$ and $m$ functions and the linear algebraic operations used in each step.',
@@ -273,62 +330,9 @@ A valid tree: $\{U,V,W,Y\}$ connected to $\{T,U,W\}$ (separator $\{U,W\}$), $\{U
         ],
       },
 
-      { t: 'h2', text: '4. Workshop 12 Q4', id: 'ws12' },
-      T`Workshop 12 Q4 和 [上一节](#/T06/past) 的 2026 practice Q5 **是同一道题**（同一张图、同一个消元顺序），workshop 原题直接上了考卷。这里按 workshop 官方答案（WK12 p9）的格式写：每删一个点记一个团，最后划掉被包含的团。上一节还多画了 junction tree 本身。`,
-      {
-        t: 'past', src: 'Workshop 12 Q4', topic: 'L22 p6–p17 · WK12 p9',
-        q: T`Consider the following Markov Random field. Assume the following node elimination order: $T, X, Z, U, W, V, Y$. (Eliminate the first node in the list, then eliminate the second node in the list, then eliminate the third node in the list, etc.) What are the cliques in the junction tree (by using the above elimination order)?`,
-        qzh: T`考虑下面的马尔可夫随机场（Markov random field）。消元顺序（elimination order）为 $T, X, Z, U, W, V, Y$（先消去列表里的第一个节点，再消第二个，再消第三个……）。用这个消元顺序，联结树（junction tree）里的团（clique）有哪些？`,
-        azh: T`按 $T,X,Z,U,W,V,Y$ 的顺序消元，每次把被消节点的当前邻居两两相连，并记下团（节点 + 邻居）：
-
-- $T$：邻居 $U,W$，填补边（fill-in edge）$U$–$W$，团 $\{T,U,W\}$；
-- $X$：邻居 $U,Y$，填补边 $U$–$Y$，团 $\{U,X,Y\}$；
-- $Z$：邻居 $V,W,Y$，填补边 $W$–$Y$，团 $\{V,W,Y,Z\}$；
-- $U$：邻居 $V,W,Y$，没有填补边，团 $\{U,V,W,Y\}$；
-- $W$、$V$、$Y$：团 $\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$，它们是 $\{U,V,W,Y\}$ 的子集，丢掉。
-
-联结树的团就是这些极大团（maximal clique）：$\{T,U,W\}$、$\{U,X,Y\}$、$\{V,W,Y,Z\}$、$\{U,V,W,Y\}$。`,
-        blocks: [Object.assign({ t: 'graph', w: 240 }, q5('T-U T-W U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z', {}, '题图（位置照 tutorial 原图）：7 个点、10 条边的无向图。'))],
-        sol: [
-          { t: 'h4', text: '第 0 步：把边抄下来' },
-          T`$T$—$U$，$T$—$W$，$U$—$V$，$U$—$X$，$V$—$W$，$V$—$Y$，$V$—$Z$，$W$—$Z$，$X$—$Y$，$Y$—$Z$，一共 10 条。`,
-          { t: 'h4', text: '第 1 步：按顺序消元，每步一行' },
-          {
-            t: 'table', head: ['被删节点', '当前邻居', 'fill-in 边', '团'], rows: [
-              ['$T$', '$U,W$', '$U$—$W$', T`$\{T,U,W\}$`],
-              ['$X$', '$U,Y$', '$U$—$Y$', T`$\{U,X,Y\}$`],
-              ['$Z$', '$V,W,Y$', '$W$—$Y$（$V$—$W$、$V$—$Y$ 原来就有）', T`$\{V,W,Y,Z\}$`],
-              ['$U$', '$V,W,Y$（$W$、$Y$ 是 fill-in 带来的）', '无（三者已两两相连）', T`$\{U,V,W,Y\}$`],
-              ['$W$', '$V,Y$', '无', T`$\{V,W,Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
-              ['$V$', '$Y$', '无', T`$\{V,Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
-              ['$Y$', '—', '无', T`$\{Y\}$ ⊂ $\{U,V,W,Y\}$，划掉`],
-            ],
-          },
-          { t: 'h4', text: '第 2 步：只留极大团' },
-          T`7 个团里，后 3 个都是 $\{U,V,W,Y\}$ 的子集，不带新信息，划掉（L22 p17）。前 4 个谁也不包含谁，全部留下：$\{T,U,W\}$，$\{U,X,Y\}$，$\{V,W,Y,Z\}$，$\{U,V,W,Y\}$。`,
-          Object.assign({ t: 'graph', w: 250 }, q5('T-U T-W U-V U-X W-V W-Z V-Y V-Z X-Y Y-Z U-W:fill U-Y:fill W-Y:fill', {}, T`核对：把 3 条 fill-in 边（紫色虚线）画回原图，4 个极大团 $\{T,U,W\}$、$\{U,X,Y\}$、$\{V,W,Y,Z\}$、$\{U,V,W,Y\}$ 在这张图里都是两两相连的。`)),
-          {
-            t: 'exam', md: T`Eliminate the nodes in the order $T,X,Z,U,W,V,Y$, each time connecting the current neighbours of the eliminated node (fill-in edges) and recording the clique "node + neighbours":
-
-- $T$: neighbours $U,W$, fill-in $U$–$W$, clique $\{T,U,W\}$;
-- $X$: neighbours $U,Y$, fill-in $U$–$Y$, clique $\{U,X,Y\}$;
-- $Z$: neighbours $V,W,Y$, fill-in $W$–$Y$, clique $\{V,W,Y,Z\}$;
-- $U$: neighbours $V,W,Y$, no fill-in, clique $\{U,V,W,Y\}$;
-- $W$, $V$, $Y$: cliques $\{V,W,Y\}$, $\{V,Y\}$, $\{Y\}$, which are subsets of $\{U,V,W,Y\}$ and are dropped.
-
-The cliques in the junction tree are the maximal cliques $\{T,U,W\}$, $\{U,X,Y\}$, $\{V,W,Y,Z\}$, $\{U,V,W,Y\}$.`,
-          },
-          {
-            t: 'warn', md: T`- **删 $U$ 时只看原图的邻居**（$T,V,X$ 去掉已删的，只剩 $V$），会把团写成 $\{U,V\}$。邻居要按当前的图算，前面补的 fill-in 边也算。
-- 不要把 $\{V,W,Y\}$、$\{V,Y\}$、$\{Y\}$ 写进最终答案：被别的团包含的团要划掉。
-- 团要把被删的点自己写进去：删 $Z$ 记的是 $\{V,W,Y,Z\}$，不是 $\{V,W,Y\}$。`,
-          },
-        ],
-      },
-
-      { t: 'h2', text: '5. MRF 势表：算 Z 和边缘概率', id: 'mrf-z' },
+      { t: 'h2', text: '6. MRF 势表：算 Z 和边缘概率', id: 'mrf-z' },
       T`另一类小计算题，2016、2019 和一份标 2021 的卷子都出过（每问 1–2 分）：给一个无向 PGM（MRF，[c55](#/c55)）和每个团的势表（potential table），问配分函数（partition function，也叫归一化常数 normalising constant）$Z$ 和某几个变量的概率。势表里的数是打分，不是概率，可以大于 1，也可以是 0。`,
-      T`算 $Z$ 用的就是消元的想法（[c56](#/c56)；本页[第 3 节 HMM 例题](#/T06/past)中"把含它的因子相乘再对它求和"的做法）：只出现在一张表里的变量，先在那张表里就地加掉；两张表只在共享变量上"接头"。下面以四个布尔变量 $A,B,C,D$ 为例：每个只取真（$T$，true）或假（$F$，false），小写 $a,b,c,d$ 表示对应变量的具体取值。给定两张势表 $f(A,B,C)$、$g(C,D)$，它们只共享 $C$；例如 $f(a,b,c)$ 就是在 $A=a,B=b,C=c$ 那一行查到的分数。$\Pr$ 与前面用过的 $P$ 都表示概率；$\sum_{A,B}$ 和 $\sum_{a,b}$ 在这里都表示遍历 $A,B$ 的全部取值组合并相加。`,
+      T`算 $Z$ 用的就是消元的想法（[c56](#/c56)；本页[第 5 节 HMM 例题](#/T06/past-old)中"把含它的因子相乘再对它求和"的做法）：只出现在一张表里的变量，先在那张表里就地加掉；两张表只在共享变量上"接头"。下面以四个布尔变量 $A,B,C,D$ 为例：每个只取真（$T$，true）或假（$F$，false），小写 $a,b,c,d$ 表示对应变量的具体取值。给定两张势表 $f(A,B,C)$、$g(C,D)$，它们只共享 $C$；例如 $f(a,b,c)$ 就是在 $A=a,B=b,C=c$ 那一行查到的分数。$\Pr$ 与前面用过的 $P$ 都表示概率；$\sum_{A,B}$ 和 $\sum_{a,b}$ 在这里都表示遍历 $A,B$ 的全部取值组合并相加。`,
       {
         t: 'steps', items: [
           T`**写联合分布**：$\Pr(A=a,B=b,C=c,D=d)=\frac1Z\,f(a,b,c)\,g(c,d)$。每个团在自己的表里查一个分数，相乘，再除以 $Z$（L20 p37）。`,
@@ -445,7 +449,7 @@ The cliques in the junction tree are the maximal cliques $\{T,U,W\}$, $\{U,X,Y\}
         ],
       },
 
-      { t: 'h2', text: '6. 随机练习', id: 'practice' },
+      { t: 'h2', text: '7. 随机练习', id: 'practice' },
       { t: 'practice', gen: 'elim', title: '消元随机题' },
       {
         t: 'quiz', items: [
@@ -463,7 +467,6 @@ The cliques in the junction tree are the maximal cliques $\{T,U,W\}$, $\{U,X,Y\}
             type: 'num', q: T`Workshop 12 Q4（顺序 $T,X,Z,U,W,V,Y$）：消掉 $T,X,Z$ 之后轮到 $U$。这一步记下的团有几个节点？`, answer: 4,
             explain: T`$U$ 在原图里的邻居是 $T,V,X$，其中 $T,X$ 已经删掉；但删 $T$ 时补了 fill-in 边 $U$—$W$，删 $X$ 时补了 $U$—$Y$，所以 $U$ 此刻的邻居是 $V,W,Y$。团 = $U$ 自己 + 当前邻居 = $\{U,V,W,Y\}$，共 4 个节点。这 4 个点已经两两相连（$W$—$Y$ 是删 $Z$ 时补的），不用再加边。只看原图会答成 $\{U,V\}$，也就是 2，这正是这道题设的坑。`,
           },
-          root.SML.canvasQuiz.elimAH,
         ],
       },
     ],

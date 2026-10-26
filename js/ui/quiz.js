@@ -5,6 +5,7 @@
  *   { type:'set',  q, answer:[tokens], explain }            // e.g. support vectors "1,2,4" — order-free
  *   { type:'show', q, answer: md, explain }                 // self-check: reveal model answer
  *   any item may add qzh (题意, shown under the question) and azh (中文意思 of an English answer)
+ *   a Canvas weekly quiz question carries cq: 'quiz.question' (e.g. '6.1') and starts with （平时小测原题）
  * Practice block: { t:'practice', gen:'id', title, opts }; generator lives in SML.practice.generators[id]
  *   and returns { q: blocks, check: { type, answer, tol, options }, sol: blocks }. */
 (function (root) {
@@ -94,8 +95,10 @@
     b.items.forEach((q, k) => {
       const item = el('div', 'qitem');
       const qid = q.id || ('q' + (++ctx.qn));
-      item.appendChild(el('div', 'qn', (b.label || '小测') + ' ' + (k + 1)));
-      renderQuestion(item, q, ctx, (correct) => {
+      item.appendChild(el('div', q.cq ? 'qn cq' : 'qn', (b.label || '小测') + ' ' + (k + 1) + (q.cq ? ' · 今年 Canvas Quiz ' + q.cq.replace('.', ' Q') : '')));
+      const untag = (x) => (typeof x === 'string' ? x.replace(/（平时小测原题）\s*/, '') : x);
+      const shown = q.cq ? Object.assign({}, q, { q: Array.isArray(q.q) ? q.q.map(untag) : untag(q.q) }) : q;
+      renderQuestion(item, shown, ctx, (correct) => {
         if (correct === false) SML.store.addMistake({ page: ctx.page.id, qid: qid, title: ctx.page.title, q: typeof q.q === 'string' ? q.q.slice(0, 140) : '' });
         if (correct === true) SML.store.removeMistake(ctx.page.id, qid);
       });

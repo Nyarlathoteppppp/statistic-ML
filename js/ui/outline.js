@@ -173,6 +173,20 @@
       flow.appendChild(sa);
     }
 
+    // this year's Canvas quiz questions of a chapter (items with cq), one handout line each
+    const quizOf = (p) => { const out = []; sectionBlocks(p, 'quiz').filter((x) => x && x.t === 'quiz').forEach((qb) => (qb.items || []).forEach((it) => { if (it.cq) out.push(it); })); return out; };
+    // a quiz question may be [text, {t:'table'}, {t:'graph'}, …]: text inline, tables as a small grid, graphs as their edge list
+    const qText = (q) => (Array.isArray(q) ? q : [q]).map((x) => typeof x === 'string' ? inline(x.replace(/（平时小测原题）\s*/, ''))
+      : x && x.t === 'graph' ? '（图的边：' + x.edges.split(/\s+/).filter(Boolean).map((e) => e.split(/[=:]/)[0].replace('>', '→').replace('-', '–')).join('，') + '）'
+      : x && x.t === 'table' ? '<table class="pc-mini">' + (x.head ? '<tr>' + x.head.map((h) => '<th>' + inline(h) + '</th>').join('') + '</tr>' : '') +
+        x.rows.map((r) => '<tr>' + r.map((c) => '<td>' + inline(String(c)) + '</td>').join('') + '</tr>').join('') + '</table>' : '').join(' ');
+    const quizLine = (it) => {
+      const ans = it.type === 'mc' ? (it.options || [])[it.answer] : Array.isArray(it.answer) ? it.answer.join('、')
+        : (it.answerText || (it.answer != null ? String(it.answer) : ''));
+      return '<li><span class="pc-qsrc">Quiz ' + it.cq.replace('.', ' Q') + '</span> <b>Q.</b> ' + qText(it.q) +
+        (it.qzh ? '<div class="pc-zh">' + inline(it.qzh) + '</div>' : '') + ' <b>A.</b> ' + inline(ans || '') + '</li>';
+    };
+
     // ---- 3. weeks ----
     course.units.forEach((u, wi) => {
       const st = story[wi];
@@ -188,8 +202,7 @@
         const head = (p.blocks || []).find((x) => x && x.t === 'chapterHead') || {};
         const ch = el('div', 'pc-ch');
         const m = (head.types || []).map((t) => mustByPage[t]).find(Boolean);
-        const quiz = [];
-        sectionBlocks(p, 'quiz').filter((x) => x && x.t === 'quiz').forEach((qb) => (qb.items || []).forEach((it) => { if (/平时小测原题/.test(it.q || '')) quiz.push(it); }));
+        const quiz = quizOf(p);
         const badges = [STAR[meta[id].star] || '', m ? pill('new', '必会 · 2026 ' + m.q.replace(/ · .*/, '')) : '',
           (p.examQ || []).length ? pill('src', '原题 ' + p.examQ.length) : '', quiz.length ? pill('src', 'Quiz') : ''].join('');
         let html = '<div class="pc-head"><span class="pc-num">' + (meta[id].tag || id) + '</span><b>' + inline(p.title) + '</b>' +
@@ -212,22 +225,16 @@
         const qa = [];
         (p.examQ || []).forEach((e) => qa.push('<li><span class="pc-qsrc">' + SML.md.esc(e.src || '原题') + '</span> <b>Q.</b> ' + inline(e.q) +
           (e.qzh ? '<div class="pc-zh">' + inline(e.qzh) + '</div>' : '') + ' <b>A.</b> ' + inline(e.a) + '</li>'));
-        // a quiz question may be [text, {t:'table'}, {t:'graph'}, …]: text inline, tables as a small grid, graphs as their edge list
-        const qText = (q) => (Array.isArray(q) ? q : [q]).map((x) => typeof x === 'string' ? inline(x.replace(/（平时小测原题）\s*/, ''))
-          : x && x.t === 'graph' ? '（图的边：' + x.edges.split(/\s+/).filter(Boolean).map((e) => e.split(/[=:]/)[0].replace('>', '→').replace('-', '–')).join('，') + '）'
-          : x && x.t === 'table' ? '<table class="pc-mini">' + (x.head ? '<tr>' + x.head.map((h) => '<th>' + inline(h) + '</th>').join('') + '</tr>' : '') +
-            x.rows.map((r) => '<tr>' + r.map((c) => '<td>' + inline(String(c)) + '</td>').join('') + '</tr>').join('') + '</table>' : '').join(' ');
-        quiz.forEach((it) => {
-          const ans = it.type === 'mc' ? (it.options || [])[it.answer] : Array.isArray(it.answer) ? it.answer.join('、')
-            : (it.answerText || (it.answer != null ? String(it.answer) : ''));
-          qa.push('<li><span class="pc-qsrc">Quiz</span> <b>Q.</b> ' + qText(it.q) +
-            (it.qzh ? '<div class="pc-zh">' + inline(it.qzh) + '</div>' : '') + ' <b>A.</b> ' + inline(ans || '') + '</li>');
-        });
-        if (qa.length) html += '<ul class="pc-qa">' + qa.join('') + '</ul>';
+        // this year's Canvas quiz first, then the older papers' questions
+        const lines = quiz.map(quizLine).concat(qa);
+        if (lines.length) html += '<ul class="pc-qa">' + lines.join('') + '</ul>';
         ch.innerHTML = html;
         flow.appendChild(ch);
       });
       if (light.length) flow.appendChild(el('div', 'pc-light', '★ 了解（往年卷没考过，只在网站）：' + light.map((id) => meta[id].tag + ' ' + inline(meta[id].title)).join('；')));
+      // a ★ chapter is not printed, but this year's quiz questions from it are
+      const lightQuiz = [].concat(...light.map((id) => (pages[id] ? quizOf(pages[id]) : [])));
+      if (lightQuiz.length) flow.appendChild(el('ul', 'pc-qa', lightQuiz.map(quizLine).join('')));
       flow.appendChild(el('div', 'pc-notes', (st ? st[0].split(' ')[0] : u.title) + ' 笔记'));
     });
 

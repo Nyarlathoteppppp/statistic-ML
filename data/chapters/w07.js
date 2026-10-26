@@ -164,7 +164,7 @@
     ],
     quiz: [
       {
-        type: 'num', q: T`（平时小测原题）We want to create a model for a binary classification problem with $10\times10$ input grayscale (single-channel) images. We use a CNN with: a convolutional layer with two filters, each $3\times3$, stride 1, no padding; a max-pooling layer over $4\times4$ patches, stride 1, no padding; a fully-connected layer with 3 neurons (ReLU); an output layer with one node (sigmoid). None of the learnable layers includes bias terms. How many parameters does this model have?`,
+        cq: '4.1', type: 'num', q: T`（平时小测原题）We want to create a model for a binary classification problem with $10\times10$ input grayscale (single-channel) images. We use a CNN with: a convolutional layer with two filters, each $3\times3$, stride 1, no padding; a max-pooling layer over $4\times4$ patches, stride 1, no padding; a fully-connected layer with 3 neurons (ReLU); an output layer with one node (sigmoid). None of the learnable layers includes bias terms. How many parameters does this model have?`,
         qzh: T`二分类，输入是 $10\times10$ 的单通道灰度图。网络：卷积层 2 个 $3\times3$ filter、步长 1、不补零；max-pooling 窗口 $4\times4$、步长 1、不补零；全连接层 3 个神经元（激活函数 ReLU，无参数）；输出层 1 个节点（激活函数 sigmoid，无参数）。所有层都没有 bias。这个模型一共多少个参数？`,
         answer: 171,
         explain: T`一层一层数。卷积层：输入单通道，每个 filter 有 $3\times3\times1=9$ 个权重，2 个 filter 共 $18$；输出边长 $(10-3)/1+1=8$，即 $8\times8\times2$。Max-pooling 没有参数；边长 $(8-4)/1+1=5$，输出 $5\times5\times2=50$ 个数，展平后是全连接层的 50 个输入。全连接层：3 个神经元各连 50 个输入，$50\times3=150$。输出层：1 个节点连 3 个，$3$。**合计 $18+150+3=171$**。常见错误：给 pooling 算参数，或把卷积按输出位置重复计数（$8\times8\times2\times9$）。`,

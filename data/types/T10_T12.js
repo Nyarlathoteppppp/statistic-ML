@@ -208,6 +208,8 @@ So the gradient of the filter is $\delta$ times the $2\times2$ input patch that 
         {
           t: 'note', title: '两种规则：考试写哪个', md: T`**区别只在 $s=0$。** 本页上面的规则（L10）是 $y\cdot s\le0$ 就更新；pseudocode 在 $s=0$、$y=+1$ 时判对、不更新。同一道题改用 $y\cdot s\le0$ 规则（$s=0$ 也算错）：更新发生在第 1 轮（E1 = Epoch 1）的 $(1,1,1)$、第 1 轮的 $(1,0,0)$、第 2 轮的 $(1,0,0)$，$\bw$ 依次变成 $(0.1,0.1,0.1)$、$(0,0.1,0.1)$、$(-0.1,0.1,0.1)$；路径不同，终点和上面一样。如果把 $s=0$ 判成 $-1$，结果会变成 $(0,0.1,0.1)$。考试时，题目指定了规则就照题目；没指定就用课件的 $y\cdot s\le0$，并在第一行写明约定，例如 "predict $+1$ if $s\ge0$; update when $y\,s\le0$"。`,
         },
+        { t: 'h3', text: 'Canvas Quiz 3 Q2（今年平时小测）' },
+        { t: 'canvasQuiz', pick: ['3.2'] },
         { t: 'h3', text: '真题：2016 S2 Q7（唯一考过的 perceptron 手算）' },
         {
           t: 'past', src: '2016 S2 Q7', marks: 2, topic: 'L10 p13–p39',
@@ -255,6 +257,8 @@ where $\eta>0$ is the learning rate (a parameter we introduce). With $\eta=0.1$:
             ['VC 泛化', '$R\\le\\hat R+\\sqrt{8\\,\\frac{\\VC\\log(2n+1)+\\log(4/\\delta)}{n}}$', '用 VC 维代替 $\\log|\\mathcal F|$'],
           ],
         },
+        { t: 'h3', text: 'Canvas Quiz 4 Q2（今年平时小测）' },
+        { t: 'canvasQuiz', pick: ['4.2'] },
         {
           t: 'quiz', items: [
             { q: '32 个专家，有一个从不出错。Majority 最多错几次？', type: 'num', answer: 5, explain: '$\\log_2 32=5$。' },

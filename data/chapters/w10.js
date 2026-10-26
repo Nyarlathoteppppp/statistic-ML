@@ -178,7 +178,7 @@
       { type: 'mc', q: '"$f(\\theta)\\propto g(\\theta)$ 且 $g$ 是分布 ⇒ $f$ 归一化后就是 $g$"，这让我们可以：', options: ['不用先验', '扔掉常数、只看形状来认出后验', '跳过似然', '直接得到 MLE'], answer: 1, explain: T`$f\propto g$ 的意思是 $f=C\cdot g$，$C$ 是和 $\theta$ 无关的常数；两边积分得 $\int f\,d\theta=C$（$g$ 是分布，积分为 1），所以 $f/\int f\,d\theta=g$。这就是 uniqueness up to normalisation（归一化唯一性）：算后验时可以扔掉所有和 $q$ 无关的常数（组合数、Gamma 函数、分母 $p(k)$），看到剩下的形状 $q^{k+\alpha-1}(1-q)^{n-k+\beta-1}$ 就认出它是 $\mathrm{Beta}(k+\alpha,\ n-k+\beta)$，不用真的去积分。它并不能省掉先验或似然——这个形状正是二者相乘得来的；它也和 MLE 无关。L19 p14。` },
       { type: 'mc', q: '后验 $\\mathrm{Beta}(9,5)$ 的 95% 等尾 credible interval 约为 $[0.39,\\ 0.86]$。哪个说法正确？', options: ['给定先验和数据，$q$ 落在 $[0.39,0.86]$ 里的后验概率是 0.95', '重复抽很多份数据，约 95% 这样算出的区间会盖住真实的 $q$', '区间左右两侧各有 5% 的后验质量', '区间以 MLE $0.7$ 为中心'], answer: 0, explain: T`credible interval（可信区间）是在后验上切出来的：$q$ 被当成随机变量，区间固定，所以可以直接说"给定先验和数据，$q$ 在区间里的概率是 0.95"。第二项是频率学派 confidence interval（置信区间）的解释：那里 $q$ 固定、区间随数据而变，95% 指重复抽样时盖住真值的比例。第三项算错了：等尾区间两侧各留 $\alpha/2=0.05/2=0.025$，即各 2.5%，加起来才是 5%。第四项：等尾区间只管两侧尾巴的质量，不以任何点估计为中心；$\mathrm{Beta}(9,5)$ 是偏的，区间端点更精确是 $0.386$ 和 $0.861$，中点 $(0.386+0.861)/2\approx0.62$，既不是 MLE $7/10=0.7$，也不是后验均值 $9/14\approx0.643$。Workshop 2 bonus。` },
       {
-        type: 'mc', q: T`（平时小测原题）Suppose Laplace models the probability $\theta$ that the Sun rises on any given day as a Bernoulli event (success = "Sun rises"). He assumes a uniform prior over $\theta$, i.e. $\theta\sim\mathrm{Beta}(1,1)$. After observing that the Sun has risen every day for 5000 consecutive days, what is the posterior distribution of $\theta$?`,
+        cq: '5.2', type: 'mc', q: T`（平时小测原题）Suppose Laplace models the probability $\theta$ that the Sun rises on any given day as a Bernoulli event (success = "Sun rises"). He assumes a uniform prior over $\theta$, i.e. $\theta\sim\mathrm{Beta}(1,1)$. After observing that the Sun has risen every day for 5000 consecutive days, what is the posterior distribution of $\theta$?`,
         qzh: T`拉普拉斯把「某天太阳升起」的概率 $\theta$（即本章前文的 $q$）看成 Bernoulli 事件（成功 = 太阳升起），并取均匀先验 $\theta\sim\mathrm{Beta}(1,1)$。连续 5000 天都看到太阳升起之后，$\theta$ 的后验分布是什么？`,
         options: [T`Binomial(5000)`, T`Beta(5001,5001)`, T`Beta(5001,1)`, T`Beta(5000,1)`],
         answer: 2,
@@ -677,7 +677,21 @@
       { type: 'mc', q: 'Alarm 网络中 $E\\perp B\\mid A$ 成立吗？', options: ['成立', '不成立'], answer: 1, explain: '$A$ 是共同孩子；moralize 后 $E$—$B$ 直接相连。' },
       { type: 'mc', q: 'Alarm 网络中 $R\\perp B$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: '祖先图 $\\{R,E,B\\}$，$E\\to R$，$B$ 孤立（$A$ 不在祖先图里，$E,B$ 不结婚）。' },
       { type: 'mc', q: '链 $A\\to B\\to C\\to D$，$A\\perp D\\mid C$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: T`按 D-separation 的步骤：① 祖先图：$D$ 的祖先是 $C,B,A$，四个点全保留；② moralize：链上每个点最多一个父节点，没有共同孩子，不加边；③ 去方向得 $A$—$B$—$C$—$D$；④ 删掉条件节点 $C$，剩下 $A$—$B$ 和孤立的 $D$。$A$ 到 $D$ 没有路 ⇒ 成立。这是链结构：知道中间的 $C$ 就挡住了信息。条件节点不必紧挨着 $A$，只要它在 $A$ 到 $D$ 唯一的那条路上就够了。` },
-      SML.canvasQuiz.dsepXT,
+      {
+        cq: '6.2', type: 'mc',
+        q: [
+          T`（平时小测原题）Consider the following *Bayesian network*. Does the conditional independence statement $X\perp T\mid V$ hold in this Bayesian network?`,
+          { t: 'graph', nodes: { S: [140, 40], T: [240, 40], U: [40, 130], V: [140, 130], W: [240, 130], X: [40, 220], Y: [140, 220], Z: [240, 220] }, edges: 'T>S S>V U>V X>U V>Z W>Z Y>Z', w: 280 },
+        ],
+        qzh: T`这个贝叶斯网络里，给定 $V$ 时 $X$ 与 $T$ 独立吗？`,
+        options: [T`$X\perp T\mid V$ holds`, T`$X\perp T\mid V$ does not hold`, 'More information is needed to answer this question'],
+        answer: 1,
+        explain: [
+          T`四步法：① 只留 $X,T,V$ 和它们的祖先：$V$ 的祖先是 $S,T,U,X$，删掉 $W,Y,Z$。② moralize：$V$ 的两个父节点 $U,S$ 连一条边，再去掉箭头。③ 删掉条件集里的 $V$。④ $X$—$U$—$S$—$T$ 还连着，所以 **does not hold**。`,
+          { t: 'graph', nodes: { S: [140, 40], T: [240, 40], U: [40, 130], V: [140, 130], X: [40, 220] }, edges: 'S-V:gone U-V:gone X-U:path U-S:path S-T:path', cls: { V: 'removed', X: 'x', T: 'y' }, w: 280, caption: T`删掉 $V$ 之后：$U$—$S$ 是结婚边，整条 $X$—$U$—$S$—$T$ 连通。` },
+          T`直觉：$V$ 是 $U\to V\leftarrow S$ 的碰撞点（collider），观测了它反而把两边接通，所以 $X\to U\to V\leftarrow S\leftarrow T$ 整条路是通的。`,
+        ],
+      },
     ],
   });
 

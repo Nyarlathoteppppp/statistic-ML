@@ -41,6 +41,8 @@
         T`$A$ and $B$ are conditionally independent given $C$: once $C$ is known, knowing $B$ gives no extra information about $A$. This does not imply that $A$ and $B$ are (marginally) independent.`,
         T`用文字说明：$\Pr(A,B\mid C)=\Pr(A\mid C)\Pr(B\mid C)$ 关于 $A,B,C$ 之间的依赖关系（dependence）说明了什么？`,
         T`给定 $C$ 时，$A$ 和 $B$ 条件独立（conditionally independent）：一旦已知 $C$，再知道 $B$ 不会提供关于 $A$ 的任何额外信息。这并不意味着 $A$ 和 $B$（在边缘意义上）相互独立（marginally independent）。`),
+      { t: 'h3', text: '今年 Canvas quiz 的概念题（Quiz 1、2、3）' },
+      { t: 'canvasQuiz', pick: ['1.1', '1.2', '1.3', '2.1', '3.1'] },
       { t: 'h3', text: '2021 S1 exam Section A' },
       past('2021 Q1', 4, 'L14 p7–p8',
         'A recurrent neural network is a type of deep artificial neural network. In what respect is it deep?',
