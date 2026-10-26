@@ -677,6 +677,7 @@
       { type: 'mc', q: 'Alarm 网络中 $E\\perp B\\mid A$ 成立吗？', options: ['成立', '不成立'], answer: 1, explain: '$A$ 是共同孩子；moralize 后 $E$—$B$ 直接相连。' },
       { type: 'mc', q: 'Alarm 网络中 $R\\perp B$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: '祖先图 $\\{R,E,B\\}$，$E\\to R$，$B$ 孤立（$A$ 不在祖先图里，$E,B$ 不结婚）。' },
       { type: 'mc', q: '链 $A\\to B\\to C\\to D$，$A\\perp D\\mid C$ 成立吗？', options: ['成立', '不成立'], answer: 0, explain: T`按 D-separation 的步骤：① 祖先图：$D$ 的祖先是 $C,B,A$，四个点全保留；② moralize：链上每个点最多一个父节点，没有共同孩子，不加边；③ 去方向得 $A$—$B$—$C$—$D$；④ 删掉条件节点 $C$，剩下 $A$—$B$ 和孤立的 $D$。$A$ 到 $D$ 没有路 ⇒ 成立。这是链结构：知道中间的 $C$ 就挡住了信息。条件节点不必紧挨着 $A$，只要它在 $A$ 到 $D$ 唯一的那条路上就够了。` },
+      SML.canvasQuiz.dsepXT,
     ],
   });
 

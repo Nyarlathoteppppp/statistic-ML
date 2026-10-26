@@ -212,8 +212,9 @@
         const qa = [];
         (p.examQ || []).forEach((e) => qa.push('<li><span class="pc-qsrc">' + SML.md.esc(e.src || '原题') + '</span> <b>Q.</b> ' + inline(e.q) +
           (e.qzh ? '<div class="pc-zh">' + inline(e.qzh) + '</div>' : '') + ' <b>A.</b> ' + inline(e.a) + '</li>'));
-        // a quiz question may be [text, {t:'table'}, …]: text inline, tables as a small grid
+        // a quiz question may be [text, {t:'table'}, {t:'graph'}, …]: text inline, tables as a small grid, graphs as their edge list
         const qText = (q) => (Array.isArray(q) ? q : [q]).map((x) => typeof x === 'string' ? inline(x.replace(/（平时小测原题）\s*/, ''))
+          : x && x.t === 'graph' ? '（图的边：' + x.edges.split(/\s+/).filter(Boolean).map((e) => e.split(/[=:]/)[0].replace('>', '→').replace('-', '–')).join('，') + '）'
           : x && x.t === 'table' ? '<table class="pc-mini">' + (x.head ? '<tr>' + x.head.map((h) => '<th>' + inline(h) + '</th>').join('') + '</tr>' : '') +
             x.rows.map((r) => '<tr>' + r.map((c) => '<td>' + inline(String(c)) + '</td>').join('') + '</tr>').join('') + '</table>' : '').join(' ');
         quiz.forEach((it) => {

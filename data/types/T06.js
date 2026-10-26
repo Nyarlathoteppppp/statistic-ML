@@ -463,6 +463,7 @@ The cliques in the junction tree are the maximal cliques $\{T,U,W\}$, $\{U,X,Y\}
             type: 'num', q: T`Workshop 12 Q4（顺序 $T,X,Z,U,W,V,Y$）：消掉 $T,X,Z$ 之后轮到 $U$。这一步记下的团有几个节点？`, answer: 4,
             explain: T`$U$ 在原图里的邻居是 $T,V,X$，其中 $T,X$ 已经删掉；但删 $T$ 时补了 fill-in 边 $U$—$W$，删 $X$ 时补了 $U$—$Y$，所以 $U$ 此刻的邻居是 $V,W,Y$。团 = $U$ 自己 + 当前邻居 = $\{U,V,W,Y\}$，共 4 个节点。这 4 个点已经两两相连（$W$—$Y$ 是删 $Z$ 时补的），不用再加边。只看原图会答成 $\{U,V\}$，也就是 2，这正是这道题设的坑。`,
           },
+          root.SML.canvasQuiz.elimAH,
         ],
       },
     ],

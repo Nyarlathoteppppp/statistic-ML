@@ -128,7 +128,7 @@ function checkMarkdownString(str, pageId, loc) {
 
 const KNOWN_BLOCK_TYPES = new Set([
   'p', 'h2', 'h3', 'h4', 'math', 'ul', 'ol', 'steps', 'table', 'callout', 'note', 'warn', 'good', 'errata', 'ext',
-  'exam', 'deep', 'fold', 'outline', 'examqIndex', 'examqPick', 'fig', 'chips', 'html', 'past', 'graph', 'graphs', 'slide', 'fx', 'quiz', 'practice', 'viz', 'video', 'pending', 'mistakes', 'phraseIndex', 'pastIndex', 'glossaryTable', 'chapterHead', 'notes', 'reviewHead', 'kp', 'recall', 'daily', 'story', 'think', 'fade',
+  'exam', 'deep', 'fold', 'outline', 'examqIndex', 'examqPick', 'fig', 'chips', 'html', 'past', 'graph', 'graphs', 'slide', 'fx', 'quiz', 'practice', 'viz', 'video', 'pending', 'mistakes', 'phraseIndex', 'pastIndex', 'canvasQuiz', 'glossaryTable', 'chapterHead', 'notes', 'reviewHead', 'kp', 'recall', 'daily', 'story', 'think', 'fade',
 ]);
 
 /* 4. Recursive validator */
