@@ -128,7 +128,7 @@ function checkMarkdownString(str, pageId, loc) {
 
 const KNOWN_BLOCK_TYPES = new Set([
   'p', 'h2', 'h3', 'h4', 'math', 'ul', 'ol', 'steps', 'table', 'callout', 'note', 'warn', 'good', 'errata', 'ext',
-  'exam', 'deep', 'fold', 'outline', 'examqIndex', 'examqPick', 'fig', 'chips', 'html', 'past', 'graph', 'graphs', 'slide', 'fx', 'quiz', 'practice', 'viz', 'video', 'pending', 'mistakes', 'phraseIndex', 'pastIndex', 'canvasQuiz', 'glossaryTable', 'chapterHead', 'notes', 'reviewHead', 'kp', 'recall', 'daily', 'story', 'think', 'fade',
+  'exam', 'deep', 'fold', 'outline', 'examqIndex', 'examqPick', 'fig', 'chips', 'html', 'past', 'graph', 'graphs', 'slide', 'fx', 'quiz', 'practice', 'viz', 'video', 'pending', 'mistakes', 'phraseIndex', 'pastIndex', 'canvasQuiz', 'spLedger', 'spHead', 'spWrap', 'spTick', 'glossaryTable', 'chapterHead', 'notes', 'reviewHead', 'kp', 'recall', 'daily', 'story', 'think', 'fade',
 ]);
 
 /* 4. Recursive validator */
@@ -195,6 +195,22 @@ function validateBlock(b, pageId, loc) {
     else validateBlock(it, pageId, `${loc}.items[${idx}]`);
   });
   if (b.t === 'chips') (b.items || []).forEach((it, idx) => { if (it && it.text) checkMarkdownString(it.text, pageId, `${loc}.items[${idx}].text`); });
+  if (b.t === 'spLedger') {
+    const ids = new Set();
+    (b.items || []).forEach((it, i) => {
+      if (ids.has(it.id)) addProblem(pageId, loc, `duplicate sprint id ${it.id}`);
+      ids.add(it.id);
+      if (!it.last && !(it.score > 0)) addProblem(pageId, loc, `sprint item ${it.id}: estimate does not compute`);
+    });
+  }
+  if (b.t === 'spHead') {
+    checkMarkdownString(b.title, pageId, `${loc}.title`);
+    checkMarkdownString(b.src, pageId, `${loc}.src`);
+  }
+  if (b.t === 'examqPick') (b.picks || []).forEach(([id, src]) => {
+    const p = global.SML.content.get(id);
+    if (!p || !(p.examQ || []).some((e) => String(e.src || '').indexOf(src) === 0)) addProblem(pageId, loc, `examqPick: no question ${id} ${src}`);
+  });
   if (b.t === 'fig') {
     if (!b.src) addProblem(pageId, loc, 'fig missing src');
     else if (!fs.existsSync(path.resolve(siteRoot, b.src))) addProblem(pageId, loc, `figure not found: ${b.src}`);

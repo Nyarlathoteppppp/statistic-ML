@@ -66,8 +66,8 @@ Pull arm 3: it has the largest UCB value. Its empirical mean is the lowest, but 
       { t: 'h2', text: '5. 真题全解', id: 'past' },
       {
         t: 'past', src: '2026 S2 practice Q2', marks: 6, topic: 'L17 p18',
-        q: 'You are running a multi-armed bandit problem with 3 arms. The rewards from each arm are binary (0 or 1), and so far you have pulled the arms with the following results: Arm 1: pulled 64 times, with 40 rewards of 1. Arm 2: pulled 16 times, with 10 rewards of 1. Arm 3: pulled 4 times, with 2 rewards of 1. Using the UCB algorithm, calculate the value of each arm based on the given results. Based on your calculations, which arm should you pull next, and why?\n\n*Useful values:* $\\ln 4\\approx1.4$, $\\ln 16\\approx2.8$, $\\ln 64\\approx4.2$, $\\ln 84\\approx4.5$, $\\ln 85\\approx4.5$ …',
-        qzh: T`你在运行一个有 3 个臂（arm）的多臂老虎机（multi-armed bandit）问题。每个臂的奖励是二元的（0 或 1），到目前为止拉臂的结果如下：臂 1：拉了 64 次，其中 40 次奖励为 1。臂 2：拉了 16 次，其中 10 次奖励为 1。臂 3：拉了 4 次，其中 2 次奖励为 1。用 UCB 算法，根据这些结果计算每个臂的值。根据你的计算，下一次应该拉哪个臂，为什么？*有用的数值：* $\ln 4\approx1.4$，$\ln 16\approx2.8$，$\ln 64\approx4.2$，$\ln 84\approx4.5$，$\ln 85\approx4.5$ …`,
+        q: 'You are running a multi-armed bandit problem with 3 arms. The rewards from each arm are binary (0 or 1), and so far you have pulled the arms with the following results: Arm 1: pulled 64 times, with 40 rewards of 1. Arm 2: pulled 16 times, with 10 rewards of 1. Arm 3: pulled 4 times, with 2 rewards of 1. Using the UCB algorithm, calculate the value of each arm based on the given results. Based on your calculations, which arm should you pull next, and why?\n\n*Some possibly useful values:* $\\ln 4\\approx1.4$, $\\ln 5\\approx1.6$, $\\ln 16\\approx2.8$, $\\ln 17\\approx2.8$, $\\ln 64\\approx4.2$, $\\ln 65\\approx4.2$, $\\ln 84\\approx4.5$, $\\ln 85\\approx4.5$\n\n*Some possibly useful formulas:* $Q_{t-1}(i)=\\hat\\mu_{t-1}(i)+\\sqrt{\\dfrac{2\\ln t}{N_{t-1}(i)}}$, where $N_{t-1}(i)=\\sum_{s=1}^{t-1}\\mathbf 1[i_s=i]$ and $\\hat\\mu_{t-1}(i)=\\dfrac{\\sum_{s=1}^{t-1}R_i(s)\\,\\mathbf 1[i_s=i]}{N_{t-1}(i)}$.',
+        qzh: T`你在运行一个有 3 个臂（arm）的多臂老虎机（multi-armed bandit）问题。每个臂的奖励是二元的（0 或 1），到目前为止拉臂的结果如下：臂 1：拉了 64 次，其中 40 次奖励为 1。臂 2：拉了 16 次，其中 10 次奖励为 1。臂 3：拉了 4 次，其中 2 次奖励为 1。用 UCB 算法，根据这些结果计算每个臂的值。根据你的计算，下一次应该拉哪个臂，为什么？*可能有用的数值：* $\ln 4\approx1.4$，$\ln 5\approx1.6$，$\ln 16\approx2.8$，$\ln 17\approx2.8$，$\ln 64\approx4.2$，$\ln 65\approx4.2$，$\ln 84\approx4.5$，$\ln 85\approx4.5$。*可能有用的公式（卷面直接给出）：* $Q_{t-1}(i)=\hat\mu_{t-1}(i)+\sqrt{2\ln t/N_{t-1}(i)}$，其中 $N_{t-1}(i)$ 是前 $t-1$ 轮里臂 $i$ 被拉的次数，$\hat\mu_{t-1}(i)$ 是这些轮里臂 $i$ 的奖励和除以 $N_{t-1}(i)$。公式给了，但 $t$ 取多少要自己定。`,
         azh: T`$t = 64+16+4+1 = 85$，$\ln 85\approx4.5$，所以 $2\ln t\approx 9$。
 $Q(1)=\tfrac{40}{64}+\sqrt{9/64}=0.625+0.375=1.0$；$Q(2)=\tfrac{10}{16}+\sqrt{9/16}=0.625+0.75=1.375$；$Q(3)=\tfrac{2}{4}+\sqrt{9/4}=0.5+1.5=2.0$。
 拉臂 3：它的 UCB 值最大。它的经验均值（empirical mean）最低，但只被拉了 4 次，所以它的探索奖励（exploration bonus，即不确定性）占主导——面对不确定性保持乐观（optimism in the face of uncertainty）。`,
@@ -82,7 +82,7 @@ $Q(1)=\tfrac{40}{64}+\sqrt{9/64}=0.625+0.375=1.0$；$Q(2)=\tfrac{10}{16}+\sqrt{9
             ],
           },
           '结论：拉 **arm 3**。arm 1 和 arm 2 的均值一样（0.625），但 arm 2 拉得少，所以 bonus 更大；arm 3 均值最低，但只拉了 4 次，不确定性最大，UCB 认为它"可能很好"，值得探索。',
-          { t: 'note', md: '题目给的 $\\ln 4,\\ln 16,\\ln 64$ 是干扰项：有人会错用"每个臂自己的次数"代替 $t$。所有臂用同一个 $t=85$。Workshop 10 的手算题就是这一道（把根号分子中的常数 2 写成探索强度参数 $\\rho>0$，并给定 $\\rho=2$；$\\rho$ 越大，探索奖励越大），官方答案同样是 $t=85$、$Q=(1,\\ 11/8,\\ 2)$、拉 arm 3；它还多给了 $\\ln 5,\\ln 17,\\ln 65$，是给"每个臂的次数 + 1"这种错用准备的干扰项。' },
+          { t: 'note', md: '公式卷面直接给出，考点是 $t$ 取多少。题目给的 $\\ln 4,\\ln 16,\\ln 64$ 是给"用每个臂自己的次数代替 $t$"准备的干扰项，$\\ln 5,\\ln 17,\\ln 65$ 是给"每个臂的次数 + 1"准备的，$\\ln 84$ 是给"忘了 + 1"准备的。所有臂用同一个 $t=85$。Workshop 10 的手算题就是这一道（把根号分子中的常数 2 写成探索强度参数 $\\rho>0$，并给定 $\\rho=2$；$\\rho$ 越大，探索奖励越大），官方答案同样是 $t=85$、$Q=(1,\\ 11/8,\\ 2)$、拉 arm 3。' },
         ],
       },
       { t: 'h3', text: 'Canvas Quiz 5 Q1（今年平时小测）' },

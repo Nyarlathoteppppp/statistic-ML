@@ -26,7 +26,7 @@
       if (b.t === 'steps') (b.items || []).forEach((it) => { if (Array.isArray(it)) walk(it, page); });
       if (b.t === 'quiz') (b.items || []).forEach((it) => { if (Array.isArray(it.explain)) walk(it.explain, page); });
     });
-    SML.app.order().forEach((id) => { const p = SML.content.get(id); if (p && ['phrases', 'pastindex', 'mock', 'mock2'].indexOf(id) < 0) walk(p.blocks, id); });
+    SML.app.order().forEach((id) => { const p = SML.content.get(id); if (p && ['phrases', 'pastindex', 'mock', 'mock2', 'sprint'].indexOf(id) < 0) walk(p.blocks, id); });
     return out;
   }
 

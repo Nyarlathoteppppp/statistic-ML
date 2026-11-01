@@ -94,6 +94,7 @@ a.chip:hover { border-color: var(--accent); color: var(--accent); }
 .qitem { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; }
 .qitem .qn { font-size: .76rem; color: var(--muted); font-weight: 700; letter-spacing: .05em; }
 .qitem .qn.cq { color: var(--accent); }
+
 .qopts { display: grid; gap: 6px; margin: 8px 0; }
 .qopt { text-align: left; border: 1px solid var(--line); background: var(--paper); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
 .qopt:hover { border-color: var(--accent); }
@@ -278,3 +279,21 @@ ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
 
 /* lecture-page reference shown inside a sentence (js/ui/md.js): muted, small */
 .lref { color: var(--muted); font-size: .82em; white-space: nowrap; }
+
+/* 两天必拿分 */
+.sp-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sp-count { font-size: 1.05rem; margin: 0; }
+.sp-count b { color: var(--good); }
+.sp-ledger td.ck { width: 2.4em; text-align: center; }
+.sp-ledger input, .sp-tick input { width: 1.15em; height: 1.15em; cursor: pointer; accent-color: var(--good); }
+.sp-ledger tr.day td { background: var(--sunk); font-weight: 650; }
+.sp-ledger td.sm { white-space: nowrap; }
+.sp-ledger tr.done td:not(.ck) { color: var(--muted); }
+.sp-ledger tr.done a { color: var(--muted); text-decoration: line-through; }
+.sp-head h2 { margin-bottom: .2rem; }
+.sp-meta { margin: 0 0 1rem; color: var(--muted); font-size: .92rem; }
+.sp-tick { display: flex; align-items: center; gap: 8px; margin: 1rem 0 2rem; padding: 9px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; }
+.sp-tick.done { background: var(--sunk); color: var(--muted); }
+body.sp-recite .sp-work { display: none; }
+.chip.kw { font-size: .86rem; padding: 2px 10px; }
+.chip.kw-label { border: none; background: none; padding: 2px 4px 2px 0; font-size: .86rem; font-weight: 650; color: var(--ink); }
