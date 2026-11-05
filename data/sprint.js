@@ -140,9 +140,10 @@ To decide: observe the readings, marginalise the unobserved variables, compute $
         { t: 'examqPick', picks: SML.mustAnswers.filter(([, src]) => src.indexOf('2026') === 0) }],
       work: [] },
 
-    { id: 'sa', tier: 3, qs: 8, p: .25, m: 5, q: .75, ml: '每道约 5', title: '必背简答 8 道', src: '2025 practice Q1 和多份卷反复出现的主题', mins: 45,
-      card: [routine('1–3 行英文：一句定义 + 一句原因。前两道是去年 practice 原题，后面是 SVM、Bayesian、回归这几个每年都考的主题。'),
-        { t: 'examqPick', picks: SML.mustAnswers.filter(([, src]) => src.indexOf('2026') !== 0) }],
+    { id: 'sa', tier: 3, qs: 5, p: .25, m: 5, q: .75, ml: '每道约 5', title: '必背简答 5 道', src: '2025 practice Q1 和多份卷反复出现的主题', mins: 30,
+      card: [routine('1–3 行英文：一句定义 + 一句原因。前两道是去年 practice 原题，后面是 SVM、Bayesian 这两个每年都考的主题。'),
+        // 2010s papers are left out (user: "过于古老的题目就删掉")
+        { t: 'examqPick', picks: SML.mustAnswers.filter(([, src]) => src.indexOf('2026') !== 0 && !/^201\d/.test(src)) }],
       work: [] },
 
     { id: 'cq', tier: 2, pin: true, qs: 13, p: .11, m: 5, q: .8, ml: '每道约 5', title: '今年 Quiz：6 次全部 13 题', src: 'Canvas Quiz 1–6 原题，Ed 考试帖写明 quiz 也考', mins: 35,
@@ -164,14 +165,12 @@ To decide: observe the readings, marginalise the unobserved variables, compute $
         ] }] }],
       work: [pick('1.1', '1.2', '1.3', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2', '5.1', '5.2', '6.1', '6.2')] },
 
-    { id: 'sa2', tier: 4, qs: 14, p: .1, m: 5, q: .7, ml: '每道约 5', title: '高频简答 14 道', src: '按考频选，2021、2022 正式卷 Section A 为主', mins: 45,
+    { id: 'sa2', tier: 4, qs: 10, p: .1, m: 5, q: .7, ml: '每道约 5', title: '高频简答 10 道', src: '按考频选，2021、2022 正式卷 Section A 为主', mins: 35,
       card: [routine('同上：1–3 行英文。每组标题里的 x/7 是 7 份完整卷里出现这个主题的份数。'),
-        { t: 'h3', text: 'Bayesian（7/7）' },
-        { t: 'examqPick', picks: [['c08', '2016 S2 Q1.5'], ['c50', '2017 S2 Q1(h)']] },
         { t: 'h3', text: 'SVM 与 kernel（6/7、5/7）' },
-        { t: 'examqPick', picks: [['c28', '2021 Q3'], ['c27', '2020 S2 practice Q2(b)'], ['c29', '2016 S2 Q8.1']] },
+        { t: 'examqPick', picks: [['c28', '2021 Q3'], ['c27', '2020 S2 practice Q2(b)']] },
         { t: 'h3', text: '独立性与图模型（6/7）' },
-        { t: 'examqPick', picks: [['c02', '2019 S2 practice Q1(e)'], ['c55', '2022 S1 Q1(d)']] },
+        { t: 'examqPick', picks: [['c55', '2022 S1 Q1(d)']] },
         { t: 'h3', text: '神经网络与优化器（4/7、3/7）' },
         { t: 'examqPick', picks: [['c33', '2021 Q4'], ['c34', '2021 Q13(b)'], ['c35', '2021 Q7'], ['c35', '2022 S1 Q1(a)']] },
         { t: 'h3', text: 'RNN、attention、autoencoder（各 2/7）' },
@@ -277,7 +276,7 @@ $\nabla L=-2\mathbf X'\mathbf y+2\mathbf X'\mathbf X\mathbf w+2\lambda\mathbf w=
 Hence $(\mathbf X'\mathbf X+\lambda\mathbf I)\mathbf w=\mathbf X'\mathbf y$, so $\mathbf w^*=(\mathbf X'\mathbf X+\lambda\mathbf I)^{-1}\mathbf X'\mathbf y$. With $\lambda=0$ this is the least-squares solution.`)],
       work: [] },
 
-    { id: 'ins-t15', tier: 4, p: .25, m: 8, q: .8, ml: '约 8', title: '正则化与模型选择模板', src: '2021 Q6、Q13(a) · 8 分，2017 Q1、Q2；W4 也讨论过', mins: 25,
+    { id: 'ins-t15', tier: 4, p: .25, m: 8, q: .8, ml: '约 8', title: '正则化与模型选择模板', src: '2021 Q6、Q13(a) · 8 分；W4 也讨论过', mins: 25,
       card: [routine(T`背下面 4 个模板。再加一句（2021 Q13(a)）：要让 $-\log P+\lambda r(\theta)$ 的最小点是 MAP，先验就是 $p(\theta)\propto\exp(-\lambda r(\theta))$；ridge 对应 Gaussian 先验，lasso 对应 Laplace 先验。`)]
         .concat(ofType(section('T15', 'templates'), 'exam')),
       work: [] },
@@ -347,18 +346,15 @@ Hence $(\mathbf X'\mathbf X+\lambda\mathbf I)\mathbf w=\mathbf X'\mathbf y$, so 
   };
   // other years' questions of the same type, newest first, folded at the end of the item (user: open one only to do it).
   // Leaves out what the page already shows: the mock, workshop questions identical to it, and short answers in the 必背 / 高频 items.
+  // 2020 onwards only: 2010s papers were dropped (user: "过于古老的题目就删掉吧比如1几年的").
   const MORE = {
     'vc-table': [['T01', '2022 S1 exam Q3(a)'], ['T01', '2021 S1 exam Q16'], ['T01', '2020 Q7(a)']],
     'vc-family': [['T01', '2022 S2 Q5(a)(b)'], ['T01', '2020 Q7(b)']],
     ucb: [['T02', '2021 S1 exam Q17']],
     cnn: [['T03', '2023 Q5(a)(b)'], ['T10', '2022 S1 exam Q5'], ['T03', '“2021 S1” Q6(a)(b)'], ['T03', '2020 Q5(a)(b)(c)'], ['T03', '2020 Q4(a)'], ['T03', '2020 Q4(b)']],
-    'svm-sv': [['T04', '2017 S2 exam Q3(a)'], ['T04', '2017 S2 exam Q1(d)']],
-    dsep: [['T05', '2021 S1 exam Q18(a)'], ['T05', '2017 S2 exam Q9(a)(b)']],
-    elim: [['T06', '2023 S1 exam PGM'], ['T06', '2022 S1 exam Q2'], ['T06', '“2022 S1” PGM'], ['T06', '2021 S1 exam Q18(b)'], ['T06', '“2021 S1” U-PGM'], ['T06', '2019 exam Q8'], ['T06', '2016 S2 exam Q9']],
-    pgm: [['T07', '2021 S1 exam Q14(c)'], ['T07', '2017 S2 exam Q11'], ['T07', '2016 S2 exam Q12']],
-    'ins-t8': [['T08', '2017 S2 exam Q3(b)'], ['T08', '2017 S2 exam Q10(b)'], ['T08', '2016 S2 exam, Q8.2'], ['T08', '2016 S2 exam, Q1.9']],
-    'ins-t9': [['T09', '2016 S2 exam Q10']],
-    perceptron: [['T11', '2016 S2 Q7']],
+    dsep: [['T05', '2021 S1 exam Q18(a)']],
+    elim: [['T06', '2023 S1 exam PGM'], ['T06', '2022 S1 exam Q2'], ['T06', '“2022 S1” PGM'], ['T06', '2021 S1 exam Q18(b)'], ['T06', '“2021 S1” U-PGM']],
+    pgm: [['T07', '2021 S1 exam Q14(c)']],
   };
   const more = (picks) => ({ t: 'deep', title: '其他年份同类题（' + picks.length + ' 道）', hint: '想做再展开', blocks: picks.map(([page, src]) => past(page, src)) });
 
@@ -613,46 +609,21 @@ Scores: $(0,0)\to-0.5$, $(0,1)\to0.5$, $(1,0)\to0.5$, $(1,1)\to-0.5$. Positive m
       T`(d) $2^4=16$ rows. (e) The joint is $P(X)P(Y)P(Z)P(V\mid X,Y)$, so $2+2+2+8=14$ rows.
 
 中文：完整联合表 $2^4$ 行；分解以后每张小表的行数加起来。`],
-    '2016 S2 Q1.10': T`The training points that lie on the margin (with a soft margin, also points inside the margin or misclassified). They have $\lambda_i>0$, and only they decide the boundary.
-
-中文：贴在 margin 上的点；只有它们决定边界。`,
     '2021 Q2': T`The 1 is not a distance. It is $y_i(\mathbf w'\mathbf x_i+b)=1$, a scale we choose for $\mathbf w$. The real distance is $1/\|\mathbf w\|$, which can be larger than 1.
 
 中文：这个 1 是我们规定的缩放，真正的距离是 $1/\|\mathbf w\|$。`,
     '2022 S1 Q1(f)': T`The SVM problem is convex (a quadratic objective with linear constraints), so strong duality holds: the primal optimum equals the dual optimum.
 
 中文：凸问题满足强对偶，两个最优值相等。`,
-    '2017 S2 Q5(b)': T`MAP uses only one value: the peak of the posterior. Full Bayes keeps the whole posterior and averages predictions over it. They differ when data are few: with 2 heads in 2 tosses and a uniform prior, MAP says P(head) = 1, full Bayes says 3/4.
-
-中文：MAP 只取后验的峰值，完整的 Bayes 对整个后验取平均；数据少的时候差别大。`,
     '2021 Q10': T`Conjugacy lets us write the full posterior (and its normaliser) in closed form. MAP only needs the peak, $\arg\max_\theta[\log p(D\mid\theta)+\log p(\theta)]$. The normaliser does not affect the peak, so we can just optimise numerically, without conjugacy.
 
 中文：MAP 只是求最大值，不用算分母，所以不需要共轭。`,
-    '2017 S2 Q2(c)': T`$p(y_i\mid\mathbf x_i,\mathbf w)=\mathcal N(y_i\mid\mathbf x_i'\mathbf w,\sigma^2)$.
-
-$\log\prod_ip(y_i\mid\mathbf x_i,\mathbf w)=-\frac n2\log(2\pi\sigma^2)-\frac1{2\sigma^2}\sum_i(y_i-\mathbf x_i'\mathbf w)^2$.
-
-The first term does not depend on $\mathbf w$, so maximising this is the same as minimising $\sum_i(y_i-\mathbf x_i'\mathbf w)^2$: least squares.
-
-中文：写出似然，取 log，和 $\mathbf w$ 有关的只剩平方误差那一项。`,
-    '2016 S2 Q1.5': T`$p(\theta\mid D)=\dfrac{p(D\mid\theta)\,p(\theta)}{p(D)}$, where $\theta$ = parameters and $D$ = data. Posterior $p(\theta\mid D)$; likelihood $p(D\mid\theta)$; prior $p(\theta)$; evidence $p(D)=\int p(D\mid\theta)p(\theta)\,d\theta$.
-
-中文：后验 = 似然 × 先验 ÷ 证据；四个名字各对应一项。`,
-    '2017 S2 Q1(h)': T`Start with the prior. When new data arrive, posterior ∝ likelihood × prior. This posterior becomes the prior for the next data, and so on.
-
-中文：这一次的后验就是下一次的先验。`,
     '2021 Q3': T`Use the primal when the number of training points $n$ is much larger than the number of quadratic features. The dual grows with $n$ (an $n\times n$ kernel matrix); the primal grows with the number of features.
 
 中文：样本数远大于特征数时用 primal。`,
     '2020 S2 practice Q2(b)': T`(1) Soft margin: slack variables $\xi_i$ let some points break the margin, at a cost $C\sum_i\xi_i$. (2) Kernel: map the data to a higher-dimensional space where it is (nearly) separable.
 
 中文：两种办法：允许出错（soft margin），或者用 kernel 升维。`,
-    '2016 S2 Q8.1': T`The SVM dual uses the data only through dot products $\mathbf x_i'\mathbf x_j$. Replace them by $K(\mathbf x_i,\mathbf x_j)=\varphi(\mathbf x_i)'\varphi(\mathbf x_j)$. Benefit: a linear model in a high-dimensional space (a non-linear boundary) without ever computing $\varphi$, so it is cheap.
-
-中文：把点积换成 kernel；好处是在高维空间做线性分类，却不用真的算出高维特征。`,
-    '2019 S2 practice Q1(e)': T`A joint is a product of conditionals: $P(A,B,C)=P(A\mid B,C)\,P(B\mid C)\,P(C)$.
-
-中文：联合分布 = 一串条件概率相乘。`,
     '2022 S1 Q1(d)': T`No. The v-structure $A\to C\leftarrow B$ says $A\perp B$ but not $A\perp B\mid C$. No undirected graph says exactly this: without the edge $A$–$B$ it says $A\perp B\mid C$; with the edge it loses $A\perp B$.
 
 中文：v-structure 的独立关系，无向图表示不出来。`,
@@ -684,12 +655,6 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
 
 中文：臂、轮、奖励对上题目；context = 用户特征 + 文章特征；i.i.d. 不现实，有 context 会好一些；用均匀随机的日志做 replay 离线评估。`,
     // the other-year questions folded under each item (MORE)
-    '2017 S2 exam Q3(a)': T`In the dual, the SVM keeps one $\lambda_i$ per training point and predicts with $\sum_i\lambda_iy_iK(\mathbf x_i,\mathbf x)+b$, so it must store the support vectors. The number of parameters grows with the data instead of being fixed. (With an RBF kernel the feature space is infinite, so no fixed weight vector exists.)
-
-中文：对偶形式每个训练点一个 $\lambda_i$，参数个数随数据增长，所以算非参数。`,
-    '2017 S2 exam Q1(d)': T`The perceptron stops at any line that separates the data; which one depends on the starting weights and the order of the examples. The hard-margin SVM finds the one line with the largest margin, so its answer is unique and more robust.
-
-中文：感知机找到任意一条能分开的线就停；SVM 找 margin 最大的那一条。`,
     '2021 S1 exam Q17': T`- (1) Optimistic start: an arm never pulled gets the value $Q_0$; with $Q_0=\infty$ every arm is tried at least once.
 - (2) The bonus $\sqrt{\rho\log t/N_{t-1}(i)}$: few pulls (small $N$) means a big bonus. For an arm left alone, $\log t$ keeps growing while $N$ stays the same, so its bonus grows until it is pulled again. Larger $\rho$ = more exploration.
 
@@ -697,22 +662,6 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
     '2021 S1 exam Q14(c)': T`A full table can represent any $P(D\mid A,B)$. Logistic regression $P(D{=}1\mid A,B)=\sigma(w_0+w_AA+w_BB)$ forces the log-odds to be linear in $A$ and $B$, so it cannot represent interactions such as XOR: more bias. In return it has less variance (shared parameters), and it still predicts for parent values never seen in training.
 
 中文：表能表示任意分布；logistic regression 只能是线性的，表达能力下降（偏差变大），但方差变小。`,
-    '2017 S2 exam Q11': [
-      { t: 'graph', nodes: { F: [210, 30], S1: [60, 140], S2: [160, 140], S3: [260, 140], T: [370, 140] }, labels: { S1: 'S₁', S2: 'S₂', S3: 'S₃' }, edges: 'F>S1 F>S2 F>S3 F>T', w: 340, caption: '(a) 卷面画这个（$I=3$ 时）：流感指向每个症状和检测结果。' },
-      T`- (a) $F\to S_i$ for every $i$, and $F\to T$. Joint: $P(F)\prod_iP(S_i\mid F)\,P(T\mid F)$. The test can be wrong, so $P(T\mid F)$ is not all 0/1: $P(T{=}1\mid F{=}0)$ is the false positive rate, $P(T{=}0\mid F{=}1)$ the false negative rate.
-- (b) The doctor only sees the evidence. Inaccurate: $S_1,\dots,S_I,T\to D$, table entries between 0 and 1. Perfectly accurate: $F\to D$ with a 0/1 table ($D=F$).
-- (c) The posterior $P(F\mid S_1=s_1,\dots,S_I=s_I,T=t)$ (leave out $T$ if no test was done).
-- (d) Records of past patients with every variable, including the true $F$ (confirmed later). MLE = counting, e.g. $\hat P(T{=}1\mid F{=}0)=\#\{T=1,F=0\}/\#\{F=0\}$.
-
-中文：流感指向症状和检测；检测会错 → 表里不全是 0/1；诊断就是算后验；有完整数据就数频率。`],
-    '2016 S2 exam Q12（12.1–12.4）': [
-      { t: 'graph', nodes: { S: [200, 30], M1: [90, 130], M2: [200, 130], M3: [310, 130], C: [200, 240], R: [40, 240] }, labels: { M1: 'M₁', M2: 'M₂', M3: 'M₃' }, edges: 'S>M1 S>M2 S>M3 M1>C M2>C M3>C M1>R', w: 320, caption: '12.1 卷面画这个（$N=3$，讲师教第 1 门）；12.2 按这张图数表。' },
-      T`- 1. $S\to M_i$ for every subject; $M_1,\dots,M_N\to C$; only $M_k\to R$ ($k$ = the lecturer's subject).
-- 2. $N+3$ tables. $P(S)$: 1 free parameter. Each $P(M_i\mid S)$: 2. $P(C\mid M_1,\dots,M_N)$: $2^N$. $P(R\mid M_k)$: 2. Total $2^N+2N+3$.
-- 3. Separate the true mark $M_i$ from the mark written on the CV, $M_i'$. Add $H$ (honest or not): $M_i\to M_i'\leftarrow H$, and $M_1',\dots,M_N'\to C$. Honest: $M_i'=M_i$ (0/1 table). Dishonest: a low mark may be written as high.
-- 4. Probabilistic inference. Observe the CV marks $M_i'$ and the letter $R$; compute $P(S\mid m',r)$ and $P(H\mid m',r)$, summing out the true marks (elimination). Inputs: these observations, the graph and the learned CPTs.
-
-中文：逐句翻成箭头；二元变量每张表的自由参数 = 父节点组合数；不诚实 → 把真实值和写出来的值分开；招聘方做推断算后验。`],
     '2023 Q5(a)(b)（据学生笔记；学期未标）': T`- (a) Output $=\lfloor(n+2p-k)/s\rfloor+1$: $\lfloor(32+2-5)/s\rfloor+1=15$, so $\lfloor29/s\rfloor=14$, so $s=2$.
 - (b) Pooling uses the same formula: $\lfloor(15-2)/2\rfloor+1=7$, so $7\times7$.
 
@@ -749,10 +698,6 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
     '2021 S1 exam Q18(a)': T`All of $b_1,\dots,b_T$, and only them. The two chains meet only at the $x_t$, which are colliders ($a_t\to x_t\leftarrow b_t$). With no $x$ observed, every path from $a_1$ to the $b$ chain is blocked. The other $a_t$ and the $x_t$ are linked to $a_1$ through the $a$ chain, so they are dependent.
 
 中文：两条链只在 $x_t$ 碰头，$x_t$ 是 collider，不观测就挡住，所以 $a_1$ 和整条 $b$ 链独立。`,
-    '2017 S2 exam Q9(a)(b)': T`- (a) $P(A,B,C,D,E)=P(B)\,P(A\mid B)\,P(C\mid B)\,P(D\mid B,C)\,P(E\mid C)$.
-- (b) $B$ and $E$ are not independent ($B\to C\to E$). $B\perp E\mid C$, and also with $A$ and/or $D$ added: $B\perp E\mid A,C$; $B\perp E\mid C,D$; $B\perp E\mid A,C,D$. Every path from $B$ to $E$ goes through $C$.
-
-中文：每个节点乘上"给定父节点"的概率；$B$ 到 $E$ 必经 $C$，只要给定 $C$ 就独立。`,
     '2023 S1 exam PGM 题 (b)(c)（据学生笔记）': T`- (b) Moralise: $E$'s parents $A,H$, add $A$–$H$ (1). Eliminate $A$: connect all its neighbours $B,C,D,E,F,H$; only $E$–$H$ exists, so add 14. Eliminate $E$: connect $I$ to $B,C,D,F,H$, add 5. Total $1+14+5=20$ extra edges.
 - (c) Two cliques of 7 nodes: $\{A,B,C,D,E,F,H\}$ and $\{B,C,D,E,F,H,I\}$.
 
@@ -775,32 +720,6 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
 - (b) $\Pr(A{=}F,B{=}F,C{=}F)=\frac1Z f(F,F,F)\sum_{d,e}g(F,d,e)=\frac{3\times11}{132}=\frac14$.
 
 中文：按共享变量 $C$ 分组，两边分别求和再相乘；问到的变量固定，剩下的变量求和掉。`,
-    '2019 exam Q8（据学生笔记）': T`- 1. Group by $C$: $Z=(3+1+2+4)(3+0)+(1+6+4+0)(0+3)=30+33=63$.
-- 2. $\Pr(A{=}F,B{=}T,C{=}F)=\frac1Z f(F,T,F)\sum_dg(F,d)=\frac{4\times3}{63}=\frac4{21}$. Don't forget to sum over $D$.
-
-中文：$Z$ 按 $C$ 分组算；问到的变量固定，没问到的 $D$ 求和。`,
-    '2016 S2 exam Q9（9.1–9.3）': T`- 1. $\Pr(a,b,c,d)=\frac1Z f(a,b,c)\,g(c,d)$.
-- 2. Group by $C$: $Z=(5+3+3+1)(0+4)+(3+1+1+0)(4+0)=48+20=68$.
-- 3. $\Pr(A{=}F,C{=}F)=\frac1Z\big(\sum_bf(F,b,F)\big)\big(\sum_dg(F,d)\big)=\frac{1\times4}{68}=\frac1{17}$.
-
-中文：联合 = 势函数相乘 ÷ $Z$；$Z$ 按 $C$ 分组算；没问到的 $B$、$D$ 求和。`,
-    '2017 S2 exam Q3(b)': T`$K_1(\mathbf u,\mathbf v)=\varphi_1(\mathbf u)'\varphi_1(\mathbf v)$ and $K_2(\mathbf u,\mathbf v)=\varphi_2(\mathbf u)'\varphi_2(\mathbf v)$. Stack the features: $\varphi(\mathbf u)=\begin{bmatrix}\varphi_1(\mathbf u)\\\varphi_2(\mathbf u)\end{bmatrix}$. Then $\varphi(\mathbf u)'\varphi(\mathbf v)=\varphi_1(\mathbf u)'\varphi_1(\mathbf v)+\varphi_2(\mathbf u)'\varphi_2(\mathbf v)=K_1+K_2$. A dot product in a feature space, so $K_1+K_2$ is a kernel.
-
-中文：把两个特征向量拼在一起，点积正好是两个 kernel 相加。`,
-    '2017 S2 exam Q10(b)': T`A kernel gives a non-linear boundary. Buying depends on combinations of previews (e.g. many sci-fi and many action), which a linear classifier on the raw features cannot capture; the kernel works in a high-dimensional space with these combinations without building them. It can also compare preview histories directly, e.g. $K(A_1,A_2)=|A_1\cap A_2|$ (movies both users previewed).
-
-中文：kernel 能学非线性（特征的组合），还能直接在预览记录这种集合上定义相似度。`,
-    '2016 S2 exam, Q8.2': T`$k$ is a kernel, so $k(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$. Since $c>0$, let $\psi(\mathbf u)=\sqrt c\,\varphi(\mathbf u)$. Then $\psi(\mathbf u)'\psi(\mathbf v)=c\,\varphi(\mathbf u)'\varphi(\mathbf v)=c\,k(\mathbf u,\mathbf v)$, a dot product, so $c\,k$ is a kernel.
-
-中文：特征乘 $\sqrt c$，点积就乘 $c$。`,
-    '2016 S2 exam, Q1.9': T`A kernel is a function $K(\mathbf u,\mathbf v)=\varphi(\mathbf u)'\varphi(\mathbf v)$: the dot product after mapping the inputs to a feature space. The SVM dual uses the data only through dot products, so we replace them with $K$ and never compute $\varphi$.
-
-中文：kernel = 映射到特征空间以后的点积。`,
-    '2016 S2 exam Q10（10.1–10.3）': T`- 1. Posterior ∝ likelihood × prior $=\frac{\lambda^xe^{-\lambda}}{x!}\cdot\frac{\lambda^{\alpha-1}e^{-\lambda\beta}}{Z(\alpha,\beta)}\propto\lambda^{(\alpha+x)-1}e^{-\lambda(\beta+1)}$ (drop every factor without $\lambda$). This has the Gamma form, so the posterior is Gamma: conjugate.
-- 2. $\alpha'=\alpha+x$, $\beta'=\beta+1$.
-- 3. The full posterior is more informative: the mode is one number, the distribution also shows the uncertainty. With few data the posterior is wide and the mode loses a lot; with many data it is narrow around the mode, so the difference is small.
-
-中文：似然 × 先验，合并同底的幂，认出 Gamma 的形状；后验分布比众数信息多，数据越多差别越小。`,
     '2022 S2 Q5(a)(b)（据学生笔记）': T`- (a) $\mathrm{VC}(\bar F)=\mathrm{VC}(F)$. On any set of points, the labellings of $\bar F$ are the flipped labellings of $F$. Flipping is one-to-one, so $F$ gets all $2^{|S|}$ labellings exactly when $\bar F$ does: they shatter the same sets.
 - (b) $\mathrm{VC}(F_{n,k})=k$. Any $k$ points: every labelling has at most $k$ positives, so it is in the family: shattered. Any $k+1$ points: all positive is impossible: not shattered.
 
@@ -808,9 +727,6 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
     '2020 Q7(b)（据学生笔记）': T`$\mathrm{VC}(H)=\mathrm{VC}(F)+\mathrm{VC}(G)$. The two domains are separate, so $H$ labels the first part with any $f$ and the second part with any $g$, independently. A set shattered by $F$ plus a set shattered by $G$ is shattered by $H$. And any set shattered by $H$ splits into a part shattered by $F$ and a part shattered by $G$, so it cannot be bigger.
 
 中文：两个定义域互不相干，可以分别随便标，所以 VC 相加。`,
-    '2016 S2 Q7': T`No bias: $s=\mathbf w'\mathbf x=2(-2)+3(3)+4(1)=9>0$, so we predict $+1$ but $y=-1$: wrong, so update. $\mathbf w\leftarrow\mathbf w+\eta y\mathbf x=\mathbf w-\eta\mathbf x$. Introduce the learning rate $\eta=1$: $\mathbf w=(4,0,3)$. (With $\eta=0.1$: $(2.2,2.7,3.9)$.)
-
-中文：先算分数判断对错；错了就 $\mathbf w\leftarrow\mathbf w+\eta y\mathbf x$；学习率要自己设并写明。`,
   };
   const usedEasy = {};
   const easyFor = (src) => { if (EASY[src]) usedEasy[src] = true; return EASY[src]; };
@@ -956,7 +872,7 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
 
 **证明不考**：L16 "We will never put an exam question about proofs"，L06 也说不会让你们证明。包括偏差–方差分解的证明（L05）、泛化界的推导（L06）、强对偶和一般 $d$ 次 kernel 的证明（L09）、UCB 背后的界（L17）、Bayesian 线性回归后验的配方推导（L18）、BP 为什么对（L21）、running intersection（L22）、Bayesian score 闭式解（L23）、MRF 的 $Z$ 求导（L24）。**结论和计算照样考**：MLE 求导、展开二次核、代公式算 UCB 和界，都要会。` },
     { t: 'spLedger', items: items.map(({ seg, tier, ev, score, last, likely, hard, ml, id, n, title, mins, marks, star }) => ({ seg, tier, ev, score, last, likely, hard, ml, id, n, title, mins, marks, star })) },
-    { t: 'note', title: '怎么排的，够不够', md: '**排序**：先看来源，今年优先：老师 mock → 今年 Quiz 和 workshop 手写题 → 去年 practice → 更早的卷。同一来源内，老师课上点名的（★）排最前，并且都放进第一段；其余按每小时预期分排（可能性 × 真卷分值 × 做对率 ÷ 用时），可能性和做对率是我估的，不是官方信息。\n\n**为什么 Quiz 紧跟 mock**：Ed 的考试帖写明 quiz 也考；13 题里有 5 题和 mock 考的是同一块（VC、CNN、bandit、D-separation、消元）。\n\n**为什么 workshop 排在旧卷前面**：mock Section B 四道题全部是今年 workshop 手写题原题：Q2 = W10，Q3 = W5 Ex1，Q4 = W12 Q1，Q5 = W12 Q4。真卷 120 分、题更多，mock 只有 50 分，多出来的分很可能来自还没上 mock 的手写题，所以 BP、experts 虽然旧卷没考过，这里也提前了。这是我从规律推断的，老师没有这样说。\n\n**时间（一天半）**：第一段一整天，约 7 小时；第二段半天，约 3 小时；出门前 30 分钟只背不做。每项的用时已经算上对答案。一题卡住超过 10 分钟就看答案，合上再自己写一遍，然后往下走。\n\n**够不够**：表里的累计估计按今年风格算。只做第一段约 45–65 分，不稳；两段都做完 65–85 分，才有把握。风险是真卷如果还像 2021、2022 旧卷，两段只覆盖 66 分、35 分，要靠"有空再做"那段补。\n\n**还没纳入**：Canvas 公告，我这边读不到。复习课没有找到：L24 说它是最后一节课，本地和 Ed 都没有复习课材料。考场节奏见[页底](#/sprint/exam-day)。' },
+    { t: 'note', title: '怎么排的，够不够', md: '**排序**：先看来源，今年优先：老师 mock → 今年 Quiz 和 workshop 手写题 → 去年 practice → 更早的卷。同一来源内，老师课上点名的（★）排最前，并且都放进第一段；其余按每小时预期分排（可能性 × 真卷分值 × 做对率 ÷ 用时），可能性和做对率是我估的，不是官方信息。\n\n**为什么 Quiz 紧跟 mock**：Ed 的考试帖写明 quiz 也考；13 题里有 5 题和 mock 考的是同一块（VC、CNN、bandit、D-separation、消元）。\n\n**为什么 workshop 排在旧卷前面**：mock Section B 四道题全部是今年 workshop 手写题原题：Q2 = W10，Q3 = W5 Ex1，Q4 = W12 Q1，Q5 = W12 Q4。真卷 120 分、题更多，mock 只有 50 分，多出来的分很可能来自还没上 mock 的手写题，所以 BP、experts 虽然旧卷没考过，这里也提前了。这是我从规律推断的，老师没有这样说。\n\n**时间（一天半）**：第一段一整天，约 7 小时；第二段半天，约 3 小时；出门前 30 分钟只背不做。每项的用时已经算上对答案。一题卡住超过 10 分钟就看答案，合上再自己写一遍，然后往下走。\n\n**够不够**：表里的累计估计按今年风格算。只做第一段约 45–65 分，不稳；两段都做完 60–85 分，才有把握。风险是真卷如果还像 2021、2022 旧卷，两段只覆盖 66 分、35 分，要靠"有空再做"那段补。\n\n**还没纳入**：Canvas 公告，我这边读不到。复习课没有找到：L24 说它是最后一节课，本地和 Ed 都没有复习课材料。考场节奏见[页底](#/sprint/exam-day)。' },
     keywords('Section A: Short Answer 简答 | Section B: Method & Calculation 方法与计算 | Section C: Design and Application 设计与应用 | Answer as briefly as possible 尽量简短 | in 1-3 lines 写 1–3 行 | In words or a mathematical expression 用文字或公式 | Consider 设有 | Suppose / Assume 假设 | given 已知 | Calculate / Compute 计算 | Determine 判断、求出 | Provide 给出 | State 写出 | Explain 解释原因 | Describe 描述 | Outline 概述 | Justify 说明理由 | Derive 推导 | Prove / Show that 证明 | Identify 指出 | Draw 画 | Design 设计 | How many 多少个 | what quantity 什么量 | Which of the following 下面哪个 | Select all 选出所有对的 | whether 是否 | Does … hold? 是否成立 | true / false 对 / 错 | at most / at least 最多 / 至少 | exclude / include 不算 / 算上 | respectively 分别 | corresponding 对应的 | otherwise 否则 | in terms of 用…表示 | need not 不必 | Why or why not? 为什么', '题干常用词'),
   ];
   items.forEach((it) => {
