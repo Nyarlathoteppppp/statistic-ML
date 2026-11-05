@@ -467,6 +467,38 @@ Hence $(\mathbf X'\mathbf X+\lambda\mathbf I)\mathbf w=\mathbf X'\mathbf y$, so 
   };
   const know = (md) => ({ t: 'note', title: '这题要懂的知识点', md: md });
 
+  // What the lecturers said in class about this item, quotes checked against the L02–L24 transcripts (txt/, reference/transcripts).
+  // STAR items were named outright ("remember", "important … at the end of the semester", "what we expect"): they sort first in their tier and join the first segment.
+  const STAR = ['dsep', 'elim', 'bp', 'ins-t8', 'derive'];
+  const TEACHER = {
+    dsep: T`**L20**："please remember this step, this is really important to know. It will be important to you at the end of the semester." 说的就是这套步骤：祖先图 → moralise → 去掉方向 → 删掉条件节点 → 看还连不连通。这是所有讲稿里最直接的考试暗示。`,
+    elim: T`- **L22**："you need to know that the elimination ordering it matters"：顺序决定团的大小，也就决定计算量；最优顺序很难找（computationally hard），所以用启发式。
+- **L22 收尾**：要知道"why we need to have a tree to do the belief propagation, that's the most important part"，还有为什么好的消元顺序难找。
+- Running intersection property "quite important"，但证明不考。
+- **不考**：Prim、Kruskal 求生成树的细节（"we won't talk about the details in this subject"）。最大权生成树这个做法要会。`,
+    bp: T`- **L21**："please remember the two rules … It will become really, really useful … in this subject"。两条规则：外出消息 = 收到的消息（不含对方发来的）× 外出势，再求和；边缘 = 收到的消息全部相乘。
+- **L22**："why we want to use a belief propagation and why we need to have a tree … that's the most important part"。
+- **不考**：loopy BP（L22 "you don't need to know this loopy belief propagation"）；BP 为什么对，老师故意不证。`,
+    'ins-t8': T`**L09**："that's what we expect from this class"：会手展开二次核，写出 $\varphi$（见下面知识点）。**不考**：一般 $d$ 次多项式核的证明（"I don't really expect you to understand all of this"）。`,
+    'svm-sv': T`**L09** 没证强对偶（"I'm not gonna prove to you why that is"），**证明不考**。**要会结论**：SVM 是凸二次规划、约束是线性的，所以强对偶成立，primal 和 dual 的最优值相等，可以改解 dual；dual 里数据只以点积出现，所以能换成 kernel。`,
+    slack: T`**L09** 没推 soft margin 的 dual（"I'm not gonna derive it here in class"），**推导不考**。**要会结论**：和 hard margin 的 dual 一样，只多了上界 $0\le\lambda_i\le C$（box constraint）。`,
+    'ins-t15': T`**L05** 偏差–方差分解的证明 "outside the scope of the subject"，**不考**。**要会结论**：期望平方误差 = bias² + variance + 不可约噪声；模型越复杂（$\lambda$ 越小），bias 越低、variance 越高。`,
+    'vc-table': T`**L06** 泛化界里 $\varepsilon$ 怎么推出来："not … part of the exam"，**不考**。**要会结论**：至少以 $1-\delta$ 的概率，$R[\hat f_D]\le\hat R_D[\hat f_D]+\sqrt{\frac{\log|\mathcal F|+\log(1/\delta)}{2n}}$；无限类把 $\log|\mathcal F|$ 换成和 VC 维有关的量。数据越多界越紧，模型越复杂界越松。`,
+    mle: T`**L23** Bayesian score 的闭式解："you also don't need to know how to derive it"，**推导不考**。**要会**：给了公式会用；score 按节点拆开（decomposable），改一条边只要重算受影响那个节点的局部分数。`,
+    mrf: T`**L24** 讲 MRF 怎么学参数，下面三处推导都没讲，**不考**，知道结论就行：
+- 对数似然对某个势的梯度 = 观测计数 − 模型预测的期望计数（L24 的例子：30 − 20 = 10），所以每一步都要做推断。
+- 树结构 MRF 的联合分布可以直接用边、点的经验概率写出来，不用迭代优化。
+- 结构未知时，边权取互信息，求最大权生成树（Chow–Liu）。`,
+    derive: T`**L02**：方差未知的 Normal MLE 是 "part of the requirements"（见下面知识点最后一条）。`,
+    w11: T`- **L18**："very important that we choose a normal distribution as the prior … also important that our likelihood is also a normal distribution"：两边都是 Gaussian（共轭），后验才有闭式解。
+- **不考**：后验均值和协方差怎么配方推出来（"a great exercise. It's not examinable"）。老师说 "the important thing is that we can obtain this close form solution"，记结果就行；Fisher information 那页（绿色页，"not examinable"）；方差也未知时用 inverse gamma 先验（"You don't need to know"）。`,
+    'ins-t9': T`**L19**："the conjugate priors are very important for our computations"：Beta–Bernoulli 和上一讲的 Normal–Normal 都是共轭，后验和先验同一族，更新只是改参数。**不考**：Laplace approximation 那页（绿色页）。`,
+    ucb: T`**L17**："we are not going to prove this bound, but we are going to use it"：UCB 的 bonus 来自这个界，会用公式算就行。`,
+    experts: T`**L16**："We will never put an exam question about proofs"：错误上界的证明不考，算法和界的公式要会用（W9 和 mock 都给 ln 值让你代）。不等式工具那页是绿色页，"not examinable"。`,
+    sa2: T`**L14**："very important to know that … W and U … are the same across every time step"：RNN 每个时间步共用同一组权重。**不考**：Transformer 结构那页（"it's a green slide, so it's not examinable"）。`,
+  };
+  const teacher = (id) => ({ t: 'warn', title: STAR.indexOf(id) >= 0 ? '★ 老师课上点名' : '老师课上说的', md: TEACHER[id] });
+
   // 考场版答案: a short, plain-English answer to memorise and write on the paper, plus one Chinese line (user: "解答都要配合一个简单易懂的回答方便我记住考场写").
   // Keyed by the question's src as shown on this page (past blocks) or the pick's src (short answers). The full solution stays below it.
   // A key that matches no question on the page throws at load.
@@ -796,9 +828,10 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
 
   // a day and a half: the full day takes the mock and this year's shortest workshop items, the half day the rest of this year and 2025
   const DAY1 = ['cq', 'mrf', 'w11', 'bp', 'ws8'];
-  const SEGS = { 1: '第一段：一整天（老师 mock、Quiz、W8、W11、W12）', 2: '第二段：半天（其余 workshop 手写题、去年 practice、必背简答）', 3: '有空再做：更早的卷（前两段做完还有时间才做）', 4: '出门前 30 分钟（不管做到哪，这项都要做）' };
+  const SEGS = { 1: '第一段：一整天（老师 mock、Quiz、★ 老师点名、W8、W11、W12）', 2:'第二段：半天（其余 workshop 手写题、去年 practice、必背简答）', 3: '有空再做：更早的卷（前两段做完还有时间才做）', 4: '出门前 30 分钟（不管做到哪，这项都要做）' };
   items.forEach((it) => {
-    it.seg = it.tier === 1 || DAY1.indexOf(it.id) >= 0 ? 1 : it.tier <= 3 ? 2 : it.tier === 4 ? 3 : 4;
+    it.star = STAR.indexOf(it.id) >= 0;
+    it.seg = it.tier === 1 || it.star || DAY1.indexOf(it.id) >= 0 ? 1 : it.tier <= 3 ? 2 : it.tier === 4 ? 3 : 4;
     if (it.last) return;
     const n = it.qs || 1;
     it.ev = n * it.p * it.m * it.q;
@@ -807,7 +840,7 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
     it.likely = hit >= .75 ? '高' : hit >= .4 ? '中' : '低';
     it.hard = it.q >= .85 ? '易' : it.q >= .65 ? '中' : '难';
   });
-  items.sort((a, b) => a.seg - b.seg || a.tier - b.tier || (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || (b.score || 0) - (a.score || 0));
+  items.sort((a, b) => a.seg - b.seg || a.tier - b.tier || (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || (b.star ? 1 : 0) - (a.star ? 1 : 0) || (b.score || 0) - (a.score || 0));
 
   const marked = () => SML.store.get('checklist', {});
   function sync() {
@@ -846,7 +879,7 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
     const { el } = SML.render;
     const { inline } = SML.md;
     const box = el('div', 'sp-head');
-    const h = el('h2', null, b.n + '. ' + inline(b.title));
+    const h = el('h2', null, b.n + '. ' + (b.star ? '★ ' : '') + inline(b.title));
     h.id = b.id;
     // which stop of the storyline page this item belongs to (SML.storyStops, data/storyline.js loads after this file)
     const s = (SML.storyStops || []).find((x) => x.items.indexOf(b.id) >= 0);
@@ -901,7 +934,7 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
       const ck = el('td', 'ck');
       ck.appendChild(checkbox(it.id));
       tr.appendChild(ck);
-      tr.insertAdjacentHTML('beforeend', '<td><a href="#/sprint/' + esc(it.id) + '">' + it.n + '. ' + inline(it.title) + '</a></td><td class="sm">' + esc(it.likely || '') + '</td><td class="sm">' + esc(it.ml || '') + '</td><td class="sm">' + esc(it.hard || '') + '</td><td class="sm">' + it.mins + ' 分钟</td>');
+      tr.insertAdjacentHTML('beforeend', '<td><a href="#/sprint/' + esc(it.id) + '">' + it.n + '. ' + (it.star ? '★ ' : '') + inline(it.title) + '</a></td><td class="sm">' + esc(it.likely || '') + '</td><td class="sm">' + esc(it.ml || '') + '</td><td class="sm">' + esc(it.hard || '') + '</td><td class="sm">' + it.mins + ' 分钟</td>');
       body.appendChild(tr);
     });
     table.appendChild(body);
@@ -915,13 +948,20 @@ The first term does not depend on $\mathbf w$, so maximising this is the same as
 
   const blocks = [
     { t: 'good', title: '先读：一条线串起来（25 分钟）', md: '全课 7 站：每站解决什么问题、带出什么新问题、这一页哪几项考它。读完知道每一项在整门课里的位置，再从第 1 项开始做。[打开 →](#/storyline)' },
-    { t: 'spLedger', items: items.map(({ seg, tier, ev, score, last, likely, hard, ml, id, n, title, mins, marks }) => ({ seg, tier, ev, score, last, likely, hard, ml, id, n, title, mins, marks })) },
-    { t: 'note', title: '怎么排的，够不够', md: '**排序**：先看来源，今年优先：老师 mock → 今年 Quiz 和 workshop 手写题 → 去年 practice → 更早的卷。同一来源内按每小时预期分排（可能性 × 真卷分值 × 做对率 ÷ 用时），可能性和做对率是我估的，不是官方信息。\n\n**为什么 Quiz 紧跟 mock**：Ed 的考试帖写明 quiz 也考；13 题里有 5 题和 mock 考的是同一块（VC、CNN、bandit、D-separation、消元）。\n\n**为什么 workshop 排在旧卷前面**：mock Section B 四道题全部是今年 workshop 手写题原题：Q2 = W10，Q3 = W5 Ex1，Q4 = W12 Q1，Q5 = W12 Q4。真卷 120 分、题更多，mock 只有 50 分，多出来的分很可能来自还没上 mock 的手写题，所以 BP、experts 虽然旧卷没考过，这里也提前了。这是我从规律推断的，老师没有这样说。\n\n**时间（一天半）**：第一段一整天，约 6.5 小时；第二段半天，约 3.5 小时；出门前 30 分钟只背不做。每项的用时已经算上对答案。一题卡住超过 10 分钟就看答案，合上再自己写一遍，然后往下走。\n\n**够不够**：表里的累计估计按今年风格算。只做第一段约 45–60 分，不稳；两段都做完 65–85 分，才有把握。风险是真卷如果还像 2021、2022 旧卷，两段只覆盖 66 分、35 分，要靠"有空再做"那段补。\n\n**还没纳入**：Canvas 公告，我这边读不到。复习课没有找到：L24 说它是最后一节课，本地和 Ed 都没有复习课材料。考场节奏见[页底](#/sprint/exam-day)。' },
+    { t: 'warn', title: '老师课上说的：★ 要会的，和不考的', md: T`来源：L02–L24 的讲稿（L01、L03、L07、L08、L10–L13 没有讲稿，没查）。每项卡片最上面的黄框写了这一项老师的原话。
+
+**★ 老师点名要会**：d-separation 的步骤（L20："important to you at the end of the semester"）；消元顺序决定计算量、为什么要变成树再跑 BP（L22："the most important part"）；BP 的两条规则（L21："please remember the two rules"）；手展开二次核（L09）；方差未知的 Normal MLE（L02）。另外 L15：t 检验如果考，"we'll give you the formulas"，只要代数字。
+
+**整块不考，直接跳过**：绿色背景的页（L14、L16、L18 都说 "green slide … not examinable"）；Transformer 结构（L14）；Fisher information（L18）；方差未知时的 inverse gamma 先验（L18）；Laplace approximation（L19）；loopy BP（L22）；Prim、Kruskal 的细节（L22）。
+
+**证明不考**：L16 "We will never put an exam question about proofs"，L06 也说不会让你们证明。包括偏差–方差分解的证明（L05）、泛化界的推导（L06）、强对偶和一般 $d$ 次 kernel 的证明（L09）、UCB 背后的界（L17）、Bayesian 线性回归后验的配方推导（L18）、BP 为什么对（L21）、running intersection（L22）、Bayesian score 闭式解（L23）、MRF 的 $Z$ 求导（L24）。**结论和计算照样考**：MLE 求导、展开二次核、代公式算 UCB 和界，都要会。` },
+    { t: 'spLedger', items: items.map(({ seg, tier, ev, score, last, likely, hard, ml, id, n, title, mins, marks, star }) => ({ seg, tier, ev, score, last, likely, hard, ml, id, n, title, mins, marks, star })) },
+    { t: 'note', title: '怎么排的，够不够', md: '**排序**：先看来源，今年优先：老师 mock → 今年 Quiz 和 workshop 手写题 → 去年 practice → 更早的卷。同一来源内，老师课上点名的（★）排最前，并且都放进第一段；其余按每小时预期分排（可能性 × 真卷分值 × 做对率 ÷ 用时），可能性和做对率是我估的，不是官方信息。\n\n**为什么 Quiz 紧跟 mock**：Ed 的考试帖写明 quiz 也考；13 题里有 5 题和 mock 考的是同一块（VC、CNN、bandit、D-separation、消元）。\n\n**为什么 workshop 排在旧卷前面**：mock Section B 四道题全部是今年 workshop 手写题原题：Q2 = W10，Q3 = W5 Ex1，Q4 = W12 Q1，Q5 = W12 Q4。真卷 120 分、题更多，mock 只有 50 分，多出来的分很可能来自还没上 mock 的手写题，所以 BP、experts 虽然旧卷没考过，这里也提前了。这是我从规律推断的，老师没有这样说。\n\n**时间（一天半）**：第一段一整天，约 7 小时；第二段半天，约 3 小时；出门前 30 分钟只背不做。每项的用时已经算上对答案。一题卡住超过 10 分钟就看答案，合上再自己写一遍，然后往下走。\n\n**够不够**：表里的累计估计按今年风格算。只做第一段约 45–65 分，不稳；两段都做完 65–85 分，才有把握。风险是真卷如果还像 2021、2022 旧卷，两段只覆盖 66 分、35 分，要靠"有空再做"那段补。\n\n**还没纳入**：Canvas 公告，我这边读不到。复习课没有找到：L24 说它是最后一节课，本地和 Ed 都没有复习课材料。考场节奏见[页底](#/sprint/exam-day)。' },
     keywords('Section A: Short Answer 简答 | Section B: Method & Calculation 方法与计算 | Section C: Design and Application 设计与应用 | Answer as briefly as possible 尽量简短 | in 1-3 lines 写 1–3 行 | In words or a mathematical expression 用文字或公式 | Consider 设有 | Suppose / Assume 假设 | given 已知 | Calculate / Compute 计算 | Determine 判断、求出 | Provide 给出 | State 写出 | Explain 解释原因 | Describe 描述 | Outline 概述 | Justify 说明理由 | Derive 推导 | Prove / Show that 证明 | Identify 指出 | Draw 画 | Design 设计 | How many 多少个 | what quantity 什么量 | Which of the following 下面哪个 | Select all 选出所有对的 | whether 是否 | Does … hold? 是否成立 | true / false 对 / 错 | at most / at least 最多 / 至少 | exclude / include 不算 / 算上 | respectively 分别 | corresponding 对应的 | otherwise 否则 | in terms of 用…表示 | need not 不必 | Why or why not? 为什么', '题干常用词'),
   ];
   items.forEach((it) => {
-    blocks.push({ t: 'spHead', id: it.id, n: it.n, title: it.title, src: it.src, mins: it.mins });
-    const card = (KW[it.id] ? [keywords(KW[it.id], '关键词')] : []).concat(KNOW[it.id] ? [know(KNOW[it.id])] : [], it.card);
+    blocks.push({ t: 'spHead', id: it.id, n: it.n, title: it.title, src: it.src, mins: it.mins, star: it.star });
+    const card = (TEACHER[it.id] ? [teacher(it.id)] : []).concat(KW[it.id] ? [keywords(KW[it.id], '关键词')] : [], KNOW[it.id] ? [know(KNOW[it.id])] : [], it.card);
     if (card.length) blocks.push({ t: 'spWrap', cls: 'sp-card', blocks: withEasy(card) });
     blocks.push({ t: 'spWrap', cls: 'sp-work', blocks: withEasy(it.work.concat(MORE[it.id] ? [more(MORE[it.id])] : [], [{ t: 'spTick', id: it.id }])) });
   });
