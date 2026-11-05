@@ -478,7 +478,10 @@
     const parents = { A: [], B: ['A'], C: ['A'], D: ['B', 'C'] };
     const result = SML.core.cpt.sizes(parents, card);
     const rows = result.tables.map(function (table) { return [table.node, String(card[table.node]), table.parents.join(', ') || '∅', String(table.parentConfigs), '(' + table.shape.join(' × ') + ')', String(table.free)]; });
-    return { q: ['给定 DAG A→B，A→C，B→D，C→D。基数为 ' + Object.keys(card).map(function (name) { return name + '=' + card[name]; }).join(', ') + '。求总 free parameters。'], check: { type: 'num', answer: result.totalFree, tol: 0 }, sol: [{ t: 'table', head: ['node', 'cardinality', 'parents', 'parent configs', 'shape', 'free'], rows: rows }, '**合计：** ' + result.totalFree], answerText: String(result.totalFree) };
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    SML.vizGraph.draw(svg, { nodes: { A: { x: 130, y: 30 }, B: { x: 50, y: 110 }, C: { x: 210, y: 110 }, D: { x: 130, y: 190 } }, edges: [['A', 'B'], ['A', 'C'], ['B', 'D'], ['C', 'D']].map(function (edge) { return { a: edge[0], b: edge[1], directed: true }; }), r: 18 });
+    svg.style.maxWidth = '260px';
+    return { q: ['给定 DAG A→B，A→C，B→D，C→D。基数为 ' + Object.keys(card).map(function (name) { return name + '=' + card[name]; }).join(', ') + '。求总 free parameters。', { t: 'html', html: svg.outerHTML }], check: { type: 'num', answer: result.totalFree, tol: 0 }, sol: [{ t: 'table', head: ['node', 'cardinality', 'parents', 'parent configs', 'shape', 'free'], rows: rows }, '**合计：** ' + result.totalFree], answerText: String(result.totalFree) };
   }
   SML.practice = SML.practice || { generators: {} };
   SML.practice.register('dsep', practiceDsep);

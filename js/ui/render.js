@@ -182,6 +182,16 @@
       if (b.qzh) q.appendChild(el('div', 'qzh', md('题意：' + b.qzh)));
       if (b.blocks) q.appendChild(renderBlocks(b.blocks, ctx));
       box.appendChild(q);
+      // a short answer to memorise and write in the exam, shown before the full worked solution
+      if (b.easy) {
+        const e = el('details', 'sol easy');
+        e.appendChild(el('summary', null, '考场版答案（背这个，照着写）'));
+        // markdown, or a list of blocks when the answer needs a figure (the graph to draw)
+        const eb = el('div', 'sol-body', Array.isArray(b.easy) ? '' : md(b.easy));
+        if (Array.isArray(b.easy)) eb.appendChild(renderBlocks(b.easy, ctx));
+        e.appendChild(eb);
+        box.appendChild(e);
+      }
       if (b.sol) {
         const d = el('details', 'sol');
         d.appendChild(el('summary', null, '查看完整解答'));

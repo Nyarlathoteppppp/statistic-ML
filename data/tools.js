@@ -174,7 +174,8 @@
     const { el } = SML.render;
     const { md, inline } = SML.md;
     const box = el('div', 'examq-index');
-    (b.picks || []).forEach(([id, src]) => {
+    // a pick may carry a third element: a short exam answer to memorise, shown before the full answer
+    (b.picks || []).forEach(([id, src, easy]) => {
       const p = SML.content.get(id);
       const e = p && (p.examQ || []).find((x) => String(x.src || '').indexOf(src) === 0);
       if (!e) { box.appendChild(el('div', 'callout errata', '找不到原题：' + SML.md.esc(id + ' ' + src))); return; }
@@ -182,8 +183,14 @@
       const card = el('div', 'callout examq');
       card.innerHTML = '<div class="ctitle"><span>' + SML.md.esc(e.src) + ' · <a href="#/' + id + '">' + inline((m.tag ? m.tag + ' ' : '') + (m.title || p.title)) + '</a></span></div>' +
         md('**Q.** ' + e.q) + (e.qzh ? md('题意：' + e.qzh) : '');
+      if (easy) {
+        const k = el('details', 'easy');
+        k.innerHTML = '<summary>考场版答案（背这个，照着写）</summary>' + (Array.isArray(easy) ? '' : md(easy));
+        if (Array.isArray(easy)) k.appendChild(SML.render.renderBlocks(easy));
+        card.appendChild(k);
+      }
       const d = el('details');
-      d.innerHTML = '<summary>看答案</summary>' + md('**A.** ' + e.a) + (e.azh ? md('中文意思：' + e.azh) : '');
+      d.innerHTML = '<summary>' + (easy ? '完整答案' : '看答案') + '</summary>' + md('**A.** ' + e.a) + (e.azh ? md('中文意思：' + e.azh) : '');
       card.appendChild(d);
       box.appendChild(card);
     });

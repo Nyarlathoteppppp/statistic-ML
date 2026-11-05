@@ -297,3 +297,17 @@ ul.bi .kzh { color: var(--muted); font-size: .92em; margin: 1px 0 4px; }
 body.sp-recite .sp-work { display: none; }
 .chip.kw { font-size: .86rem; padding: 2px 10px; }
 .chip.kw-label { border: none; background: none; padding: 2px 4px 2px 0; font-size: .86rem; font-weight: 650; color: var(--ink); }
+
+/* storyline page: the course as one chain of stops, each arrow names the new problem that leads to the next stop */
+.st-flow { display: flex; flex-direction: column; max-width: 680px; margin: 12px 0 24px; }
+.st-stop { display: block; border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); background: var(--card); padding: 8px 14px; color: var(--ink); text-decoration: none; }
+.st-stop:hover { background: var(--accent-soft); }
+.st-stop b { display: block; font-weight: 650; }
+.st-stop span { display: block; font-size: .86rem; color: var(--muted); margin-top: 2px; }
+.st-why { margin-left: 22px; padding: 7px 0 7px 16px; border-left: 2px dashed var(--line-2); font-size: .88rem; color: var(--ink-2); }
+.st-why::before { content: '↓ 新问题：'; color: var(--accent); font-weight: 650; }
+
+/* exam-ready short answers (sprint page): the version to memorise, above the full solution */
+.past details.sol.easy > .sol-body { background: var(--good-soft); padding-top: 8px; }
+.examq-index .callout.examq details.easy > summary { color: var(--good); font-weight: 650; }
+.examq-index .callout.examq details.easy[open] { background: var(--good-soft); padding: 4px 10px; border-radius: 6px; }

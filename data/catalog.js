@@ -139,6 +139,7 @@
     pastindex: { title: '真题索引', countable: false },
     canvasquiz: { title: '平时小测合集', countable: false },
     sprint: { title: '两天必拿分', countable: false },
+    storyline: { title: '一条线串起来', countable: false },
     mistakes: { title: '错题本', countable: false },
   };
 
@@ -146,7 +147,7 @@
   root.SML.catalog = {
     meta: meta,
     zones: [
-      { id: 'guide', title: '考试导航', items: ['home', 'sprint', 'must', 'daily', 'route', 'outline', 'canvasquiz'] },
+      { id: 'guide', title: '考试导航', items: ['home', 'storyline', 'sprint', 'must', 'daily', 'route', 'outline', 'canvasquiz'] },
       {
         id: 'course', title: '课程（按周学习）', units: [
           { title: 'W1 · 概率、统计学派', items: ['c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'c07', 'c08', 'c09', 'r01'] },
