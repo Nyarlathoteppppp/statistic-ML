@@ -123,14 +123,14 @@ Pull arm …: it has the largest UCB value. Its empirical mean is not the highes
 
 1. 画图：每个变量一个节点，原因 → 结果；没说有关系的不连。
 2. 因子分解：每个节点写 $P(x\mid\text{parents})$，全部相乘。
-3. 数 CPT：每个节点一张表，$r$ 个取值，父节点 $q$ 种组合，$r\times q$；自由参数 $(r-1)q$。Ed 上对这道题的答复（11/1）：32 行 2 列或 2 行 32 列都对，但要写清每行对应哪种父节点组合；也可以只存 $P(\text{True}\mid\text{parents})$。
+3. 数 CPT：每个节点一张表，$r$ 个取值，父节点 $q$ 种组合，$r\times q$；自由参数 $(r-1)q$。**老师官方答案的写法**（布尔变量）：每种父节点组合一行，只写 True 的概率（False = 1 减它）；没有父节点就 1 行，$m$ 个父节点就 $2^m$ 行，列 = $m$ 个父节点 + 这个变量本身。Ed 上对这道题的答复（11/1）：32 行 2 列或 2 行 32 列也都对，但要写清每行对应哪种父节点组合。
 4. 规则确定（传感器绝对准确）就填 0/1。
 5. 读数会出错：加隐变量 $F\to S$，$P(S\mid F)$ 是误报 / 漏报率。
 6. 做决定：代入读数，对看不到的变量求和，算 $P(A\mid\text{readings})$，超过阈值就行动。
 7. 问 CPT 换成 logistic regression 的后果（2021 Q14(c)）：参数变少，但 log-odds 只能是父节点的线性函数，表示不了 XOR 式的交互，bias 更大。`),
       phrase(T`Nodes …; edges …, i.e. $P(\dots)=\prod_iP(x_i\mid\mathrm{pa}_i)$.
-One CPT per node: $2\times1$ for a Boolean root node, $2\times2^m$ for a Boolean node with $m$ Boolean parents.
-Perfect sensors make the CPT deterministic (all entries 0 or 1).
+One table per random variable. A Boolean root node: one row, the probability that it is True (False is one minus this). A Boolean node with $m$ Boolean parents: $2^m$ rows, one per parent configuration, with $m+1$ columns (the parents and the node).
+Perfect sensors make the CPT deterministic (all entries 0 or 1); they say nothing about the sensors' own tables.
 For a noisy sensor, add a latent true state $F$ with $F\to S$; $P(S\mid F)$ models false positives and negatives.
 To decide: observe the readings, marginalise the unobserved variables, compute $P(A=1\mid\text{readings})$ and act if it exceeds a threshold.`)],
       work: [past('T07', '2026 S2 practice Q6'), random('cpt', 'CPT 计数随机题')] },
